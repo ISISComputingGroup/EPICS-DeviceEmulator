@@ -41,12 +41,14 @@ class Tpg26xEmulator:
                 self.enquire = None
                 self.params = None
                 tokens = data.split(',')
+                if len(tokens) == 0:
+                    return None
                 if len(tokens) > 0:
                     self.enquire = tokens[0]
-                    return ENQ_SIGNAL
                 if len(tokens) > 1:
                     return self._set_value(tokens[1:])
-                return None
+                else:
+                    return ENQ_SIGNAL
 
         except (ValueError, TypeError) as ex:
             print "Exception thrown during emulation: {0}".format(ex)
