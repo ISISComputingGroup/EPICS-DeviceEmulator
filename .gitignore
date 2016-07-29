@@ -89,4 +89,4 @@ ENV/
 .ropeproject
 
 # Port files
-.port
+*.port
