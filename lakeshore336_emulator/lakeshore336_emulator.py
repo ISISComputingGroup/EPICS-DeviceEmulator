@@ -37,6 +37,14 @@ class LakeshoreOutput:
         self.temp_setpoint = 100.0
         self.ramp_on = True
         self.ramp_rate = 2.0
+        self.heater_range = 2
+        self.manual_output = 20.0
+        self.pid = (1.0, 2.0, 3.0)
+        self.output_mode = 1
+        self.control_input = 1
+        self.powerup_enabled = True
+        self.heater_output = 21.0
+        self.heater_status = 2
 
 
 class CalibrationCurve:
@@ -46,6 +54,10 @@ class CalibrationCurve:
         self.format = 1
         self.limit = 1000.0
         self.coeff = 2
+
+class NullCommand:
+    def execute_and_reply(self, data):
+        return None
 
 class GetIdCommand:
     def __init__(self, emulator):
@@ -146,6 +158,152 @@ class GetInputTypeCommand:
         return "%d,%d,%d,%d,%d" % (input.sensor_type, self._emu.bool_to_int(input.autorange_on), input.range, \
                                    self._emu.bool_to_int(input.compensation_on), input.units)
 
+class GetSetpointCommand:
+    def __init__(self, emulator):
+        self.id = "SETP?"
+        self._emu = emulator
+
+    def execute_and_reply(self, data):
+        return str(self._emu.get_target_output(data).temp_setpoint)
+
+class SetSetpointCommand:
+    def __init__(self, emulator):
+        self.id = "SETP"
+        self._emu = emulator
+
+    def execute_and_reply(self, data):
+        tokens = self._emu.get_set_tokens(data, self.id)
+        index = tokens[0]
+        new_temp = float(tokens[1])
+        self._emu.outputs[index].temp_setpoint = new_temp
+        return None
+
+class GetOutputRampCommand:
+    def __init__(self, emulator):
+        self.id = "RAMP?"
+        self._emu = emulator
+
+    def execute_and_reply(self, data):
+        output = self._emu.get_target_output(data)
+        return "%d,%f" % (output.ramp_on, output.ramp_rate)
+
+class SetOutputRampCommand:
+    def __init__(self, emulator):
+        self.id = "RAMP"
+        self._emu = emulator
+
+    def execute_and_reply(self, data):
+        tokens = self._emu.get_set_tokens(data, self.id)
+        index = tokens[0]
+        ramp_on = self._emu.int_to_bool(int(tokens[1]))
+        ramp_rate = float(tokens[2])
+        self._emu.outputs[index].ramp_on = ramp_on
+        self._emu.outputs[index].ramp_rate = ramp_rate
+        return None
+
+class GetHeaterRangeCommand:
+    def __init__(self, emulator):
+        self.id = "RANGE?"
+        self._emu = emulator
+
+    def execute_and_reply(self, data):
+        return str(self._emu.get_target_output(data).heater_range)
+
+class SetHeaterRangeCommand:
+    def __init__(self, emulator):
+        self.id = "RANGE"
+        self._emu = emulator
+
+    def execute_and_reply(self, data):
+        tokens = self._emu.get_set_tokens(data, self.id)
+        index = tokens[0]
+        range = int(tokens[1])
+        self._emu.outputs[index].heater_range = range
+        return None
+
+class GetManualOutputCommand:
+    def __init__(self, emulator):
+        self.id = "MOUT?"
+        self._emu = emulator
+
+    def execute_and_reply(self, data):
+        return str(self._emu.get_target_output(data).manual_output)
+
+class SetManualOutputCommand:
+    def __init__(self, emulator):
+        self.id = "MOUT"
+        self._emu = emulator
+
+    def execute_and_reply(self, data):
+        tokens = self._emu.get_set_tokens(data, self.id)
+        index = tokens[0]
+        output = float(tokens[1])
+        self._emu.outputs[index].manual_output = output
+        return None
+
+class GetPIDCommand:
+    def __init__(self, emulator):
+        self.id = "PID?"
+        self._emu = emulator
+
+    def execute_and_reply(self, data):
+        return "%f,%f,%f" % self._emu.get_target_output(data).pid
+
+class SetPIDCommand:
+    def __init__(self, emulator):
+        self.id = "PID"
+        self._emu = emulator
+
+    def execute_and_reply(self, data):
+        tokens = self._emu.get_set_tokens(data, self.id)
+        index = tokens[0]
+        self._emu.outputs[index].pid = tuple([float(t) for t in tokens[1:]])
+        return None
+
+class GetOutputModeCommand:
+    def __init__(self, emulator):
+        self.id = "OUTMODE?"
+        self._emu = emulator
+
+    def execute_and_reply(self, data):
+        output = self._emu.get_target_output(data)
+        return "%d,%d,%d" % (output.output_mode, output.control_input, self._emu.bool_to_int(output.powerup_enabled))
+
+class SetOutputModeCommand:
+    def __init__(self, emulator):
+        self.id = "OUTMODE"
+        self._emu = emulator
+
+    def execute_and_reply(self, data):
+        tokens = self._emu.get_set_tokens(data, self.id)
+        index = tokens[0]
+        output = self._emu.get_target_output(index)
+        (mode, ctr_input, powerup) = [int(t) for t in tokens[1:]]
+        output.output_mode = mode
+        output.control_input = ctr_input
+        output.powerup_enabled = self._emu.int_to_bool(powerup)
+        return None
+
+class GetHeaterOutputCommand:
+    def __init__(self, emulator):
+        self.id = "HTR?"
+        self._emu = emulator
+
+    def execute_and_reply(self, data):
+        return str(self._emu.get_target_output(data).heater_output)
+
+class GetHeaterStatusCommand:
+    def __init__(self, emulator):
+        self.id = "HTRST?"
+        self._emu = emulator
+
+    def execute_and_reply(self, data):
+        return str(self._emu.get_target_output(data).heater_status)
+
+class StartAutotuneCommand(NullCommand):
+    def __init__(self, emulator):
+        self.id = "ATUNE"
+
 
 class Lakeshore336Emulator:
     def __init__(self):#
@@ -184,6 +342,21 @@ class Lakeshore336Emulator:
         self.commands.append(GetInputCurveNumberCommand(self))
         self.commands.append(GetCurveHeaderCommand(self))
         self.commands.append(GetInputTypeCommand(self))
+        self.commands.append(GetSetpointCommand(self))
+        self.commands.append(SetSetpointCommand(self))
+        self.commands.append(GetOutputRampCommand(self))
+        self.commands.append(SetOutputRampCommand(self))
+        self.commands.append(GetHeaterRangeCommand(self))
+        self.commands.append(SetHeaterRangeCommand(self))
+        self.commands.append(GetManualOutputCommand(self))
+        self.commands.append(SetManualOutputCommand(self))
+        self.commands.append(GetPIDCommand(self))
+        self.commands.append(SetPIDCommand(self))
+        self.commands.append(GetOutputModeCommand(self))
+        self.commands.append(SetOutputModeCommand(self))
+        self.commands.append(GetHeaterOutputCommand(self))
+        self.commands.append(GetHeaterStatusCommand(self))
+        self.commands.append(StartAutotuneCommand(self))
 
     def process(self, data):
         msg = self._reply(data)
@@ -194,23 +367,18 @@ class Lakeshore336Emulator:
 
     def _reply(self, data):
         command_id = data.split()[0]
-        (command,) = [cmd for cmd in self.commands if cmd.id == command_id]
-        return command.execute_and_reply(data)
+        try:
+            (command,) = [cmd for cmd in self.commands if cmd.id == command_id]
+            return command.execute_and_reply(data)
+        except ValueError:
+            print "***\n*** Command \"%s\" not supported! ***\n***" % (data)
+            return None
 
-#    def _reply(self, data):
-#        if data.startswith("SETP?"):
-#            return str(self._get_target_output(data).temp_setpoint)
-#
-#        if data.startswith("SETP "):
-#            self._set_setpoint(data)
-#            return None
-#
-#        if data.startswith("RAMP?")
-#
-#        return None
-#
     def bool_to_int(self, bool):
         return 1 if bool else 0
+
+    def int_to_bool(self, value):
+        return value == 1
 
     def get_target_input(self, data):
         index = data[-1]
@@ -219,20 +387,13 @@ class Lakeshore336Emulator:
     def get_target_curve(self, data):
         index = data.split()[-1]
         return self.curves[index]
-#
-#    def _get_target_output(self, data):
-#        index = data[-1]
-#        return self.outputs[index]
-#
+
+    def get_target_output(self, data):
+        index = data[-1]
+        return self.outputs[index]
+
     def get_set_tokens(self, data, command):
         return data[len(command + " "):].split(",")
-#
-#
-#    def _set_setpoint(self, data):
-#        tokens = self._get_set_tokens(data, "SETP")
-#        index = tokens[0]
-#        new_temp = float(tokens[1])
-#        self.outputs[index].temp_setpoint = new_temp
 
 
 if __name__ == "__main__":
