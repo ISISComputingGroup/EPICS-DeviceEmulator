@@ -32,6 +32,13 @@ class LakeshoreInput:
         return return_value
 
 
+class LakeshoreOutput:
+    def __init__(self):
+        self.temp_setpoint = 100.0
+        self.ramp_on = True
+        self.ramp_rate = 2.0
+
+
 class CalibrationCurve:
     def __init__(self):
         self.name = "Emulator curve " # Must be 15 chars
@@ -40,19 +47,143 @@ class CalibrationCurve:
         self.limit = 1000.0
         self.coeff = 2
 
+class GetIdCommand:
+    def __init__(self, emulator):
+        self.id = "*IDN?"
+        self._emu = emulator
+
+    def execute_and_reply(self, data):
+        return "LSCI,%s" % (self._emu.id)
+
+class GetInputNameCommand:
+    def __init__(self, emulator):
+        self.id = "INNAME?"
+        self._emu = emulator
+
+    def execute_and_reply(self, data):
+        return self._emu.get_target_input(data).name
+
+class SetInputNameCommand:
+    def __init__(self, emulator):
+        self.id = "INNAME"
+        self._emu = emulator
+
+    def execute_and_reply(self, data):
+        tokens = self._emu.get_set_tokens(data, self.id)
+        index = tokens[0]
+        new_name = tokens[1].strip("\"")
+        self._emu.inputs[index].name = new_name
+        return None
+
+class GetInputTempCommand:
+    def __init__(self, emulator):
+        self.id = "KRDG?"
+        self._emu = emulator
+
+    def execute_and_reply(self, data):
+        return str(self._emu.get_target_input(data).get_temperature())
+
+class GetInputVoltageCommand:
+    def __init__(self, emulator):
+        self.id = "SRDG?"
+        self._emu = emulator
+
+    def execute_and_reply(self, data):
+        return str(self._emu.get_target_input(data).raw_voltage)
+
+class GetAlarmStatusCommand:
+    def __init__(self, emulator):
+        self.id = "ALARMST?"
+        self._emu = emulator
+
+    def execute_and_reply(self, data):
+        input = self._emu.get_target_input(data)
+        return "%d,%d" % (self._emu.bool_to_int(input.has_high_alarm), self._emu.bool_to_int(input.has_low_alarm))
+
+class GetAlarmSettingsCommand:
+    def __init__(self, emulator):
+        self.id = "ALARM?"
+        self._emu = emulator
+
+    def execute_and_reply(self, data):
+        input = self._emu.get_target_input(data)
+        return "%d,%f,%f,%f,%d,%d,%d" % (input.alarm_enabled, input.alarm_high_setpoint, input.alarm_low_setpoint, \
+                                         input.alarm_deadband, input.alarm_latching, input.alarm_audible, \
+                                         input.alarm_visible)
+
+class GetReadingStatusCommand:
+    def __init__(self, emulator):
+        self.id = "RDGST?"
+        self._emu = emulator
+
+    def execute_and_reply(self, data):
+        return str(self._emu.get_target_input(data).reading_status)
+
+class GetInputCurveNumberCommand:
+    def __init__(self, emulator):
+        self.id = "INCRV?"
+        self._emu = emulator
+
+    def execute_and_reply(self, data):
+        return str(self._emu.get_target_input(data).curve_number)
+
+class GetCurveHeaderCommand:
+    def __init__(self, emulator):
+        self.id = "CRVHDR?"
+        self._emu = emulator
+
+    def execute_and_reply(self, data):
+        curve = self._emu.get_target_curve(data)
+        return "%s,%s,%d,%f,%d" % (curve.name, curve.serial, curve.format, curve.limit, curve.coeff)
+
+class GetInputTypeCommand:
+    def __init__(self, emulator):
+        self.id = "INTYPE?"
+        self._emu = emulator
+
+    def execute_and_reply(self, data):
+        input = self._emu.get_target_input(data)
+        return "%d,%d,%d,%d,%d" % (input.sensor_type, self._emu.bool_to_int(input.autorange_on), input.range, \
+                                   self._emu.bool_to_int(input.compensation_on), input.units)
+
 
 class Lakeshore336Emulator:
-    def __init__(self):
+    def __init__(self):#
         self.id = "EmulatedDevice"
+        self._populate_inputs()
+        self._populate_curves()
+        self._populate_outputs()
+        self._populate_commands()
 
+    def _populate_inputs(self):
         self.inputs = dict()
         self.inputs["A"] = LakeshoreInput()
         self.inputs["B"] = LakeshoreInput()
         self.inputs["C"] = LakeshoreInput()
         self.inputs["D"] = LakeshoreInput()
 
+    def _populate_outputs(self):
+        self.outputs = dict()
+        self.outputs["1"] = LakeshoreOutput()
+        self.outputs["2"] = LakeshoreOutput()
+
+    def _populate_curves(self):
         self.curves = dict()
         self.curves["15"] = CalibrationCurve()
+
+    def _populate_commands(self):
+        self.commands = list()
+        self.commands.append(GetIdCommand(self))
+        self.commands.append(GetInputNameCommand(self))
+        self.commands.append(SetInputNameCommand(self))
+        self.commands.append(GetInputTempCommand(self))
+        self.commands.append(GetInputVoltageCommand(self))
+        self.commands.append(GetAlarmStatusCommand(self))
+        self.commands.append(GetAlarmSettingsCommand(self))
+        self.commands.append(GetReadingStatusCommand(self))
+        self.commands.append(GetInputCurveNumberCommand(self))
+        self.commands.append(GetCurveHeaderCommand(self))
+        self.commands.append(GetInputTypeCommand(self))
 
     def process(self, data):
         msg = self._reply(data)
@@ -62,78 +193,47 @@ class Lakeshore336Emulator:
         return None
 
     def _reply(self, data):
-        if data == "*IDN?":
-            return "LSCI,%s" % (self.id)
+        command_id = data.split()[0]
+        (command,) = [cmd for cmd in self.commands if cmd.id == command_id]
+        return command.execute_and_reply(data)
 
-        if data.startswith("INNAME?"):
-            return self._get_target_input(data).name
-
-        if data.startswith("INNAME"):
-            self._set_input_name(data)
-            return None
-
-        if data.startswith("KRDG?"):
-            return str(self._get_target_input(data).get_temperature())
-
-        if data.startswith("SRDG?"):
-            return str(self._get_target_input(data).raw_voltage)
-
-        if data.startswith("ALARMST?"):
-            return self._get_alarm_status(data)
-
-        if data.startswith("ALARM?"):
-            return self._get_alarm_settings(data)
-
-        if data.startswith("RDGST?"):
-            return str(self._get_target_input(data).reading_status)
-
-        if data.startswith("INCRV?"):
-            index = data[-1]
-            return str(self.inputs[index].curve_number)
-
-        if data.startswith("CRVHDR?"):
-            return self._get_curve_header(data)
-
-        if data.startswith("INTYPE?"):
-            return self._get_input_type(data)
-
-        return None
-
-    def _bool_to_int(self, bool):
+#    def _reply(self, data):
+#        if data.startswith("SETP?"):
+#            return str(self._get_target_output(data).temp_setpoint)
+#
+#        if data.startswith("SETP "):
+#            self._set_setpoint(data)
+#            return None
+#
+#        if data.startswith("RAMP?")
+#
+#        return None
+#
+    def bool_to_int(self, bool):
         return 1 if bool else 0
 
-    def _get_target_input(self, data):
+    def get_target_input(self, data):
         index = data[-1]
         return self.inputs[index]
 
-    def _get_target_curve(self, data):
+    def get_target_curve(self, data):
         index = data.split()[-1]
         return self.curves[index]
+#
+#    def _get_target_output(self, data):
+#        index = data[-1]
+#        return self.outputs[index]
+#
+    def get_set_tokens(self, data, command):
+        return data[len(command + " "):].split(",")
+#
+#
+#    def _set_setpoint(self, data):
+#        tokens = self._get_set_tokens(data, "SETP")
+#        index = tokens[0]
+#        new_temp = float(tokens[1])
+#        self.outputs[index].temp_setpoint = new_temp
 
-    def _set_input_name(self, data):
-        tokens = data[len("INNAME "):].split(",")
-        index = tokens[0]
-        new_name = tokens[1].strip("\"")
-        self.inputs[index].name = new_name
-
-    def _get_alarm_status(self, data):
-        input = self._get_target_input(data)
-        return "%d,%d" % (self._bool_to_int(input.has_high_alarm), self._bool_to_int(input.has_low_alarm))
-
-    def _get_alarm_settings(self, data):
-        input = self._get_target_input(data)
-        return "%d,%f,%f,%f,%d,%d,%d" % (input.alarm_enabled, input.alarm_high_setpoint, input.alarm_low_setpoint, \
-                                         input.alarm_deadband, input.alarm_latching, input.alarm_audible, \
-                                         input.alarm_visible)
-
-    def _get_curve_header(self, data):
-        curve = self._get_target_curve(data)
-        return "%s,%s,%d,%f,%d" % (curve.name, curve.serial, curve.format, curve.limit, curve.coeff)
-
-    def _get_input_type(self, data):
-        input = self._get_target_input(data)
-        return "%d,%d,%d,%d,%d" % (input.sensor_type, self._bool_to_int(input.autorange_on), input.range, \
-                                   self._bool_to_int(input.compensation_on), input.units)
 
 if __name__ == "__main__":
     port_file = __file__
