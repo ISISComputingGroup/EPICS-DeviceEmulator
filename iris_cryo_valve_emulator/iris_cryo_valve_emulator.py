@@ -7,6 +7,7 @@ class CryValveEmulator:
 	
 	CLOSED = "CLOSED"
 	OPEN = "OPEN"
+	TERMINATOR = "\r"
 	
 	def __init__(self):
 		self.state = CryValveEmulator.CLOSED
@@ -14,14 +15,14 @@ class CryValveEmulator:
 	def process(self, data):
 		if data == 'CLOSE':
 			self.state = CryValveEmulator.CLOSED
-			return ""
+			return CryValveEmulator.TERMINATOR
 			
 		if data == 'OPEN':
 			self.state = CryValveEmulator.OPEN
-			return ""
+			return CryValveEmulator.TERMINATOR
 			
 		if data == '?':
-			return "SOLENOID " + self.state
+			return "SOLENOID " + self.state + CryValveEmulator.TERMINATOR
 		
 		return None
 		
