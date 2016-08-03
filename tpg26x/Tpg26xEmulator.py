@@ -1,10 +1,10 @@
 import sys
-from telnet_engine import TelnetEngine, ENQ_SIGNAL, ACK_SIGNAL, NAK_SIGNAL
+sys.path.append("..")
+
+from test_framework.telnet_engine import ENQ_SIGNAL, ACK_SIGNAL, NAK_SIGNAL, TelnetEngine
 
 """Prefix for command sent to emulator to change the state of the emulator"""
 EMULATOR_COMMAND_PREFIX = "emulator:"
-
-sys.path.append("../test_framework")
 
 
 class Tpg26xEmulator:
@@ -35,7 +35,7 @@ class Tpg26xEmulator:
         try:
             if data.startswith(EMULATOR_COMMAND_PREFIX):
                 return self._do_emulator_command(data[len(EMULATOR_COMMAND_PREFIX):])
-            elif data == chr(5):
+            elif data == ENQ_SIGNAL:
                 return self._make_enquiry()
             else:
                 self.enquire = None
@@ -48,10 +48,11 @@ class Tpg26xEmulator:
                 if len(tokens) > 1:
                     return self._set_value(tokens[1:])
                 else:
-                    return ENQ_SIGNAL
+                    return ACK_SIGNAL
 
         except (ValueError, TypeError) as ex:
             print "Exception thrown during emulation: {0}".format(ex)
+            return NAK_SIGNAL
 
     def _do_emulator_command(self, command):
         """
