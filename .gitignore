@@ -87,6 +87,5 @@ ENV/
 
 # Rope project settings
 .ropeproject
-
-# Port files
+*.pid
 *.port
