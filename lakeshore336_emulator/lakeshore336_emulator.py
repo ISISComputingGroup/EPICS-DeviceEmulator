@@ -55,287 +55,323 @@ class CalibrationCurve(object):
         self.limit = 1000.0
         self.coeff = 2
 
+class LakeshoreModel(object):
+    def __init__(self):
+        self.id = "EmulatedDevice"
+        self._populate_inputs()
+        self._populate_curves()
+        self._populate_outputs()
+
+    def _populate_inputs(self):
+        self._inputs = dict()
+        self._inputs["A"] = LakeshoreInput()
+        self._inputs["B"] = LakeshoreInput()
+        self._inputs["C"] = LakeshoreInput()
+        self._inputs["D"] = LakeshoreInput()
+
+    def _populate_outputs(self):
+        self._outputs = dict()
+        self._outputs["1"] = LakeshoreOutput()
+        self._outputs["2"] = LakeshoreOutput()
+
+    def _populate_curves(self):
+        self._curves = dict()
+        self._curves["15"] = CalibrationCurve()
+
+    def get_input(self, input_key):
+        return self._inputs[input_key]
+
+    def get_output(self, output_key):
+        return self._outputs[output_key]
+
+    def get_curve(self, curve_key):
+        return self._curves[curve_key]
+
+
 class Command(object):
-    def __init__(self, emulator, id):
-        self._emu = emulator
+    def __init__(self, model, id):
+        self._model = model
         self.id = id
 
     def execute_and_reply(self, data):
         return None
 
+    def _get_target_input(self, data):
+        index = data[-1]
+        return self._model.get_input(index)
+
+    def _get_target_output(self, data):
+        index = data[-1]
+        return self._model.get_output(index)
+
+    def _get_target_curve(self, data):
+        index = data.split()[-1]
+        return self._model.get_curve(index)
+
+    def _get_set_tokens(self, data):
+        return data[len(self.id + " "):].split(",")
+
+    def _bool_to_int(self, bool):
+        return 1 if bool else 0
+
+    def _int_to_bool(self, value):
+        return value == 1
+
+
 class GetIdCommand(Command):
-    def __init__(self, emulator):
-        super(GetIdCommand, self).__init__(emulator, "*IDN?")
+    def __init__(self, model):
+        super(GetIdCommand, self).__init__(model, "*IDN?")
 
     def execute_and_reply(self, data):
-        return "LSCI,%s" % (self._emu.id)
+        return "LSCI,%s" % (self._model.id)
 
 class GetInputNameCommand(Command):
-    def __init__(self, emulator):
-        super(GetInputNameCommand, self).__init__(emulator, "INNAME?")
+    def __init__(self, model):
+        super(GetInputNameCommand, self).__init__(model, "INNAME?")
 
     def execute_and_reply(self, data):
-        return self._emu.get_target_input(data).name
+        return self._get_target_input(data).name
 
 class SetInputNameCommand(Command):
-    def __init__(self, emulator):
-        super(SetInputNameCommand, self).__init__(emulator, "INNAME")
+    def __init__(self, model):
+        super(SetInputNameCommand, self).__init__(model, "INNAME")
 
     def execute_and_reply(self, data):
-        tokens = self._emu.get_set_tokens(data, self.id)
+        tokens = self._get_set_tokens(data)
         index = tokens[0]
         new_name = tokens[1].strip("\"")
-        self._emu.inputs[index].name = new_name
+        self._model.get_input(index).name = new_name
         return None
 
 class GetInputTempCommand(Command):
-    def __init__(self, emulator):
-        super(GetInputTempCommand, self).__init__(emulator, "KRDG?")
+    def __init__(self, model):
+        super(GetInputTempCommand, self).__init__(model, "KRDG?")
 
     def execute_and_reply(self, data):
-        return str(self._emu.get_target_input(data).get_temperature())
+        return str(self._get_target_input(data).get_temperature())
 
 class GetInputVoltageCommand(Command):
-    def __init__(self, emulator):
-        super(GetInputVoltageCommand, self).__init__(emulator, "SRDG?")
+    def __init__(self, model):
+        super(GetInputVoltageCommand, self).__init__(model, "SRDG?")
 
     def execute_and_reply(self, data):
-        return str(self._emu.get_target_input(data).raw_voltage)
+        return str(self._get_target_input(data).raw_voltage)
 
 class GetAlarmStatusCommand(Command):
-    def __init__(self, emulator):
-        super(GetAlarmStatusCommand, self).__init__(emulator, "ALARMST?")
+    def __init__(self, model):
+        super(GetAlarmStatusCommand, self).__init__(model, "ALARMST?")
 
     def execute_and_reply(self, data):
-        input = self._emu.get_target_input(data)
-        return "%d,%d" % (self._emu.bool_to_int(input.has_high_alarm), self._emu.bool_to_int(input.has_low_alarm))
+        input = self._get_target_input(data)
+        return "%d,%d" % (self._bool_to_int(input.has_high_alarm), self._bool_to_int(input.has_low_alarm))
 
 class GetAlarmSettingsCommand(Command):
-    def __init__(self, emulator):
-        super(GetAlarmSettingsCommand, self).__init__(emulator, "ALARM?")
+    def __init__(self, model):
+        super(GetAlarmSettingsCommand, self).__init__(model, "ALARM?")
 
     def execute_and_reply(self, data):
-        input = self._emu.get_target_input(data)
+        input = self._get_target_input(data)
         return "%d,%f,%f,%f,%d,%d,%d" % (input.alarm_enabled, input.alarm_high_setpoint, input.alarm_low_setpoint, \
                                          input.alarm_deadband, input.alarm_latching, input.alarm_audible, \
                                          input.alarm_visible)
 
 class GetReadingStatusCommand(Command):
-    def __init__(self, emulator):
-        super(GetReadingStatusCommand, self).__init__(emulator, "RDGST?")
+    def __init__(self, model):
+        super(GetReadingStatusCommand, self).__init__(model, "RDGST?")
 
     def execute_and_reply(self, data):
-        return str(self._emu.get_target_input(data).reading_status)
+        return str(self._get_target_input(data).reading_status)
 
 class GetInputCurveNumberCommand(Command):
-    def __init__(self, emulator):
-        super(GetInputCurveNumberCommand, self).__init__(emulator, "INCRV?")
+    def __init__(self, model):
+        super(GetInputCurveNumberCommand, self).__init__(model, "INCRV?")
 
     def execute_and_reply(self, data):
-        return str(self._emu.get_target_input(data).curve_number)
+        return str(self._get_target_input(data).curve_number)
 
 class GetCurveHeaderCommand(Command):
-    def __init__(self, emulator):
-        super(GetCurveHeaderCommand, self).__init__(emulator, "CRVHDR?")
+    def __init__(self, model):
+        super(GetCurveHeaderCommand, self).__init__(model, "CRVHDR?")
 
     def execute_and_reply(self, data):
-        curve = self._emu.get_target_curve(data)
+        curve = self._get_target_curve(data)
         return "%s,%s,%d,%f,%d" % (curve.name, curve.serial, curve.format, curve.limit, curve.coeff)
 
 class GetInputTypeCommand(Command):
-    def __init__(self, emulator):
-        super(GetInputTypeCommand, self).__init__(emulator, "INTYPE?")
+    def __init__(self, model):
+        super(GetInputTypeCommand, self).__init__(model, "INTYPE?")
 
     def execute_and_reply(self, data):
-        input = self._emu.get_target_input(data)
-        return "%d,%d,%d,%d,%d" % (input.sensor_type, self._emu.bool_to_int(input.autorange_on), input.range, \
-                                   self._emu.bool_to_int(input.compensation_on), input.units)
+        input = self._get_target_input(data)
+        return "%d,%d,%d,%d,%d" % (input.sensor_type, self._bool_to_int(input.autorange_on), input.range, \
+                                   self._bool_to_int(input.compensation_on), input.units)
 
 class GetSetpointCommand(Command):
-    def __init__(self, emulator):
-        super(GetSetpointCommand, self).__init__(emulator, "SETP?")
+    def __init__(self, model):
+        super(GetSetpointCommand, self).__init__(model, "SETP?")
 
     def execute_and_reply(self, data):
-        return str(self._emu.get_target_output(data).temp_setpoint)
+        return str(self._get_target_output(data).temp_setpoint)
 
 class SetSetpointCommand(Command):
-    def __init__(self, emulator):
-        super(SetSetpointCommand, self).__init__(emulator, "SETP")
+    def __init__(self, model):
+        super(SetSetpointCommand, self).__init__(model, "SETP")
 
     def execute_and_reply(self, data):
-        tokens = self._emu.get_set_tokens(data, self.id)
+        tokens = self._get_set_tokens(data)
         index = tokens[0]
         new_temp = float(tokens[1])
-        self._emu.outputs[index].temp_setpoint = new_temp
+        self._model.get_output(index).temp_setpoint = new_temp
         return None
 
 class GetOutputRampCommand(Command):
-    def __init__(self, emulator):
-        super(GetOutputRampCommand, self).__init__(emulator, "RAMP?")
+    def __init__(self, model):
+        super(GetOutputRampCommand, self).__init__(model, "RAMP?")
 
     def execute_and_reply(self, data):
-        output = self._emu.get_target_output(data)
+        output = self._get_target_output(data)
         return "%d,%f" % (output.ramp_on, output.ramp_rate)
 
 class SetOutputRampCommand(Command):
-    def __init__(self, emulator):
-        super(SetOutputRampCommand, self).__init__(emulator, "RAMP")
+    def __init__(self, model):
+        super(SetOutputRampCommand, self).__init__(model, "RAMP")
 
     def execute_and_reply(self, data):
-        tokens = self._emu.get_set_tokens(data, self.id)
+        tokens = self._get_set_tokens(data)
         index = tokens[0]
-        ramp_on = self._emu.int_to_bool(int(tokens[1]))
+        ramp_on = self._int_to_bool(int(tokens[1]))
         ramp_rate = float(tokens[2])
-        self._emu.outputs[index].ramp_on = ramp_on
-        self._emu.outputs[index].ramp_rate = ramp_rate
+        self._model.get_output(index).ramp_on = ramp_on
+        self._model.get_output(index).ramp_rate = ramp_rate
         return None
 
 class GetHeaterRangeCommand(Command):
-    def __init__(self, emulator):
-        super(GetHeaterRangeCommand, self).__init__(emulator, "RANGE?")
+    def __init__(self, model):
+        super(GetHeaterRangeCommand, self).__init__(model, "RANGE?")
 
     def execute_and_reply(self, data):
-        return str(self._emu.get_target_output(data).heater_range)
+        return str(self._get_target_output(data).heater_range)
 
 class SetHeaterRangeCommand(Command):
-    def __init__(self, emulator):
-        super(SetHeaterRangeCommand, self).__init__(emulator, "RANGE")
+    def __init__(self, model):
+        super(SetHeaterRangeCommand, self).__init__(model, "RANGE")
 
     def execute_and_reply(self, data):
-        tokens = self._emu.get_set_tokens(data, self.id)
+        tokens = self._get_set_tokens(data)
         index = tokens[0]
         range = int(tokens[1])
-        self._emu.outputs[index].heater_range = range
+        self._model.get_output(index).heater_range = range
         return None
 
 class GetManualOutputCommand(Command):
-    def __init__(self, emulator):
-        super(GetManualOutputCommand, self).__init__(emulator, "MOUT?")
+    def __init__(self, model):
+        super(GetManualOutputCommand, self).__init__(model, "MOUT?")
 
     def execute_and_reply(self, data):
-        return str(self._emu.get_target_output(data).manual_output)
+        return str(self._get_target_output(data).manual_output)
 
 class SetManualOutputCommand(Command):
-    def __init__(self, emulator):
-        super(SetManualOutputCommand, self).__init__(emulator, "MOUT")
+    def __init__(self, model):
+        super(SetManualOutputCommand, self).__init__(model, "MOUT")
 
     def execute_and_reply(self, data):
-        tokens = self._emu.get_set_tokens(data, self.id)
+        tokens = self._get_set_tokens(data)
         index = tokens[0]
-        output = float(tokens[1])
-        self._emu.outputs[index].manual_output = output
+        man_output = float(tokens[1])
+        self._model.get_output(index).manual_output = man_output
         return None
 
 class GetPIDCommand(Command):
-    def __init__(self, emulator):
-        super(GetPIDCommand, self).__init__(emulator, "PID?")
+    def __init__(self, model):
+        super(GetPIDCommand, self).__init__(model, "PID?")
 
     def execute_and_reply(self, data):
-        return "%f,%f,%f" % self._emu.get_target_output(data).pid
+        return "%f,%f,%f" % self._get_target_output(data).pid
 
 class SetPIDCommand(Command):
-    def __init__(self, emulator):
-        super(SetPIDCommand, self).__init__(emulator, "PID")
+    def __init__(self, model):
+        super(SetPIDCommand, self).__init__(model, "PID")
 
     def execute_and_reply(self, data):
-        tokens = self._emu.get_set_tokens(data, self.id)
+        tokens = self._get_set_tokens(data)
         index = tokens[0]
-        self._emu.outputs[index].pid = tuple([float(t) for t in tokens[1:]])
+        self._model.get_output(index).pid = tuple([float(t) for t in tokens[1:]])
         return None
 
 class GetOutputModeCommand(Command):
-    def __init__(self, emulator):
-        super(GetOutputModeCommand, self).__init__(emulator, "OUTMODE?")
+    def __init__(self, model):
+        super(GetOutputModeCommand, self).__init__(model, "OUTMODE?")
 
     def execute_and_reply(self, data):
-        output = self._emu.get_target_output(data)
-        return "%d,%d,%d" % (output.output_mode, output.control_input, self._emu.bool_to_int(output.powerup_enabled))
+        output = self._get_target_output(data)
+        return "%d,%d,%d" % (output.output_mode, output.control_input, self._bool_to_int(output.powerup_enabled))
 
 class SetOutputModeCommand(Command):
-    def __init__(self, emulator):
-        super(SetOutputModeCommand, self).__init__(emulator, "OUTMODE")
+    def __init__(self, model):
+        super(SetOutputModeCommand, self).__init__(model, "OUTMODE")
 
     def execute_and_reply(self, data):
-        tokens = self._emu.get_set_tokens(data, self.id)
+        tokens = self._get_set_tokens(data)
         index = tokens[0]
-        output = self._emu.get_target_output(index)
+        output = self._get_target_output(index)
         (mode, ctr_input, powerup) = [int(t) for t in tokens[1:]]
         output.output_mode = mode
         output.control_input = ctr_input
-        output.powerup_enabled = self._emu.int_to_bool(powerup)
+        output.powerup_enabled = self._int_to_bool(powerup)
         return None
 
 class GetHeaterOutputCommand(Command):
-    def __init__(self, emulator):
-        super(GetHeaterOutputCommand, self).__init__(emulator, "HTR?")
+    def __init__(self, model):
+        super(GetHeaterOutputCommand, self).__init__(model, "HTR?")
 
     def execute_and_reply(self, data):
-        return str(self._emu.get_target_output(data).heater_output)
+        return str(self._get_target_output(data).heater_output)
 
 class GetHeaterStatusCommand(Command):
-    def __init__(self, emulator):
-        super(GetHeaterStatusCommand, self).__init__(emulator, "HTRST?")
+    def __init__(self, model):
+        super(GetHeaterStatusCommand, self).__init__(model, "HTRST?")
 
     def execute_and_reply(self, data):
-        return str(self._emu.get_target_output(data).heater_status)
+        return str(self._get_target_output(data).heater_status)
 
 class StartAutotuneCommand(Command):
-    def __init__(self, emulator):
-        super(StartAutotuneCommand, self).__init__(emulator, "ATUNE")
+    def __init__(self, model):
+        super(StartAutotuneCommand, self).__init__(model, "ATUNE")
 
 
 class Lakeshore336Emulator(object):
-    def __init__(self):#
-        self.id = "EmulatedDevice"
-        self._populate_inputs()
-        self._populate_curves()
-        self._populate_outputs()
+    def __init__(self):
+        self._model = LakeshoreModel()
         self._populate_commands()
-
-    def _populate_inputs(self):
-        self.inputs = dict()
-        self.inputs["A"] = LakeshoreInput()
-        self.inputs["B"] = LakeshoreInput()
-        self.inputs["C"] = LakeshoreInput()
-        self.inputs["D"] = LakeshoreInput()
-
-    def _populate_outputs(self):
-        self.outputs = dict()
-        self.outputs["1"] = LakeshoreOutput()
-        self.outputs["2"] = LakeshoreOutput()
-
-    def _populate_curves(self):
-        self.curves = dict()
-        self.curves["15"] = CalibrationCurve()
 
     def _populate_commands(self):
         self.commands = list()
-        self.commands.append(GetIdCommand(self))
-        self.commands.append(GetInputNameCommand(self))
-        self.commands.append(SetInputNameCommand(self))
-        self.commands.append(GetInputTempCommand(self))
-        self.commands.append(GetInputVoltageCommand(self))
-        self.commands.append(GetAlarmStatusCommand(self))
-        self.commands.append(GetAlarmSettingsCommand(self))
-        self.commands.append(GetReadingStatusCommand(self))
-        self.commands.append(GetInputCurveNumberCommand(self))
-        self.commands.append(GetCurveHeaderCommand(self))
-        self.commands.append(GetInputTypeCommand(self))
-        self.commands.append(GetSetpointCommand(self))
-        self.commands.append(SetSetpointCommand(self))
-        self.commands.append(GetOutputRampCommand(self))
-        self.commands.append(SetOutputRampCommand(self))
-        self.commands.append(GetHeaterRangeCommand(self))
-        self.commands.append(SetHeaterRangeCommand(self))
-        self.commands.append(GetManualOutputCommand(self))
-        self.commands.append(SetManualOutputCommand(self))
-        self.commands.append(GetPIDCommand(self))
-        self.commands.append(SetPIDCommand(self))
-        self.commands.append(GetOutputModeCommand(self))
-        self.commands.append(SetOutputModeCommand(self))
-        self.commands.append(GetHeaterOutputCommand(self))
-        self.commands.append(GetHeaterStatusCommand(self))
-        self.commands.append(StartAutotuneCommand(self))
+        self.commands.append(GetIdCommand(self._model))
+        self.commands.append(GetInputNameCommand(self._model))
+        self.commands.append(SetInputNameCommand(self._model))
+        self.commands.append(GetInputTempCommand(self._model))
+        self.commands.append(GetInputVoltageCommand(self._model))
+        self.commands.append(GetAlarmStatusCommand(self._model))
+        self.commands.append(GetAlarmSettingsCommand(self._model))
+        self.commands.append(GetReadingStatusCommand(self._model))
+        self.commands.append(GetInputCurveNumberCommand(self._model))
+        self.commands.append(GetCurveHeaderCommand(self._model))
+        self.commands.append(GetInputTypeCommand(self._model))
+        self.commands.append(GetSetpointCommand(self._model))
+        self.commands.append(SetSetpointCommand(self._model))
+        self.commands.append(GetOutputRampCommand(self._model))
+        self.commands.append(SetOutputRampCommand(self._model))
+        self.commands.append(GetHeaterRangeCommand(self._model))
+        self.commands.append(SetHeaterRangeCommand(self._model))
+        self.commands.append(GetManualOutputCommand(self._model))
+        self.commands.append(SetManualOutputCommand(self._model))
+        self.commands.append(GetPIDCommand(self._model))
+        self.commands.append(SetPIDCommand(self._model))
+        self.commands.append(GetOutputModeCommand(self._model))
+        self.commands.append(SetOutputModeCommand(self._model))
+        self.commands.append(GetHeaterOutputCommand(self._model))
+        self.commands.append(GetHeaterStatusCommand(self._model))
+        self.commands.append(StartAutotuneCommand(self._model))
 
     def process(self, data):
         msg = self._reply(data)
@@ -352,27 +388,6 @@ class Lakeshore336Emulator(object):
         except ValueError:
             print "***\n*** Command \"%s\" not supported! ***\n***" % (data)
             return None
-
-    def bool_to_int(self, bool):
-        return 1 if bool else 0
-
-    def int_to_bool(self, value):
-        return value == 1
-
-    def get_target_input(self, data):
-        index = data[-1]
-        return self.inputs[index]
-
-    def get_target_curve(self, data):
-        index = data.split()[-1]
-        return self.curves[index]
-
-    def get_target_output(self, data):
-        index = data[-1]
-        return self.outputs[index]
-
-    def get_set_tokens(self, data, command):
-        return data[len(command + " "):].split(",")
 
 
 if __name__ == "__main__":
