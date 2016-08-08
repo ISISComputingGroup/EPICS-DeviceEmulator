@@ -3,7 +3,7 @@ sys.path.append("../test_framework")
 
 from telnet_engine import TelnetEngine
 
-class LakeshoreInput:
+class LakeshoreInput(object):
     def __init__(self):
         self.name = "Default Name"
         self._temperature = 0.0
@@ -32,7 +32,7 @@ class LakeshoreInput:
         return return_value
 
 
-class LakeshoreOutput:
+class LakeshoreOutput(object):
     def __init__(self):
         self.temp_setpoint = 100.0
         self.ramp_on = True
@@ -47,7 +47,7 @@ class LakeshoreOutput:
         self.heater_status = 2
 
 
-class CalibrationCurve:
+class CalibrationCurve(object):
     def __init__(self):
         self.name = "Emulator curve " # Must be 15 chars
         self.serial = "0123456789" # Must be 10 chars
@@ -55,30 +55,31 @@ class CalibrationCurve:
         self.limit = 1000.0
         self.coeff = 2
 
-class NullCommand:
+class Command(object):
+    def __init__(self, emulator, id):
+        self._emu = emulator
+        self.id = id
+
     def execute_and_reply(self, data):
         return None
 
-class GetIdCommand:
+class GetIdCommand(Command):
     def __init__(self, emulator):
-        self.id = "*IDN?"
-        self._emu = emulator
+        super(GetIdCommand, self).__init__(emulator, "*IDN?")
 
     def execute_and_reply(self, data):
         return "LSCI,%s" % (self._emu.id)
 
-class GetInputNameCommand:
+class GetInputNameCommand(Command):
     def __init__(self, emulator):
-        self.id = "INNAME?"
-        self._emu = emulator
+        super(GetInputNameCommand, self).__init__(emulator, "INNAME?")
 
     def execute_and_reply(self, data):
         return self._emu.get_target_input(data).name
 
-class SetInputNameCommand:
+class SetInputNameCommand(Command):
     def __init__(self, emulator):
-        self.id = "INNAME"
-        self._emu = emulator
+        super(SetInputNameCommand, self).__init__(emulator, "INNAME")
 
     def execute_and_reply(self, data):
         tokens = self._emu.get_set_tokens(data, self.id)
@@ -87,35 +88,31 @@ class SetInputNameCommand:
         self._emu.inputs[index].name = new_name
         return None
 
-class GetInputTempCommand:
+class GetInputTempCommand(Command):
     def __init__(self, emulator):
-        self.id = "KRDG?"
-        self._emu = emulator
+        super(GetInputTempCommand, self).__init__(emulator, "KRDG?")
 
     def execute_and_reply(self, data):
         return str(self._emu.get_target_input(data).get_temperature())
 
-class GetInputVoltageCommand:
+class GetInputVoltageCommand(Command):
     def __init__(self, emulator):
-        self.id = "SRDG?"
-        self._emu = emulator
+        super(GetInputVoltageCommand, self).__init__(emulator, "SRDG?")
 
     def execute_and_reply(self, data):
         return str(self._emu.get_target_input(data).raw_voltage)
 
-class GetAlarmStatusCommand:
+class GetAlarmStatusCommand(Command):
     def __init__(self, emulator):
-        self.id = "ALARMST?"
-        self._emu = emulator
+        super(GetAlarmStatusCommand, self).__init__(emulator, "ALARMST?")
 
     def execute_and_reply(self, data):
         input = self._emu.get_target_input(data)
         return "%d,%d" % (self._emu.bool_to_int(input.has_high_alarm), self._emu.bool_to_int(input.has_low_alarm))
 
-class GetAlarmSettingsCommand:
+class GetAlarmSettingsCommand(Command):
     def __init__(self, emulator):
-        self.id = "ALARM?"
-        self._emu = emulator
+        super(GetAlarmSettingsCommand, self).__init__(emulator, "ALARM?")
 
     def execute_and_reply(self, data):
         input = self._emu.get_target_input(data)
@@ -123,53 +120,47 @@ class GetAlarmSettingsCommand:
                                          input.alarm_deadband, input.alarm_latching, input.alarm_audible, \
                                          input.alarm_visible)
 
-class GetReadingStatusCommand:
+class GetReadingStatusCommand(Command):
     def __init__(self, emulator):
-        self.id = "RDGST?"
-        self._emu = emulator
+        super(GetReadingStatusCommand, self).__init__(emulator, "RDGST?")
 
     def execute_and_reply(self, data):
         return str(self._emu.get_target_input(data).reading_status)
 
-class GetInputCurveNumberCommand:
+class GetInputCurveNumberCommand(Command):
     def __init__(self, emulator):
-        self.id = "INCRV?"
-        self._emu = emulator
+        super(GetInputCurveNumberCommand, self).__init__(emulator, "INCRV?")
 
     def execute_and_reply(self, data):
         return str(self._emu.get_target_input(data).curve_number)
 
-class GetCurveHeaderCommand:
+class GetCurveHeaderCommand(Command):
     def __init__(self, emulator):
-        self.id = "CRVHDR?"
-        self._emu = emulator
+        super(GetCurveHeaderCommand, self).__init__(emulator, "CRVHDR?")
 
     def execute_and_reply(self, data):
         curve = self._emu.get_target_curve(data)
         return "%s,%s,%d,%f,%d" % (curve.name, curve.serial, curve.format, curve.limit, curve.coeff)
 
-class GetInputTypeCommand:
+class GetInputTypeCommand(Command):
     def __init__(self, emulator):
-        self.id = "INTYPE?"
-        self._emu = emulator
+        super(GetInputTypeCommand, self).__init__(emulator, "INTYPE?")
 
     def execute_and_reply(self, data):
         input = self._emu.get_target_input(data)
         return "%d,%d,%d,%d,%d" % (input.sensor_type, self._emu.bool_to_int(input.autorange_on), input.range, \
                                    self._emu.bool_to_int(input.compensation_on), input.units)
 
-class GetSetpointCommand:
+class GetSetpointCommand(Command):
     def __init__(self, emulator):
-        self.id = "SETP?"
-        self._emu = emulator
+        super(GetSetpointCommand, self).__init__(emulator, "SETP?")
 
     def execute_and_reply(self, data):
         return str(self._emu.get_target_output(data).temp_setpoint)
 
-class SetSetpointCommand:
+class SetSetpointCommand(Command):
     def __init__(self, emulator):
-        self.id = "SETP"
-        self._emu = emulator
+        super(SetSetpointCommand, self).__init__(emulator, "SETP")
 
     def execute_and_reply(self, data):
         tokens = self._emu.get_set_tokens(data, self.id)
@@ -178,19 +169,17 @@ class SetSetpointCommand:
         self._emu.outputs[index].temp_setpoint = new_temp
         return None
 
-class GetOutputRampCommand:
+class GetOutputRampCommand(Command):
     def __init__(self, emulator):
-        self.id = "RAMP?"
-        self._emu = emulator
+        super(GetOutputRampCommand, self).__init__(emulator, "RAMP?")
 
     def execute_and_reply(self, data):
         output = self._emu.get_target_output(data)
         return "%d,%f" % (output.ramp_on, output.ramp_rate)
 
-class SetOutputRampCommand:
+class SetOutputRampCommand(Command):
     def __init__(self, emulator):
-        self.id = "RAMP"
-        self._emu = emulator
+        super(SetOutputRampCommand, self).__init__(emulator, "RAMP")
 
     def execute_and_reply(self, data):
         tokens = self._emu.get_set_tokens(data, self.id)
@@ -201,18 +190,16 @@ class SetOutputRampCommand:
         self._emu.outputs[index].ramp_rate = ramp_rate
         return None
 
-class GetHeaterRangeCommand:
+class GetHeaterRangeCommand(Command):
     def __init__(self, emulator):
-        self.id = "RANGE?"
-        self._emu = emulator
+        super(GetHeaterRangeCommand, self).__init__(emulator, "RANGE?")
 
     def execute_and_reply(self, data):
         return str(self._emu.get_target_output(data).heater_range)
 
-class SetHeaterRangeCommand:
+class SetHeaterRangeCommand(Command):
     def __init__(self, emulator):
-        self.id = "RANGE"
-        self._emu = emulator
+        super(SetHeaterRangeCommand, self).__init__(emulator, "RANGE")
 
     def execute_and_reply(self, data):
         tokens = self._emu.get_set_tokens(data, self.id)
@@ -221,18 +208,16 @@ class SetHeaterRangeCommand:
         self._emu.outputs[index].heater_range = range
         return None
 
-class GetManualOutputCommand:
+class GetManualOutputCommand(Command):
     def __init__(self, emulator):
-        self.id = "MOUT?"
-        self._emu = emulator
+        super(GetManualOutputCommand, self).__init__(emulator, "MOUT?")
 
     def execute_and_reply(self, data):
         return str(self._emu.get_target_output(data).manual_output)
 
-class SetManualOutputCommand:
+class SetManualOutputCommand(Command):
     def __init__(self, emulator):
-        self.id = "MOUT"
-        self._emu = emulator
+        super(SetManualOutputCommand, self).__init__(emulator, "MOUT")
 
     def execute_and_reply(self, data):
         tokens = self._emu.get_set_tokens(data, self.id)
@@ -241,18 +226,16 @@ class SetManualOutputCommand:
         self._emu.outputs[index].manual_output = output
         return None
 
-class GetPIDCommand:
+class GetPIDCommand(Command):
     def __init__(self, emulator):
-        self.id = "PID?"
-        self._emu = emulator
+        super(GetPIDCommand, self).__init__(emulator, "PID?")
 
     def execute_and_reply(self, data):
         return "%f,%f,%f" % self._emu.get_target_output(data).pid
 
-class SetPIDCommand:
+class SetPIDCommand(Command):
     def __init__(self, emulator):
-        self.id = "PID"
-        self._emu = emulator
+        super(SetPIDCommand, self).__init__(emulator, "PID")
 
     def execute_and_reply(self, data):
         tokens = self._emu.get_set_tokens(data, self.id)
@@ -260,19 +243,17 @@ class SetPIDCommand:
         self._emu.outputs[index].pid = tuple([float(t) for t in tokens[1:]])
         return None
 
-class GetOutputModeCommand:
+class GetOutputModeCommand(Command):
     def __init__(self, emulator):
-        self.id = "OUTMODE?"
-        self._emu = emulator
+        super(GetOutputModeCommand, self).__init__(emulator, "OUTMODE?")
 
     def execute_and_reply(self, data):
         output = self._emu.get_target_output(data)
         return "%d,%d,%d" % (output.output_mode, output.control_input, self._emu.bool_to_int(output.powerup_enabled))
 
-class SetOutputModeCommand:
+class SetOutputModeCommand(Command):
     def __init__(self, emulator):
-        self.id = "OUTMODE"
-        self._emu = emulator
+        super(SetOutputModeCommand, self).__init__(emulator, "OUTMODE")
 
     def execute_and_reply(self, data):
         tokens = self._emu.get_set_tokens(data, self.id)
@@ -284,28 +265,26 @@ class SetOutputModeCommand:
         output.powerup_enabled = self._emu.int_to_bool(powerup)
         return None
 
-class GetHeaterOutputCommand:
+class GetHeaterOutputCommand(Command):
     def __init__(self, emulator):
-        self.id = "HTR?"
-        self._emu = emulator
+        super(GetHeaterOutputCommand, self).__init__(emulator, "HTR?")
 
     def execute_and_reply(self, data):
         return str(self._emu.get_target_output(data).heater_output)
 
-class GetHeaterStatusCommand:
+class GetHeaterStatusCommand(Command):
     def __init__(self, emulator):
-        self.id = "HTRST?"
-        self._emu = emulator
+        super(GetHeaterStatusCommand, self).__init__(emulator, "HTRST?")
 
     def execute_and_reply(self, data):
         return str(self._emu.get_target_output(data).heater_status)
 
-class StartAutotuneCommand(NullCommand):
+class StartAutotuneCommand(Command):
     def __init__(self, emulator):
-        self.id = "ATUNE"
+        super(StartAutotuneCommand, self).__init__(emulator, "ATUNE")
 
 
-class Lakeshore336Emulator:
+class Lakeshore336Emulator(object):
     def __init__(self):#
         self.id = "EmulatedDevice"
         self._populate_inputs()
