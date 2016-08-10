@@ -4,9 +4,9 @@ sys.path.append("../test_framework")
 from telnet_engine import TelnetEngine
 
 class LakeshoreInput(object):
-    def __init__(self):
+    def __init__(self, start_temp=0.0):
         self.name = "Default Name"
-        self._temperature = 0.0
+        self._temperature = start_temp
         self.raw_voltage = random.uniform(0, 1000)
         self.has_high_alarm = False
         self.has_low_alarm = False
@@ -33,7 +33,7 @@ class LakeshoreInput(object):
 
 
 class LakeshoreOutput(object):
-    def __init__(self):
+    def __init__(self, start_heater_output=0.0):
         self.temp_setpoint = 100.0
         self.ramp_on = True
         self.ramp_rate = 2.0
@@ -43,8 +43,15 @@ class LakeshoreOutput(object):
         self.output_mode = 1
         self.control_input = 1
         self.powerup_enabled = True
-        self.heater_output = 21.0
+        self._heater_output = start_heater_output
+        self._heater_increment = 10.0
         self.heater_status = 2
+
+    def get_heater_output(self):
+        return_value = self._heater_output
+        self._heater_output += self._heater_increment
+        self._heater_increment *= -1
+        return return_value
 
 
 class CalibrationCurve(object):
@@ -64,15 +71,15 @@ class LakeshoreModel(object):
 
     def _populate_inputs(self):
         self._inputs = dict()
-        self._inputs["A"] = LakeshoreInput()
-        self._inputs["B"] = LakeshoreInput()
-        self._inputs["C"] = LakeshoreInput()
-        self._inputs["D"] = LakeshoreInput()
+        self._inputs["A"] = LakeshoreInput(0.0)
+        self._inputs["B"] = LakeshoreInput(5.0)
+        self._inputs["C"] = LakeshoreInput(10.0)
+        self._inputs["D"] = LakeshoreInput(20.0)
 
     def _populate_outputs(self):
         self._outputs = dict()
-        self._outputs["1"] = LakeshoreOutput()
-        self._outputs["2"] = LakeshoreOutput()
+        self._outputs["1"] = LakeshoreOutput(50.0)
+        self._outputs["2"] = LakeshoreOutput(80.0)
 
     def _populate_curves(self):
         self._curves = dict()
@@ -325,7 +332,7 @@ class GetHeaterOutputCommand(Command):
         super(GetHeaterOutputCommand, self).__init__(model, "HTR?")
 
     def execute_and_reply(self, data):
-        return str(self._get_target_output(data).heater_output)
+        return str(self._get_target_output(data).get_heater_output())
 
 class GetHeaterStatusCommand(Command):
     def __init__(self, model):
