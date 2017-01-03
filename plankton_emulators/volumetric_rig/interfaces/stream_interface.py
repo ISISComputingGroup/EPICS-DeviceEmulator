@@ -19,15 +19,15 @@ class VolumetricRigStreamInterface(StreamAdapter):
     commands = {
         Cmd("get_identity", "^IDN$"),
         Cmd("get_identity", "^\?$"),
-        Cmd("get_buffer_control_and_status", "^BCS 2$"),
+        Cmd("get_buffer_control_and_status", "^BCS\s([0-9]+)$"),
         Cmd("get_ethernet_and_hmi_status", "^ETN$"),
         Cmd("get_gas_control_and_status", "^GCS$"),
         Cmd("get_gas_mix_matrix", "^GMM$"),
-        Cmd("gas_mix_check", "^GMC 02 05$"),
+        Cmd("gas_mix_check", "^GMC\s([0-9]+)\s([0-9]+)$"),
         Cmd("get_gas_number_available", "^GNA$"),
         Cmd("get_hmi_status", "^HMI$"),
         Cmd("get_hmi_count_cycles", "^HMC$"),
-        Cmd("get_memory_location", "^RDM 200$"),
+        Cmd("get_memory_location", "^RDM\s([0-9]+)$"),
         Cmd("get_pressure_and_temperature_status", "^PTS$"),
         Cmd("get_pressures", "^PMV$"),
         Cmd("get_temperatures", "^TMV$"),
@@ -38,8 +38,8 @@ class VolumetricRigStreamInterface(StreamAdapter):
         Cmd("get_system_status", "^STS$"),
         Cmd("get_com_activity", "^COM$"),
         Cmd("get_valve_status", "^VST$"),
-        Cmd("set_valve_open", "^OPV 1$"),
-        Cmd("set_valve_closed", "^CLV 1$"),
+        Cmd("set_valve_open", "^OPV\s([0-9]+)$"),
+        Cmd("set_valve_closed", "^CLV\s([0-9]+)$"),
         Cmd("halt", "^HLT$"),
     }
 
@@ -50,7 +50,7 @@ class VolumetricRigStreamInterface(StreamAdapter):
         return "IDN,00,ISIS Volumetric Gas Handing Panel"
 
     def get_buffer_control_and_status(self,buffer):
-        return "BCS "+buffer+"2 04 NITROGEN             d c 01 EMPTY"
+        return "BCS "+buffer+" 04 NITROGEN             d c 01 EMPTY"
 
     def get_ethernet_and_hmi_status(self):
         return "ETN:PLC 192.168.100.156,HMI OK ,192.168.100.208"
@@ -95,8 +95,12 @@ class VolumetricRigStreamInterface(StreamAdapter):
         return '\n'.join(lines)
 
     def gas_mix_check(self,gas1_index,gas2_index):
-        return "GMC " + gas1_index + " VACUUM EXTRACT...... " + gas2_index + " NEON................ 05 " + \
-               ("ok" if is_mixable(gases[gas1_index],gases[gas2_index]) else "NO")
+        gas1 = gases[int(gas1_index)]
+        gas2 = gases[int(gas2_index)]
+        gas1_padded = gas1 + "."*(20-len(gas1))
+        gas2_padded = gas2 + "."*(20-len(gas2))
+        return "GMC " + gas1_index.zfill(2) + " " + gas1_padded + " " + gas2_index.zfill(2) + " " + \
+               gas2_padded + " " + ("ok" if is_mixable(gas1,gas2) else "NO")
 
     def get_gas_number_available(self):
         return "20"
@@ -142,11 +146,11 @@ class VolumetricRigStreamInterface(StreamAdapter):
 
     def set_valve_closed(self,valve_number):
         #return "CLV Rejected only allowed when running"
-        return "CLV Valve Buffer " + valve_number + " closed was open"
+        return "CLV Valve Buffer " + valve_number.lstrip("0") + " closed was open"
 
     def set_valve_open(self,valve_number):
         #return "OLV Rejected only allowed when running"
-        return "OPV Valve Buffer " + valve_number + " opened was closed "
+        return "OPV Valve Buffer " + valve_number.lstrip("0") + " opened was closed "
 
     def halt(self):
         return "HLT *** SYSTEM NOW HALTED ***"
