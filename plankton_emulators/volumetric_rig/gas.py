@@ -1,27 +1,15 @@
-from types import *
+from types import StringType, IntType
 
 
 class Gas(object):
     def __init__(self,index,name):
-        assert type(index) is IntType
-        assert type(name) is StringType
+        assert type(index) is IntType and type(name) is StringType
         self.index = index
         self.name = name
 
-    def get_name(self):
-        return self.name
+    def name(self, length=None, padding_character=" "):
+        return self.name if length is None \
+            else self.name[:length] + (length-len(self.name))*padding_character
 
-    def get_index(self):
-        return self.index
-
-    def get_zero_padded_index(self,length=2):
+    def index_string(self, length=2):
         return str(self.index).zfill(length)
-
-    def get_dash_padded_name(self,length):
-        return self.get_padded_name(length,"-")
-
-    def get_dot_padded_name(self,length):
-        return self.get_padded_name(length,".")
-
-    def get_padded_name(self,length,char):
-        return self.name + char*(length-len(self.name))

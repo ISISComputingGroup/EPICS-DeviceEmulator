@@ -1,70 +1,68 @@
 from lewis.devices import Device
+from two_gas_mixer import TwoGasMixer
+from buffer import Buffer
+from gas import Gas
 from system_gases import SystemGases
-
-# Define string literals for all gas names to avoid typos
-UNKNOWN = "UNKNOWN"
-EMPTY = "EMPTY"
-VACUUM_EXTRACT = "VACUUM EXTRACT"
-ARGON = "ARGON"
-NITROGEN = "NITROGEN"
-NEON = "NEON"
-CARBON_DIOXIDE = "CARBON DIOXIDE"
-CARBON_MONOXIDE = "CARBON MONOXIDE"
-HELIUM = "HELIUM"
-GRAVY = "GRAVY"
-LIVER = "LIVER"
-HYDROGEN = "HYDROGEN"
-OXYGEN = "OXYGEN"
-CURRIED_RAT = "CURRIED RAT"
-FRESH_COFFEE = "FRESH COFFEE"
-BACON = "BACON"
-ONION = "ONION"
-CHIPS = "CHIPS"
-GARLIC = "GARLIC"
-BROWN_SAUCE = "BROWN SAUCE"
+from seed_gas_data import SeedGasData
+from ethernet_device import EthernetDevice
+from hmi_device import HmiDevice
+from temperature_sensor import TemperatureSensor
+from valve import Valve
 
 
 class SimulatedVolumetricRig(Device):
     def __init__(self):
-        self.system_gases = SystemGases()
 
-        # Populate system gases
-        gas_names = [UNKNOWN, EMPTY, VACUUM_EXTRACT, ARGON, NITROGEN, NEON, CARBON_DIOXIDE, CARBON_MONOXIDE, HELIUM,
-                     GRAVY, LIVER, HYDROGEN, OXYGEN, CURRIED_RAT, FRESH_COFFEE, BACON, ONION, CHIPS, GARLIC,
-                     BROWN_SAUCE]
-        index = 0
-        for gas_name in gas_names:
-            self.system_gases.add_gas(index,gas_name)
-            index += 1
+        names = SeedGasData.names()
+        self.system_gases = SystemGases([Gas(i, names[i]) for i in range(len(names))])
 
-        # Set unmixable gases
-        for g in gas_names:
-            self.system_gases.set_unmixable_by_name(UNKNOWN, g)
-            self.system_gases.set_unmixable_by_name(LIVER, g)
-            if g not in {ARGON, NITROGEN, VACUUM_EXTRACT, EMPTY}:
-                self.system_gases.set_unmixable_by_name(NITROGEN, g)
-            if g not in {NEON, CARBON_DIOXIDE, CARBON_MONOXIDE}:
-                self.system_gases.set_unmixable_by_name(CARBON_MONOXIDE, g)
-            if g in {CURRIED_RAT, FRESH_COFFEE, BACON, CHIPS}:
-                self.system_gases.set_unmixable_by_name(GRAVY, g)
-            if g in {OXYGEN, ONION, BROWN_SAUCE}:
-                self.system_gases.set_unmixable_by_name(HYDROGEN, g)
+        self.mixer = TwoGasMixer()
+        for pair in SeedGasData.mixable_gas_names():
+            self.mixer.add_mixable(self.system_gases.gas_by_name(pair.pop()), self.system_gases.gas_by_name(pair.pop()))
 
-        self.system_gases.set_buffer_gas(1, ARGON)
-        self.system_gases.set_buffer_gas(2, NITROGEN)
-        self.system_gases.set_buffer_gas(3, NEON)
-        self.system_gases.set_buffer_gas(4, CARBON_DIOXIDE)
-        self.system_gases.set_buffer_gas(5, HELIUM)
-        self.system_gases.set_buffer_gas(6, HYDROGEN)
+        # Set buffers
+        buffer_gases = [(self.system_gases.gas_by_name(pair[0]),
+                         self.system_gases.gas_by_name(pair[1]))
+                        for pair in SeedGasData.buffer_gas_names()]
+        self.buffers = [Buffer(i+1, buffer_gases[i][0], buffer_gases[i][1])
+                        for i in range(len(buffer_gases))]
 
-    def get_identity(self):
+        # Set ethernet devices
+        self.plc = EthernetDevice()
+        self.hmi = HmiDevice()
+
+        # Set up sensors
+        self.temperature_sensors = [TemperatureSensor() for i in range(9)]
+        self.pressure_sensors = [TemperatureSensor() for i in range(5)]
+
+        # Target pressure: We can't set this via serial
+        self.target_pressure = 12.34
+
+        # Set up special valves
+        self.supply_valve = Valve()
+        self.vacuum_extract_valve = Valve()
+        self.cell_valve = Valve()
+
+        self.halted = False
+        self.status_code = 2
+        self.errors = ErrorStates()
+
+        super(SimulatedVolumetricRig, self).__init__()
+
+    def identify(self):
         return "ISIS Volumetric Gas Handing Panel"
 
-    def get_plc_ip(self):
-        return "192.168.1.100"
+    def count_buffers(self):
+        return len(self.buffers)
 
-    def get_hmi_ip(self):
-        return "192.168.1.101"
+    def buffer(self,i):
+        try:
+            return next(b for b in self.buffers if b.index == i)
+        except StopIteration:
+            return None
 
-    def get_hmi_status(self):
-        return "OK"
+    def memory_location(self, location):
+        return str(location).zfill(6)
+
+    def halt(self):
+        self.halted = True
