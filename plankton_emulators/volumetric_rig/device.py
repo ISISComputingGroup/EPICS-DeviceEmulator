@@ -56,3 +56,15 @@ class SimulatedVolumetricRig(Device):
         self.system_gases.set_buffer_gas(4, CARBON_DIOXIDE)
         self.system_gases.set_buffer_gas(5, HELIUM)
         self.system_gases.set_buffer_gas(6, HYDROGEN)
+
+    def get_identity(self):
+        return "ISIS Volumetric Gas Handing Panel"
+
+    def get_plc_ip(self):
+        return "192.168.1.100"
+
+    def get_hmi_ip(self):
+        return "192.168.1.101"
+
+    def get_hmi_status(self):
+        return "OK"

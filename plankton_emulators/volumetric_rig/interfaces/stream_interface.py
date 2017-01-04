@@ -1,17 +1,5 @@
 from lewis.adapters.stream import StreamAdapter, Cmd
-
-gases = ["UNKNOWN", "EMPTY", "VACUUM EXTRACT", "ARGON", "NITROGEN", "NEON", "CARBON DIOXIDE", "CARBON MONOXIDE",
-         "HELIUM", "GRAVY", "LIVER", "HYDROGEN", "OXYGEN", "CURRIED RAT", "FRESH COFFEE", "BACON", "ONION", "CHIPS",
-         "GARLIC", "BROWN SAUCE"]
-
-
-def is_mixable(g1, g2):
-    if "LIVER" in {g1, g2}:
-        return False
-    elif "NITROGEN" in {g1, g2} and not {g1, g2}.isdisjoint({"EMPTY", "VACUUM EXTRACT", "ARGON", "NEON"}):
-        return False
-    else:
-        return True
+from ..device import SimulatedVolumetricRig
 
 
 class VolumetricRigStreamInterface(StreamAdapter):
@@ -46,83 +34,212 @@ class VolumetricRigStreamInterface(StreamAdapter):
     in_terminator = "\r\n"
     out_terminator = "\r\n"
 
-    def get_identity(self):
-        return "IDN,00,ISIS Volumetric Gas Handing Panel"
+    def __init__(self):
+        self.simulated_rig = SimulatedVolumetricRig()
+        self.gas_output_length = 20
+        super(VolumetricRigStreamInterface, self).__init__()
 
-    def get_buffer_control_and_status(self,buffer):
-        return "BCS "+buffer+" 04 NITROGEN             d c 01 EMPTY"
+    def get_identity(self):
+        return "IDN,00," + self.simulated_rig.get_identity()
+
+    def get_buffer_control_and_status(self,buffer_number_string):
+        number_print_length = 3
+        message_prefix = "BCS Buffer " + buffer_number_string.zfill(number_print_length)[:number_print_length] + " "
+        buffer_too_low = message_prefix + "Too Low"
+        buffer_too_high = message_prefix + "Too High"
+        try:
+            buffer_number = int(buffer_number_string)
+        except TypeError:
+            # This is how the volumetric rig currently responds
+            return buffer_too_low
+
+        if buffer_number <= 0:
+            return buffer_too_low
+        elif buffer_number > self.simulated_rig.number_of_buffers():
+            return buffer_too_high
+
+        buffer = self.simulated_rig.get_buffer(buffer_number)
+        return " ".join([
+            message_prefix[:-1],
+            buffer.get_buffer_gas().get_index_string(),
+            buffer.get_buffer_gas().get_name(length=self.gas_output_length, padding_character=" "),
+            "E" if buffer.get_valve().enabled() else "d",
+            "O" if buffer.get_valve().is_open() else "c",
+            buffer.get_system_gas().get_index_string(),
+            buffer.get_system_gas().get_name()
+        ])
+
 
     def get_ethernet_and_hmi_status(self):
-        return "ETN:PLC 192.168.100.156,HMI OK ,192.168.100.208"
+        return "ETN:PLC " + self.simulated_rig.get_plc_ip() + ",HMI " + self.simulated_rig.get_hmi_status() + " ," + \
+               self.simulated_rig.get_hmi_ip()
 
     def get_gas_control_and_status(self):
         lines = list()
         lines.append("No No Buffer               E O No System")
-        lines.append(" 1 03 ARGON                E O 03 ARGON")
-        lines.append(" 2 04 NITROGEN             d c 01 EMPTY")
-        lines.append(" 3 05 NEON                 E c 01 EMPTY")
-        lines.append(" 4 06 CARBON DIOXIDE       E c 01 EMPTY")
-        lines.append(" 5 08 HELIUM               E c 08 HELIUM")
-        lines.append(" 6 11 HYDROGEN             E c 01 EMPTY")
+        for buffer in self.simulated_rig.get_buffers():
+            words = list()
+            words.append(buffer.get_number())
+            words.append(buffer.get_buffer_gas().get_index_string())
+            words.append(buffer.get_buffer_gas().get_name(length=self.gas_output_length, padding_character=' '))
+            words.append("E" if buffer.valve_available() else "d")
+            words.append("O" if buffer.valve_open() else "c")
+            words.append(buffer.get_system_gas().get_index_string())
+            words.append(buffer.get_buffer_gas().get_name())
+            lines.append(' '.join(words))
         lines.append("GCS")
         return '\n'.join(lines)
 
     def get_gas_mix_matrix(self):
-        length_limit = 20
-        padded_gases = [(g + (length_limit-len(g))*"-") for g in gases]
+
+        # Gather data
+        system_gases = self.simulated_rig.get_system_gases().get_gases()
+        column_headers = [gas.get_name(length=self.gas_output_length, padding_character='-')
+                          for gas in system_gases]
+        column_header_length = self.gas_output_length
+        row_titles = [gas.get_index_string() + " " + gas.get_name(length=self.gas_output_length, padding_character=' ')
+                      for gas in system_gases]
+        row_title_length = max(row_titles, key=len)
+        mixable_chars = [["<" if self.simulated_rig.mixable(g1,g2) else "." for g1 in system_gases]
+                         for g2 in system_gases]
+
+        # Put data in output format
         lines = list()
-
-        # Column headers
-        for i in range(length_limit):
+        # Add column headers
+        for i in range(column_header_length):
             words = list()
-            words.append(' '*(length_limit+3))
-            for j in range(length_limit):
-                words.append(padded_gases[j][i])
-            lines.append(''.join(words))
-
-        # Rows
-        for i in range(length_limit):
-            words = list()
-            words.append(str(i).zfill(2))
-            words.append(padded_gases[i])
-            for j in range(length_limit):
-                words.append("<" if is_mixable(gases[i], gases[j]) else ".")
+            words.append((row_title_length-1)*" ")
+            for j in range(len(column_headers)):
+                words.append(column_headers[j][i])
             lines.append(' '.join(words))
-
-        # Footer
-        lines.append("GMM allowance limit: " + str(length_limit))
+        # Add rows
+        assert len(row_titles)==len(mixable_chars)
+        for i in range(len(row_titles)):
+            words = list()
+            words.append(row_titles[i])
+            words.append(' '.join(mixable_chars[i]))
+            lines.append(''.join(words))
+        # Add footer
+        lines.append("GMM allowance limit: " + str(len(system_gases)))
 
         return '\n'.join(lines)
 
     def gas_mix_check(self,gas1_index,gas2_index):
-        gas1 = gases[int(gas1_index)]
-        gas2 = gases[int(gas2_index)]
-        gas1_padded = gas1 + "."*(20-len(gas1))
-        gas2_padded = gas2 + "."*(20-len(gas2))
-        return "GMC " + gas1_index.zfill(2) + " " + gas1_padded + " " + gas2_index.zfill(2) + " " + \
-               gas2_padded + " " + ("ok" if is_mixable(gas1,gas2) else "NO")
+        gas1 = self.simulated_rig.get_system_gases().get_gas_by_index(gas1_index)
+        gas2 = self.simulated_rig.get_system_gases().get_gas_by_index(gas2_index)
+        return ' '.join(["GMC",
+                        gas1.get_index_string(), gas1.get_name(length=self.gas_output_length, padding_character='.'),
+                        gas2.get_index_string(), gas2.get_name(length=self.gas_output_length, padding_character='.'),
+                        "ok" if self.simulated_rig.mixable(gas1, gas2) else "NO"])
+
 
     def get_gas_number_available(self):
-        return "20"
+        return str(self.simulated_rig.system_gases.count())
 
     def get_hmi_status(self):
-        return "HMI OK ,192.168.100.208,B,034,S,041"
+        hmi = self.simulated_rig.get_hmi()
+        return " ".join(["HMI " + hmi.get_status() + " ",
+                         hmi.get_ip(), "B", hmi.get_base_page(), "S", hmi.get_sub_page()])
 
     def get_hmi_count_cycles(self):
-        return "HMC 999 006 002 002 002 002 002 001 001 310"
+        return " ".join(["HMC"] + self.simulated_rig.get_hmi().get_count_cycles())
 
     def get_memory_location(self,location):
-        return "RDM " + location.zfill(4) + " 000000"
+        location_length = 4
+        return " ".join(["RDM", location.zfill(location_length), self.simulated_rig.get_memory_location(location)])
 
     def get_pressure_and_temperature_status(self):
-        return "PTS ODDDDDDDDDDDDD"
+
+        def get_status_code(s):
+            if s==Sensor.DISABLED:
+                return "D"
+            elif s==Sensor.NO_REPLY:
+                return "X"
+            elif s==Sensor.VALUE_IN_RANGE:
+                return "O"
+            elif s==Sensor.VALUE_TOO_LOW:
+                return "L"
+            elif s==Sensor.VALUE_TOO_HIGH:
+                return "H"
+            else:
+                return "?"
+
+        return "PTS " + \
+               "".join([get_status_code(self.simulated_rig.get_temperature_sensor(i).get_status())
+                        for i in reversed(range(self.simulated_rig.number_of_temperature_sensors()))]) + \
+               "".join([get_status_code(self.simulated_rig.get_pressure_sensor(i).get_status())
+                        for i in reversed(range(self.simulated_rig.number_of_pressure_sensors()))])
 
     def get_pressures(self):
-        return "PMV 00.00 01.00 00.00 00.00 01.02 00.00"
+        return " ".join(["PMV"] + [self.simulated_rig.get_pressure_sensor(i).get_pressure()
+                                   for i in reversed(range(self.simulated_rig.number_of_pressure_sensors()))])
 
     def get_temperatures(self):
-        return "TMV 25.00 00.00 00.00 00.00 00.00 00.00 00.00 00.00 00.00"
+        return " ".join(["TMV"] + [self.simulated_rig.get_temperature_sensor(i).get_temperature()
+                                   for i in reversed(range(self.simulated_rig.number_of_temperature_sensors()))])
 
+    def get_valve_status(self):
+        valves = [self.simulated_rig.get_supply_valve(),
+                  self.get_vacuum_extract_valve(),
+                  self.get_cell_valve()] + \
+                 [b.get_valve() for b in self.simulated_rig.get_buffers().reverse()]
+
+        def derive_status(valve):
+            if valve.enabled() and valve.is_open():
+                return "O"
+            elif valve.enabled() and not valve.is_open():
+                return "E"
+            elif not valve.enabled() and valve.is_open():
+                return "!"
+            elif not valve.enabled() and not valve.is_open():
+                return "D"
+            else:
+                assert False
+
+        return "VST Valve Status " + ''.join([derive_status(v) for v in valves])
+
+    def set_valve_status(self,valve_number,set_to_open):
+        if self.simulated_rig.halted():
+            return "CLV Rejected only allowed when running"
+        else:
+            original_status = self.simulated_rig.is_valve_open(valve_number)
+            self.simulated_rig.set_valve_open(set_to_open)
+            new_status = self.simulated_rig.is_valve_open(valve_number)
+
+            def derive_status(is_open):
+                return "open" if is_open else "closed"
+
+            return " ".join(["OPV" if set_to_open else "CLV", "Valve Buffer", valve_number.lstrip("0"),
+                             derive_status(original_status), "was", derive_status(new_status)])
+
+    def set_valve_closed(self, valve_number):
+        self.set_valve_status(valve_number, False)
+
+    def set_valve_open(self, valve_number):
+        self.set_valve_status(valve_number, True)
+
+    def halt(self):
+        if self.simulated_rig.halted():
+            message = "SYSTEM ALREADY HALTED"
+        else:
+            self.simulated_rig.halt()
+            assert self.simulated_rig.halted()
+            message = "SYSTEM NOW HALTED"
+        return "HLT *** " + message + " ***"
+
+    def get_system_status(self):
+        return " ".join([
+            "STS",
+            str(self.simulated_rig.get_status_code()).zfill(2),
+            "STOP" if self.simulated_rig.errors().run else "run",
+            "HMI" if self.simulated_rig.errors().hmi else "hmi",
+            "GUAGES" if self.simulated_rig.errors().guages else "guages",
+            "COMMS" if self.simulated_rig.errors().guages else "comms",
+            "HLT" if self.simulated_rig.halted() else "halted",
+            "E-STOP" if self.simulated_rig.errors().estop else "estop"
+        ])
+
+    # Information about ports, relays and com traffic are currently returned statically
     def get_ports_and_relays_hex(self):
         return "PTR I:00 0000 0000 R:0000 0200 0000 O:00 0000 4400"
 
@@ -135,22 +252,5 @@ class VolumetricRigStreamInterface(StreamAdapter):
     def get_ports_relays(self):
         return "PRY qwertyuiopasdfgh zyxwhmLsrqponmlk abcdefghihlbhace"
 
-    def get_system_status(self):
-        return "STS 09 STOP hmi guages comms hlt E-STOP"
-
     def get_com_activity(self):
         return "COM ok  0113/0000"
-
-    def get_valve_status(self):
-        return "VST Valve Status DDDDDDDDD"
-
-    def set_valve_closed(self,valve_number):
-        #return "CLV Rejected only allowed when running"
-        return "CLV Valve Buffer " + valve_number.lstrip("0") + " closed was open"
-
-    def set_valve_open(self,valve_number):
-        #return "OLV Rejected only allowed when running"
-        return "OPV Valve Buffer " + valve_number.lstrip("0") + " opened was closed "
-
-    def halt(self):
-        return "HLT *** SYSTEM NOW HALTED ***"
