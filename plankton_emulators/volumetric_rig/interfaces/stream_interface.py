@@ -8,7 +8,7 @@ class VolumetricRigStreamInterface(StreamAdapter):
     commands = {
         Cmd("get_identity", "^IDN$"),
         Cmd("get_identity", "^\?$"),
-        Cmd("get_buffer_control_and_status", "^BCS\s([0-9]+)$"),
+        Cmd("get_buffer_control_and_status", "^BCS\s([a-zA-Z0-9_.-]+)$"),
         Cmd("get_ethernet_and_hmi_status", "^ETN$"),
         Cmd("get_gas_control_and_status", "^GCS$"),
         Cmd("get_gas_mix_matrix", "^GMM$"),
@@ -45,28 +45,30 @@ class VolumetricRigStreamInterface(StreamAdapter):
         return "IDN,00," + self.rig.identify()
 
     def get_buffer_control_and_status(self, buffer_number_string):
-        index_print_length = 3
-        message_prefix = "BCS Buffer " + buffer_number_string.zfill(index_print_length)[:index_print_length] + " "
-        buffer_too_low = message_prefix + "Too Low"
-        buffer_too_high = message_prefix + "Too High"
-
         try:
             buffer_number = int(buffer_number_string)
-        except TypeError:
+        except ValueError:
             # This is how the volumetric rig currently responds
-            return buffer_too_low
+            buffer_number = 0
+
+        message_prefix = "BCS"
+        num_length = 3
+        error_message_prefix = " ".join(["Buffer",message_prefix,str(buffer_number)[:num_length].zfill(num_length)])
+        buffer_too_low = " ".join([error_message_prefix,"Too Low"])
+        buffer_too_high = " ".join([error_message_prefix + "Too High"])
 
         if buffer_number <= 0:
             return buffer_too_low
-        elif buffer_number > len(self.rig.buffers()):
+        elif buffer_number > len(self.rig.buffers):
             return buffer_too_high
 
         buff = self.rig.buffer(buffer_number)
         assert buff is not None
         return " ".join([
-            message_prefix[:-1],
+            message_prefix,
+            buff.index_string(),
             buff.buffer_gas.index_string(),
-            buff.buffer_gas.name(self.gas_output_length, " "),
+            buff.buffer_gas.pad_name(self.gas_output_length, " "),
             "E" if buff.valve.is_enabled else "d",
             "O" if buff.valve.is_open else "c",
             buff.system_gas.index_string(),
@@ -89,7 +91,7 @@ class VolumetricRigStreamInterface(StreamAdapter):
             words = list()
             words.append(buff.index_string())
             words.append(buff.buffer_gas.index_string())
-            words.append(buff.buffer_gas.name(self.gas_output_length, ' '))
+            words.append(buff.buffer_gas.pad_name(self.gas_output_length, ' '))
             words.append("E" if buff.valve.is_enabled else "d")
             words.append("O" if buff.valve.is_open else "c")
             words.append(buff.system_gas.index_string())
@@ -103,8 +105,8 @@ class VolumetricRigStreamInterface(StreamAdapter):
         # Gather data
         system_gases = self.rig.system_gases.gases
 
-        column_headers = [gas.name(self.gas_output_length, '-') for gas in system_gases]
-        row_titles = [" ".join([gas.index_string(), gas.name(self.gas_output_length, ' ')]) for gas in system_gases]
+        column_headers = [gas.pad_name(self.gas_output_length, '-') for gas in system_gases]
+        row_titles = [" ".join([gas.index_string(), gas.pad_name(self.gas_output_length, ' ')]) for gas in system_gases]
         mixable_chars = [["<" if self.rig.mixer.can_mix(g1, g2) else "." for g1 in system_gases]
                          for g2 in system_gases]
 

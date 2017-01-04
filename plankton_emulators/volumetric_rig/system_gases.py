@@ -12,11 +12,11 @@ class SystemGases(object):
     def gas_by_name(self, name):
         return self._get_by_method(name, "name")
 
-    def _get_by_method(self, value, method):
+    def _get_by_method(self, value, attr):
         try:
-            return next(g for g in self.gases if getattr(Gas, method) == value)
+            return next(g for g in self.gases if getattr(g, attr) == value)
         except StopIteration:
             return None
 
     def _add_gases(self, iterable):
-        self.gases += {g for g in iterable if isinstance(g, Gas)}
+        self.gases = set.union(self.gases, {g for g in iterable if isinstance(g, Gas)})

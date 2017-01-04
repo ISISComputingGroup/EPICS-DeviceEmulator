@@ -8,28 +8,33 @@ from ethernet_device import EthernetDevice
 from hmi_device import HmiDevice
 from temperature_sensor import TemperatureSensor
 from valve import Valve
+from error_states import ErrorStates
+from time import sleep
 
 
 class SimulatedVolumetricRig(Device):
     def __init__(self):
+        # Set up all available gases
+        self.system_gases = SystemGases([Gas(i, SeedGasData.names[i]) for i in range(len(SeedGasData.names))])
 
-        names = SeedGasData.names()
-        self.system_gases = SystemGases([Gas(i, names[i]) for i in range(len(names))])
-
+        # Set mixable gases
         self.mixer = TwoGasMixer()
         for pair in SeedGasData.mixable_gas_names():
-            self.mixer.add_mixable(self.system_gases.gas_by_name(pair.pop()), self.system_gases.gas_by_name(pair.pop()))
+            name1, name2 = pair
+            self.mixer.add_mixable(
+                self.system_gases.gas_by_name(name1),
+                self.system_gases.gas_by_name(name2))
 
         # Set buffers
-        buffer_gases = [(self.system_gases.gas_by_name(pair[0]),
-                         self.system_gases.gas_by_name(pair[1]))
+        buffer_gases = [(self.system_gases.gas_by_name(next(iter(pair))),
+                         self.system_gases.gas_by_name(next(iter(pair))))
                         for pair in SeedGasData.buffer_gas_names()]
         self.buffers = [Buffer(i+1, buffer_gases[i][0], buffer_gases[i][1])
                         for i in range(len(buffer_gases))]
 
         # Set ethernet devices
-        self.plc = EthernetDevice()
-        self.hmi = HmiDevice()
+        self.plc = EthernetDevice("192.168.0.1")
+        self.hmi = HmiDevice("192.168.0.2")
 
         # Set up sensors
         self.temperature_sensors = [TemperatureSensor() for i in range(9)]
@@ -43,10 +48,12 @@ class SimulatedVolumetricRig(Device):
         self.vacuum_extract_valve = Valve()
         self.cell_valve = Valve()
 
+        # Misc system state variables
         self.halted = False
         self.status_code = 2
         self.errors = ErrorStates()
 
+        # Parent constructor
         super(SimulatedVolumetricRig, self).__init__()
 
     def identify(self):

@@ -7,7 +7,7 @@ class Gas(object):
         self.index = index
         self.name = name
 
-    def name(self, length=None, padding_character=" "):
+    def pad_name(self, length=None, padding_character=" "):
         return self.name if length is None \
             else self.name[:length] + (length-len(self.name))*padding_character
 

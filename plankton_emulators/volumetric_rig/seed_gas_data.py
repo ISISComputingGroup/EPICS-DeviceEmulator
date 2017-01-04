@@ -1,6 +1,3 @@
-from gas import Gas
-
-
 class SeedGasData(object):
     unknown = "UNKNOWN"
     empty = "EMPTY"
@@ -23,35 +20,32 @@ class SeedGasData(object):
     garlic = "GARLIC"
     brown_sauce = "BROWN SAUCE"
 
-    names = [unknown, empty, vacuum_extract, argon, nitrogen, neon, carbon_dioxide, carbon_monoxide,
-                 helium, gravy, liver, hydrogen, oxygen, curried_rat, fresh_coffee, bacon, onion, chips, garlic,
-                 brown_sauce]
+    names = [unknown, empty, vacuum_extract, argon, nitrogen, neon, carbon_dioxide, carbon_monoxide, helium, gravy,
+             liver, hydrogen, oxygen, curried_rat, fresh_coffee, bacon, onion, chips, garlic, brown_sauce]
 
     @staticmethod
-    def names():
-        return SeedGasData.names
-
-    @ staticmethod
     def mixable_gas_names():
         sgd = SeedGasData
         mixable_names = set()
         for g in sgd.names:
             if g not in {sgd.unknown, sgd.liver}:
-                mixable_names.add({g, g})
-                mixable_names.add({sgd.empty, g})
-                mixable_names.add({sgd.vacuum_extract, g})
-                mixable_names.add({sgd.argon, g})
+                mixable_names.add((g, g))
+                mixable_names.add((sgd.empty, g))
+                mixable_names.add((sgd.vacuum_extract, g))
+                mixable_names.add((sgd.argon, g))
                 if g != sgd.nitrogen:
-                    mixable_names.add({sgd.neon, g})
-                    mixable_names.add({sgd.carbon_dioxide, g})
+                    mixable_names.add((sgd.neon, g))
+                    mixable_names.add((sgd.carbon_dioxide, g))
                     if g != sgd.carbon_monoxide:
-                        mixable_names.add({sgd.helium, g})
+                        mixable_names.add((sgd.helium, g))
         for g in {sgd.hydrogen, sgd.oxygen, sgd.onion, sgd.garlic, sgd.brown_sauce}:
-            mixable_names.add({sgd.gravy, g})
+            mixable_names.add((sgd.gravy, g))
         import itertools
         for pair in list(itertools.combinations(
-            {sgd.oxygen, sgd.curried_rat, sgd.fresh_coffee, sgd.bacon, sgd.onion, sgd.chips, sgd.garlic, sgd.brown_sauce},2)):
-            mixable_names.add({pair[0], pair[1]})
+            {sgd.oxygen, sgd.curried_rat, sgd.fresh_coffee, sgd.bacon,
+             sgd.onion, sgd.chips, sgd.garlic, sgd.brown_sauce},
+                2)):
+            mixable_names.add((pair[0], pair[1]))
         return mixable_names
 
     @staticmethod
