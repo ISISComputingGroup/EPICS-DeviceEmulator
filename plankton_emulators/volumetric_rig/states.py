@@ -1,5 +1,4 @@
 from lewis.core.statemachine import State
-from lewis.core import approaches
 
 
 class DefaultInitState(State):
@@ -7,4 +6,5 @@ class DefaultInitState(State):
 
 
 class DefaultRunningState(State):
-    pass
+    def in_state(self, dt):
+        self._context.update_buffer_pressures(dt)

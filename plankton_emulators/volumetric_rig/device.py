@@ -139,7 +139,8 @@ class SimulatedVolumetricRig(StateMachineDevice):
         self._cell_valve.open()
 
     def open_vacuum_valve(self):
-        self._vacuum_extract_valve.open()
+        if not any([b.valve_is_open() for b in self._buffers]):
+            self._vacuum_extract_valve.open()
 
     def close_buffer_valve(self, buffer_number):
         buff = self.buffer(buffer_number)
@@ -154,3 +155,7 @@ class SimulatedVolumetricRig(StateMachineDevice):
 
     def buffers(self):
         return self._buffers
+
+    def update_buffer_pressures(self, dt):
+        for b in self._buffers:
+            b.update_pressure(dt)
