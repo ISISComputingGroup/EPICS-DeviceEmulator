@@ -203,46 +203,46 @@ class VolumetricRigStreamInterface(StreamAdapter):
             "Value",
             str(valve_number)
             ])
+        args = list()
         if self.rig.halted():
             return "CLV Rejected only allowed when running"
         elif valve_number <= 0:
             return message_prefix + " Too Low"
         elif valve_number <= self.rig.buffer_count():
-            valve_status = self.rig.buffer_valve_is_open(valve_number)
-            open_valve = self.rig.open_buffer_valve(valve_number)
-            close_valve = self.rig.close_buffer_valve(valve_number)
+            valve_status = self.rig.buffer_valve_is_open
+            open_valve = self.rig.open_buffer_valve
+            close_valve = self.rig.close_buffer_valve
+            args.append(valve_number)
         elif valve_number == self.rig.buffer_count() + 1:
-            valve_status = self.rig.cell_valve_is_open()
-            open_valve = self.rig.open_cell_valve()
-            close_valve = self.rig.close_cell_valve()
+            valve_status = self.rig.cell_valve_is_open
+            open_valve = self.rig.open_cell_valve
+            close_valve = self.rig.close_cell_valve
         elif valve_number == self.rig.buffer_count() + 2:
-            valve_status = self.rig.vacuum_valve_is_open()
-            open_valve = self.rig.open_vacuum_valve()
-            close_valve = self.rig.close_vacuum_valve()
+            valve_status = self.rig.vacuum_valve_is_open
+            open_valve = self.rig.open_vacuum_valve
+            close_valve = self.rig.close_vacuum_valve
         else:
             return message_prefix + " Too High"
 
-        original_status = valve_status()
-        open_valve() if set_to_open else close_valve()
-        new_status = valve_status()
+        original_status = valve_status(*args)
+        open_valve(*args) if set_to_open else close_valve(*args)
+        new_status = valve_status(*args)
 
-        def derive_status(is_open):
-            return "open" if is_open else "closed"
-
-        # e.g. CLV Valve Buffer 1 closed was open
+        status_codes = {True: "open", False:"closed"}
         return " ".join([
             command,
             "Valve Buffer",
             str(valve_number),
-            derive_status(original_status),
+            status_codes[original_status],
             "was",
-            derive_status(new_status)])
+            status_codes[new_status],
+        ])
 
     def set_valve_closed(self, buffer_number_raw):
-        self._set_valve_status(buffer_number_raw, False)
+        return self._set_valve_status(buffer_number_raw, False)
 
     def set_valve_open(self, buffer_number_raw):
-        self._set_valve_status(buffer_number_raw, True)
+        return self._set_valve_status(buffer_number_raw, True)
 
     def halt(self):
         if self.rig.halted():
