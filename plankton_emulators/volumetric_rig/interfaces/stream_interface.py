@@ -204,7 +204,7 @@ class VolumetricRigStreamInterface(StreamAdapter):
             else:
                 assert False
 
-        return "VST Valve Status " + "".join([derive_status(v) for v in self.rig.valves()])
+        return "VST Valve Status " + "".join([derive_status(v) for v in self.rig.valves_status()])
 
     def _set_valve_status(self, valve_number_raw, set_to_open):
         valve_number = convert_raw_to_int(valve_number_raw)
