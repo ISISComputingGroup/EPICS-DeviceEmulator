@@ -11,36 +11,36 @@ class VolumetricRigStreamInterface(StreamAdapter):
     # "BCS" is the same as "BCS 00" and also "BCS AA".
     commands = {
         #Cmd("get_identity", "^IDN$"),
-        Cmd("get_identity", "^IDN(\s.*)?$"),
-        Cmd("get_identity", "^\?(\s.*)?$"),
+        Cmd("get_identity", "^IDN(?: .*)?$"),
+        Cmd("get_identity", "^\?(?: .*)?$"),
         Cmd("get_buffer_control_and_status", "^BCS$"),
         Cmd("get_buffer_control_and_status", "^BCS\s(\S*).*$"),
-        Cmd("get_ethernet_and_hmi_status", "^ETN(\s.*)?$"),
-        Cmd("get_gas_control_and_status", "^GCS(\s.*)?$"),
-        Cmd("get_gas_mix_matrix", "^GMM(\s.*)?$"),
+        Cmd("get_ethernet_and_hmi_status", "^ETN(?: .*)?$"),
+        Cmd("get_gas_control_and_status", "^GCS(?: .*)?$"),
+        Cmd("get_gas_mix_matrix", "^GMM(?: .*)?$"),
         Cmd("gas_mix_check", "^GMC$"),
         Cmd("gas_mix_check", "^GMC\s(\S*)$"),
         Cmd("gas_mix_check", "^GMC\s(\S*)\s(\S*).*$"),
-        Cmd("get_gas_number_available", "^GNA(\s.*)?$"),
-        Cmd("get_hmi_status", "^HMI(\s.*)?$"),
-        Cmd("get_hmi_count_cycles", "^HMC(\s.*)?$"),
+        Cmd("get_gas_number_available", "^GNA(?: .*)?$"),
+        Cmd("get_hmi_status", "^HMI(?: .*)?$"),
+        Cmd("get_hmi_count_cycles", "^HMC(?: .*)?$"),
         Cmd("get_memory_location", "^RDM"),
         Cmd("get_memory_location", "^RDM\s(\S*).*$"),
-        Cmd("get_pressure_and_temperature_status", "^PTS(\s.*)?$"),
-        Cmd("get_pressures", "^PMV(\s.*)?$"),
-        Cmd("get_temperatures", "^TMV(\s.*)?$"),
-        Cmd("get_ports_and_relays_hex", "^PTR(\s.*)?$"),
-        Cmd("get_ports_output", "^POT(\s.*)?$"),
-        Cmd("get_ports_input", "^PIN(\s.*)?$"),
-        Cmd("get_ports_relays", "^PRY(\s.*)?$"),
-        Cmd("get_system_status", "^STS(\s.*)?$"),
-        Cmd("get_com_activity", "^COM(\s.*)?$"),
-        Cmd("get_valve_status", "^VST(\s.*)?$"),
+        Cmd("get_pressure_and_temperature_status", "^PTS(?: .*)?$"),
+        Cmd("get_pressures", "^PMV(?: .*)?$"),
+        Cmd("get_temperatures", "^TMV(?: .*)?$"),
+        Cmd("get_ports_and_relays_hex", "^PTR(?: .*)?$"),
+        Cmd("get_ports_output", "^POT(?: .*)?$"),
+        Cmd("get_ports_input", "^PIN(?: .*)?$"),
+        Cmd("get_ports_relays", "^PRY(?: .*)?$"),
+        Cmd("get_system_status", "^STS(?: .*)?$"),
+        Cmd("get_com_activity", "^COM(?: .*)?$"),
+        Cmd("get_valve_status", "^VST(?: .*)?$"),
         Cmd("set_valve_open", "^OPV$"),
         Cmd("set_valve_open", "^OPV\s(\S*).*$"),
         Cmd("set_valve_closed", "^CLV.*$"),
         Cmd("set_valve_closed", "^CLV\s(\S*).*$"),
-        Cmd("halt", "^HLT(\s.*)?$"),
+        Cmd("halt", "^HLT(?: .*)?$"),
     }
 
     in_terminator = "\r\n"
@@ -52,7 +52,7 @@ class VolumetricRigStreamInterface(StreamAdapter):
         self.gas_output_length = 20
         super(VolumetricRigStreamInterface, self).__init__(device, arguments)
 
-    def get_identity(self, dummy):
+    def get_identity(self):
         return "IDN,00," + self.rig.identify()
 
     def get_buffer_control_and_status(self, buffer_number_string="0"):
@@ -86,7 +86,7 @@ class VolumetricRigStreamInterface(StreamAdapter):
             buff.system_gas.name
         ])
 
-    def get_ethernet_and_hmi_status(self, dummy):
+    def get_ethernet_and_hmi_status(self):
         # The syntax of the return string is odd: the separators are not consistent
         return " ".join([
             "ETN:PLC",
@@ -95,11 +95,12 @@ class VolumetricRigStreamInterface(StreamAdapter):
             "," + self.rig.hmi.ip
         ])
 
-    def get_gas_control_and_status(self, dummy):
+    def get_gas_control_and_status(self):
         lines = list()
         lines.append("No No Buffer               E O No System")
         for buff in self.rig.buffers:
             words = list()
+            words.append("")
             words.append(buff.index_string())
             words.append(buff.buffer_gas.index_string())
             words.append(buff.buffer_gas.pad_name(self.gas_output_length, ' '))
@@ -111,7 +112,7 @@ class VolumetricRigStreamInterface(StreamAdapter):
         lines.append("GCS")
         return '\r\n'.join(lines)
 
-    def get_gas_mix_matrix(self, dummy):
+    def get_gas_mix_matrix(self):
 
         # Gather data
         system_gases = self.rig.system_gases.gases
@@ -161,15 +162,15 @@ class VolumetricRigStreamInterface(StreamAdapter):
                          gas2.index_string(), gas2.pad_name(self.gas_output_length, '.'),
                         "ok" if self.rig.mixer.can_mix(gas1, gas2) else "NO"])
 
-    def get_gas_number_available(self, dummy):
+    def get_gas_number_available(self):
         return len(self.rig.system_gases)
 
-    def get_hmi_status(self, dummy):
+    def get_hmi_status(self):
         hmi = self.rig.hmi
         return " ".join(["HMI " + hmi.status + " ",
                          hmi.ip, "B", hmi.base_page_string(), "S", hmi.sub_page_string()])
 
-    def get_hmi_count_cycles(self, dummy):
+    def get_hmi_count_cycles(self):
         return " ".join(["HMC"] + self.rig.hmi.count_cycles)
 
     def get_memory_location(self, location_raw="0"):
@@ -179,7 +180,7 @@ class VolumetricRigStreamInterface(StreamAdapter):
             location = 0
         return " ".join(["RDM", location.zfill(4), self.rig.memory_location(location)])
 
-    def get_pressure_and_temperature_status(self, dummy):
+    def get_pressure_and_temperature_status(self):
 
         def get_status_code(s):
             if s == SensorStatus.DISABLED:
@@ -201,18 +202,18 @@ class VolumetricRigStreamInterface(StreamAdapter):
                "".join([get_status_code(self.rig.pressure_sensors[i].status)
                         for i in reversed(range(len(self.rig.pressure_sensors)))])
 
-    def get_pressures(self, dummy):
+    def get_pressures(self):
         return " ".join(["PMV"] +
                         [self.rig.pressure_sensors[i].pressure
                          for i in reversed(range(len(self.rig.pressure_sensors)))] +
                         ["T", self.rig.target_pressure])
 
-    def get_temperatures(self, dummy):
+    def get_temperatures(self):
         return " ".join(["TMV"] +
                         [self.rig.temperature_sensors[i].temperature
                          for i in reversed(range(len(self.rig.temperature_sensors)))])
 
-    def get_valve_status(self, dummy):
+    def get_valve_status(self):
         valves = [self.rig.supply_valve, self.rig.vacuum_extract_valve,  self.rig.cell_valve] + \
                  [b.valve for b in self.rig.buffers.reverse()]
 
@@ -272,7 +273,7 @@ class VolumetricRigStreamInterface(StreamAdapter):
     def set_valve_open(self, buffer_number_raw):
         self._set_valve_status(buffer_number_raw, True)
 
-    def halt(self, dummy):
+    def halt(self):
         if self.rig.halted:
             message = "SYSTEM ALREADY HALTED"
         else:
@@ -281,7 +282,7 @@ class VolumetricRigStreamInterface(StreamAdapter):
             message = "SYSTEM NOW HALTED"
         return "HLT *** " + message + " ***"
 
-    def get_system_status(self, dummy):
+    def get_system_status(self):
         return " ".join([
             "STS",
             str(self.rig.status_code).zfill(2),
@@ -295,19 +296,19 @@ class VolumetricRigStreamInterface(StreamAdapter):
         ])
 
     # Information about ports, relays and com traffic are currently returned statically
-    def get_ports_and_relays_hex(self, dummy):
+    def get_ports_and_relays_hex(self):
         return "PTR I:00 0000 0000 R:0000 0200 0000 O:00 0000 4400"
 
-    def get_ports_output(self, dummy):
+    def get_ports_output(self):
         return "POT qwertyus vsbbbbbbzyxwvuts aBhecSssvsbbbbbb"
 
-    def get_ports_input(self, dummy):
+    def get_ports_input(self):
         return "PIN qwertyui zyxwvutsrqponmlk abcdefghijklmneb"
 
-    def get_ports_relays(self, dummy):
+    def get_ports_relays(self):
         return "PRY qwertyuiopasdfgh zyxwhmLsrqponmlk abcdefghihlbhace"
 
-    def get_com_activity(self, dummy):
+    def get_com_activity(self):
         return "COM ok  0113/0000"
 
     def handle_error(self, request, error):
