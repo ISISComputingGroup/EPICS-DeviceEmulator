@@ -82,10 +82,10 @@ class SimulatedVolumetricRig(Device):
         self._halted = True
 
     def pressure_sensors(self, reverse=False):
-        return self._pressure_sensors if not reverse else self._pressure_sensors.reverse()
+        return self._pressure_sensors if not reverse else list(reversed(self._pressure_sensors))
 
     def temperature_sensors(self, reverse=False):
-        return self._temperature_sensors if not reverse else self._temperature_sensors.reverse()
+        return self._temperature_sensors if not reverse else list(reversed(self._temperature_sensors))
 
     def target_pressure(self):
         return self._target_pressure
@@ -101,11 +101,11 @@ class SimulatedVolumetricRig(Device):
 
     def valves(self):
         return [self._supply_valve, self._vacuum_extract_valve, self._cell_valve] + \
-               [b.valve for b in self._buffers.reverse()]
+               [b.valve for b in list(reversed(self._buffers))]
 
     def buffer_valve_is_open(self, buffer_number):
         buff = self.buffer(buffer_number)
-        return buff.valve().is_open if buff is not None else False
+        return buff.valve_is_open() if buff is not None else False
 
     def vacuum_valve_is_open(self):
         return self._vacuum_extract_valve.is_open

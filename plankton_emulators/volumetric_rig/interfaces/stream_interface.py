@@ -164,6 +164,7 @@ class VolumetricRigStreamInterface(StreamAdapter):
     def get_pressure_and_temperature_status(self):
 
         def get_status_code(status):
+            print status
             if status == SensorStatus.DISABLED:
                 return "D"
             elif status == SensorStatus.NO_REPLY:
