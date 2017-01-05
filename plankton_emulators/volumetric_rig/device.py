@@ -69,23 +69,11 @@ class SimulatedVolumetricRig(Device):
     def memory_location(self, location, as_string, length):
         return optional_int_string_format(location, as_string, length)
 
-    def plc_ip(self):
-        return self._plc.ip
+    def plc(self):
+        return self._plc
 
-    def hmi_ip(self):
-        return self._hmi.ip
-
-    def hmi_status(self):
-        return self._hmi.status
-
-    def hmi_base_page(self, as_string=False, length=None):
-        return optional_int_string_format(self._hmi.base_page, as_string, length)
-
-    def hmi_sub_page(self, as_string=False, length=None):
-        return optional_int_string_format(self._hmi.sub_page, as_string, length)
-
-    def hmi_count_cycles(self):
-        return self._hmi.count_cycles
+    def hmi(self):
+        return self._hmi
 
     def halted(self):
         return self._halted
