@@ -96,13 +96,13 @@ class SimulatedVolumetricRig(Device):
         return self._errors
 
     def valve_count(self):
-        return len(self.valves())
+        return len(self.valves_status())
 
     def valves_status(self):
         return [self._supply_valve.is_open(),
                 self._vacuum_extract_valve.is_open(),
                 self._cell_valve.is_open()] + \
-               [b.valve_is_open() for b in list(reversed(self._buffers))]
+               [b.valve_status() for b in list(reversed(self._buffers))]
 
     def buffer_valve_is_open(self, buffer_number):
         buff = self.buffer(buffer_number)

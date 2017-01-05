@@ -24,10 +24,13 @@ class Buffer(object):
         self._valve.close()
 
     def valve_is_open(self):
-        return self._valve.is_open
+        return self._valve.is_open()
 
     def valve_is_enabled(self):
-        return self._valve.is_enabled
+        return self._valve.is_enabled()
+
+    def valve_status(self):
+        return self._valve.status()
 
     def buffer_gas(self):
         return self._buffer_gas

@@ -2,6 +2,7 @@ from lewis.adapters.stream import StreamAdapter, Cmd
 from ..device import SimulatedVolumetricRig
 from ..sensor_status import SensorStatus
 from ..utilities import optional_int_string_format, convert_raw_to_int
+from ..valve_status import ValveStatus
 
 
 class VolumetricRigStreamInterface(StreamAdapter):
@@ -163,22 +164,17 @@ class VolumetricRigStreamInterface(StreamAdapter):
 
     def get_pressure_and_temperature_status(self):
 
-        def get_status_code(status):
-            if status == SensorStatus.DISABLED:
-                return "D"
-            elif status == SensorStatus.NO_REPLY:
-                return "X"
-            elif status == SensorStatus.VALUE_IN_RANGE:
-                return "O"
-            elif status == SensorStatus.VALUE_TOO_LOW:
-                return "L"
-            elif status == SensorStatus.VALUE_TOO_HIGH:
-                return "H"
-            else:
-                return "?"
+        status_codes = {
+            SensorStatus.DISABLED:"D",
+            SensorStatus.NO_REPLY:"X",
+            SensorStatus.VALUE_IN_RANGE:"O",
+            SensorStatus.VALUE_TOO_LOW:"L",
+            SensorStatus.VALUE_TOO_HIGH:"H"
+            SensorStatus.UNKNOWN:"?"
+        }
 
         return "PTS " + \
-               "".join([get_status_code(s.status()) for s in
+               "".join([status_codes[s.status()] for s in
                         self.rig.pressure_sensors(reverse=True)+self.rig.temperature_sensors(reverse=True)])
 
     def get_pressures(self):
@@ -191,20 +187,13 @@ class VolumetricRigStreamInterface(StreamAdapter):
                         [t.value(as_string=True) for t in self.rig.temperature_sensors(reverse=True)])
 
     def get_valve_status(self):
-
-        def derive_status(valve):
-            if valve.enabled() and valve.is_open():
-                return "O"
-            elif valve.enabled() and not valve.is_open():
-                return "E"
-            elif not valve.enabled() and valve.is_open():
-                return "!"
-            elif not valve.enabled() and not valve.is_open():
-                return "D"
-            else:
-                assert False
-
-        return "VST Valve Status " + "".join([derive_status(v) for v in self.rig.valves_status()])
+        status_codes = {
+            ValveStatus.OPEN_AND_ENABLED:"O",
+            ValveStatus.CLOSED_AND_ENABLED:"E",
+            ValveStatus.CLOSED_AND_DISABLED:"D",
+            ValveStatus.OPEN_AND_DISABLED:"!"
+        }
+        return "VST Valve Status " + "".join([status_codes(v) for v in self.rig.valves_status()])
 
     def _set_valve_status(self, valve_number_raw, set_to_open):
         valve_number = convert_raw_to_int(valve_number_raw)

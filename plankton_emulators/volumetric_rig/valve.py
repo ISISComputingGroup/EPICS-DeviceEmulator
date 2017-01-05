@@ -1,3 +1,6 @@
+from valve_status import ValveStatus
+
+
 class Valve(object):
     def __init__(self):
         self._is_enabled = True
@@ -16,3 +19,9 @@ class Valve(object):
 
     def is_enabled(self):
         return self._is_enabled
+
+    def status(self):
+        if self._is_open:
+            return ValveStatus.OPEN_AND_ENABLED if self._is_enabled else ValveStatus.OPEN_AND_DISABLED
+        else:
+            return ValveStatus.CLOSED_AND_ENABLED if self._is_enabled else ValveStatus.CLOSED_AND_DISABLED
