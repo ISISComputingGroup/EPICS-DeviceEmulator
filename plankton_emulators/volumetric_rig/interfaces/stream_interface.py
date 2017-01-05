@@ -1,6 +1,7 @@
 from lewis.adapters.stream import StreamAdapter, Cmd
 from ..device import SimulatedVolumetricRig
 from ..sensor_status import SensorStatus
+from ..utilities import optional_int_string_format
 
 
 class VolumetricRigStreamInterface(StreamAdapter):
@@ -23,7 +24,8 @@ class VolumetricRigStreamInterface(StreamAdapter):
         Cmd("get_gas_number_available", "^GNA(?: .*)?$"),
         Cmd("get_hmi_status", "^HMI(?: .*)?$"),
         Cmd("get_hmi_count_cycles", "^HMC(?: .*)?$"),
-        Cmd("get_memory_location", "^RDM(?: .*)?"),
+        Cmd("get_memory_location", "^RDM$"),
+        Cmd("get_memory_location", "^RDM\s(\S*).*"),
         Cmd("get_pressure_and_temperature_status", "^PTS(?: .*)?$"),
         Cmd("get_pressures", "^PMV(?: .*)?$"),
         Cmd("get_temperatures", "^TMV(?: .*)?$"),
@@ -179,7 +181,7 @@ class VolumetricRigStreamInterface(StreamAdapter):
             location = int(location_raw)
         except ValueError:
             location = 0
-        return " ".join(["RDM", location[:4].zfill(4),
+        return " ".join(["RDM", optional_int_string_format(location, as_string=True, length=4),
                          self.rig.memory_location(location, as_string=True, length=6)])
 
     def get_pressure_and_temperature_status(self):
@@ -230,7 +232,7 @@ class VolumetricRigStreamInterface(StreamAdapter):
     def _set_valve_status(self, buffer_number_raw, set_to_open):
         try:
             valve_number = int(buffer_number_raw)
-        except TypeError:
+        except ValueError:
             valve_number = 0
 
         command = "OPV" if set_to_open else "CLV"
