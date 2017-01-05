@@ -19,16 +19,13 @@ class SimulatedVolumetricRig(Device):
 
         # Set mixable gases
         self.mixer = TwoGasMixer()
-        for pair in SeedGasData.mixable_gas_names():
-            name1, name2 = pair
-            self.mixer.add_mixable(
-                self.system_gases.gas_by_name(name1),
-                self.system_gases.gas_by_name(name2))
+        for name1, name2 in SeedGasData.mixable_gas_names():
+            self.mixer.add_mixable(self.system_gases.gas_by_name(name1), self.system_gases.gas_by_name(name2))
 
         # Set buffers
-        buffer_gases = [(self.system_gases.gas_by_name(next(iter(pair))),
-                         self.system_gases.gas_by_name(next(iter(pair))))
-                        for pair in SeedGasData.buffer_gas_names()]
+        buffer_gases = [(self.system_gases.gas_by_name(name1),
+                         self.system_gases.gas_by_name(name2))
+                        for name1, name2 in SeedGasData.buffer_gas_names()]
         self.buffers = [Buffer(i+1, buffer_gases[i][0], buffer_gases[i][1])
                         for i in range(len(buffer_gases))]
 
