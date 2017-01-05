@@ -1,5 +1,5 @@
 from sensor_status import SensorStatus
-from utilities import optional_float_string_format
+from utilities import format_float
 
 
 class Sensor(object):
@@ -17,4 +17,4 @@ class Sensor(object):
         self._value = v
 
     def value(self, as_string):
-        return optional_float_string_format(self._value, as_string)
+        return format_float(self._value, as_string)

@@ -1,5 +1,5 @@
 from valve import Valve
-from utilities import optional_int_string_format
+from utilities import format_int
 from two_gas_mixer import TwoGasMixer
 
 
@@ -13,7 +13,7 @@ class Buffer(object):
         self._valve = Valve()
 
     def index(self, as_string=False, length=1):
-        return optional_int_string_format(self._index, as_string, length)
+        return format_int(self._index, as_string, length)
 
     def open_valve(self, mixer):
         assert isinstance(mixer, TwoGasMixer)

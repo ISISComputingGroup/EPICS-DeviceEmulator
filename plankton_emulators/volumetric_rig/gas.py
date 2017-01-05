@@ -1,5 +1,5 @@
 from types import StringType, IntType
-from utilities import pad_string, optional_int_string_format
+from utilities import pad_string, format_int
 
 
 class Gas(object):
@@ -12,4 +12,4 @@ class Gas(object):
         return pad_string(self._name, length, padding_character)
 
     def index(self, as_string=False, length=2):
-        return optional_int_string_format(self._index, as_string, length)
+        return format_int(self._index, as_string, length)

@@ -1,6 +1,6 @@
 from lewis.adapters.stream import StreamAdapter, Cmd
 from ..sensor_status import SensorStatus
-from ..utilities import optional_int_string_format, convert_raw_to_int
+from ..utilities import format_int, convert_raw_to_int
 from ..valve_status import ValveStatus
 
 
@@ -11,6 +11,7 @@ class VolumetricRigStreamInterface(StreamAdapter):
     # Some commands that take input will respond with default (often invalid) parameters if not present. For example
     # "BCS" is the same as "BCS 00" and also "BCS AA".
     commands = {
+        Cmd("purge","^(.*)\!$"),
         Cmd("get_identity", "^IDN(?: .*)?$"),
         Cmd("get_identity", "^\?(?: .*)?$"),
         Cmd("get_buffer_control_and_status", "^BCS(?:\s(\S*))?.*$"),
@@ -44,6 +45,14 @@ class VolumetricRigStreamInterface(StreamAdapter):
         # Lots of formatted output is based on fixed length strings
         self.gas_output_length = 20
         super(VolumetricRigStreamInterface, self).__init__(device, arguments)
+
+    def purge(self, chars):
+        return " ".join([
+            "PRG,00,Purge",
+            format_int(len(chars) + 1, True, 5),
+            "Characters",
+            chars+"!"
+        ])
 
     def get_identity(self):
         return "IDN,00," + self._device.identify()
@@ -157,7 +166,7 @@ class VolumetricRigStreamInterface(StreamAdapter):
 
     def get_memory_location(self, location_raw):
         location = convert_raw_to_int(location_raw)
-        return " ".join(["RDM", optional_int_string_format(location, as_string=True, length=4),
+        return " ".join(["RDM", format_int(location, as_string=True, length=4),
                          self._device.memory_location(location, as_string=True, length=6)])
 
     def get_pressure_and_temperature_status(self):

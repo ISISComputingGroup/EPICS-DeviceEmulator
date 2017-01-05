@@ -7,7 +7,7 @@ from ethernet_device import EthernetDevice
 from hmi_device import HmiDevice
 from valve import Valve
 from error_states import ErrorStates
-from utilities import optional_int_string_format, optional_float_string_format
+from utilities import format_int, format_float
 from sensor import Sensor
 from states import DefaultInitState, DefaultRunningState
 from collections import OrderedDict
@@ -82,7 +82,7 @@ class SimulatedVolumetricRig(StateMachineDevice):
             return None
 
     def memory_location(self, location, as_string, length):
-        return optional_int_string_format(location, as_string, length)
+        return format_int(location, as_string, length)
 
     def plc(self):
         return self._plc
@@ -103,10 +103,10 @@ class SimulatedVolumetricRig(StateMachineDevice):
         return self._temperature_sensors if not reverse else list(reversed(self._temperature_sensors))
 
     def target_pressure(self, as_string):
-        return optional_float_string_format(self._target_pressure, as_string)
+        return format_float(self._target_pressure, as_string)
 
     def status_code(self, as_string=False, length=None):
-        return optional_int_string_format(2, as_string, length)
+        return format_int(2, as_string, length)
 
     def errors(self):
         return self._errors

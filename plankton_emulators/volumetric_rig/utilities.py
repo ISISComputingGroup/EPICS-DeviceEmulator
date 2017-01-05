@@ -1,11 +1,11 @@
-def optional_int_string_format(i, as_string, length):
+def format_int(i, as_string, length):
     if as_string:
         return str(i) if length is None else str(i)[:length].zfill(length)
     else:
         return i
 
 
-def optional_float_string_format(f, as_string):
+def format_float(f, as_string):
     return "{0:.2f}".format(f).zfill(5) if as_string else f
 
 

@@ -1,5 +1,5 @@
 from ethernet_device import EthernetDevice
-from utilities import optional_int_string_format
+from utilities import format_int
 
 
 class HmiDevice(EthernetDevice):
@@ -17,22 +17,22 @@ class HmiDevice(EthernetDevice):
         super(HmiDevice, self).__init__(ip)
 
     def base_page(self, as_string, length):
-        return optional_int_string_format(self._base_page, as_string, length)
+        return format_int(self._base_page, as_string, length)
 
     def sub_page(self, as_string, length):
-        return optional_int_string_format(self._sub_page, as_string, length)
+        return format_int(self._sub_page, as_string, length)
 
     def count_cycles(self):
         return list(self._count_cycles)
 
     def max_grabbed(self, as_string, length):
-        return optional_int_string_format(self._max_grabbed, as_string, length)
+        return format_int(self._max_grabbed, as_string, length)
 
     def limit(self, as_string, length):
-        return optional_int_string_format(self._limit, as_string, length)
+        return format_int(self._limit, as_string, length)
 
     def count(self, as_string, length):
-        return optional_int_string_format(self._count, as_string, length)
+        return format_int(self._count, as_string, length)
 
     def status(self):
         return self._status
