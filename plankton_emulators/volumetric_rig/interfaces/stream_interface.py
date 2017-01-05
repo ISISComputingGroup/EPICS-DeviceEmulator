@@ -159,7 +159,7 @@ class VolumetricRigStreamInterface(StreamAdapter):
                         "ok" if self.rig.mixer.can_mix(gas1, gas2) else "NO"])
 
     def get_gas_number_available(self):
-        return len(self.rig.system_gases)
+        return self.rig.system_gases.gas_count()
 
     def get_hmi_status(self):
         return " ".join(["HMI " + self.rig.hmi_status() + " ",

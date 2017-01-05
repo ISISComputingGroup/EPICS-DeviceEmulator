@@ -23,3 +23,6 @@ class SystemGases(object):
 
     def gases(self):
         return sorted(list(self._gases), key=lambda g: g.index())
+
+    def gas_count(self):
+        return len(self._gases)
