@@ -1,8 +1,8 @@
-def optional_int_string_format(int, as_string, length):
+def optional_int_string_format(i, as_string, length):
     if as_string:
-        return str(int) if length is None else str(int)[:length].zfill(length)
+        return str(i) if length is None else str(i)[:length].zfill(length)
     else:
-        return int
+        return i
 
 
 def pad_string(s, length, padding_character):
