@@ -105,7 +105,7 @@ class VolumetricRigStreamInterface(StreamAdapter):
 
     def get_gas_mix_matrix(self):
         # Gather data
-        system_gases = self.rig.system_gases.gases
+        system_gases = self.rig.system_gases.gases()
 
         column_headers = [gas.name(self.gas_output_length, '|') for gas in system_gases]
         row_titles = [" ".join([gas.index(as_string=True), gas.name(self.gas_output_length, ' ')])

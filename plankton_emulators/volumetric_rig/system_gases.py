@@ -3,7 +3,7 @@ from gas import Gas
 
 class SystemGases(object):
     def __init__(self, gases=list()):
-        self.gases = set()
+        self._gases = set()
         self._add_gases(gases)
 
     def gas_by_index(self, index):
@@ -14,9 +14,12 @@ class SystemGases(object):
 
     def _get_by_method(self, value, method):
         try:
-            return next(g for g in self.gases if getattr(g, method)() == value)
+            return next(g for g in self._gases if getattr(g, method)() == value)
         except StopIteration:
             return None
 
     def _add_gases(self, iterable):
-        self.gases = set.union(self.gases, {g for g in iterable if isinstance(g, Gas)})
+        self._gases = set.union(self._gases, {g for g in iterable if isinstance(g, Gas)})
+
+    def gases(self):
+        return sorted(list(self._gases), key=lambda g: g.index())
