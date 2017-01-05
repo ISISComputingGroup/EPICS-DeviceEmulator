@@ -162,12 +162,14 @@ class VolumetricRigStreamInterface(StreamAdapter):
         return self.rig.system_gases.gas_count()
 
     def get_hmi_status(self):
-        return " ".join(["HMI " + self.rig.hmi_status() + " ",
+        # C, L and M are returned by the current rig. I don't know what they are
+        return ",".join(["HMI " + self.rig.hmi_status() + " ",
                          self.rig.hmi_ip(),
                          "B",
                          self.rig.hmi_base_page(as_string=True, length=4),
                          "S",
-                         self.rig.hmi_sub_page(as_string=True, length=3)])
+                         self.rig.hmi_sub_page(as_string=True, length=3)]) + \
+                         ",C,0000,L,0020,M,0038"
 
     def get_hmi_count_cycles(self):
         return " ".join(["HMC"] + self.rig.hmi_count_cycles())
