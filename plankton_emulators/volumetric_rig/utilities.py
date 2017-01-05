@@ -1,6 +1,6 @@
 def optional_int_string_format(int, as_string, length):
     if as_string:
-        return str(int) if length is not None else int[:length].zfill(length)
+        return str(int) if length is None else str(int)[:length].zfill(length)
     else:
         return int
 

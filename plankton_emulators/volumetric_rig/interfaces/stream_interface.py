@@ -53,6 +53,20 @@ class VolumetricRigStreamInterface(StreamAdapter):
     def get_identity(self):
         return "IDN,00," + self.rig.identify()
 
+    def _build_buffer_control_and_status_string(self, buffer_number):
+        buff = self.rig.buffer(buffer_number)
+        assert buff is not None
+        return " ".join([
+            "",
+            buff.index(as_string=True),
+            buff.buffer_gas().index(as_string=True),
+            buff.buffer_gas().name(self.gas_output_length, " "),
+            "E" if buff.valve_is_enabled() else "d",
+            "O" if buff.valve_is_open() else "c",
+            buff.system_gas().index(as_string=True),
+            buff.system_gas().name()
+        ])
+
     def get_buffer_control_and_status(self, buffer_number_string="0"):
         try:
             buffer_number = int(buffer_number_string)
@@ -70,19 +84,8 @@ class VolumetricRigStreamInterface(StreamAdapter):
             return buffer_too_low
         elif buffer_number > len(self.rig.buffers()):
             return buffer_too_high
-
-        buff = self.rig.buffer(buffer_number)
-        assert buff is not None
-        return " ".join([
-            message_prefix,
-            buff.index(as_string=True),
-            buff.buffer_gas().index(as_string=True),
-            buff.buffer_gas().name(self.gas_output_length, " "),
-            "E" if buff.valve_is_enabled() else "d",
-            "O" if buff.valve_is_open() else "c",
-            buff.system_gas().index(as_string=True),
-            buff.system_gas().name()
-        ])
+        else:
+            return "BCS " + self._build_buffer_control_and_status_string(buffer_number)
 
     def get_ethernet_and_hmi_status(self):
         # The syntax of the return string is odd: the separators are not consistent
@@ -94,28 +97,19 @@ class VolumetricRigStreamInterface(StreamAdapter):
         ])
 
     def get_gas_control_and_status(self):
-        lines = list()
-        lines.append("No No Buffer               E O No System")
-        for buff in self.rig.buffers():
-            words = list()
-            words.append("")
-            words.append(buff.index(as_string=True))
-            words.append(buff.buffer_gas().index(as_string=True))
-            words.append(buff.buffer_gas().name(self.gas_output_length, " "))
-            words.append("E" if buff.valve.is_enabled else "d")
-            words.append("O" if buff.valve.is_open else "c")
-            words.append(buff.system_gas().index(as_string=True))
-            words.append(buff.system_gas().name())
-            lines.append(" ".join(words))
-        lines.append("GCS")
-        return '\r\n'.join(lines)
+        return "\r\n".join(
+            ["No No Buffer               E O No System"] +
+            [self._build_buffer_control_and_status_string(b.index()) for b in self.rig.buffers()] +
+            ["GCS"]
+        )
 
     def get_gas_mix_matrix(self):
         # Gather data
         system_gases = self.rig.system_gases.gases
 
         column_headers = [gas.name(self.gas_output_length, '-') for gas in system_gases]
-        row_titles = [" ".join([gas.index(as_string=True), gas.name(self.gas_output_length, ' ')]) for gas in system_gases]
+        row_titles = [" ".join([gas.index(as_string=True), gas.name(self.gas_output_length, ' ')])
+                      for gas in system_gases]
         mixable_chars = [["<" if self.rig.mixer.can_mix(g1, g2) else "." for g1 in system_gases]
                          for g2 in system_gases]
 
