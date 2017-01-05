@@ -101,7 +101,7 @@ class VolumetricRigStreamInterface(StreamAdapter):
             words.append("")
             words.append(buff.index(as_string=True))
             words.append(buff.buffer_gas().index(as_string=True))
-            words.append(buff.buffer_gas().pad_name(self.gas_output_length, " "))
+            words.append(buff.buffer_gas().name(self.gas_output_length, " "))
             words.append("E" if buff.valve.is_enabled else "d")
             words.append("O" if buff.valve.is_open else "c")
             words.append(buff.system_gas().index(as_string=True))
@@ -114,8 +114,8 @@ class VolumetricRigStreamInterface(StreamAdapter):
         # Gather data
         system_gases = self.rig.system_gases.gases
 
-        column_headers = [gas.pad_name(self.gas_output_length, '-') for gas in system_gases]
-        row_titles = [" ".join([gas.index(as_string=True), gas.pad_name(self.gas_output_length, ' ')]) for gas in system_gases]
+        column_headers = [gas.name(self.gas_output_length, '-') for gas in system_gases]
+        row_titles = [" ".join([gas.index(as_string=True), gas.name(self.gas_output_length, ' ')]) for gas in system_gases]
         mixable_chars = [["<" if self.rig.mixer.can_mix(g1, g2) else "." for g1 in system_gases]
                          for g2 in system_gases]
 
@@ -160,8 +160,8 @@ class VolumetricRigStreamInterface(StreamAdapter):
             gas2 = self.rig.system_gases.gas_by_index(0)
 
         return ' '.join(["GMC",
-                         gas1.index(as_string=True), gas1.pad_name(self.gas_output_length, '.'),
-                         gas2.index(as_string=True), gas2.pad_name(self.gas_output_length, '.'),
+                         gas1.index(as_string=True), gas1.name(self.gas_output_length, '.'),
+                         gas2.index(as_string=True), gas2.name(self.gas_output_length, '.'),
                         "ok" if self.rig.mixer.can_mix(gas1, gas2) else "NO"])
 
     def get_gas_number_available(self):
