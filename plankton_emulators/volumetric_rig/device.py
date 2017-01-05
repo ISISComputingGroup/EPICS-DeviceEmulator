@@ -30,8 +30,8 @@ class SimulatedVolumetricRig(Device):
                         for i in range(len(buffer_gases))]
 
         # Set ethernet devices
-        self.plc = EthernetDevice("192.168.0.1")
-        self.hmi = HmiDevice("192.168.0.2")
+        self._plc = EthernetDevice("192.168.0.1")
+        self._hmi = HmiDevice("192.168.0.2")
 
         # Set up sensors
         self.temperature_sensors = [TemperatureSensor() for i in range(9)]
@@ -46,7 +46,7 @@ class SimulatedVolumetricRig(Device):
         self.cell_valve = Valve()
 
         # Misc system state variables
-        self.halted = False
+        self._halted = False
         self.status_code = 2
         self.errors = ErrorStates()
 
@@ -65,8 +65,35 @@ class SimulatedVolumetricRig(Device):
         except StopIteration:
             return None
 
-    def memory_location(self, location):
-        return str(location).zfill(6)
+    def memory_location(self, location, as_string, length):
+        return self._optional_int_string_format(location, as_string, length)
 
     def halt(self):
-        self.halted = True
+        self._halted = True
+
+    def plc_ip(self):
+        return self._plc.ip
+
+    def hmi_ip(self):
+        return self._hmi.ip
+
+    def hmi_status(self):
+        return self._hmi.status
+
+    def hmi_base_page(self, as_string=False, length=None):
+        return self._optional_int_string_format(self._hmi.base_page, as_string, length)
+
+    def hmi_sub_page(self, as_string=False, length=None):
+        return self._optional_int_string_format(self._hmi.sub_page, as_string, length)
+
+    def hmi_count_cycles(self):
+        return self._hmi.count_cycles
+
+    def _optional_int_string_format(self, int, as_string, length):
+        if as_string:
+            return str(int) if length is not None else int[:length].zfill(length)
+        else:
+            return int
+
+    def halted(self):
+        return self._halted

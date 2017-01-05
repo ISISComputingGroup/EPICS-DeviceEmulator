@@ -24,8 +24,7 @@ class VolumetricRigStreamInterface(StreamAdapter):
         Cmd("get_gas_number_available", "^GNA(?: .*)?$"),
         Cmd("get_hmi_status", "^HMI(?: .*)?$"),
         Cmd("get_hmi_count_cycles", "^HMC(?: .*)?$"),
-        Cmd("get_memory_location", "^RDM"),
-        Cmd("get_memory_location", "^RDM\s(\S*).*$"),
+        Cmd("get_memory_location", "^RDM(?: .*)?"),
         Cmd("get_pressure_and_temperature_status", "^PTS(?: .*)?$"),
         Cmd("get_pressures", "^PMV(?: .*)?$"),
         Cmd("get_temperatures", "^TMV(?: .*)?$"),
@@ -90,9 +89,9 @@ class VolumetricRigStreamInterface(StreamAdapter):
         # The syntax of the return string is odd: the separators are not consistent
         return " ".join([
             "ETN:PLC",
-            self.rig.plc.ip + ",HMI",
-            self.rig.hmi.status,
-            "," + self.rig.hmi.ip
+            self.rig.plc_ip() + ",HMI",
+            self.rig.hmi_status(),
+            "," + self.rig.hmi_ip()
         ])
 
     def get_gas_control_and_status(self):
@@ -166,19 +165,23 @@ class VolumetricRigStreamInterface(StreamAdapter):
         return len(self.rig.system_gases)
 
     def get_hmi_status(self):
-        hmi = self.rig.hmi
-        return " ".join(["HMI " + hmi.status + " ",
-                         hmi.ip, "B", hmi.base_page_string(), "S", hmi.sub_page_string()])
+        return " ".join(["HMI " + self.rig.hmi_status() + " ",
+                         self.rig.hmi_ip(),
+                         "B",
+                         self.rig.hmi_base_page(as_string=True, length=4),
+                         "S",
+                         self.rig.hmi_sub_page(as_string=True, length=3)])
 
     def get_hmi_count_cycles(self):
-        return " ".join(["HMC"] + self.rig.hmi.count_cycles)
+        return " ".join(["HMC"] + self.rig.hmi.count_cycles())
 
     def get_memory_location(self, location_raw="0"):
         try:
             location = int(location_raw)
         except ValueError:
             location = 0
-        return " ".join(["RDM", location.zfill(4), self.rig.memory_location(location)])
+        return " ".join(["RDM", location[:4].zfill(4),
+                         self.rig.memory_location(location, as_string=True, length=6)])
 
     def get_pressure_and_temperature_status(self):
 
@@ -247,7 +250,7 @@ class VolumetricRigStreamInterface(StreamAdapter):
         elif buffer_number > len(self.rig.buffers):
             return message_prefix + " Too High"
 
-        if self.rig.halted:
+        if self.rig.halted():
             return "CLV Rejected only allowed when running"
         else:
             valve = self.rig.buffer(buffer_number).valve
@@ -274,11 +277,11 @@ class VolumetricRigStreamInterface(StreamAdapter):
         self._set_valve_status(buffer_number_raw, True)
 
     def halt(self):
-        if self.rig.halted:
+        if self.rig.halted():
             message = "SYSTEM ALREADY HALTED"
         else:
             self.rig.halt()
-            assert self.rig.halted
+            assert self.rig.halted()
             message = "SYSTEM NOW HALTED"
         return "HLT *** " + message + " ***"
 
@@ -291,7 +294,7 @@ class VolumetricRigStreamInterface(StreamAdapter):
             # Spelling error duplicated as on device
             "GUAGES" if self.rig.errors.gauges else "guages",
             "COMMS" if self.rig.errors.comms else "comms",
-            "HLT" if self.rig.halted else "halted",
+            "HLT" if self.rig.halted() else "halted",
             "E-STOP" if self.rig.errors.estop else "estop"
         ])
 
