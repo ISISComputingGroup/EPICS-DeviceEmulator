@@ -16,6 +16,9 @@ from lewis.devices import StateMachineDevice
 
 
 class SimulatedVolumetricRig(StateMachineDevice):
+
+    HALTED_MESSAGE = "Rejected only allowed when running"
+
     def _initialize_data(self):
         self.serial_command_mode = False
 
@@ -141,27 +144,33 @@ class SimulatedVolumetricRig(StateMachineDevice):
         return self._cell_valve.is_enabled()
 
     def open_buffer_valve(self, buffer_number):
-        buff = self.buffer(buffer_number)
-        if buff is not None:
-            buff.open_valve(self.mixer)
+        if not self._halted:
+            buff = self.buffer(buffer_number)
+            if buff is not None:
+                buff.open_valve(self.mixer)
 
     def open_cell_valve(self):
-        self._cell_valve.open()
+        if not self._halted:
+            self._cell_valve.open()
 
     def open_vacuum_valve(self):
-        if not any([b.valve_is_open() for b in self._buffers]):
-            self._vacuum_extract_valve.open()
+        if not self._halted:
+            if not any([b.valve_is_open() for b in self._buffers]):
+                self._vacuum_extract_valve.open()
 
     def close_buffer_valve(self, buffer_number):
-        buff = self.buffer(buffer_number)
-        if buff is not None:
-            buff.close_valve()
+        if not self._halted:
+            buff = self.buffer(buffer_number)
+            if buff is not None:
+                buff.close_valve()
 
     def close_cell_valve(self):
-        self._cell_valve.close()
+        if not self._halted:
+            self._cell_valve.close()
 
     def close_vacuum_valve(self):
-        self._vacuum_extract_valve.close()
+        if not self._halted:
+            self._vacuum_extract_valve.close()
 
     def buffers(self):
         return self._buffers
