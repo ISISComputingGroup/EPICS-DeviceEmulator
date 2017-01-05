@@ -193,7 +193,7 @@ class VolumetricRigStreamInterface(StreamAdapter):
             ValveStatus.CLOSED_AND_DISABLED:"D",
             ValveStatus.OPEN_AND_DISABLED:"!"
         }
-        return "VST Valve Status " + "".join([status_codes(v) for v in self.rig.valves_status()])
+        return "VST Valve Status " + "".join([status_codes[v] for v in self.rig.valves_status()])
 
     def _set_valve_status(self, valve_number_raw, set_to_open):
         valve_number = convert_raw_to_int(valve_number_raw)
