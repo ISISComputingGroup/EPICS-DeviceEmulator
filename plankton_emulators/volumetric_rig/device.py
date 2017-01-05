@@ -8,7 +8,7 @@ from ethernet_device import EthernetDevice
 from hmi_device import HmiDevice
 from valve import Valve
 from error_states import ErrorStates
-from utilities import optional_int_string_format
+from utilities import optional_int_string_format, optional_float_string_format
 from sensor import Sensor
 
 
@@ -86,8 +86,8 @@ class SimulatedVolumetricRig(Device):
     def temperature_sensors(self, reverse=False):
         return self._temperature_sensors if not reverse else list(reversed(self._temperature_sensors))
 
-    def target_pressure(self):
-        return self._target_pressure
+    def target_pressure(self, as_string):
+        return optional_float_string_format(self._target_pressure, as_string)
 
     def status_code(self, as_string=False, length=None):
         return optional_int_string_format(2, as_string, length)

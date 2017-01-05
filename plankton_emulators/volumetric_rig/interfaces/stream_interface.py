@@ -184,7 +184,7 @@ class VolumetricRigStreamInterface(StreamAdapter):
     def get_pressures(self):
         return " ".join(["PMV"] +
                         [p.value(as_string=True) for p in self.rig.pressure_sensors(reverse=True)] +
-                        ["T", self.rig.target_pressure()])
+                        ["T", self.rig.target_pressure(as_string=True)])
 
     def get_temperatures(self):
         return " ".join(["TMV"] +
