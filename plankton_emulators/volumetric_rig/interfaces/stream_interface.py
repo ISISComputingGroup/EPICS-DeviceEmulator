@@ -78,8 +78,8 @@ class VolumetricRigStreamInterface(StreamAdapter):
             buff.index(as_string=True),
             buff.buffer_gas.index(as_string=True),
             buff.buffer_gas.name(self.gas_output_length, " "),
-            "E" if buff.valve().is_enabled else "d",
-            "O" if buff.valve().is_open else "c",
+            "E" if buff.valve_is_enabled() else "d",
+            "O" if buff.valve_is_open() else "c",
             buff.system_gas.index(as_string=True),
             buff.system_gas.name()
         ])
@@ -198,8 +198,8 @@ class VolumetricRigStreamInterface(StreamAdapter):
                 return "?"
 
         return "PTS " + \
-               "".join([get_status_code(s.status) for s in self.rig.pressure_sensors(reverse=True)]) + \
-               "".join([get_status_code(s.status) for s in self.rig.temperature_sensors(reverse=True)])
+               "".join([get_status_code(s.status()) for s in
+                        self.rig.pressure_sensors(reverse=True)+self.rig.temperature_sensors(reverse=True)])
 
     def get_pressures(self):
         return " ".join(["PMV"] +
@@ -259,7 +259,7 @@ class VolumetricRigStreamInterface(StreamAdapter):
 
         original_status = valve_status()
         open_valve() if set_to_open else close_valve()
-        new_status = valve_stauts()
+        new_status = valve_status()
 
         def derive_status(is_open):
             return "open" if is_open else "closed"

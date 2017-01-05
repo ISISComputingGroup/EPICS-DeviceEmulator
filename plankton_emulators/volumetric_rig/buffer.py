@@ -20,3 +20,9 @@ class Buffer(object):
 
     def close_valve(self):
         self._valve.close()
+
+    def valve_is_open(self):
+        return self._valve.is_open
+
+    def valve_is_enabled(self):
+        return self._valve.is_enabled
