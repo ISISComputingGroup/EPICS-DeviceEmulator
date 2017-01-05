@@ -12,9 +12,9 @@ class SystemGases(object):
     def gas_by_name(self, name):
         return self._get_by_method(name, "name")
 
-    def _get_by_method(self, value, attr):
+    def _get_by_method(self, value, method):
         try:
-            return next(g for g in self.gases if getattr(g, attr) == value)
+            return next(g for g in self.gases if getattr(g, method)() == value)
         except StopIteration:
             return None
 

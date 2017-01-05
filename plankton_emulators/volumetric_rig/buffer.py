@@ -5,6 +5,8 @@ from two_gas_mixer import TwoGasMixer
 
 class Buffer(object):
     def __init__(self, index, buffer_gas, system_gas):
+        assert buffer_gas is not None
+        assert system_gas is not None
         self._buffer_gas = buffer_gas
         self._system_gas = system_gas
         self._index = index
@@ -26,3 +28,9 @@ class Buffer(object):
 
     def valve_is_enabled(self):
         return self._valve.is_enabled
+
+    def buffer_gas(self):
+        return self._buffer_gas
+
+    def system_gas(self):
+        return self._system_gas
