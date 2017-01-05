@@ -125,10 +125,20 @@ class SimulatedVolumetricRig(StateMachineDevice):
         return buff.valve_is_open() if buff is not None else False
 
     def vacuum_valve_is_open(self):
-        return self._vacuum_extract_valve.is_open
+        return self._vacuum_extract_valve.is_open()
 
     def cell_valve_is_open(self):
-        return self._cell_valve.is_open
+        return self._cell_valve.is_open()
+
+    def buffer_valve_is_enabled(self, buffer_number):
+        buff = self.buffer(buffer_number)
+        return buff.valve_is_enabled() if buff is not None else False
+
+    def vacuum_valve_is_enabled(self):
+        return self._vacuum_extract_valve.is_enabled()
+
+    def cell_valve_is_enabled(self):
+        return self._cell_valve.is_enabled()
 
     def open_buffer_valve(self, buffer_number):
         buff = self.buffer(buffer_number)

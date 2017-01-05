@@ -216,24 +216,30 @@ class VolumetricRigStreamInterface(StreamAdapter):
         elif valve_number <= 0:
             return message_prefix + " Too Low"
         elif valve_number <= self._device.buffer_count():
-            valve_status = self._device.buffer_valve_is_open
+            valve_enabled = self.device.buffer_valve_is_enabled
+            valve_is_open = self._device.buffer_valve_is_open
             open_valve = self._device.open_buffer_valve
             close_valve = self._device.close_buffer_valve
             args.append(valve_number)
         elif valve_number == self._device.buffer_count() + 1:
-            valve_status = self._device.cell_valve_is_open
+            valve_enabled = self.device.cell_valve_is_enabled
+            valve_is_open = self._device.cell_valve_is_open
             open_valve = self._device.open_cell_valve
             close_valve = self._device.close_cell_valve
         elif valve_number == self._device.buffer_count() + 2:
-            valve_status = self._device.vacuum_valve_is_open
+            valve_enabled = self.device.vacuum_valve_is_enabled
+            valve_is_open = self._device.vacuum_valve_is_open
             open_valve = self._device.open_vacuum_valve
             close_valve = self._device.close_vacuum_valve
         else:
             return message_prefix + " Too High"
 
-        original_status = valve_status(*args)
+        if not valve_enabled(*args):
+            return " ".join([command,"Rejected not enabled",format_int(valve_number,True,1)])
+
+        original_status = valve_is_open(*args)
         open_valve(*args) if set_to_open else close_valve(*args)
-        new_status = valve_status(*args)
+        new_status = valve_is_open(*args)
 
         status_codes = {True: "open", False: "closed"}
         return " ".join([
