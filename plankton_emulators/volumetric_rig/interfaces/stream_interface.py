@@ -1,7 +1,7 @@
 from lewis.adapters.stream import StreamAdapter, Cmd
 from ..device import SimulatedVolumetricRig
 from ..sensor_status import SensorStatus
-from ..utilities import optional_int_string_format
+from ..utilities import optional_int_string_format, convert_raw_to_int
 
 
 class VolumetricRigStreamInterface(StreamAdapter):
@@ -13,19 +13,15 @@ class VolumetricRigStreamInterface(StreamAdapter):
     commands = {
         Cmd("get_identity", "^IDN(?: .*)?$"),
         Cmd("get_identity", "^\?(?: .*)?$"),
-        Cmd("get_buffer_control_and_status", "^BCS$"),
-        Cmd("get_buffer_control_and_status", "^BCS\s(\S*).*$"),
+        Cmd("get_buffer_control_and_status", "^BCS(?:\s(\S*))?.*$"),
         Cmd("get_ethernet_and_hmi_status", "^ETN(?: .*)?$"),
         Cmd("get_gas_control_and_status", "^GCS(?: .*)?$"),
         Cmd("get_gas_mix_matrix", "^GMM(?: .*)?$"),
-        Cmd("gas_mix_check", "^GMC$"),
-        Cmd("gas_mix_check", "^GMC\s(\S*)$"),
-        Cmd("gas_mix_check", "^GMC\s(\S*)\s(\S*).*$"),
+        Cmd("gas_mix_check", "^GMC(?:\s(\S*))?(?:\s(\S*))?.*$"),
         Cmd("get_gas_number_available", "^GNA(?: .*)?$"),
         Cmd("get_hmi_status", "^HMI(?: .*)?$"),
         Cmd("get_hmi_count_cycles", "^HMC(?: .*)?$"),
-        Cmd("get_memory_location", "^RDM$"),
-        Cmd("get_memory_location", "^RDM\s(\S*).*"),
+        Cmd("get_memory_location", "^RDM(?:\s(\S*))?.*"),
         Cmd("get_pressure_and_temperature_status", "^PTS(?: .*)?$"),
         Cmd("get_pressures", "^PMV(?: .*)?$"),
         Cmd("get_temperatures", "^TMV(?: .*)?$"),
@@ -36,10 +32,8 @@ class VolumetricRigStreamInterface(StreamAdapter):
         Cmd("get_system_status", "^STS(?: .*)?$"),
         Cmd("get_com_activity", "^COM(?: .*)?$"),
         Cmd("get_valve_status", "^VST(?: .*)?$"),
-        Cmd("set_valve_open", "^OPV$"),
-        Cmd("set_valve_open", "^OPV\s(\S*).*$"),
-        Cmd("set_valve_closed", "^CLV.*$"),
-        Cmd("set_valve_closed", "^CLV\s(\S*).*$"),
+        Cmd("set_valve_open", "^OPV(?:\s(\S*))?.*$"),
+        Cmd("set_valve_closed", "^CLV(?:\s(\S*))?.*$"),
         Cmd("halt", "^HLT(?: .*)?$"),
     }
 
@@ -69,13 +63,8 @@ class VolumetricRigStreamInterface(StreamAdapter):
             buff.system_gas().name()
         ])
 
-    def get_buffer_control_and_status(self, buffer_number_string="0"):
-        try:
-            buffer_number = int(buffer_number_string)
-        except ValueError:
-            # This is how the volumetric rig currently responds
-            buffer_number = 0
-
+    def get_buffer_control_and_status(self, buffer_number_raw):
+        buffer_number = convert_raw_to_int(buffer_number_raw)
         message_prefix = "BCS"
         num_length = 3
         error_message_prefix = " ".join([message_prefix, "Buffer", str(buffer_number)[:num_length].zfill(num_length)])
@@ -138,18 +127,9 @@ class VolumetricRigStreamInterface(StreamAdapter):
 
         return '\r\n'.join(lines)
 
-    def gas_mix_check(self, gas1_index_raw="0", gas2_index_raw="0"):
-        try:
-            gas1_index = int(gas1_index_raw)
-        except ValueError:
-            gas1_index = 0
-        try:
-            gas2_index = int(gas2_index_raw)
-        except ValueError:
-            gas2_index = 0
-
-        gas1 = self.rig.system_gases.gas_by_index(gas1_index)
-        gas2 = self.rig.system_gases.gas_by_index(gas2_index)
+    def gas_mix_check(self, gas1_index_raw, gas2_index_raw):
+        gas1 = self.rig.system_gases.gas_by_index(convert_raw_to_int(gas1_index_raw))
+        gas2 = self.rig.system_gases.gas_by_index(convert_raw_to_int(gas2_index_raw))
         if gas1 is None:
             gas1 = self.rig.system_gases.gas_by_index(0)
         if gas2 is None:
@@ -176,11 +156,8 @@ class VolumetricRigStreamInterface(StreamAdapter):
     def get_hmi_count_cycles(self):
         return " ".join(["HMC"] + self.rig.hmi_count_cycles())
 
-    def get_memory_location(self, location_raw="0"):
-        try:
-            location = int(location_raw)
-        except ValueError:
-            location = 0
+    def get_memory_location(self, location_raw):
+        location = convert_raw_to_int(location_raw)
         return " ".join(["RDM", optional_int_string_format(location, as_string=True, length=4),
                          self.rig.memory_location(location, as_string=True, length=6)])
 
@@ -229,12 +206,8 @@ class VolumetricRigStreamInterface(StreamAdapter):
 
         return "VST Valve Status " + "".join([derive_status(v) for v in self.rig.valves()])
 
-    def _set_valve_status(self, buffer_number_raw, set_to_open):
-        try:
-            valve_number = int(buffer_number_raw)
-        except ValueError:
-            valve_number = 0
-
+    def _set_valve_status(self, valve_number_raw, set_to_open):
+        valve_number = convert_raw_to_int(valve_number_raw)
         command = "OPV" if set_to_open else "CLV"
         message_prefix = " ".join([
             command,
