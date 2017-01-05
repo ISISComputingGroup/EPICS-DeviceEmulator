@@ -8,5 +8,5 @@ class Sensor(object):
     def set_status(self, status):
         self._status = status
 
-    def get_status(self):
+    def status(self):
         return self._status
