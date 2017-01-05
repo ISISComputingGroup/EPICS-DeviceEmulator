@@ -34,11 +34,8 @@ class SimulatedVolumetricRig(Device):
         self._hmi = HmiDevice("192.168.0.2")
 
         # Set up sensors
-        self.temperature_sensors = [TemperatureSensor() for i in range(9)]
-        self.pressure_sensors = [TemperatureSensor() for i in range(5)]
-
-        # Target pressure: We can't set this via serial
-        self.target_pressure = 12.34
+        self._temperature_sensors = [TemperatureSensor() for i in range(9)]
+        self._pressure_sensors = [TemperatureSensor() for i in range(5)]
 
         # Set up special valves
         self.supply_valve = Valve()
@@ -47,8 +44,11 @@ class SimulatedVolumetricRig(Device):
 
         # Misc system state variables
         self._halted = False
-        self.status_code = 2
+        self._status_code = 2
         self.errors = ErrorStates()
+
+        # Target pressure: We can't set this via serial
+        self._target_pressure = 12.34
 
         # Parent constructor
         super(SimulatedVolumetricRig, self).__init__()
@@ -89,11 +89,23 @@ class SimulatedVolumetricRig(Device):
     def hmi_count_cycles(self):
         return self._hmi.count_cycles
 
+    def halted(self):
+        return self._halted
+
+    def pressure_sensors(self, reverse=False):
+        return self._pressure_sensors if not reverse else self._pressure_sensors.reverse()
+
+    def temperature_sensors(self, reverse=False):
+        return self._temperature_sensors if not reverse else self._temperature_sensors.reverse()
+
+    def target_pressure(self):
+        return self._target_pressure
+
+    def status_code(self, as_string=False, length=None):
+        return self._optional_int_string_format(2, as_string, length)
+
     def _optional_int_string_format(self, int, as_string, length):
         if as_string:
             return str(int) if length is not None else int[:length].zfill(length)
         else:
             return int
-
-    def halted(self):
-        return self._halted

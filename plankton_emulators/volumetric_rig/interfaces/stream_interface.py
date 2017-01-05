@@ -10,7 +10,6 @@ class VolumetricRigStreamInterface(StreamAdapter):
     # Some commands that take input will respond with default (often invalid) parameters if not present. For example
     # "BCS" is the same as "BCS 00" and also "BCS AA".
     commands = {
-        #Cmd("get_identity", "^IDN$"),
         Cmd("get_identity", "^IDN(?: .*)?$"),
         Cmd("get_identity", "^\?(?: .*)?$"),
         Cmd("get_buffer_control_and_status", "^BCS$"),
@@ -64,8 +63,8 @@ class VolumetricRigStreamInterface(StreamAdapter):
         message_prefix = "BCS"
         num_length = 3
         error_message_prefix = " ".join([message_prefix, "Buffer", str(buffer_number)[:num_length].zfill(num_length)])
-        buffer_too_low = " ".join([error_message_prefix,"Too Low"])
-        buffer_too_high = " ".join([error_message_prefix + "Too High"])
+        buffer_too_low = " ".join([error_message_prefix, "Too Low"])
+        buffer_too_high = " ".join([error_message_prefix, "Too High"])
 
         if buffer_number <= 0:
             return buffer_too_low
@@ -112,7 +111,6 @@ class VolumetricRigStreamInterface(StreamAdapter):
         return '\r\n'.join(lines)
 
     def get_gas_mix_matrix(self):
-
         # Gather data
         system_gases = self.rig.system_gases.gases
 
@@ -173,7 +171,7 @@ class VolumetricRigStreamInterface(StreamAdapter):
                          self.rig.hmi_sub_page(as_string=True, length=3)])
 
     def get_hmi_count_cycles(self):
-        return " ".join(["HMC"] + self.rig.hmi.count_cycles())
+        return " ".join(["HMC"] + self.rig.hmi_count_cycles())
 
     def get_memory_location(self, location_raw="0"):
         try:
@@ -185,36 +183,32 @@ class VolumetricRigStreamInterface(StreamAdapter):
 
     def get_pressure_and_temperature_status(self):
 
-        def get_status_code(s):
-            if s == SensorStatus.DISABLED:
+        def get_status_code(status):
+            if status == SensorStatus.DISABLED:
                 return "D"
-            elif s == SensorStatus.NO_REPLY:
+            elif status == SensorStatus.NO_REPLY:
                 return "X"
-            elif s == SensorStatus.VALUE_IN_RANGE:
+            elif status == SensorStatus.VALUE_IN_RANGE:
                 return "O"
-            elif s == SensorStatus.VALUE_TOO_LOW:
+            elif status == SensorStatus.VALUE_TOO_LOW:
                 return "L"
-            elif s == SensorStatus.VALUE_TOO_HIGH:
+            elif status == SensorStatus.VALUE_TOO_HIGH:
                 return "H"
             else:
                 return "?"
 
         return "PTS " + \
-               "".join([get_status_code(self.rig.temperature_sensors[i].status)
-                        for i in reversed(range(len(self.rig.temperature_sensors)))]) + \
-               "".join([get_status_code(self.rig.pressure_sensors[i].status)
-                        for i in reversed(range(len(self.rig.pressure_sensors)))])
+               "".join([get_status_code(s.status) for s in self.rig.pressure_sensors(reverse=True)]) + \
+               "".join([get_status_code(s.status) for s in self.rig.temperature_sensors(reverse=True)])
 
     def get_pressures(self):
         return " ".join(["PMV"] +
-                        [self.rig.pressure_sensors[i].pressure
-                         for i in reversed(range(len(self.rig.pressure_sensors)))] +
-                        ["T", self.rig.target_pressure])
+                        [p.pressure for p in self.rig.pressure_sensors(reverse=True)] +
+                        ["T", self.rig.target_pressure()])
 
     def get_temperatures(self):
         return " ".join(["TMV"] +
-                        [self.rig.temperature_sensors[i].temperature
-                         for i in reversed(range(len(self.rig.temperature_sensors)))])
+                        [t.temperature for t in self.rig.temperature_sensors(reverse=True)])
 
     def get_valve_status(self):
         valves = [self.rig.supply_valve, self.rig.vacuum_extract_valve,  self.rig.cell_valve] + \
@@ -265,7 +259,7 @@ class VolumetricRigStreamInterface(StreamAdapter):
             return " ".join([
                 "OPV" if set_to_open else "CLV",
                 "Valve Buffer",
-                buffer_number.lstrip("0"),
+                str(buffer_number),
                 derive_status(original_status),
                 "was",
                 derive_status(new_status)])
@@ -288,7 +282,7 @@ class VolumetricRigStreamInterface(StreamAdapter):
     def get_system_status(self):
         return " ".join([
             "STS",
-            str(self.rig.status_code).zfill(2),
+            self.rig.status_code(as_string=True, length=2),
             "STOP" if self.rig.errors.run else "run",
             "HMI" if self.rig.errors.hmi else "hmi",
             # Spelling error duplicated as on device
