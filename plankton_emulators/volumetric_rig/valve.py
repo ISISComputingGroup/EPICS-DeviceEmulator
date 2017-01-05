@@ -7,6 +7,7 @@ class Valve(object):
         self._is_open = False
 
     def open(self):
+        print "Opening..."
         if self._is_enabled:
             self._is_open = True
 
