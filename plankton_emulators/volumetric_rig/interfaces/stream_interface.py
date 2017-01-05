@@ -107,7 +107,7 @@ class VolumetricRigStreamInterface(StreamAdapter):
         # Gather data
         system_gases = self.rig.system_gases.gases
 
-        column_headers = [gas.name(self.gas_output_length, '-') for gas in system_gases]
+        column_headers = [gas.name(self.gas_output_length, '|') for gas in system_gases]
         row_titles = [" ".join([gas.index(as_string=True), gas.name(self.gas_output_length, ' ')])
                       for gas in system_gases]
         mixable_chars = [["<" if self.rig.mixer.can_mix(g1, g2) else "." for g1 in system_gases]
