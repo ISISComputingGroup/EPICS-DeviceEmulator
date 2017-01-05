@@ -1,5 +1,4 @@
 from lewis.adapters.stream import StreamAdapter, Cmd
-from ..device import SimulatedVolumetricRig
 from ..sensor_status import SensorStatus
 from ..utilities import optional_int_string_format, convert_raw_to_int
 from ..valve_status import ValveStatus
@@ -42,16 +41,15 @@ class VolumetricRigStreamInterface(StreamAdapter):
     out_terminator = "\r\n"
 
     def __init__(self, device, arguments=None):
-        self.rig = SimulatedVolumetricRig()
         # Lots of formatted output is based on fixed length strings
         self.gas_output_length = 20
         super(VolumetricRigStreamInterface, self).__init__(device, arguments)
 
     def get_identity(self):
-        return "IDN,00," + self.rig.identify()
+        return "IDN,00," + self._device.identify()
 
     def _build_buffer_control_and_status_string(self, buffer_number):
-        buff = self.rig.buffer(buffer_number)
+        buff = self._device.buffer(buffer_number)
         assert buff is not None
         return " ".join([
             "",
@@ -74,7 +72,7 @@ class VolumetricRigStreamInterface(StreamAdapter):
 
         if buffer_number <= 0:
             return buffer_too_low
-        elif buffer_number > len(self.rig.buffers()):
+        elif buffer_number > len(self._device.buffers()):
             return buffer_too_high
         else:
             return "BCS " + self._build_buffer_control_and_status_string(buffer_number)
@@ -83,26 +81,26 @@ class VolumetricRigStreamInterface(StreamAdapter):
         # The syntax of the return string is odd: the separators are not consistent
         return " ".join([
             "ETN:PLC",
-            self.rig.plc.ip() + ",HMI",
-            self.rig.hmi().status(),
-            "," + self.rig.hmi().ip()
+            self._device.plc().ip() + ",HMI",
+            self._device.hmi().status(),
+            "," + self._device.hmi().ip()
         ])
 
     def get_gas_control_and_status(self):
         return "\r\n".join(
             ["No No Buffer               E O No System"] +
-            [self._build_buffer_control_and_status_string(b.index()) for b in self.rig.buffers()] +
+            [self._build_buffer_control_and_status_string(b.index()) for b in self._device.buffers()] +
             ["GCS"]
         )
 
     def get_gas_mix_matrix(self):
         # Gather data
-        system_gases = self.rig.system_gases.gases()
+        system_gases = self._device.system_gases.gases()
 
         column_headers = [gas.name(self.gas_output_length, '|') for gas in system_gases]
         row_titles = [" ".join([gas.index(as_string=True), gas.name(self.gas_output_length, ' ')])
                       for gas in system_gases]
-        mixable_chars = [["<" if self.rig.mixer.can_mix(g1, g2) else "." for g1 in system_gases]
+        mixable_chars = [["<" if self._device.mixer.can_mix(g1, g2) else "." for g1 in system_gases]
                          for g2 in system_gases]
 
         # Put data in output format
@@ -129,71 +127,71 @@ class VolumetricRigStreamInterface(StreamAdapter):
         return '\r\n'.join(lines)
 
     def gas_mix_check(self, gas1_index_raw, gas2_index_raw):
-        gas1 = self.rig.system_gases.gas_by_index(convert_raw_to_int(gas1_index_raw))
-        gas2 = self.rig.system_gases.gas_by_index(convert_raw_to_int(gas2_index_raw))
+        gas1 = self._device.system_gases.gas_by_index(convert_raw_to_int(gas1_index_raw))
+        gas2 = self._device.system_gases.gas_by_index(convert_raw_to_int(gas2_index_raw))
         if gas1 is None:
-            gas1 = self.rig.system_gases.gas_by_index(0)
+            gas1 = self._device.system_gases.gas_by_index(0)
         if gas2 is None:
-            gas2 = self.rig.system_gases.gas_by_index(0)
+            gas2 = self._device.system_gases.gas_by_index(0)
 
         return ' '.join(["GMC",
                          gas1.index(as_string=True), gas1.name(self.gas_output_length, '.'),
                          gas2.index(as_string=True), gas2.name(self.gas_output_length, '.'),
-                        "ok" if self.rig.mixer.can_mix(gas1, gas2) else "NO"])
+                        "ok" if self._device.mixer.can_mix(gas1, gas2) else "NO"])
 
     def get_gas_number_available(self):
-        return self.rig.system_gases.gas_count()
+        return self._device.system_gases.gas_count()
 
     def get_hmi_status(self):
-        hmi = self.rig.hmi()
+        hmi = self._device.hmi()
         return ",".join(["HMI " + hmi.status() + " ", hmi.ip(),
-                         "B",hmi.base_page(as_string=True, length=3),
-                         "S",hmi.sub_page(as_string=True, length=3),
-                         "C",hmi.count(as_string=True, length=4),
-                         "L",hmi.limit(as_string=True, length=4),
-                         "M",hmi.max_grabbed(as_string=True, length=4)
+                         "B", hmi.base_page(as_string=True, length=3),
+                         "S", hmi.sub_page(as_string=True, length=3),
+                         "C", hmi.count(as_string=True, length=4),
+                         "L", hmi.limit(as_string=True, length=4),
+                         "M", hmi.max_grabbed(as_string=True, length=4)
                          ])
 
     def get_hmi_count_cycles(self):
-        return " ".join(["HMC"] + self.rig.hmi().count_cycles())
+        return " ".join(["HMC"] + self._device.hmi().count_cycles())
 
     def get_memory_location(self, location_raw):
         location = convert_raw_to_int(location_raw)
         return " ".join(["RDM", optional_int_string_format(location, as_string=True, length=4),
-                         self.rig.memory_location(location, as_string=True, length=6)])
+                         self._device.memory_location(location, as_string=True, length=6)])
 
     def get_pressure_and_temperature_status(self):
 
         status_codes = {
-            SensorStatus.DISABLED:"D",
-            SensorStatus.NO_REPLY:"X",
-            SensorStatus.VALUE_IN_RANGE:"O",
-            SensorStatus.VALUE_TOO_LOW:"L",
-            SensorStatus.VALUE_TOO_HIGH:"H",
-            SensorStatus.UNKNOWN:"?"
+            SensorStatus.DISABLED: "D",
+            SensorStatus.NO_REPLY: "X",
+            SensorStatus.VALUE_IN_RANGE: "O",
+            SensorStatus.VALUE_TOO_LOW: "L",
+            SensorStatus.VALUE_TOO_HIGH: "H",
+            SensorStatus.UNKNOWN: "?"
         }
 
         return "PTS " + \
                "".join([status_codes[s.status()] for s in
-                        self.rig.pressure_sensors(reverse=True)+self.rig.temperature_sensors(reverse=True)])
+                        self._device.pressure_sensors(reverse=True)+self._device.temperature_sensors(reverse=True)])
 
     def get_pressures(self):
         return " ".join(["PMV"] +
-                        [p.value(as_string=True) for p in self.rig.pressure_sensors(reverse=True)] +
-                        ["T", self.rig.target_pressure(as_string=True)])
+                        [p.value(as_string=True) for p in self._device.pressure_sensors(reverse=True)] +
+                        ["T", self._device.target_pressure(as_string=True)])
 
     def get_temperatures(self):
         return " ".join(["TMV"] +
-                        [t.value(as_string=True) for t in self.rig.temperature_sensors(reverse=True)])
+                        [t.value(as_string=True) for t in self._device.temperature_sensors(reverse=True)])
 
     def get_valve_status(self):
         status_codes = {
-            ValveStatus.OPEN_AND_ENABLED:"O",
-            ValveStatus.CLOSED_AND_ENABLED:"E",
-            ValveStatus.CLOSED_AND_DISABLED:"D",
-            ValveStatus.OPEN_AND_DISABLED:"!"
+            ValveStatus.OPEN_AND_ENABLED: "O",
+            ValveStatus.CLOSED_AND_ENABLED: "E",
+            ValveStatus.CLOSED_AND_DISABLED: "D",
+            ValveStatus.OPEN_AND_DISABLED: "!"
         }
-        return "VST Valve Status " + "".join([status_codes[v] for v in self.rig.valves_status()])
+        return "VST Valve Status " + "".join([status_codes[v] for v in self._device.valves_status()])
 
     def _set_valve_status(self, valve_number_raw, set_to_open):
         valve_number = convert_raw_to_int(valve_number_raw)
@@ -204,23 +202,23 @@ class VolumetricRigStreamInterface(StreamAdapter):
             str(valve_number)
             ])
         args = list()
-        if self.rig.halted():
+        if self._device.halted():
             return "CLV Rejected only allowed when running"
         elif valve_number <= 0:
             return message_prefix + " Too Low"
-        elif valve_number <= self.rig.buffer_count():
-            valve_status = self.rig.buffer_valve_is_open
-            open_valve = self.rig.open_buffer_valve
-            close_valve = self.rig.close_buffer_valve
+        elif valve_number <= self._device.buffer_count():
+            valve_status = self._device.buffer_valve_is_open
+            open_valve = self._device.open_buffer_valve
+            close_valve = self._device.close_buffer_valve
             args.append(valve_number)
-        elif valve_number == self.rig.buffer_count() + 1:
-            valve_status = self.rig.cell_valve_is_open
-            open_valve = self.rig.open_cell_valve
-            close_valve = self.rig.close_cell_valve
-        elif valve_number == self.rig.buffer_count() + 2:
-            valve_status = self.rig.vacuum_valve_is_open
-            open_valve = self.rig.open_vacuum_valve
-            close_valve = self.rig.close_vacuum_valve
+        elif valve_number == self._device.buffer_count() + 1:
+            valve_status = self._device.cell_valve_is_open
+            open_valve = self._device.open_cell_valve
+            close_valve = self._device.close_cell_valve
+        elif valve_number == self._device.buffer_count() + 2:
+            valve_status = self._device.vacuum_valve_is_open
+            open_valve = self._device.open_vacuum_valve
+            close_valve = self._device.close_vacuum_valve
         else:
             return message_prefix + " Too High"
 
@@ -228,7 +226,7 @@ class VolumetricRigStreamInterface(StreamAdapter):
         open_valve(*args) if set_to_open else close_valve(*args)
         new_status = valve_status(*args)
 
-        status_codes = {True: "open", False:"closed"}
+        status_codes = {True: "open", False: "closed"}
         return " ".join([
             command,
             "Valve Buffer",
@@ -245,25 +243,25 @@ class VolumetricRigStreamInterface(StreamAdapter):
         return self._set_valve_status(buffer_number_raw, True)
 
     def halt(self):
-        if self.rig.halted():
+        if self._device.halted():
             message = "SYSTEM ALREADY HALTED"
         else:
-            self.rig.halt()
-            assert self.rig.halted()
+            self._device.halt()
+            assert self._device.halted()
             message = "SYSTEM NOW HALTED"
         return "HLT *** " + message + " ***"
 
     def get_system_status(self):
         return " ".join([
             "STS",
-            self.rig.status_code(as_string=True, length=2),
-            "STOP" if self.rig.errors().run else "run",
-            "HMI" if self.rig.errors().hmi else "hmi",
+            self._device.status_code(as_string=True, length=2),
+            "STOP" if self._device.errors().run else "run",
+            "HMI" if self._device.errors().hmi else "hmi",
             # Spelling error duplicated as on device
-            "GUAGES" if self.rig.errors().gauges else "guages",
-            "COMMS" if self.rig.errors().comms else "comms",
-            "HLT" if self.rig.halted() else "halted",
-            "E-STOP" if self.rig.errors().estop else "estop"
+            "GUAGES" if self._device.errors().gauges else "guages",
+            "COMMS" if self._device.errors().comms else "comms",
+            "HLT" if self._device.halted() else "halted",
+            "E-STOP" if self._device.errors().estop else "estop"
         ])
 
     # Information about ports, relays and com traffic are currently returned statically

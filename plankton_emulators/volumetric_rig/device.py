@@ -1,4 +1,3 @@
-from lewis.devices import Device
 from two_gas_mixer import TwoGasMixer
 from buffer import Buffer
 from gas import Gas
@@ -10,10 +9,16 @@ from valve import Valve
 from error_states import ErrorStates
 from utilities import optional_int_string_format, optional_float_string_format
 from sensor import Sensor
+from states import DefaultInitState, DefaultRunningState
+from collections import OrderedDict
+
+from lewis.devices import StateMachineDevice
 
 
-class SimulatedVolumetricRig(Device):
-    def __init__(self):
+class SimulatedVolumetricRig(StateMachineDevice):
+    def _initialize_data(self):
+        self.serial_command_mode = False
+
         # Set up all available gases
         self.system_gases = SystemGases([Gas(i, SeedGasData.names[i]) for i in range(len(SeedGasData.names))])
 
@@ -50,8 +55,19 @@ class SimulatedVolumetricRig(Device):
         # Target pressure: We can't set this via serial
         self._target_pressure = 12.34
 
-        # Parent constructor
-        super(SimulatedVolumetricRig, self).__init__()
+    def _get_state_handlers(self):
+        return {
+            'init': DefaultInitState(),
+            'running': DefaultRunningState(),
+        }
+
+    def _get_initial_state(self):
+        return 'init'
+
+    def _get_transition_handlers(self):
+        return OrderedDict([
+            (('init', 'running'), lambda: self.serial_command_mode),
+        ])
 
     def identify(self):
         return "ISIS Volumetric Gas Handing Panel"
