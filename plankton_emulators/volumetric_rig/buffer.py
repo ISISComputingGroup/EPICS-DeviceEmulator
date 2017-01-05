@@ -1,6 +1,7 @@
 from valve import Valve
 from utilities import format_int
 from two_gas_mixer import TwoGasMixer
+from lewis.core import approaches
 
 
 class Buffer(object):
@@ -50,9 +51,10 @@ class Buffer(object):
 
     def update_pressure(self, dt, pressure_limit):
         if self._valve.is_open():
-            self._pressure += Buffer.PRESSURE_RATE*dt
+            # Intentionally overshoot to check that the valve closes properly when the limit is reached
+            self._pressure = approaches.linear(self._pressure, 1.1*pressure_limit, Buffer.PRESSURE_RATE, dt)
         else:
-            self._pressure -= Buffer.PRESSURE_RATE*dt
+            self._pressure = approaches.linear(self._pressure, 0.0, Buffer.PRESSURE_RATE, dt)
 
         if self._pressure > pressure_limit:
             self.close_valve()
