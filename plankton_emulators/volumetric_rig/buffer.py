@@ -4,6 +4,9 @@ from two_gas_mixer import TwoGasMixer
 
 
 class Buffer(object):
+
+    PRESSURE_RATE = 1.0
+
     def __init__(self, index, buffer_gas, system_gas):
         assert buffer_gas is not None
         assert system_gas is not None
@@ -11,6 +14,13 @@ class Buffer(object):
         self._system_gas = system_gas
         self._index = index
         self._valve = Valve()
+        self._pressure = 0.0
+
+    def _disable_valve(self):
+        self._valve.disable()
+
+    def _enable_valve(self):
+        self._valve.enable()
 
     def index(self, as_string=False, length=1):
         return format_int(self._index, as_string, length)
@@ -37,3 +47,16 @@ class Buffer(object):
 
     def system_gas(self):
         return self._system_gas
+
+    def update_pressure(self, dt, pressure_limit):
+        if self._valve.is_open():
+            self._pressure += Buffer.PRESSURE_RATE*dt
+        else:
+            self._pressure -= Buffer.PRESSURE_RATE*dt
+
+        if self._pressure > pressure_limit:
+            self.close_valve()
+            self._disable_valve()
+
+    def pressure(self):
+        return self._pressure

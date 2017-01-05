@@ -4,7 +4,7 @@ from utilities import format_float
 
 class Sensor(object):
     def __init__(self):
-        self._status = SensorStatus.UNKNOWN
+        self._status = SensorStatus.NO_REPLY
         self._value = 0.0
 
     def set_status(self, status):

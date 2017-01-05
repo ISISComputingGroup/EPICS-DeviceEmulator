@@ -9,6 +9,7 @@ from valve import Valve
 from error_states import ErrorStates
 from utilities import format_int, format_float
 from sensor import Sensor
+from pressure_sensor import PressureSensor
 from states import DefaultInitState, DefaultRunningState
 from collections import OrderedDict
 
@@ -20,7 +21,7 @@ class SimulatedVolumetricRig(StateMachineDevice):
     HALTED_MESSAGE = "Rejected only allowed when running"
 
     def _initialize_data(self):
-        self.serial_command_mode = False
+        self.serial_command_mode = True
 
         # Set up all available gases
         self.system_gases = SystemGases([Gas(i, SeedGasData.names[i]) for i in range(len(SeedGasData.names))])
@@ -41,9 +42,12 @@ class SimulatedVolumetricRig(StateMachineDevice):
         self._plc = EthernetDevice("192.168.0.1")
         self._hmi = HmiDevice("192.168.0.2")
 
+        # Target pressure: We can't set this via serial
+        self._target_pressure = 100.00
+
         # Set up sensors
         self._temperature_sensors = [Sensor() for _ in range(9)]
-        self._pressure_sensors = [Sensor() for _ in range(5)]
+        self._pressure_sensors = [PressureSensor(self._target_pressure) for _ in range(5)]
 
         # Set up special valves
         self._supply_valve = Valve()
@@ -54,9 +58,6 @@ class SimulatedVolumetricRig(StateMachineDevice):
         self._halted = False
         self._status_code = 2
         self._errors = ErrorStates()
-
-        # Target pressure: We can't set this via serial
-        self._target_pressure = 12.34
 
     def _get_state_handlers(self):
         return {
@@ -177,4 +178,6 @@ class SimulatedVolumetricRig(StateMachineDevice):
 
     def update_buffer_pressures(self, dt):
         for b in self._buffers:
-            b.update_pressure(dt)
+            b.update_pressure(dt, self._target_pressure)
+        for p in self._pressure_sensors:
+            p.set_value(self._buffers[0].pressure())

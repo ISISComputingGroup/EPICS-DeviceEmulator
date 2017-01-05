@@ -25,3 +25,9 @@ class Valve(object):
             return ValveStatus.OPEN_AND_ENABLED if self._is_enabled else ValveStatus.OPEN_AND_DISABLED
         else:
             return ValveStatus.CLOSED_AND_ENABLED if self._is_enabled else ValveStatus.CLOSED_AND_DISABLED
+
+    def disable(self):
+        self._is_enabled = False
+
+    def enable(self):
+        self._is_enabled = True
