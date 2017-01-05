@@ -83,8 +83,8 @@ class VolumetricRigStreamInterface(StreamAdapter):
         return " ".join([
             "ETN:PLC",
             self.rig.plc.ip() + ",HMI",
-            self.rig.hmi_status(),
-            "," + self.rig.hmi_ip()
+            self.rig.hmi().status(),
+            "," + self.rig.hmi().ip()
         ])
 
     def get_gas_control_and_status(self):
@@ -154,7 +154,7 @@ class VolumetricRigStreamInterface(StreamAdapter):
                          ])
 
     def get_hmi_count_cycles(self):
-        return " ".join(["HMC"] + self.rig.hmi_count_cycles())
+        return " ".join(["HMC"] + self.rig.hmi().count_cycles())
 
     def get_memory_location(self, location_raw):
         location = convert_raw_to_int(location_raw)

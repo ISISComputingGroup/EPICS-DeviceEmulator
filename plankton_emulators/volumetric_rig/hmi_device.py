@@ -33,3 +33,6 @@ class HmiDevice(EthernetDevice):
 
     def count(self, as_string, length):
         return optional_int_string_format(self._count, as_string, length)
+
+    def status(self):
+        return self._status
