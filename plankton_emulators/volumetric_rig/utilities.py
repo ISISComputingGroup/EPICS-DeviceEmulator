@@ -5,6 +5,13 @@ def optional_int_string_format(i, as_string, length):
         return i
 
 
+def optional_float_string_format(f, as_string):
+    if as_string:
+        return "{0:5.2f}".format(f)
+    else:
+        return f
+
+
 def pad_string(s, length, padding_character):
     return s if length is None else s[:length] + (length - len(s))*padding_character
 

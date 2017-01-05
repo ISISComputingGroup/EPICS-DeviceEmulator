@@ -164,7 +164,6 @@ class VolumetricRigStreamInterface(StreamAdapter):
     def get_pressure_and_temperature_status(self):
 
         def get_status_code(status):
-            print status
             if status == SensorStatus.DISABLED:
                 return "D"
             elif status == SensorStatus.NO_REPLY:
@@ -184,12 +183,12 @@ class VolumetricRigStreamInterface(StreamAdapter):
 
     def get_pressures(self):
         return " ".join(["PMV"] +
-                        [p.pressure for p in self.rig.pressure_sensors(reverse=True)] +
+                        [p.value(as_string=True) for p in self.rig.pressure_sensors(reverse=True)] +
                         ["T", self.rig.target_pressure()])
 
     def get_temperatures(self):
         return " ".join(["TMV"] +
-                        [t.temperature for t in self.rig.temperature_sensors(reverse=True)])
+                        [t.value(as_string=True) for t in self.rig.temperature_sensors(reverse=True)])
 
     def get_valve_status(self):
 

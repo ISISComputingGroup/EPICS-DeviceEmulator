@@ -6,11 +6,10 @@ from system_gases import SystemGases
 from seed_gas_data import SeedGasData
 from ethernet_device import EthernetDevice
 from hmi_device import HmiDevice
-from temperature_sensor import TemperatureSensor
-from pressure_sensor import PressureSensor
 from valve import Valve
 from error_states import ErrorStates
 from utilities import optional_int_string_format
+from sensor import Sensor
 
 
 class SimulatedVolumetricRig(Device):
@@ -35,8 +34,8 @@ class SimulatedVolumetricRig(Device):
         self._hmi = HmiDevice("192.168.0.2")
 
         # Set up sensors
-        self._temperature_sensors = [TemperatureSensor() for _ in range(9)]
-        self._pressure_sensors = [PressureSensor() for _ in range(5)]
+        self._temperature_sensors = [Sensor() for _ in range(9)]
+        self._pressure_sensors = [Sensor() for _ in range(5)]
 
         # Set up special valves
         self._supply_valve = Valve()
