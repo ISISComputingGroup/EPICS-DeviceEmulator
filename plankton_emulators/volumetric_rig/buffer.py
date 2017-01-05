@@ -1,5 +1,6 @@
 from valve import Valve
 from utilities import optional_int_string_format
+from two_gas_mixer import TwoGasMixer
 
 
 class Buffer(object):
@@ -12,5 +13,10 @@ class Buffer(object):
     def index(self, as_string=False, length=1):
         return optional_int_string_format(self._index, as_string, length)
 
-    def valve(self):
-        return self._valve
+    def open_valve(self, mixer):
+        assert isinstance(mixer, TwoGasMixer)
+        if mixer.can_mix(self._buffer_gas, self._system_gas):
+            self._valve.open()
+
+    def close_valve(self):
+        self._valve.close()

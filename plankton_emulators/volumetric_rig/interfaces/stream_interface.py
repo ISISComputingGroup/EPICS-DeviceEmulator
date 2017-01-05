@@ -243,17 +243,23 @@ class VolumetricRigStreamInterface(StreamAdapter):
         elif valve_number <= 0:
             return message_prefix + " Too Low"
         elif valve_number <= self.rig.buffer_count():
-            valve = self.rig.buffer(valve_number).valve
+            valve_status = self.rig.buffer_valve_is_open(valve_number)
+            open_valve = self.rig.open_buffer_valve(valve_number)
+            close_valve = self.rig.close_buffer_valve(valve_number)
         elif valve_number == self.rig.buffer_count() + 1:
-            valve = self.rig.cell_valve()
+            valve_status = self.rig.cell_valve_is_open()
+            open_valve = self.rig.open_cell_valve()
+            close_valve = self.rig.close_cell_valve()
         elif valve_number == self.rig.buffer_count() + 2:
-            valve = self.rig.vacuum_valve()
+            valve_status = self.rig.vacuum_valve_is_open()
+            open_valve = self.rig.open_vacuum_valve()
+            close_valve = self.rig.close_vacuum_valve()
         else:
             return message_prefix + " Too High"
 
-        original_status = valve.is_open
-        valve.open() if set_to_open else valve.close()
-        new_status = self.rig.buffer(valve_number).valve.is_open
+        original_status = valve_status()
+        open_valve() if set_to_open else close_valve()
+        new_status = valve_stauts()
 
         def derive_status(is_open):
             return "open" if is_open else "closed"

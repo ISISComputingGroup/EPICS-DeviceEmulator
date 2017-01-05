@@ -115,11 +115,37 @@ class SimulatedVolumetricRig(Device):
         return [self._supply_valve, self._vacuum_extract_valve, self._cell_valve] + \
                [b.valve for b in self._buffers.reverse()]
 
-    def cell_valve(self):
-        return self._cell_valve
+    def buffer_valve_is_open(self, buffer_number):
+        buff = self.buffer(buffer_number)
+        return buff.valve().is_open if buff is not None else False
 
-    def vacuum_valve(self):
-        return self._vacuum_extract_valve
+    def vacuum_valve_is_open(self):
+        return self._vacuum_extract_valve.is_open
+
+    def cell_valve_is_open(self):
+        return self._cell_valve.is_open
+
+    def open_buffer_valve(self, buffer_number):
+        buff = self.buffer(buffer_number)
+        if buff is not None:
+            buff.open_valve(self.mixer)
+
+    def open_cell_valve(self):
+        self._cell_valve.open()
+
+    def open_vacuum_valve(self):
+        self._vacuum_extract_valve.open()
+
+    def close_buffer_valve(self, buffer_number):
+        buff = self.buffer(buffer_number)
+        if buff is not None:
+            buff.close_valve()
+
+    def close_cell_valve(self):
+        self._cell_valve.close()
+
+    def close_vacuum_valve(self):
+        self._vacuum_extract_valve.close()
 
     def buffers(self):
         return self._buffers
