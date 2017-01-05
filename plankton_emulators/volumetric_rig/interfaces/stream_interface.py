@@ -169,7 +169,7 @@ class VolumetricRigStreamInterface(StreamAdapter):
             SensorStatus.NO_REPLY:"X",
             SensorStatus.VALUE_IN_RANGE:"O",
             SensorStatus.VALUE_TOO_LOW:"L",
-            SensorStatus.VALUE_TOO_HIGH:"H"
+            SensorStatus.VALUE_TOO_HIGH:"H",
             SensorStatus.UNKNOWN:"?"
         }
 
