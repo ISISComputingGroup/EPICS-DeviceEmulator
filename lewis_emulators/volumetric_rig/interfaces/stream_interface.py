@@ -339,7 +339,7 @@ class VolumetricRigStreamInterface(StreamAdapter):
         if set_to_open is not None:
             command = "OPV" if set_to_open else "CLV"
         elif set_to_enabled is not None:
-            command = "_DIV" if set_to_open else "_ENV"
+            command = "_ENV" if set_to_enabled else "_DIV"
         else:
             assert False
 
@@ -451,7 +451,7 @@ class VolumetricRigStreamInterface(StreamAdapter):
         Returns:
             string : Indicates the valve number, previous state, and new state
         """
-        return self._set_valve_status(convert_raw_to_bool(valve_number_raw), set_to_enabled=True)
+        return self._set_valve_status(convert_raw_to_int(valve_number_raw), set_to_enabled=True)
 
     def disable_valve(self, valve_number_raw):
         """
@@ -467,7 +467,7 @@ class VolumetricRigStreamInterface(StreamAdapter):
         Returns:
             string : Indicates the valve number, previous state, and new state
         """
-        return self._set_valve_status(convert_raw_to_bool(valve_number_raw), set_to_enabled=False)
+        return self._set_valve_status(convert_raw_to_int(valve_number_raw), set_to_enabled=False)
 
     def halt(self):
         """
