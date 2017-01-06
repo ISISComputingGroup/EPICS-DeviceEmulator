@@ -147,8 +147,10 @@ class SimulatedVolumetricRig(StateMachineDevice):
     def open_buffer_valve(self, buffer_number):
         if not self._halted:
             buff = self.buffer(buffer_number)
-            if buff is not None:
-                buff.open_valve(self._mixer)
+            # The buffer must exist and the system gas connected to it must be mixable with all the other current
+            # buffer gases
+            if buff is not None and all(self._mixer.can_mix(buff.system_gas(), b.buffer_gas()) for b in self._buffers):
+                    buff.open_valve(self._mixer)
 
     def open_cell_valve(self):
         if not self._halted:
@@ -201,3 +203,6 @@ class SimulatedVolumetricRig(StateMachineDevice):
                 b.enable_valve()
                 if self._overall_pressure() < 0.1*self._target_pressure:
                     b.open_valve(self._mixer)
+
+    def mixer(self):
+        return self._mixer

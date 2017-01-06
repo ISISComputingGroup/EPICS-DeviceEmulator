@@ -10,7 +10,7 @@ class VolumetricRigStreamInterface(StreamAdapter):
     # so "IDN" will respond as "IDN BLAH BLAH BLAH" and "BCS 01" would be the same has "BCS 01 02 03".
     # Some commands that take input will respond with default (often invalid) parameters if not present. For example
     # "BCS" is the same as "BCS 00" and also "BCS AA".
-    commands = {
+    serial_commands = {
         Cmd("purge","^(.*)\!$"),
         Cmd("get_identity", "^IDN(?: .*)?$"),
         Cmd("get_identity", "^\?(?: .*)?$"),
@@ -37,6 +37,12 @@ class VolumetricRigStreamInterface(StreamAdapter):
         Cmd("set_valve_closed", "^CLV(?:\s(\S*))?.*$"),
         Cmd("halt", "^HLT(?: .*)?$"),
     }
+
+    control_commands = {
+        Cmd("set_buffer_system_gas", "^_SBG(?:\s(\S*))?(?:\s(\S*))?.*$"),
+    }
+
+    commands = set.union(serial_commands, control_commands)
 
     in_terminator = "\r\n"
     out_terminator = "\r\n"
@@ -109,7 +115,7 @@ class VolumetricRigStreamInterface(StreamAdapter):
         column_headers = [gas.name(self.gas_output_length, '|') for gas in system_gases]
         row_titles = [" ".join([gas.index(as_string=True), gas.name(self.gas_output_length, ' ')])
                       for gas in system_gases]
-        mixable_chars = [["<" if self._device.mixer.can_mix(g1, g2) else "." for g1 in system_gases]
+        mixable_chars = [["<" if self._device.mixer().can_mix(g1, g2) else "." for g1 in system_gases]
                          for g2 in system_gases]
 
         # Put data in output format
@@ -146,7 +152,7 @@ class VolumetricRigStreamInterface(StreamAdapter):
         return ' '.join(["GMC",
                          gas1.index(as_string=True), gas1.name(self.gas_output_length, '.'),
                          gas2.index(as_string=True), gas2.name(self.gas_output_length, '.'),
-                        "ok" if self._device.mixer.can_mix(gas1, gas2) else "NO"])
+                        "ok" if self._device.mixer().can_mix(gas1, gas2) else "NO"])
 
     def get_gas_number_available(self):
         return self._device.system_gases.gas_count()
@@ -216,18 +222,18 @@ class VolumetricRigStreamInterface(StreamAdapter):
         elif valve_number <= 0:
             return message_prefix + " Too Low"
         elif valve_number <= self._device.buffer_count():
-            valve_enabled = self.device.buffer_valve_is_enabled
+            valve_enabled = self._device.buffer_valve_is_enabled
             valve_is_open = self._device.buffer_valve_is_open
             open_valve = self._device.open_buffer_valve
             close_valve = self._device.close_buffer_valve
             args.append(valve_number)
         elif valve_number == self._device.buffer_count() + 1:
-            valve_enabled = self.device.cell_valve_is_enabled
+            valve_enabled = self._device.cell_valve_is_enabled
             valve_is_open = self._device.cell_valve_is_open
             open_valve = self._device.open_cell_valve
             close_valve = self._device.close_cell_valve
         elif valve_number == self._device.buffer_count() + 2:
-            valve_enabled = self.device.vacuum_valve_is_enabled
+            valve_enabled = self._device.vacuum_valve_is_enabled
             valve_is_open = self._device.vacuum_valve_is_open
             open_valve = self._device.open_vacuum_valve
             close_valve = self._device.close_vacuum_valve
@@ -300,3 +306,21 @@ class VolumetricRigStreamInterface(StreamAdapter):
             return "URC,04,Unrecognised Command," + str(request)
         else:
             print "An error occurred at request " + repr(request) + ": " + repr(error)
+
+    def set_buffer_system_gas(self, buffer_index_raw, gas_index_raw):
+        gas = self._device.system_gases.gas_by_index(convert_raw_to_int(gas_index_raw))
+        buff = self._device.buffer(convert_raw_to_int(buffer_index_raw))
+        if gas is not None and buff is not None:
+            original_gas = buff.system_gas()
+            buff.set_system_gas(gas)
+            new_gas = buff.system_gas()
+            return " ".join([
+                "SBG Buffer",
+                buff.index(as_string=True),
+                "system gas was",
+                original_gas.name(),
+                "now",
+                new_gas.name()
+            ])
+        else:
+            return "SBG Lookup failed"

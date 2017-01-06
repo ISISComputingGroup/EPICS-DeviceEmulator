@@ -51,3 +51,7 @@ class Buffer(object):
 
     def system_gas(self):
         return self._system_gas
+
+    def set_system_gas(self, gas):
+        if not self._valve.is_open():
+            self._system_gas = gas
