@@ -21,3 +21,14 @@ def convert_raw_to_int(raw):
         return int(raw.zfill(1))
     else:
         return 0
+
+
+def convert_raw_to_float(raw):
+    try:
+        return float(raw)
+    except:
+        return 0.0
+
+
+def convert_raw_to_bool(raw):
+    return bool(convert_raw_to_int(raw))

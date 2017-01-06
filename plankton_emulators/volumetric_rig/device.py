@@ -22,6 +22,7 @@ class SimulatedVolumetricRig(StateMachineDevice):
 
     def _initialize_data(self):
         self.serial_command_mode = True
+        self._cycle_pressures = False
 
         # Set up all available gases
         self.system_gases = SystemGases([Gas(i, SeedGasData.names[i]) for i in range(len(SeedGasData.names))])
@@ -175,17 +176,63 @@ class SimulatedVolumetricRig(StateMachineDevice):
         if not self._halted:
             self._vacuum_extract_valve.close()
 
+    def enable_cell_valve(self):
+        if not self._halted:
+            self._cell_valve.enable()
+
+    def enable_vacuum_valve(self):
+        if not self._halted:
+            self._vacuum_extract_valve.enable()
+
+    def enable_buffer_valve(self, buffer_number):
+        if not self._halted:
+            buff = self.buffer(buffer_number)
+            if buff is not None:
+                buff.enable_valve()
+
+    def disble_cell_valve(self):
+        if not self._halted:
+            self._cell_valve.disable()
+
+    def disable_vacuum_valve(self):
+        if not self._halted:
+            self._vacuum_extract_valve.disable()
+
+    def disable_buffer_valve(self, buffer_number):
+        if not self._halted:
+            buff = self.buffer(buffer_number)
+            if buff is not None:
+                buff.disable_valve()
+
     def buffers(self):
         return self._buffers
 
+    def mixer(self):
+        return self._mixer
+
     def update_pressures(self, dt):
-        number_of_open_buffers = sum(1 for b in self._buffers if b.valve_is_open())
-        for p in self._pressure_sensors:
-            if number_of_open_buffers > 0:
-                # Approach a pressure above target pressure so we intentionally go over the limit
-                p.approach_value(dt, 1.1*self._target_pressure, float(number_of_open_buffers)/self.buffer_count())
-            else:
-                p.approach_value(dt, 0.0)
+
+        # This is a custom behaviour designed to cycle through various valve behaviours. It will ramp up the pressure
+        # to the maximum, close and disable all valves, then let the pressure drop and enable and subsequently reopen
+        # the valves
+        if self._cycle_pressures:
+            number_of_open_buffers = sum(1 for b in self._buffers if b.valve_is_open())
+            for p in self._pressure_sensors:
+                base_rate = 10.0
+                if number_of_open_buffers > 0:
+                    # Approach a pressure above target pressure so we intentionally go over the limit
+                    from random import random
+                    p.approach_value(dt, 1.1*self._target_pressure,
+                                     base_rate*float(number_of_open_buffers)/self.buffer_count()*random())
+                else:
+                    p.approach_value(dt, 0.0, base_rate)
+                if self._overall_pressure() < 0.5 * self._target_pressure:
+                    for b in self._buffers:
+                        b.enable_valve()
+                        if self._overall_pressure() < 0.1 * self._target_pressure:
+                            b.open_valve(self._mixer)
+
+        # Check if system pressure is over the maximum and disable valves if necessary
         self._check_pressure()
 
     # This calculates the pressure based on the 5 readings from the pressure sensor. At the moment this is done in an
@@ -198,11 +245,14 @@ class SimulatedVolumetricRig(StateMachineDevice):
         if self._overall_pressure() > self._target_pressure:
             for b in self._buffers:
                 b.disable_valve()
-        elif self._overall_pressure() < 0.5*self._target_pressure:
-            for b in self._buffers:
-                b.enable_valve()
-                if self._overall_pressure() < 0.1*self._target_pressure:
-                    b.open_valve(self._mixer)
 
-    def mixer(self):
-        return self._mixer
+    def cycle_pressures(self, on):
+        assert isinstance(on, bool)
+        self._cycle_pressures = on
+
+    def set_pressures(self, value):
+        for p in self._pressure_sensors:
+            p.set_value(value, self._target_pressure)
+
+    def set_pressure_target(self, value):
+        self._target_pressure = value

@@ -1,6 +1,6 @@
 from lewis.adapters.stream import StreamAdapter, Cmd
 from ..sensor_status import SensorStatus
-from ..utilities import format_int, convert_raw_to_int
+from ..utilities import format_int, convert_raw_to_int, convert_raw_to_float, convert_raw_to_bool
 from ..valve_status import ValveStatus
 
 
@@ -12,34 +12,37 @@ class VolumetricRigStreamInterface(StreamAdapter):
     # "BCS" is the same as "BCS 00" and also "BCS AA".
     serial_commands = {
         Cmd("purge","^(.*)\!$"),
-        Cmd("get_identity", "^IDN(?: .*)?$"),
-        Cmd("get_identity", "^\?(?: .*)?$"),
+        Cmd("get_identity", "^IDN(?:\s.*)?$"),
+        Cmd("get_identity", "^\?(?:\s.*)?$"),
         Cmd("get_buffer_control_and_status", "^BCS(?:\s(\S*))?.*$"),
-        Cmd("get_ethernet_and_hmi_status", "^ETN(?: .*)?$"),
-        Cmd("get_gas_control_and_status", "^GCS(?: .*)?$"),
-        Cmd("get_gas_mix_matrix", "^GMM(?: .*)?$"),
+        Cmd("get_ethernet_and_hmi_status", "^ETN(?:\s.*)?$"),
+        Cmd("get_gas_control_and_status", "^GCS(?:\s.*)?$"),
+        Cmd("get_gas_mix_matrix", "^GMM(?:\s.*)?$"),
         Cmd("gas_mix_check", "^GMC(?:\s(\S*))?(?:\s(\S*))?.*$"),
-        Cmd("get_gas_number_available", "^GNA(?: .*)?$"),
-        Cmd("get_hmi_status", "^HMI(?: .*)?$"),
-        Cmd("get_hmi_count_cycles", "^HMC(?: .*)?$"),
+        Cmd("get_gas_number_available", "^GNA(?:\s.*)?$"),
+        Cmd("get_hmi_status", "^HMI(?:\s.*)?$"),
+        Cmd("get_hmi_count_cycles", "^HMC(?:\s.*)?$"),
         Cmd("get_memory_location", "^RDM(?:\s(\S*))?.*"),
-        Cmd("get_pressure_and_temperature_status", "^PTS(?: .*)?$"),
-        Cmd("get_pressures", "^PMV(?: .*)?$"),
-        Cmd("get_temperatures", "^TMV(?: .*)?$"),
-        Cmd("get_ports_and_relays_hex", "^PTR(?: .*)?$"),
-        Cmd("get_ports_output", "^POT(?: .*)?$"),
-        Cmd("get_ports_input", "^PIN(?: .*)?$"),
-        Cmd("get_ports_relays", "^PRY(?: .*)?$"),
-        Cmd("get_system_status", "^STS(?: .*)?$"),
-        Cmd("get_com_activity", "^COM(?: .*)?$"),
-        Cmd("get_valve_status", "^VST(?: .*)?$"),
+        Cmd("get_pressure_and_temperature_status", "^PTS(?:\s.*)?$"),
+        Cmd("get_pressures", "^PMV(?:\s.*)?$"),
+        Cmd("get_temperatures", "^TMV(?:\s.*)?$"),
+        Cmd("get_ports_and_relays_hex", "^PTR(?:\s.*)?$"),
+        Cmd("get_ports_output", "^POT(?:\s.*)?$"),
+        Cmd("get_ports_input", "^PIN(?:\s.*)?$"),
+        Cmd("get_ports_relays", "^PRY(?:\s.*)?$"),
+        Cmd("get_system_status", "^STS(?:\s.*)?$"),
+        Cmd("get_com_activity", "^COM(?:\s.*)?$"),
+        Cmd("get_valve_status", "^VST(?:\s.*)?$"),
         Cmd("set_valve_open", "^OPV(?:\s(\S*))?.*$"),
         Cmd("set_valve_closed", "^CLV(?:\s(\S*))?.*$"),
-        Cmd("halt", "^HLT(?: .*)?$"),
+        Cmd("halt", "^HLT(?:\s.*)?$"),
     }
 
     control_commands = {
         Cmd("set_buffer_system_gas", "^_SBG(?:\s(\S*))?(?:\s(\S*))?.*$"),
+        Cmd("set_pressure_cycling", "^_PCY(?:\s(\S*)).*$"),
+        Cmd("set_pressures", "^_SPR(?:\s(\S*)).*$"),
+        Cmd("set_pressure_target", "^_SPT(?:\s(\S*)).*$"),
     }
 
     commands = set.union(serial_commands, control_commands)
@@ -208,9 +211,16 @@ class VolumetricRigStreamInterface(StreamAdapter):
         }
         return "VST Valve Status " + "".join([status_codes[v] for v in self._device.valves_status()])
 
-    def _set_valve_status(self, valve_number_raw, set_to_open):
+    def _set_valve_status(self, valve_number_raw, set_to_open=None, set_to_enabled=None):
         valve_number = convert_raw_to_int(valve_number_raw)
-        command = "OPV" if set_to_open else "CLV"
+
+        if set_to_open is not None:
+            command = "OPV" if set_to_open else "CLV"
+        elif set_to_enabled is not None:
+            command = "_SVE" if set_to_open else "_SVD"
+        else:
+            assert False
+
         message_prefix = " ".join([
             command,
             "Value",
@@ -222,39 +232,50 @@ class VolumetricRigStreamInterface(StreamAdapter):
         elif valve_number <= 0:
             return message_prefix + " Too Low"
         elif valve_number <= self._device.buffer_count():
-            valve_enabled = self._device.buffer_valve_is_enabled
+            valve_is_enabled = self._device.buffer_valve_is_enabled
             valve_is_open = self._device.buffer_valve_is_open
             open_valve = self._device.open_buffer_valve
             close_valve = self._device.close_buffer_valve
+            enable_valve = self._device.enable_buffer_valve
+            disable_valve = self._device.disable_buffer_valve
             args.append(valve_number)
         elif valve_number == self._device.buffer_count() + 1:
-            valve_enabled = self._device.cell_valve_is_enabled
+            valve_is_enabled = self._device.cell_valve_is_enabled
             valve_is_open = self._device.cell_valve_is_open
             open_valve = self._device.open_cell_valve
             close_valve = self._device.close_cell_valve
+            enable_valve = self._device.enable_cell_valve
+            disable_valve = self._device.disable_cell_valve
         elif valve_number == self._device.buffer_count() + 2:
-            valve_enabled = self._device.vacuum_valve_is_enabled
+            valve_is_enabled = self._device.vacuum_valve_is_enabled
             valve_is_open = self._device.vacuum_valve_is_open
             open_valve = self._device.open_vacuum_valve
             close_valve = self._device.close_vacuum_valve
+            enable_valve = self._device.enable_vacuum_valve
+            disable_valve = self._device.disable_vacuum_valve
         else:
             return message_prefix + " Too High"
 
-        if not valve_enabled(*args):
-            return " ".join([command,"Rejected not enabled",format_int(valve_number,True,1)])
+        if set_to_open is not None:
+            if not valve_is_enabled(*args):
+                return " ".join([command,"Rejected not enabled",format_int(valve_number,True,1)])
+            original_status = valve_is_open(*args)
+            open_valve(*args) if set_to_open else close_valve(*args)
+            new_status = valve_is_open(*args)
+            status_codes = {True: "open", False: "closed"}
+        if set_to_enabled is not None:
+            original_status = valve_is_enabled(*args)
+            enable_valve(*args) if set_to_enabled else disable_valve(*args)
+            new_status = valve_is_enabled(*args)
+            status_codes = {True: "enabled", False: "disabled"}
 
-        original_status = valve_is_open(*args)
-        open_valve(*args) if set_to_open else close_valve(*args)
-        new_status = valve_is_open(*args)
-
-        status_codes = {True: "open", False: "closed"}
         return " ".join([
             command,
             "Valve Buffer",
             str(valve_number),
-            status_codes[original_status],
-            "was",
             status_codes[new_status],
+            "was",
+            status_codes[original_status],
         ])
 
     def set_valve_closed(self, buffer_number_raw):
@@ -324,3 +345,19 @@ class VolumetricRigStreamInterface(StreamAdapter):
             ])
         else:
             return "SBG Lookup failed"
+
+    def set_pressure_cycling(self, on_int_raw):
+        self._device.cycle_pressures(bool(convert_raw_to_int(on_int_raw)))
+
+    def set_pressures(self, value_raw):
+        value = convert_raw_to_float(value_raw)
+        self._device.set_pressures(value)
+        return "SPR Pressures set to " + str(value)
+
+    def set_pressure_target(self, value_raw):
+        value = convert_raw_to_float(value_raw)
+        self._device.set_pressure_target(value)
+        print "SPT Pressure target set to " + str(value)
+
+    def disable_valve(self, number_raw):
+        self._set_valve_status(convert_raw_to_bool(number_raw), set_to_enabled=True)
