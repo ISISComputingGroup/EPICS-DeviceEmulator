@@ -33,8 +33,8 @@ class VolumetricRigStreamInterface(StreamAdapter):
         Cmd("get_system_status", "^STS(?:\s.*)?$"),
         Cmd("get_com_activity", "^COM(?:\s.*)?$"),
         Cmd("get_valve_status", "^VST(?:\s.*)?$"),
-        Cmd("set_valve_open", "^OPV(?:\s(\S*))?.*$"),
-        Cmd("set_valve_closed", "^CLV(?:\s(\S*))?.*$"),
+        Cmd("open_valve", "^OPV(?:\s(\S*))?.*$"),
+        Cmd("close_valve", "^CLV(?:\s(\S*))?.*$"),
         Cmd("halt", "^HLT(?:\s.*)?$"),
     }
 
@@ -45,6 +45,8 @@ class VolumetricRigStreamInterface(StreamAdapter):
         Cmd("set_pressure_cycling", "^_PCY(?:\s(\S*)).*$"),
         Cmd("set_pressures", "^_SPR(?:\s(\S*)).*$"),
         Cmd("set_pressure_target", "^_SPT(?:\s(\S*)).*$"),
+        Cmd("enable_valve", "^_ENV(?:\s(\S*)).*$"),
+        Cmd("disable_valve", "^_DIV(?:\s(\S*)).*$"),
     }
 
     commands = set.union(serial_commands, control_commands)
@@ -57,6 +59,11 @@ class VolumetricRigStreamInterface(StreamAdapter):
     output_length = 20
 
     def purge(self, chars):
+        """ Responds any current input to the screen without executing it
+
+        Returns:
+            string : Purge message including ignored input
+        """
         return " ".join([
             "PRG,00,Purge",
             format_int(len(chars) + 1, True, 5),
@@ -65,9 +72,23 @@ class VolumetricRigStreamInterface(StreamAdapter):
         ])
 
     def get_identity(self):
+        """ Responds with the devices identity
+
+        Returns:
+            string : Device identity
+        """
         return "IDN,00," + self._device.identify()
 
     def _build_buffer_control_and_status_string(self, buffer_number):
+        """
+        Get information about a specific buffer, its valve state and the gases connected to it.
+
+        Args:
+            buffer_number : The index of the buffer
+
+        Returns:
+            string : Information about the requested buffer
+        """
         buff = self._device.buffer(buffer_number)
         assert buff is not None
         return " ".join([
@@ -82,6 +103,16 @@ class VolumetricRigStreamInterface(StreamAdapter):
         ])
 
     def get_buffer_control_and_status(self, buffer_number_raw):
+        """
+        Get information about a specific buffer, its valve state and the gases connected to it.
+
+        Args:
+            buffer_number_raw : The buffer "number" entered by a user. Although a number is expected, the command will
+             accept other types of input
+
+        Returns:
+            string : Information about the requested buffer
+        """
         buffer_number = convert_raw_to_int(buffer_number_raw)
         message_prefix = "BCS"
         num_length = 3
@@ -97,7 +128,13 @@ class VolumetricRigStreamInterface(StreamAdapter):
             return "BCS " + self._build_buffer_control_and_status_string(buffer_number)
 
     def get_ethernet_and_hmi_status(self):
-        # The syntax of the return string is odd: the separators are not consistent
+        """
+        Get information about the rig's hmi and plc ethernet devices
+
+        Returns:
+            string : Information about the ethernet devices status. The syntax of the return string is odd: the
+             separators are not consistent
+        """
         return " ".join([
             "ETN:PLC",
             self._device.plc().ip() + ",HMI",
@@ -106,6 +143,12 @@ class VolumetricRigStreamInterface(StreamAdapter):
         ])
 
     def get_gas_control_and_status(self):
+        """
+        Get a list of information about all the buffers, their associated gases and valve statuses
+
+        Returns:
+            string : Buffer information. One line per buffer with a header
+        """
         return "\r\n".join(
             ["No No Buffer               E O No System"] +
             [self._build_buffer_control_and_status_string(b.index()) for b in self._device.buffers()] +
@@ -113,13 +156,16 @@ class VolumetricRigStreamInterface(StreamAdapter):
         )
 
     def get_gas_mix_matrix(self):
-        # Gather data
-        system_gases = self._device.system_gases.gases()
+        """
+        Get information about which gases can be mixed together
 
+        Returns:
+            string : A 2D matrix representation of the ability to mix different gases with column and row titles
+        """
+        system_gases = self._device.system_gases.gases()
         column_headers = [gas.name(VolumetricRigStreamInterface.output_length, '|') for gas in system_gases]
-        row_titles = [" ".join(
-            [gas.index(as_string=True), gas.name(VolumetricRigStreamInterface.output_length, ' ')]
-        ) for gas in system_gases]
+        row_titles = [" ".join([gas.index(as_string=True), gas.name(VolumetricRigStreamInterface.output_length, ' ')])
+                      for gas in system_gases]
         mixable_chars = [["<" if self._device.mixer().can_mix(g1, g2) else "." for g1 in system_gases]
                          for g2 in system_gases]
 
@@ -147,6 +193,18 @@ class VolumetricRigStreamInterface(StreamAdapter):
         return '\r\n'.join(lines)
 
     def gas_mix_check(self, gas1_index_raw, gas2_index_raw):
+        """
+        Query whether two gases can be mixed
+
+        Args:
+            gas1_index_raw : The index of the first gas. Although a number is expected, the command will
+             accept other types of input
+            gas2_index_raw : As above for the 2nd gas
+
+        Returns:
+            string : An echo of the name and index of the requested gases as well as an ok/NO indicating whether the
+             gases can be mixed
+        """
         gas1 = self._device.system_gases.gas_by_index(convert_raw_to_int(gas1_index_raw))
         gas2 = self._device.system_gases.gas_by_index(convert_raw_to_int(gas2_index_raw))
         if gas1 is None:
@@ -160,9 +218,21 @@ class VolumetricRigStreamInterface(StreamAdapter):
                         "ok" if self._device.mixer().can_mix(gas1, gas2) else "NO"])
 
     def get_gas_number_available(self):
+        """
+        Get the number of available gases
+
+        Returns:
+            string : The number of available gases
+        """
         return self._device.system_gases.gas_count()
 
     def get_hmi_status(self):
+        """
+        Get the current status of the HMI
+
+        Returns:
+            string : Information about the HMI
+        """
         hmi = self._device.hmi()
         return ",".join(["HMI " + hmi.status() + " ", hmi.ip(),
                          "B", hmi.base_page(as_string=True, length=3),
@@ -173,14 +243,37 @@ class VolumetricRigStreamInterface(StreamAdapter):
                          ])
 
     def get_hmi_count_cycles(self):
+        """
+        Get information about how frequently the HMI is disconnected
+
+        Returns:
+            string : A list of integers indicating the number of occurrences of a disconnected count cycle of a specific
+             length
+        """
         return " ".join(["HMC"] + self._device.hmi().count_cycles())
 
     def get_memory_location(self, location_raw):
+        """
+        Get the value stored in a particular location in memory
+
+        Args:
+            location_raw : The memory location to read. Although a number is expected, the command will accept other
+             types of input
+
+        Returns:
+            string : The memory location and the value stored there
+        """
         location = convert_raw_to_int(location_raw)
         return " ".join(["RDM", format_int(location, as_string=True, length=4),
                          self._device.memory_location(location, as_string=True, length=6)])
 
     def get_pressure_and_temperature_status(self):
+        """
+        Get the status of the temperature and pressure sensors
+
+        Returns:
+            string : A letter for each sensor indicating its status. Refer to the spec for the meaning and sensor order
+        """
 
         status_codes = {
             SensorStatus.DISABLED: "D",
@@ -196,15 +289,35 @@ class VolumetricRigStreamInterface(StreamAdapter):
                         self._device.pressure_sensors(reverse=True)+self._device.temperature_sensors(reverse=True)])
 
     def get_pressures(self):
+        """
+        Get the current pressure sensor readings, and target pressure
+
+        Returns:
+            string : The pressure readings from each of the pressure sensors and the target pressure which, if exceeded,
+             will cause all buffer valves to close and disable
+        """
         return " ".join(["PMV"] +
                         [p.value(as_string=True) for p in self._device.pressure_sensors(reverse=True)] +
                         ["T", self._device.target_pressure(as_string=True)])
 
     def get_temperatures(self):
+        """
+        Get the current temperature reading
+
+        Returns:
+            string : The current temperature for each of the temperature sensors
+        """
         return " ".join(["TMV"] +
                         [t.value(as_string=True) for t in self._device.temperature_sensors(reverse=True)])
 
     def get_valve_status(self):
+        """
+        Get the status of the buffer and system valves
+
+        Returns:
+            string : The status of each of the system valves represented by a letter. Refer to the specification for the
+            exact meaning and order
+        """
         status_codes = {
             ValveStatus.OPEN_AND_ENABLED: "O",
             ValveStatus.CLOSED_AND_ENABLED: "E",
@@ -214,63 +327,71 @@ class VolumetricRigStreamInterface(StreamAdapter):
         return "VST Valve Status " + "".join([status_codes[v] for v in self._device.valves_status()])
 
     def _set_valve_status(self, valve_number_raw, set_to_open=None, set_to_enabled=None):
+        """
+        Change the valve status
+
+        Returns:
+            string : Indicates the valve number, previous state, and new state
+        """
         valve_number = convert_raw_to_int(valve_number_raw)
 
+        # We should have exactly one of these arguments
         if set_to_open is not None:
             command = "OPV" if set_to_open else "CLV"
         elif set_to_enabled is not None:
-            command = "_SVE" if set_to_open else "_SVD"
+            command = "_DIV" if set_to_open else "_ENV"
         else:
             assert False
 
+        # The command and valve number are always included
         message_prefix = " ".join([
             command,
             "Value",
             str(valve_number)
             ])
+
+        # Select an action based on the input parameters.
         args = list()
         if self._device.halted():
-            return "CLV Rejected only allowed when running"
+            return command + " Rejected only allowed when running"
         elif valve_number <= 0:
             return message_prefix + " Too Low"
         elif valve_number <= self._device.buffer_count():
-            valve_is_enabled = self._device.buffer_valve_is_enabled
-            valve_is_open = self._device.buffer_valve_is_open
-            open_valve = self._device.open_buffer_valve
-            close_valve = self._device.close_buffer_valve
-            enable_valve = self._device.enable_buffer_valve
-            disable_valve = self._device.disable_buffer_valve
+            if set_to_open is not None:
+                action = self._device.open_buffer_valve if set_to_open else self._device.close_buffer_valve
+                current_state = self._device.buffer_valve_is_open
+            else:
+                action = self._device.enable_buffer_valve if set_to_enabled else self._device.disable_buffer_valve
+                current_state = self._device.buffer_valve_is_enabled
             args.append(valve_number)
         elif valve_number == self._device.buffer_count() + 1:
-            valve_is_enabled = self._device.cell_valve_is_enabled
-            valve_is_open = self._device.cell_valve_is_open
-            open_valve = self._device.open_cell_valve
-            close_valve = self._device.close_cell_valve
-            enable_valve = self._device.enable_cell_valve
-            disable_valve = self._device.disable_cell_valve
+            if set_to_open is not None:
+                action = self._device.open_cell_valve if set_to_open else self._device.close_cell_valve
+                current_state = self._device.cell_valve_is_open
+            else:
+                action = self._device.enable_cell_valve if set_to_enabled else self._device.disable_cell_valve
+                current_state = self._device.cell_valve_is_enabled
         elif valve_number == self._device.buffer_count() + 2:
-            valve_is_enabled = self._device.vacuum_valve_is_enabled
-            valve_is_open = self._device.vacuum_valve_is_open
-            open_valve = self._device.open_vacuum_valve
-            close_valve = self._device.close_vacuum_valve
-            enable_valve = self._device.enable_vacuum_valve
-            disable_valve = self._device.disable_vacuum_valve
+            if set_to_open is not None:
+                action = self._device.open_vacuum_valve if set_to_open else self._device.close_vacuum_valve
+                current_state = self._device.vacuum_valve_is_open
+            else:
+                action = self._device.enable_vacuum_valve if set_to_enabled else self._device.disable_vacuum_valve
+                current_state = self._device.vacuum_valve_is_enabled
         else:
             return message_prefix + " Too High"
 
         if set_to_open is not None:
-            if not valve_is_enabled(*args):
+            if not current_state(*args):
                 return " ".join([command, "Rejected not enabled", format_int(valve_number, True, 1)])
-            original_status = valve_is_open(*args)
-            open_valve(*args) if set_to_open else close_valve(*args)
-            new_status = valve_is_open(*args)
             status_codes = {True: "open", False: "closed"}
         else:
-            original_status = valve_is_enabled(*args)
-            enable_valve(*args) if set_to_enabled else disable_valve(*args)
-            new_status = valve_is_enabled(*args)
             status_codes = {True: "enabled", False: "disabled"}
 
+        # Execute the action and get the status before and after
+        original_status = current_state(*args)
+        action(*args)
+        new_status = current_state(*args)
         return " ".join([
             command,
             "Valve Buffer",
@@ -280,13 +401,77 @@ class VolumetricRigStreamInterface(StreamAdapter):
             status_codes[original_status],
         ])
 
-    def set_valve_closed(self, buffer_number_raw):
-        return self._set_valve_status(buffer_number_raw, False)
+    def close_valve(self, valve_number_raw):
+        """
+        Close a valve
 
-    def set_valve_open(self, buffer_number_raw):
-        return self._set_valve_status(buffer_number_raw, True)
+        Args:
+            valve_number_raw : The number of the valve to close. The first n valves correspond to the buffers where n
+             is the number of buffers. The n+1th valve is the cell valve, the n+2nd valve is for the vacuum. The supply
+             valve cannot be controlled via serial. Although a number is expected, the command will accept other types
+             of input
+
+
+        Returns:
+            string : Indicates the valve number, previous state, and new state
+        """
+        return self._set_valve_status(valve_number_raw, set_to_open=False)
+
+    def open_valve(self, valve_number_raw):
+        """
+        Open a valve
+
+        Args:
+            valve_number_raw : The number of the valve to close. The first n valves correspond to the buffers where n
+             is the number of buffers. The n+1th valve is the cell valve, the n+2nd valve is for the vacuum. The supply
+             valve cannot be controlled via serial. Although a number is expected, the command will accept other types
+             of input
+
+
+        Returns:
+            string : Indicates the valve number, previous state, and new state
+        """
+        return self._set_valve_status(valve_number_raw, set_to_open=True)
+
+    def enable_valve(self, valve_number_raw):
+        """
+        Enable a valve
+
+        Args:
+            valve_number_raw : The number of the valve to close. The first n valves correspond to the buffers where n
+             is the number of buffers. The n+1th valve is the cell valve, the n+2nd valve is for the vacuum. The supply
+             valve cannot be controlled via serial. Although a number is expected, the command will accept other types
+             of input
+
+
+        Returns:
+            string : Indicates the valve number, previous state, and new state
+        """
+        self._set_valve_status(convert_raw_to_bool(valve_number_raw), set_to_enabled=True)
+
+    def disable_valve(self, valve_number_raw):
+        """
+        Disable a valve
+
+        Args:
+            valve_number_raw : The number of the valve to close. The first n valves correspond to the buffers where n
+             is the number of buffers. The n+1th valve is the cell valve, the n+2nd valve is for the vacuum. The supply
+             valve cannot be controlled via serial. Although a number is expected, the command will accept other types
+             of input
+
+
+        Returns:
+            string : Indicates the valve number, previous state, and new state
+        """
+        self._set_valve_status(convert_raw_to_bool(valve_number_raw), set_to_enabled=False)
 
     def halt(self):
+        """
+        Halts the device. No further valve commands will be accepted.
+
+        Returns:
+            string : Indicates that the system has been, or was already halted
+        """
         if self._device.halted():
             message = "SYSTEM ALREADY HALTED"
         else:
@@ -296,6 +481,14 @@ class VolumetricRigStreamInterface(StreamAdapter):
         return "HLT *** " + message + " ***"
 
     def get_system_status(self):
+        """
+        Get information about the current system state.
+
+
+        Returns:
+            string : Information about the system. Capitalisation of a particular word indicates an error has occurred
+             in that subsystem. Refer to the specification for the meaning of system codes
+        """
         return " ".join([
             "STS",
             self._device.status_code(as_string=True, length=2),
@@ -308,29 +501,52 @@ class VolumetricRigStreamInterface(StreamAdapter):
             "E-STOP" if self._device.errors().estop else "estop"
         ])
 
-    # Information about ports, relays and com traffic are currently returned statically
     def get_ports_and_relays_hex(self):
+        """
+        Returns:
+            string : Information about the ports and relays
+        """
         return "PTR I:00 0000 0000 R:0000 0200 0000 O:00 0000 4400"
 
     def get_ports_output(self):
+        """
+        Returns:
+            string : Information about the port output
+        """
         return "POT qwertyus vsbbbbbbzyxwvuts aBhecSssvsbbbbbb"
 
     def get_ports_input(self):
+        """
+        Returns:
+            string : Information about the port input
+        """
         return "PIN qwertyui zyxwvutsrqponmlk abcdefghijklmneb"
 
     def get_ports_relays(self):
+        """
+        Returns:
+            string : Information about the port relays.
+        """
         return "PRY qwertyuiopasdfgh zyxwhmLsrqponmlk abcdefghihlbhace"
 
     def get_com_activity(self):
+        """
+        Returns:
+            string : Information about activity over the COM port
+        """
         return "COM ok  0113/0000"
 
-    def handle_error(self, request, error):
-        if str(error) == "None of the device's commands matched.":
-            return "URC,04,Unrecognised Command," + str(request)
-        else:
-            print "An error occurred at request " + repr(request) + ": " + repr(error)
-
     def set_buffer_system_gas(self, buffer_index_raw, gas_index_raw):
+        """
+        Changes the system gas associated with a particular buffer
+
+        Args:
+            buffer_index_raw : The index of the buffer to update
+            gas_index_raw : The index of the gas to update
+
+        Returns:
+            string : Indicates the buffer changed, the previous system gas and the new system gas
+        """
         gas = self._device.system_gases.gas_by_index(convert_raw_to_int(gas_index_raw))
         buff = self._device.buffer(convert_raw_to_int(buffer_index_raw))
         if gas is not None and buff is not None:
@@ -349,17 +565,55 @@ class VolumetricRigStreamInterface(StreamAdapter):
             return "SBG Lookup failed"
 
     def set_pressure_cycling(self, on_int_raw):
-        self._device.cycle_pressures(bool(convert_raw_to_int(on_int_raw)))
+        """
+        Starts a sequence of pressure cycling. The pressure is increased until the target is met. This disables all
+        buffer valves. The system pressure is decreased and the valves are renabled and reopened when the pressure
+        falls below set limits. When the pressure reaches a minimum, the cycle is restarted. This allows simulation
+        of various valve conditions.
+
+        Args:
+            on_int_raw : Whether to switch cycling on(1)/off(other)
+
+        Returns:
+            string : Indicates whether cycling is enabled
+        """
+        cycle = convert_raw_to_bool(on_int_raw)
+        self._device.cycle_pressures(cycle)
+        return "_PCY " + str(cycle)
 
     def set_pressures(self, value_raw):
+        """
+        Set the reading for all pressure sensors to a fixed value
+
+        Args:
+            value_raw : The value to apply to the pressure sensors
+
+        Returns:
+            string : Echo the new pressure
+        """
         value = convert_raw_to_float(value_raw)
         self._device.set_pressures(value)
         return "SPR Pressures set to " + str(value)
 
     def set_pressure_target(self, value_raw):
+        """
+        Set the target (limit) pressure for the system
+
+        Args:
+            value_raw : The new pressure target
+
+        Returns:
+            string : Echo the new target
+        """
         value = convert_raw_to_float(value_raw)
         self._device.set_pressure_target(value)
         print "SPT Pressure target set to " + str(value)
 
-    def disable_valve(self, number_raw):
-        self._set_valve_status(convert_raw_to_bool(number_raw), set_to_enabled=True)
+    def handle_error(self, request, error):
+        """
+        Handle errors during execution. May be an unrecognised command or emulator failure.
+        """
+        if str(error) == "None of the device's commands matched.":
+            return "URC,04,Unrecognised Command," + str(request)
+        else:
+            print "An error occurred at request " + repr(request) + ": " + repr(error)
