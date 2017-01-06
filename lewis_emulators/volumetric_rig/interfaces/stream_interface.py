@@ -352,6 +352,7 @@ class VolumetricRigStreamInterface(StreamAdapter):
 
         # Select an action based on the input parameters.
         args = list()
+        enabled = lambda *args: None
         if self._device.halted():
             return command + " Rejected only allowed when running"
         elif valve_number <= 0:
@@ -359,6 +360,7 @@ class VolumetricRigStreamInterface(StreamAdapter):
         elif valve_number <= self._device.buffer_count():
             if set_to_open is not None:
                 action = self._device.open_buffer_valve if set_to_open else self._device.close_buffer_valve
+                enabled = self._device.buffer_valve_is_enabled
                 current_state = self._device.buffer_valve_is_open
             else:
                 action = self._device.enable_buffer_valve if set_to_enabled else self._device.disable_buffer_valve
@@ -367,6 +369,7 @@ class VolumetricRigStreamInterface(StreamAdapter):
         elif valve_number == self._device.buffer_count() + 1:
             if set_to_open is not None:
                 action = self._device.open_cell_valve if set_to_open else self._device.close_cell_valve
+                enabled = self._device.cell_valve_is_enabled
                 current_state = self._device.cell_valve_is_open
             else:
                 action = self._device.enable_cell_valve if set_to_enabled else self._device.disable_cell_valve
@@ -374,6 +377,7 @@ class VolumetricRigStreamInterface(StreamAdapter):
         elif valve_number == self._device.buffer_count() + 2:
             if set_to_open is not None:
                 action = self._device.open_vacuum_valve if set_to_open else self._device.close_vacuum_valve
+                enabled = self._device.vacuum_valve_is_enabled
                 current_state = self._device.vacuum_valve_is_open
             else:
                 action = self._device.enable_vacuum_valve if set_to_enabled else self._device.disable_vacuum_valve
@@ -382,7 +386,7 @@ class VolumetricRigStreamInterface(StreamAdapter):
             return message_prefix + " Too High"
 
         if set_to_open is not None:
-            if not current_state(*args):
+            if not enabled(*args):
                 return " ".join([command, "Rejected not enabled", format_int(valve_number, True, 1)])
             status_codes = {True: "open", False: "closed"}
         else:
