@@ -21,6 +21,7 @@ class SimulatedVolumetricRig(StateMachineDevice):
     HALTED_MESSAGE = "Rejected only allowed when running"
 
     def _initialize_data(self):
+        # Device modes
         self.serial_command_mode = True
         self._cycle_pressures = False
 
@@ -87,6 +88,7 @@ class SimulatedVolumetricRig(StateMachineDevice):
             return None
 
     def memory_location(self, location, as_string, length):
+        # Currently returns the value at the location as the location itself.
         return format_int(location, as_string, length)
 
     def plc(self):
@@ -111,6 +113,7 @@ class SimulatedVolumetricRig(StateMachineDevice):
         return format_float(self._target_pressure, as_string)
 
     def status_code(self, as_string=False, length=None):
+        # We don't currently do any logic for the system status, it always returns 2
         return format_int(2, as_string, length)
 
     def errors(self):
@@ -120,6 +123,7 @@ class SimulatedVolumetricRig(StateMachineDevice):
         return len(self.valves_status())
 
     def valves_status(self):
+        # The valve order goes: supply, vacuum, cell, buffer(n), ... , buffer(1)
         return [self._supply_valve.status(),
                 self._vacuum_extract_valve.status(),
                 self._cell_valve.status()] + \
@@ -159,6 +163,7 @@ class SimulatedVolumetricRig(StateMachineDevice):
 
     def open_vacuum_valve(self):
         if not self._halted:
+            # We can't open the vacuum valve if any of the buffer valves are open
             if not any([b.valve_is_open() for b in self._buffers]):
                 self._vacuum_extract_valve.open()
 
@@ -190,7 +195,7 @@ class SimulatedVolumetricRig(StateMachineDevice):
             if buff is not None:
                 buff.enable_valve()
 
-    def disble_cell_valve(self):
+    def disable_cell_valve(self):
         if not self._halted:
             self._cell_valve.disable()
 
@@ -211,7 +216,6 @@ class SimulatedVolumetricRig(StateMachineDevice):
         return self._mixer
 
     def update_pressures(self, dt):
-
         # This is a custom behaviour designed to cycle through various valve behaviours. It will ramp up the pressure
         # to the maximum, close and disable all valves, then let the pressure drop and enable and subsequently reopen
         # the valves
@@ -235,22 +239,24 @@ class SimulatedVolumetricRig(StateMachineDevice):
         # Check if system pressure is over the maximum and disable valves if necessary
         self._check_pressure()
 
-    # This calculates the pressure based on the 5 readings from the pressure sensor. At the moment this is done in an
-    # ad hoc fashion. The actual behaviour hasn't been set on the real device, and it is likely the output from the
-    # PMV command could change in the future to give the actual reference pressure.
     def _overall_pressure(self):
+        # This calculates the pressure based on the 5 readings from the pressure sensor. At the moment this is done in
+        # an ad hoc fashion. The actual behaviour hasn't been set on the real device, and it is likely the output from
+        # the PMV command could change in the future to give the actual reference pressure.
         return max(s.value() for s in self._pressure_sensors)
 
     def _check_pressure(self):
+        # Disable the buffer valves if the pressure exceeds the limit
         if self._overall_pressure() > self._target_pressure:
             for b in self._buffers:
                 b.disable_valve()
 
     def cycle_pressures(self, on):
-        assert isinstance(on, bool)
+        # Switch on/off pressure cycling
         self._cycle_pressures = on
 
     def set_pressures(self, value):
+        # Sets all pressure sensors to have the same value
         for p in self._pressure_sensors:
             p.set_value(value, self._target_pressure)
 

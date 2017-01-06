@@ -1,4 +1,7 @@
 class SeedGasData(object):
+    """Contains information about gases and their mixing properties used to set up the initial device state"""
+
+    # Gas names
     unknown = "UNKNOWN"
     empty = "EMPTY"
     vacuum_extract = "VACUUM EXTRACT"
