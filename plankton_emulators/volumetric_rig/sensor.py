@@ -16,5 +16,5 @@ class Sensor(object):
     def set_value(self, v):
         self._value = v
 
-    def value(self, as_string):
+    def value(self, as_string=False):
         return format_float(self._value, as_string)

@@ -27,9 +27,9 @@ class SimulatedVolumetricRig(StateMachineDevice):
         self.system_gases = SystemGases([Gas(i, SeedGasData.names[i]) for i in range(len(SeedGasData.names))])
 
         # Set mixable gases
-        self.mixer = TwoGasMixer()
+        self._mixer = TwoGasMixer()
         for name1, name2 in SeedGasData.mixable_gas_names():
-            self.mixer.add_mixable(self.system_gases.gas_by_name(name1), self.system_gases.gas_by_name(name2))
+            self._mixer.add_mixable(self.system_gases.gas_by_name(name1), self.system_gases.gas_by_name(name2))
 
         # Set buffers
         buffer_gases = [(self.system_gases.gas_by_name(name1),
@@ -47,7 +47,7 @@ class SimulatedVolumetricRig(StateMachineDevice):
 
         # Set up sensors
         self._temperature_sensors = [Sensor() for _ in range(9)]
-        self._pressure_sensors = [PressureSensor(self._target_pressure) for _ in range(5)]
+        self._pressure_sensors = [PressureSensor() for _ in range(5)]
 
         # Set up special valves
         self._supply_valve = Valve()
@@ -148,7 +148,7 @@ class SimulatedVolumetricRig(StateMachineDevice):
         if not self._halted:
             buff = self.buffer(buffer_number)
             if buff is not None:
-                buff.open_valve(self.mixer)
+                buff.open_valve(self._mixer)
 
     def open_cell_valve(self):
         if not self._halted:
@@ -176,8 +176,28 @@ class SimulatedVolumetricRig(StateMachineDevice):
     def buffers(self):
         return self._buffers
 
-    def update_buffer_pressures(self, dt):
-        for b in self._buffers:
-            b.update_pressure(dt, self._target_pressure)
+    def update_pressures(self, dt):
+        number_of_open_buffers = sum(1 for b in self._buffers if b.valve_is_open())
         for p in self._pressure_sensors:
-            p.set_value(self._buffers[0].pressure())
+            if number_of_open_buffers > 0:
+                # Approach a pressure above target pressure so we intentionally go over the limit
+                p.approach_value(dt, 1.1*self._target_pressure, float(number_of_open_buffers)/self.buffer_count())
+            else:
+                p.approach_value(dt, 0.0)
+        self._check_pressure()
+
+    # This calculates the pressure based on the 5 readings from the pressure sensor. At the moment this is done in an
+    # ad hoc fashion. The actual behaviour hasn't been set on the real device, and it is likely the output from the
+    # PMV command could change in the future to give the actual reference pressure.
+    def _overall_pressure(self):
+        return max(s.value() for s in self._pressure_sensors)
+
+    def _check_pressure(self):
+        if self._overall_pressure() > self._target_pressure:
+            for b in self._buffers:
+                b.disable_valve()
+        elif self._overall_pressure() < 0.5*self._target_pressure:
+            for b in self._buffers:
+                b.enable_valve()
+                if self._overall_pressure() < 0.1*self._target_pressure:
+                    b.open_valve(self._mixer)

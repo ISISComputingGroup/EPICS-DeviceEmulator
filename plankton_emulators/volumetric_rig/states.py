@@ -7,4 +7,4 @@ class DefaultInitState(State):
 
 class DefaultRunningState(State):
     def in_state(self, dt):
-        self._context.update_buffer_pressures(dt)
+        self._context.update_pressures(dt)
