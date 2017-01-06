@@ -11,7 +11,7 @@ class VolumetricRigStreamInterface(StreamAdapter):
     # Some commands that take input will respond with default (often invalid) parameters if not present. For example
     # "BCS" is the same as "BCS 00" and also "BCS AA".
     serial_commands = {
-        Cmd("purge","^(.*)\!$"),
+        Cmd("purge", "^(.*)\!$"),
         Cmd("get_identity", "^IDN(?:\s.*)?$"),
         Cmd("get_identity", "^\?(?:\s.*)?$"),
         Cmd("get_buffer_control_and_status", "^BCS(?:\s(\S*))?.*$"),
@@ -38,6 +38,8 @@ class VolumetricRigStreamInterface(StreamAdapter):
         Cmd("halt", "^HLT(?:\s.*)?$"),
     }
 
+    # These commands are intended solely as a control mechanism for the emulator. As an alternative, the Lewis
+    # backdoor can be used to modify the device state.
     control_commands = {
         Cmd("set_buffer_system_gas", "^_SBG(?:\s(\S*))?(?:\s(\S*))?.*$"),
         Cmd("set_pressure_cycling", "^_PCY(?:\s(\S*)).*$"),
@@ -47,13 +49,12 @@ class VolumetricRigStreamInterface(StreamAdapter):
 
     commands = set.union(serial_commands, control_commands)
 
-    in_terminator = "\r\n"
-    out_terminator = "\r\n"
+    # You may need to change these to \r\n if using Telnet"
+    in_terminator = "\r"
+    out_terminator = "\r"
 
-    def __init__(self, device, arguments=None):
-        # Lots of formatted output is based on fixed length strings
-        self.gas_output_length = 20
-        super(VolumetricRigStreamInterface, self).__init__(device, arguments)
+    # Lots of formatted output for the volumetric rig is based on fixed length strings
+    output_length = 20
 
     def purge(self, chars):
         return " ".join([
@@ -73,7 +74,7 @@ class VolumetricRigStreamInterface(StreamAdapter):
             "",
             buff.index(as_string=True),
             buff.buffer_gas().index(as_string=True),
-            buff.buffer_gas().name(self.gas_output_length, " "),
+            buff.buffer_gas().name(VolumetricRigStreamInterface.output_length, " "),
             "E" if buff.valve_is_enabled() else "d",
             "O" if buff.valve_is_open() else "c",
             buff.system_gas().index(as_string=True),
@@ -115,9 +116,10 @@ class VolumetricRigStreamInterface(StreamAdapter):
         # Gather data
         system_gases = self._device.system_gases.gases()
 
-        column_headers = [gas.name(self.gas_output_length, '|') for gas in system_gases]
-        row_titles = [" ".join([gas.index(as_string=True), gas.name(self.gas_output_length, ' ')])
-                      for gas in system_gases]
+        column_headers = [gas.name(VolumetricRigStreamInterface.output_length, '|') for gas in system_gases]
+        row_titles = [" ".join(
+            [gas.index(as_string=True), gas.name(VolumetricRigStreamInterface.output_length, ' ')]
+        ) for gas in system_gases]
         mixable_chars = [["<" if self._device.mixer().can_mix(g1, g2) else "." for g1 in system_gases]
                          for g2 in system_gases]
 
@@ -153,8 +155,8 @@ class VolumetricRigStreamInterface(StreamAdapter):
             gas2 = self._device.system_gases.gas_by_index(0)
 
         return ' '.join(["GMC",
-                         gas1.index(as_string=True), gas1.name(self.gas_output_length, '.'),
-                         gas2.index(as_string=True), gas2.name(self.gas_output_length, '.'),
+                         gas1.index(as_string=True), gas1.name(VolumetricRigStreamInterface.output_length, '.'),
+                         gas2.index(as_string=True), gas2.name(VolumetricRigStreamInterface.output_length, '.'),
                         "ok" if self._device.mixer().can_mix(gas1, gas2) else "NO"])
 
     def get_gas_number_available(self):
@@ -258,12 +260,12 @@ class VolumetricRigStreamInterface(StreamAdapter):
 
         if set_to_open is not None:
             if not valve_is_enabled(*args):
-                return " ".join([command,"Rejected not enabled",format_int(valve_number,True,1)])
+                return " ".join([command, "Rejected not enabled", format_int(valve_number, True, 1)])
             original_status = valve_is_open(*args)
             open_valve(*args) if set_to_open else close_valve(*args)
             new_status = valve_is_open(*args)
             status_codes = {True: "open", False: "closed"}
-        if set_to_enabled is not None:
+        else:
             original_status = valve_is_enabled(*args)
             enable_valve(*args) if set_to_enabled else disable_valve(*args)
             new_status = valve_is_enabled(*args)
