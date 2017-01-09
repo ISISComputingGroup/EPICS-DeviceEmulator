@@ -26,16 +26,16 @@ class SimulatedVolumetricRig(StateMachineDevice):
         self._cycle_pressures = False
 
         # Set up all available gases
-        self.system_gases = SystemGases([Gas(i, SeedGasData.names[i]) for i in range(len(SeedGasData.names))])
+        self._system_gases = SystemGases([Gas(i, SeedGasData.names[i]) for i in range(len(SeedGasData.names))])
 
         # Set mixable gases
         self._mixer = TwoGasMixer()
         for name1, name2 in SeedGasData.mixable_gas_names():
-            self._mixer.add_mixable(self.system_gases.gas_by_name(name1), self.system_gases.gas_by_name(name2))
+            self._mixer.add_mixable(self._system_gases.gas_by_name(name1), self._system_gases.gas_by_name(name2))
 
         # Set buffers
-        buffer_gases = [(self.system_gases.gas_by_name(name1),
-                         self.system_gases.gas_by_name(name2))
+        buffer_gases = [(self._system_gases.gas_by_name(name1),
+                         self._system_gases.gas_by_name(name2))
                         for name1, name2 in SeedGasData.buffer_gas_names()]
         self._buffers = [Buffer(i + 1, buffer_gases[i][0], buffer_gases[i][1])
                          for i in range(len(buffer_gases))]
@@ -262,3 +262,6 @@ class SimulatedVolumetricRig(StateMachineDevice):
 
     def set_pressure_target(self, value):
         self._target_pressure = value
+
+    def system_gases(self):
+        return self._system_gases

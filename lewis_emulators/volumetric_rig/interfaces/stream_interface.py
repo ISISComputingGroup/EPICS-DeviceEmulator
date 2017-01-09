@@ -162,7 +162,7 @@ class VolumetricRigStreamInterface(StreamAdapter):
         Returns:
             string : A 2D matrix representation of the ability to mix different gases with column and row titles
         """
-        system_gases = self._device.system_gases.gases()
+        system_gases = self._device.system_gases().gases()
         column_headers = [gas.name(VolumetricRigStreamInterface.output_length, '|') for gas in system_gases]
         row_titles = [" ".join([gas.index(as_string=True), gas.name(VolumetricRigStreamInterface.output_length, ' ')])
                       for gas in system_gases]
@@ -188,7 +188,7 @@ class VolumetricRigStreamInterface(StreamAdapter):
             words.append(' '.join(mixable_chars[i]))
             lines.append(''.join(words))
         # Add footer
-        lines.append("GMM allowance limit: " + str(len(system_gases)))
+        lines.append("GMM allowance limit: " + str(self._device.system_gases().gas_count()))
 
         return '\r\n'.join(lines)
 
@@ -205,12 +205,12 @@ class VolumetricRigStreamInterface(StreamAdapter):
             string : An echo of the name and index of the requested gases as well as an ok/NO indicating whether the
              gases can be mixed
         """
-        gas1 = self._device.system_gases.gas_by_index(convert_raw_to_int(gas1_index_raw))
-        gas2 = self._device.system_gases.gas_by_index(convert_raw_to_int(gas2_index_raw))
+        gas1 = self._device.system_gases().gas_by_index(convert_raw_to_int(gas1_index_raw))
+        gas2 = self._device.system_gases().gas_by_index(convert_raw_to_int(gas2_index_raw))
         if gas1 is None:
-            gas1 = self._device.system_gases.gas_by_index(0)
+            gas1 = self._device.system_gases().gas_by_index(0)
         if gas2 is None:
-            gas2 = self._device.system_gases.gas_by_index(0)
+            gas2 = self._device.system_gases().gas_by_index(0)
 
         return ' '.join(["GMC",
                          gas1.index(as_string=True), gas1.name(VolumetricRigStreamInterface.output_length, '.'),
@@ -224,7 +224,7 @@ class VolumetricRigStreamInterface(StreamAdapter):
         Returns:
             string : The number of available gases
         """
-        return self._device.system_gases.gas_count()
+        return self._device.system_gases().gas_count()
 
     def get_hmi_status(self):
         """
@@ -551,7 +551,7 @@ class VolumetricRigStreamInterface(StreamAdapter):
         Returns:
             string : Indicates the buffer changed, the previous system gas and the new system gas
         """
-        gas = self._device.system_gases.gas_by_index(convert_raw_to_int(gas_index_raw))
+        gas = self._device.system_gases().gas_by_index(convert_raw_to_int(gas_index_raw))
         buff = self._device.buffer(convert_raw_to_int(buffer_index_raw))
         if gas is not None and buff is not None:
             original_gas = buff.system_gas()
