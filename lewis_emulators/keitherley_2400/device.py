@@ -4,7 +4,7 @@ from states import DefaultInitState, DefaultRunningState
 from lewis.devices import StateMachineDevice
 
 
-class SimulatedVolumetricRig(StateMachineDevice):
+class SimulatedKeitherley2400(StateMachineDevice):
 
     def _initialize_data(self):
         self.serial_command_mode = True
