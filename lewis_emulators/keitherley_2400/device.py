@@ -1,5 +1,6 @@
-from utilities import format
+from utilities import format_value
 from collections import OrderedDict
+from states import DefaultInitState, DefaultRunningState
 from lewis.devices import StateMachineDevice
 
 
@@ -26,10 +27,20 @@ class SimulatedVolumetricRig(StateMachineDevice):
         ])
         
     def get_voltage(self, as_string=False):
-        return format(self._voltage, as_string)
+        return format_value(self._voltage, as_string)
         
     def get_current(self, as_string=False):
-        return format(self._current, as_string)
+        return format_value(self._current, as_string)
         
     def get_resistance(self, as_string=False):
-        return format(self._resistance, as_string)
+        return format_value(self._resistance, as_string)
+
+    def set_current(self, value):
+        self._current = value
+
+    def set_voltage(self, value):
+        self._voltage = value
+
+    def set_resistance(self, value):
+        self._resistance = value
+
