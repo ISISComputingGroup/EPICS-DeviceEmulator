@@ -28,3 +28,7 @@ class Keitherley2400StreamInterface(StreamAdapter):
             self._device.get_current(as_string=True),
             self._device.get_resistance(as_string=True)
         ])
+
+
+    def handle_error(self, request, error):
+        print "An error occurred at request " + repr(request) + ": " + repr(error)
