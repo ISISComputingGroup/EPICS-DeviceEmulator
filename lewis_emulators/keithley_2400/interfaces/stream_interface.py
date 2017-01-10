@@ -23,7 +23,7 @@ class Keithley2400StreamInterface(StreamAdapter):
         Returns:
             string : A string of 3 doubles: voltage, current, resistance. In that order
         """
-        return " ".join([
+        return ", ".join([
             self._device.get_voltage(as_string=True),
             self._device.get_current(as_string=True),
             self._device.get_resistance(as_string=True)
