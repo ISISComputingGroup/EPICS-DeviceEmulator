@@ -1,7 +1,7 @@
 from lewis.adapters.stream import StreamAdapter, Cmd
 
 
-class Keitherley2400StreamInterface(StreamAdapter):
+class Keithley2400StreamInterface(StreamAdapter):
 
     # Commands that we expect via serial during normal operation
     serial_commands = {
