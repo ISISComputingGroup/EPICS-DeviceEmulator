@@ -8,9 +8,9 @@ class SimulatedVolumetricRig(StateMachineDevice):
 
     def _initialize_data(self):
         self.serial_command_mode = True
-        self._current = 1.111
-        self._voltage = 2.222
-        self._resistance = 3.333
+        self._current = 0.0
+        self._voltage = 0.0
+        self._resistance = 0.0
 
     def _get_state_handlers(self):
         return {
