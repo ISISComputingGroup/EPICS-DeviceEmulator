@@ -5,7 +5,7 @@ class Keitherley2400StreamInterface(StreamAdapter):
 
     # Commands that we expect via serial during normal operation
     serial_commands = {
-        Cmd("get_values", "^:READ?(?:\s.*)?$"),
+        Cmd("get_values", "^:READ\?(?:\s.*)?$"),
     }
 
     # Private control commands that can be used as an alternative to the lewis backdoor
