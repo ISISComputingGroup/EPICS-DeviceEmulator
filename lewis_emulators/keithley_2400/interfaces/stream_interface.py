@@ -8,6 +8,7 @@ class Keithley2400StreamInterface(StreamAdapter):
         Cmd("get_values", "^:READ\?$"),
         Cmd("reset", "^\*RST$"),
         Cmd("set_output_mode", "^\:OUTP\s(ON|OFF)$"),
+        Cmd("get_output_mode", "^\:OUTP\?$"),
     }
 
     # Private control commands that can be used as an alternative to the lewis backdoor
@@ -34,15 +35,22 @@ class Keithley2400StreamInterface(StreamAdapter):
     def reset(self):
         """ Resets the device """
         self._device.reset()
-        return ""
+        return "*RST"
 
     def set_output_mode(self, new_mode):
         if new_mode == "ON":
-            return self._device.set_output_mode(is_on=True)
+            self._device.set_output_on(True)
         elif new_mode == "OFF":
-            return self._device.set_output_mode(is_on=False)
+            self._device.set_output_on(False)
         else:
             raise Exception("Invalid output mode received: " + str(new_mode))
+        return ":OUTP " + str(new_mode)
+
+    def get_output_mode(self):
+        if self._device.output_is_on():
+            return "ON"
+        else:
+            return "OFF"
 
     def handle_error(self, request, error):
         print "An error occurred at request " + repr(request) + ": " + repr(error)

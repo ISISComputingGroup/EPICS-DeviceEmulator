@@ -56,8 +56,11 @@ class SimulatedKeithley2400(StateMachineDevice):
         self._current = SimulatedKeithley2400.INITIAL_VALUE
         self._voltage = SimulatedKeithley2400.INITIAL_VALUE
 
-    def set_output_mode(self, is_on):
+    def set_output_on(self, is_on):
         self._output_mode_on = is_on
+
+    def output_is_on(self):
+        return self._output_mode_on
 
     def update(self, dt):
         def update_value(value):
