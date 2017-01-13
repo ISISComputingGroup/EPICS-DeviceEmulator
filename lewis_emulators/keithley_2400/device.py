@@ -1,4 +1,5 @@
 from utilities import format_value
+from random import uniform
 from collections import OrderedDict
 from states import DefaultInitState, DefaultRunningState
 from lewis.devices import StateMachineDevice
@@ -13,6 +14,7 @@ class SimulatedKeithley2400(StateMachineDevice):
         self._current = SimulatedKeithley2400.INITIAL_VALUE
         self._voltage = SimulatedKeithley2400.INITIAL_VALUE
         self._resistance = SimulatedKeithley2400.INITIAL_VALUE
+        self._output_mode_on = True
 
     def _get_state_handlers(self):
         return {
@@ -27,15 +29,18 @@ class SimulatedKeithley2400(StateMachineDevice):
         return OrderedDict([
             (('init', 'running'), lambda: self.serial_command_mode),
         ])
+
+    def _get_output(self, value, as_string):
+        return format_value(value if self._output_mode_on else 0.0, as_string)
         
     def get_voltage(self, as_string=False):
-        return format_value(self._voltage, as_string)
+        return self._get_output(self._voltage, as_string)
         
     def get_current(self, as_string=False):
-        return format_value(self._current, as_string)
+        return self._get_output(self._current, as_string)
         
     def get_resistance(self, as_string=False):
-        return format_value(self._resistance, as_string)
+        return self._get_output(self._resistance, as_string)
 
     def set_current(self, value):
         self._current = value
@@ -50,3 +55,13 @@ class SimulatedKeithley2400(StateMachineDevice):
         self._resistance = SimulatedKeithley2400.INITIAL_VALUE
         self._current = SimulatedKeithley2400.INITIAL_VALUE
         self._voltage = SimulatedKeithley2400.INITIAL_VALUE
+
+    def set_output_mode(self, is_on):
+        self._output_mode_on = is_on
+
+    def update(self, dt):
+        def update_value(value):
+            return abs(value + uniform(-1,1)*dt)
+        self._current = update_value(self._current)
+        self._voltage = update_value(self._voltage)
+        self._resistance = update_value(self._resistance)
