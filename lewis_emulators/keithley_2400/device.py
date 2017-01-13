@@ -14,6 +14,7 @@ class SimulatedKeithley2400(StateMachineDevice):
         self._current = SimulatedKeithley2400.INITIAL_VALUE
         self._voltage = SimulatedKeithley2400.INITIAL_VALUE
         self._resistance = SimulatedKeithley2400.INITIAL_VALUE
+        self._offset_compensation_on = False
         self._output_mode_on = True
 
     def _get_state_handlers(self):
@@ -31,7 +32,9 @@ class SimulatedKeithley2400(StateMachineDevice):
         ])
 
     def _get_output(self, value, as_string):
-        return format_value(value if self._output_mode_on else 0.0, as_string)
+        return format_value((value - SimulatedKeithley2400.INITIAL_VALUE if self._offset_compensation_on else value)
+                            if self._output_mode_on else 0.0,
+                            as_string)
         
     def get_voltage(self, as_string=False):
         return self._get_output(self._voltage, as_string)
@@ -61,6 +64,12 @@ class SimulatedKeithley2400(StateMachineDevice):
 
     def output_is_on(self):
         return self._output_mode_on
+
+    def set_offset_compensation_on(self, is_on):
+        self._offset_compensation_on = is_on
+
+    def offset_compensation_is_on(self):
+        return self._offset_compensation_on
 
     def update(self, dt):
         def update_value(value):

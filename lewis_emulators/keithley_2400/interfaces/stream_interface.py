@@ -9,6 +9,8 @@ class Keithley2400StreamInterface(StreamAdapter):
         Cmd("reset", "^\*RST$"),
         Cmd("set_output_mode", "^\:OUTP\s(ON|OFF)$"),
         Cmd("get_output_mode", "^\:OUTP\?$"),
+        Cmd("set_offset_compensation", "^\:SENS:RES:OCOM\s(ON|OFF)$"),
+        Cmd("get_offset_compensation", "^\:SENS:RES:OCOM\?$"),
     }
 
     # Private control commands that can be used as an alternative to the lewis backdoor
@@ -37,20 +39,33 @@ class Keithley2400StreamInterface(StreamAdapter):
         self._device.reset()
         return "*RST"
 
-    def set_output_mode(self, new_mode):
+    def _set_on_off(self, set_method, type_string, command, new_mode):
         if new_mode == "ON":
-            self._device.set_output_on(True)
+            set_method(True)
         elif new_mode == "OFF":
-            self._device.set_output_on(False)
+            set_method(False)
         else:
-            raise Exception("Invalid output mode received: " + str(new_mode))
-        return ":OUTP " + str(new_mode)
+            raise Exception("Invalid " + type_string + " " + str(new_mode))
+        return command + " " + str(new_mode)
 
-    def get_output_mode(self):
-        if self._device.output_is_on():
+    def _get_on_off(self, get_method):
+        if get_method():
             return "ON"
         else:
             return "OFF"
+
+    def set_output_mode(self, new_mode):
+        return self._set_on_off(self._device.set_output_on, "output mode", "OUTP:", new_mode)
+
+    def get_output_mode(self):
+        return self._get_on_off(self._device.output_is_on)
+
+    def set_offset_compensation(self, new_mode):
+        return self._set_on_off(self._device.set_offset_compensation_on, "offset compensation mode",
+                         ":SENS:RES:OCOM", new_mode)
+
+    def get_offset_compensation(self):
+        return self._get_on_off(self._device.offset_compensation_is_on)
 
     def handle_error(self, request, error):
         print "An error occurred at request " + repr(request) + ": " + repr(error)
