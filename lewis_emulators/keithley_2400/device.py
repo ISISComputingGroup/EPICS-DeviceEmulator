@@ -6,11 +6,13 @@ from lewis.devices import StateMachineDevice
 
 class SimulatedKeithley2400(StateMachineDevice):
 
+    INITIAL_VALUE = 10.0
+
     def _initialize_data(self):
         self.serial_command_mode = True
-        self._current = 0.0
-        self._voltage = 0.0
-        self._resistance = 0.0
+        self._current = SimulatedKeithley2400.INITIAL_VALUE
+        self._voltage = SimulatedKeithley2400.INITIAL_VALUE
+        self._resistance = SimulatedKeithley2400.INITIAL_VALUE
 
     def _get_state_handlers(self):
         return {
@@ -44,3 +46,7 @@ class SimulatedKeithley2400(StateMachineDevice):
     def set_resistance(self, value):
         self._resistance = value
 
+    def reset(self):
+        self._resistance = SimulatedKeithley2400.INITIAL_VALUE
+        self._current = SimulatedKeithley2400.INITIAL_VALUE
+        self._voltage = SimulatedKeithley2400.INITIAL_VALUE

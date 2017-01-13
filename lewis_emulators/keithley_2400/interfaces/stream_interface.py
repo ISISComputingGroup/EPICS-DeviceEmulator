@@ -5,7 +5,8 @@ class Keithley2400StreamInterface(StreamAdapter):
 
     # Commands that we expect via serial during normal operation
     serial_commands = {
-        Cmd("get_values", "^:READ\?(?:\s.*)?$"),
+        Cmd("get_values", "^:READ\?$"),
+        Cmd("reset", "^\*RST$"),
     }
 
     # Private control commands that can be used as an alternative to the lewis backdoor
@@ -29,6 +30,9 @@ class Keithley2400StreamInterface(StreamAdapter):
             self._device.get_resistance(as_string=True)
         ])
 
+    def reset(self):
+        """ Resets the device """
+        self._device.reset()
 
     def handle_error(self, request, error):
         print "An error occurred at request " + repr(request) + ": " + repr(error)
