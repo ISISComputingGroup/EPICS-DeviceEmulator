@@ -16,6 +16,8 @@ class SimulatedKeithley2400(StateMachineDevice):
         self._resistance = SimulatedKeithley2400.INITIAL_VALUE
         self._offset_compensation_on = False
         self._output_mode_on = True
+        self._resistance_mode_auto = True
+        self._remote_sensing_on = False
 
     def _get_state_handlers(self):
         return {
@@ -77,3 +79,15 @@ class SimulatedKeithley2400(StateMachineDevice):
         self._current = update_value(self._current)
         self._voltage = update_value(self._voltage)
         self._resistance = update_value(self._resistance)
+
+    def resistance_mode_is_auto(self):
+        return self._resistance_mode_auto
+
+    def set_resistance_mode_auto(self, is_auto):
+        self._resistance_mode_auto = is_auto
+
+    def remote_sensing_is_on(self):
+        return self._remote_sensing_on
+
+    def set_remote_sensing_on(self, is_on):
+        self._remote_sensing_on = is_on
