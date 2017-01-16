@@ -18,6 +18,7 @@ class SimulatedKeithley2400(StateMachineDevice):
         self._output_mode_on = True
         self._resistance_mode_auto = True
         self._remote_sensing_on = False
+        self._auto_resistance_range = True
 
     def _get_state_handlers(self):
         return {
@@ -91,3 +92,9 @@ class SimulatedKeithley2400(StateMachineDevice):
 
     def set_remote_sensing_on(self, is_on):
         self._remote_sensing_on = is_on
+
+    def auto_resistance_range_is_on(self):
+        return self._auto_resistance_range
+
+    def set_auto_resistance_on(self, is_on):
+        self._auto_resistance_range = is_on

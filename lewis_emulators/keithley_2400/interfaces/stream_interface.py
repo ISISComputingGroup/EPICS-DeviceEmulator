@@ -15,6 +15,8 @@ class Keithley2400StreamInterface(StreamAdapter):
         Cmd("get_resistance_mode", "^\:SENS:RES:MODE\?$"),
         Cmd("set_remote_sensing_mode", "^\:SYST:RSEN\s(ON|OFF)$"),
         Cmd("get_remote_sensing_mode", "^\:SYST:RSEN\?$"),
+        Cmd("set_auto_resistance_range", "^\:SENS:RES:RANG:AUTO\s(AUTO|MANUAL)$"),
+        Cmd("get_auto_resistance_range_on", "^\:SENS:RES:RANG:AUTO\?$"),
     }
 
     # Private control commands that can be used as an alternative to the lewis backdoor
@@ -84,6 +86,12 @@ class Keithley2400StreamInterface(StreamAdapter):
 
     def set_remote_sensing_mode(self, new_mode):
         return self._set_on_off(self._device.set_remote_sensing_on, ":SYST:RSEN", new_mode)
+
+    def get_auto_resistance_range_on(self):
+        return self._get_option(self._device.auto_resistance_range_is_on, {True: "AUTO", False: "MANUAL"})
+
+    def set_auto_resistance_range(self, new_mode):
+        return self._set_mode(self._device.set_auto_resistance_on, ":SENS:RES:RANG:AUTO", new_mode, {"AUTO": True, "MANUAL": False})
 
     def handle_error(self, request, error):
         print "An error occurred at request " + repr(request) + ": " + repr(error)
