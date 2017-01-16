@@ -7,7 +7,7 @@ from ..valve_status import ValveStatus
 class VolumetricRigStreamInterface(StreamAdapter):
 
     # The rig typically splits a command by whitespace and then uses the arguments it needs and then ignores the rest
-    # so "IDN" will respond as "IDN BLAH BLAH BLAH" and "BCS 01" would be the same has "BCS 01 02 03".
+    # so "IDN" will respond as "IDN BLAH BLAH BLAH" and "BCS 01" would be the same as "BCS 01 02 03".
     # Some commands that take input will respond with default (often invalid) parameters if not present. For example
     # "BCS" is the same as "BCS 00" and also "BCS AA".
     serial_commands = {
