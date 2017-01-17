@@ -6,7 +6,7 @@ class OffState(State):
 
 
 class MonitorState(State):
-    NAME = __name__
+    NAME = 'monitor'
 
 class ControlState(State):
-    pass
+    NAME = 'control'

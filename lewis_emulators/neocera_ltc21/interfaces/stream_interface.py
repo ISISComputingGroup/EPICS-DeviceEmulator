@@ -1,18 +1,61 @@
+import re
+
 from lewis.adapters.stream import StreamAdapter, Cmd
+from lewis_emulators.neocera_ltc21.states import MonitorState, ControlState
+
+
+def get_regex(arg):
+
+    """
+
+    Takes a command and turns it into a regex for lewis
+
+    Args:
+        arg: the command to turn into a regex
+
+    Returns: a regex for lewis
+
+    """
+
+    arg = re.escape(arg)
+    output = r"[\r\n]*" + arg + r"[\r\n]*"
+    return output
 
 
 class NeoceraStreamInterface(StreamAdapter):
 
     commands = {
-        Cmd("get_state", r"[\r\n]*QISTATE\?[\r\n]*"),
+        Cmd("get_state", get_regex("QISTATE?")),
+        Cmd("set_state_monitor", get_regex("SMON")),
+        Cmd("set_state_control", get_regex("SCONT")),
     }
 
-    in_terminator = ";"
-    out_terminator = ";"
+    in_terminator = ";\r\n"
+    out_terminator = ";\r\n"
 
     def get_state(self):
-        return "this is my state"
+
+        """
+        Gets the current state of the device
+
+        Returns: a single character string containing a number which represents the state of the device
+
+        """
+
+        if self._device.state == MonitorState.NAME:
+            return "0"
+        elif self._device.state == ControlState.NAME:
+            return "1"
 
     def handle_error(self, request, error):
+        """
+
+        Handles errors.
+
+        Args:
+            request:
+            error:
+
+        """
         print "An error occurred at request " + repr(request) + ": " + repr(error)
 
