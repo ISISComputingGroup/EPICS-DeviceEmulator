@@ -9,20 +9,28 @@ class Keithley2400StreamInterface(StreamAdapter):
         Cmd("reset", "^\*RST$"),
         Cmd("set_output_mode", "^\:OUTP\s(ON|OFF)$"),
         Cmd("get_output_mode", "^\:OUTP\?$"),
-        Cmd("set_offset_compensation", "^\:SENS:RES:OCOM\s(ON|OFF)$"),
-        Cmd("get_offset_compensation", "^\:SENS:RES:OCOM\?$"),
-        Cmd("set_resistance_mode", "^\:SENS:RES:MODE\s(AUTO|MANUAL)$"),
+        Cmd("set_offset_compensation_mode", "^\:SENS:RES:OCOM\s(ON|OFF)$"),
+        Cmd("get_offset_compensation_mode", "^\:SENS:RES:OCOM\?$"),
+        Cmd("set_resistance_mode", "^\:SENS:RES:MODE\s(AUTO|MAN)$"),
         Cmd("get_resistance_mode", "^\:SENS:RES:MODE\?$"),
         Cmd("set_remote_sensing_mode", "^\:SYST:RSEN\s(ON|OFF)$"),
         Cmd("get_remote_sensing_mode", "^\:SYST:RSEN\?$"),
-        Cmd("set_auto_resistance_range", "^\:SENS:RES:RANG:AUTO\s(AUTO|MANUAL)$"),
-        Cmd("get_auto_resistance_range_on", "^\:SENS:RES:RANG:AUTO\?$"),
+        Cmd("set_resistance_range_mode", "^\:SENS:RES:RANG:AUTO\s(0|1)$"),
+        Cmd("get_resistance_range_mode", "^\:SENS:RES:RANG:AUTO\?$"),
         Cmd("set_resistance_range", "^\:SENS:RES:RANG\s([2][0]*)$"),
         Cmd("get_resistance_range", "^\:SENS:RES:RANG\?$"),
+        Cmd("set_source_mode", "^\:SOUR:FUNC\s(CURR|VOLT)$"),
+        Cmd("get_source_mode", "^\:SOUR:FUNC\?$"),
+        Cmd("set_current_compliance", "^\:SENS:CURR\s([-+]?[0-9]*\.?[0-9]+)$"),
+        Cmd("get_current_compliance", "^\:SENS:CURR\?$"),
+        Cmd("set_voltage_compliance", "^\:SENS:VOLT\s([-+]?[0-9]*\.?[0-9]+)$"),
+        Cmd("get_voltage_compliance", "^\:SENS:VOLT\?$"),
     }
 
     # Private control commands that can be used as an alternative to the lewis backdoor
     control_commands = {
+        Cmd("set_voltage", "^\:_CTRL:VOLT\s([-+]?[0-9]*\.?[0-9]+)$"),
+        Cmd("set_current", "^\:_CTRL:CURR\s([-+]?[0-9]*\.?[0-9]+)$"),
     }
 
     commands = set.union(serial_commands, control_commands)
@@ -47,59 +55,74 @@ class Keithley2400StreamInterface(StreamAdapter):
         self._device.reset()
         return "*RST"
 
-    def _set_mode(self, set_method, command, new_mode, mode_lookup):
-        set_method(mode_lookup[new_mode])
-        return command + " " + str(new_mode)
+    def set_current(self, value):
+        self._device.set_current(float(value))
+        return "Current set to: " + str(value)
 
-    def _set_on_off(self, set_method, command, new_mode):
-        return self._set_mode(set_method, command, new_mode, {"ON": True, "OFF": False})
+    def set_voltage(self, value):
+        self._device.set_voltage(float(value))
+        return "Voltage set to: " + str(value)
 
     def _get_option(self, get_method, option_lookup):
         return option_lookup[get_method()]
 
-    def _get_on_off(self, get_method):
-        return self._get_option(get_method, {True: "ON", False: "OFF"})
-
-    def _get_auto_manual(self, get_method):
-        return self._get_option(get_method, {True: "AUTO", False: "MANUAL"})
+    def _set_mode(self, set_method, mode, command):
+        set_method(mode)
+        return command + " " + mode
 
     def set_output_mode(self, new_mode):
-        return self._set_on_off(self._device.set_output_on, "OUTP:", new_mode)
+        return self._set_mode(self._device.set_output_mode, new_mode, "OUTP:")
 
     def get_output_mode(self):
-        return self._get_on_off(self._device.output_is_on)
+        return self._device.get_output_mode()
 
-    def set_offset_compensation(self, new_mode):
-        return self._set_on_off(self._device.set_offset_compensation_on, ":SENS:RES:OCOM", new_mode)
+    def set_offset_compensation_mode(self, new_mode):
+        return self._set_mode(self._device.set_offset_compensation_mode, new_mode, ":SENS:RES:OCOM")
 
-
-    def get_offset_compensation(self):
-        return self._get_on_off(self._device.offset_compensation_is_on)
-
-    def get_resistance_mode(self):
-        return self._get_auto_manual(self._device.resistance_mode_is_auto)
+    def get_offset_compensation_mode(self):
+        return self._device.get_offset_compensation_mode()
 
     def set_resistance_mode(self, new_mode):
-        return self._set_mode(self._device.set_resistance_mode_auto, ":SENS:RES:MODE", new_mode,
-                              {"AUTO": True, "MANUAL": False})
+        return self._set_mode(self._device.set_resistance_mode, new_mode, ":SENS:RES:MODE")
 
-    def get_remote_sensing_mode(self):
-        return self._get_on_off(self._device.remote_sensing_is_on)
+    def get_resistance_mode(self):
+        return self._device.get_resistance_mode()
 
     def set_remote_sensing_mode(self, new_mode):
-        return self._set_on_off(self._device.set_remote_sensing_on, ":SYST:RSEN", new_mode)
+        return self._set_mode(self._device.set_remote_sensing_mode, new_mode, ":SYST:RSEN")
 
-    def get_auto_resistance_range_on(self):
-        return self._get_option(self._device.auto_resistance_range_is_on, {True: "AUTO", False: "MANUAL"})
+    def get_remote_sensing_mode(self):
+        return self._device.get_remote_sensing_mode()
 
-    def set_auto_resistance_range(self, new_mode):
-        return self._set_mode(self._device.set_auto_resistance_on, ":SENS:RES:RANG:AUTO", new_mode, {"AUTO": True, "MANUAL": False})
+    def set_resistance_range_mode(self, new_mode):
+        return self._set_mode(self._device.set_resistance_range_mode, new_mode, ":SENS:RES:RANG:AUTO")
+
+    def get_resistance_range_mode(self):
+        return self._device.get_resistance_range_mode()
+
+    def set_resistance_range(self, value):
+        return self._device.set_resistance_range(int(value))
 
     def get_resistance_range(self):
         return self._device.get_resistance_range()
 
-    def set_resistance_range(self, value):
-        return self._device.set_resistance_range(int(value))
+    def set_source_mode(self, new_mode):
+        return self._set_mode(self._device.set_source_mode, new_mode, ":SOUR:FUNC")
+
+    def get_source_mode(self):
+        return self._device.get_source_mode()
+
+    def set_current_compliance(self, value):
+        return self._device.set_current_compliance(float(value))
+
+    def get_current_compliance(self):
+        return self._device.get_current_compliance()
+
+    def set_voltage_compliance(self, value):
+        return self._device.set_voltage_compliance(float(value))
+
+    def get_voltage_compliance(self):
+        return self._device.get_voltage_compliance()
 
     def handle_error(self, request, error):
         print "An error occurred at request " + repr(request) + ": " + repr(error)

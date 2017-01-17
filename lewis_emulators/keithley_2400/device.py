@@ -2,24 +2,37 @@ from utilities import format_value
 from random import uniform
 from collections import OrderedDict
 from states import DefaultInitState, DefaultRunningState
+from control_modes import *
 from lewis.devices import StateMachineDevice
 
 
 class SimulatedKeithley2400(StateMachineDevice):
 
-    INITIAL_VALUE = 10.0
+    INITIAL_CURRENT = 0.1
+    INITIAL_CURRENT_COMPLIANCE = INITIAL_CURRENT
+    INITIAL_VOLTAGE = 10.0
+    INITIAL_VOLTAGE_COMPLIANCE = INITIAL_VOLTAGE
+    MINIMUM_CURRENT = 1.0e-20
 
     def _initialize_data(self):
         self.serial_command_mode = True
-        self._current = SimulatedKeithley2400.INITIAL_VALUE
-        self._voltage = SimulatedKeithley2400.INITIAL_VALUE
-        self._resistance = SimulatedKeithley2400.INITIAL_VALUE
-        self._offset_compensation_on = False
-        self._output_mode_on = True
-        self._resistance_mode_auto = True
-        self._remote_sensing_on = False
-        self._auto_resistance_range = True
+
+        # Power properties
+        self._current = SimulatedKeithley2400.INITIAL_CURRENT
+        self._voltage = SimulatedKeithley2400.INITIAL_VOLTAGE
+
+        # Modes
+        self._output_mode = OutputMode.ON
+        self._offset_compensation_mode = OffsetCompensationMode.OFF
+        self._resistance_mode = ResistanceMode.AUTO
+        self._remote_sensing_mode = RemoteSensingMode.OFF
+        self._resistance_range_mode = ResistanceRangeMode.AUTO
+        self._source_mode = SourceMode.CURRENT
+
+        # Mode settings
         self._resistance_range = 200000000
+        self._current_compliance = SimulatedKeithley2400.INITIAL_CURRENT_COMPLIANCE
+        self._voltage_compliance = SimulatedKeithley2400.INITIAL_VOLTAGE_COMPLIANCE
 
     def _get_state_handlers(self):
         return {
@@ -35,73 +48,122 @@ class SimulatedKeithley2400(StateMachineDevice):
             (('init', 'running'), lambda: self.serial_command_mode),
         ])
 
-    def _get_output(self, value, as_string):
-        return format_value((value - SimulatedKeithley2400.INITIAL_VALUE if self._offset_compensation_on else value)
-                            if self._output_mode_on else 0.0,
-                            as_string)
-        
-    def get_voltage(self, as_string=False):
-        return self._get_output(self._voltage, as_string)
-        
-    def get_current(self, as_string=False):
-        return self._get_output(self._current, as_string)
-        
-    def get_resistance(self, as_string=False):
-        return self._get_output(self._resistance, as_string)
+    def _resistance(self):
+        r = self._voltage/max(self._current, SimulatedKeithley2400.MINIMUM_CURRENT)
+        return min(r, self._resistance_range) if self._resistance_range_mode == ResistanceRangeMode.MANUAL else r
 
-    def set_current(self, value):
-        self._current = value
+    def _format_power_output(self, value, as_string, offset=0.0):
+        """
+        Some properties like output mode and offset compensation affect the output without affecting the underlying
+         model. Those adjustments are applied here.
+        """
+        if self._output_mode == OutputMode.OFF:
+            output_value = 0.0
+        elif self._offset_compensation_mode == OffsetCompensationMode.ON:
+            output_value = value - offset
+        else:
+            output_value = value
+        return format_value(output_value, as_string)
 
     def set_voltage(self, value):
         self._voltage = value
 
-    def set_resistance(self, value):
-        self._resistance = value
-
-    def reset(self):
-        self._resistance = SimulatedKeithley2400.INITIAL_VALUE
-        self._current = SimulatedKeithley2400.INITIAL_VALUE
-        self._voltage = SimulatedKeithley2400.INITIAL_VALUE
-
-    def set_output_on(self, is_on):
-        self._output_mode_on = is_on
-
-    def output_is_on(self):
-        return self._output_mode_on
-
-    def set_offset_compensation_on(self, is_on):
-        self._offset_compensation_on = is_on
-
-    def offset_compensation_is_on(self):
-        return self._offset_compensation_on
+    def set_current(self, value):
+        self._current = value
+        
+    def get_voltage(self, as_string=False):
+        return self._format_power_output(self._voltage, as_string, SimulatedKeithley2400.INITIAL_VOLTAGE)
+        
+    def get_current(self, as_string=False):
+        return self._format_power_output(self._current, as_string, SimulatedKeithley2400.INITIAL_CURRENT)
+        
+    def get_resistance(self, as_string=False):
+        return self._format_power_output(self._resistance(), as_string)
 
     def update(self, dt):
         def update_value(value):
             return abs(value + uniform(-1,1)*dt)
-        self._current = update_value(self._current)
-        self._voltage = update_value(self._voltage)
-        self._resistance = update_value(self._resistance)
+        new_current = max(update_value(self._current), SimulatedKeithley2400.MINIMUM_CURRENT)
+        new_voltage = update_value(self._voltage)
 
-    def resistance_mode_is_auto(self):
-        return self._resistance_mode_auto
 
-    def set_resistance_mode_auto(self, is_auto):
-        self._resistance_mode_auto = is_auto
+        if self._resistance_mode == ResistanceMode.MANUAL:
+            if new_current < self._current_compliance or self._source_mode == SourceMode.VOLTAGE:
+                self._current = new_current
+            if new_voltage < self._voltage_compliance or self._source_mode == SourceMode.CURRENT:
+                self._voltage = new_voltage
+        elif self._resistance_mode == ResistanceMode.AUTO:
+            self._current = new_current
+            self._voltage = new_voltage
 
-    def remote_sensing_is_on(self):
-        return self._remote_sensing_on
+    def reset(self):
+        self._voltage = SimulatedKeithley2400.INITIAL_POWER_VALUE
+        self._current = SimulatedKeithley2400.INITIAL_POWER_VALUE
 
-    def set_remote_sensing_on(self, is_on):
-        self._remote_sensing_on = is_on
+    @staticmethod
+    def _check_mode(mode, mode_class):
+        if mode in mode_class.MODES:
+            return True
+        else:
+            print "Invalid mode, " + mode + ", received for: " + mode_class.__name__
+            return False
 
-    def auto_resistance_range_is_on(self):
-        return self._auto_resistance_range
+    def set_output_mode(self, mode):
+        if SimulatedKeithley2400._check_mode(mode, OutputMode):
+            self._output_mode = mode
 
-    def set_auto_resistance_on(self, is_on):
-        self._auto_resistance_range = is_on
+    def get_output_mode(self):
+        return self._output_mode
+
+    def set_offset_compensation_mode(self, mode):
+        if SimulatedKeithley2400._check_mode(mode, OffsetCompensationMode):
+            self._offset_compensation_mode = mode
+
+    def get_offset_compensation_mode(self):
+        return self._offset_compensation_mode
+
+    def set_resistance_mode(self, mode):
+        if SimulatedKeithley2400._check_mode(mode, ResistanceMode):
+            self._resistance_mode = mode
+
+    def get_resistance_mode(self):
+        return self._resistance_mode
+
+    def set_remote_sensing_mode(self, mode):
+        if SimulatedKeithley2400._check_mode(mode, RemoteSensingMode):
+            self._remote_sensing_mode = mode
+
+    def get_remote_sensing_mode(self):
+        return self._remote_sensing_mode
+
+    def set_resistance_range_mode(self, mode):
+        if SimulatedKeithley2400._check_mode(mode, ResistanceRangeMode):
+            self._resistance_range_mode = mode
+
+    def get_resistance_range_mode(self):
+        return self._resistance_range_mode
+
+    def set_source_mode(self, mode):
+        if SimulatedKeithley2400._check_mode(mode, SourceMode):
+            self._source_mode = mode
+
+    def get_source_mode(self):
+        return self._source_mode
+
+    def set_resistance_range(self, value):
+        self._resistance_range = value
 
     def get_resistance_range(self):
         return self._resistance_range
 
-    def set_resistance_range(self, value):
-        self._resistance_range = value
+    def set_current_compliance(self, value):
+        self._current_compliance = value
+
+    def get_current_compliance(self):
+        return self._current_compliance
+
+    def set_voltage_compliance(self, value):
+        self._voltage_compliance = value
+
+    def get_voltage_compliance(self):
+        return self._voltage_compliance
