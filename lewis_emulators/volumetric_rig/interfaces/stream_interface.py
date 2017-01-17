@@ -52,8 +52,8 @@ class VolumetricRigStreamInterface(StreamAdapter):
     commands = set.union(serial_commands, control_commands)
 
     # You may need to change these to \r\n if using Telnet"
-    in_terminator = "\r"
-    out_terminator = "\r"
+    in_terminator = "\r\n"
+    out_terminator = "\r\n"
 
     # Lots of formatted output for the volumetric rig is based on fixed length strings
     output_length = 20
