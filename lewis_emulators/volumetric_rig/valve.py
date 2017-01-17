@@ -2,6 +2,9 @@ from valve_status import ValveStatus
 
 
 class Valve(object):
+    """
+    Valves can either be enabled/disabled and open/closed. A valve should never be open and disabled.
+    """
     def __init__(self):
         self._is_enabled = True
         self._is_open = False

@@ -4,6 +4,11 @@ from two_gas_mixer import TwoGasMixer
 
 
 class Buffer(object):
+    """
+    A buffer contains a gas and is connected to a supply of a specific system gas via a valve. The system gas can be
+    changed and the buffer fills from the system gas it is connected to. The valve can only be opened if mixing of
+    the system and buffer gas are permitted
+    """
     def __init__(self, index, buffer_gas, system_gas):
         assert buffer_gas is not None
         assert system_gas is not None
@@ -22,6 +27,12 @@ class Buffer(object):
         return format_int(self._index, as_string, length)
 
     def open_valve(self, mixer):
+        """
+        Try to open the valve between the buffer and system. Nothing will happen if the buffer and system gases are not
+                allowed to mix.
+
+        :param mixer: The details of which gases can be mixed
+        """
         assert isinstance(mixer, TwoGasMixer)
         if mixer.can_mix(self._buffer_gas, self._system_gas):
             self._valve.open()
@@ -33,7 +44,9 @@ class Buffer(object):
         self._valve.enable()
 
     def disable_valve(self):
-        # Valves must be closed before they are disabled
+        """
+        Disable the valve. If the valve is open when this is requested then it will be automatically closed
+        """
         self._valve.close()
         self._valve.disable()
 
@@ -53,5 +66,10 @@ class Buffer(object):
         return self._system_gas
 
     def set_system_gas(self, gas):
+        """
+        Set a new system gas. This is only possible if the valve is closed.
+
+        :param gas: The new system gas
+        """
         if not self._valve.is_open():
             self._system_gas = gas
