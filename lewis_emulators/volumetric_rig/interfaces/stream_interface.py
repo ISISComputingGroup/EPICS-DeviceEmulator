@@ -342,14 +342,14 @@ class VolumetricRigStreamInterface(StreamAdapter):
             n = convert_raw_to_int(raw)
         return n
 
-    def _set_valve_status(self, valve_number_raw, set_to_open=None, set_to_enabled=None):
+    def _set_valve_status(self, valve_identifier_raw, set_to_open=None, set_to_enabled=None):
         """
         Change the valve status
 
         Returns:
             string : Indicates the valve number, previous state, and new state
         """
-        valve_number = VolumetricRigStreamInterface._convert_raw_valve_to_int(valve_number_raw)
+        valve_number = VolumetricRigStreamInterface._convert_raw_valve_to_int(valve_identifier_raw)
 
         # We should have exactly one of these arguments
         if set_to_open is not None:
