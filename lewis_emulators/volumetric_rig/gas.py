@@ -3,7 +3,7 @@ from utilities import pad_string, format_int
 
 
 class Gas(object):
-    def __init__(self,index,name):
+    def __init__(self, index, name):
         assert type(index) is IntType and type(name) is StringType
         self._index = index
         self._name = name
