@@ -15,6 +15,7 @@ class SimulatedKeithley2400(StateMachineDevice):
     MINIMUM_CURRENT = 1.0e-20
 
     def _initialize_data(self):
+        """ Initialize all of the device's attributes """
         self.serial_command_mode = True
 
         # Power properties
@@ -49,6 +50,7 @@ class SimulatedKeithley2400(StateMachineDevice):
         ])
 
     def _resistance(self):
+        # The device only tracks current and voltage. Resistance is calculated as a dependent variable
         r = self._voltage/max(self._current, SimulatedKeithley2400.MINIMUM_CURRENT)
         return min(r, self._resistance_range) if self._resistance_range_mode == ResistanceRangeMode.MANUAL else r
 
@@ -81,13 +83,14 @@ class SimulatedKeithley2400(StateMachineDevice):
         return self._format_power_output(self._resistance(), as_string)
 
     def update(self, dt):
+        """ Update the current and voltage values based on the current mode and time elapsed """
         def update_value(value):
             return abs(value + uniform(-1,1)*dt)
         new_current = max(update_value(self._current), SimulatedKeithley2400.MINIMUM_CURRENT)
         new_voltage = update_value(self._voltage)
 
-
         if self._resistance_mode == ResistanceMode.MANUAL:
+            # Restrict the current if we're in current compliance mode. Similarly for voltage
             if new_current < self._current_compliance or self._source_mode == SourceMode.VOLTAGE:
                 self._current = new_current
             if new_voltage < self._voltage_compliance or self._source_mode == SourceMode.CURRENT:
@@ -97,11 +100,12 @@ class SimulatedKeithley2400(StateMachineDevice):
             self._voltage = new_voltage
 
     def reset(self):
-        self._voltage = SimulatedKeithley2400.INITIAL_POWER_VALUE
-        self._current = SimulatedKeithley2400.INITIAL_POWER_VALUE
+        """ Set all the attributes back to their initial values """
+        self._initialize_data()
 
     @staticmethod
     def _check_mode(mode, mode_class):
+        """ Make sure the mode requested exists in the related class """
         if mode in mode_class.MODES:
             return True
         else:

@@ -7,6 +7,7 @@ class Keithley2400StreamInterface(StreamAdapter):
     serial_commands = {
         Cmd("get_values", "^:READ\?$"),
         Cmd("reset", "^\*RST$"),
+        Cmd("identify", "^\*IDN?"),
         Cmd("set_output_mode", "^\:OUTP\s(ON|OFF)$"),
         Cmd("get_output_mode", "^\:OUTP\?$"),
         Cmd("set_offset_compensation_mode", "^\:SENS:RES:OCOM\s(ON|OFF)$"),
@@ -55,6 +56,10 @@ class Keithley2400StreamInterface(StreamAdapter):
         self._device.reset()
         return "*RST"
 
+    def identify(self):
+        """ Replies with the device's identity """
+        return "Keithley 2400 Source Meter emulator"
+
     def set_current(self, value):
         self._device.set_current(float(value))
         return "Current set to: " + str(value)
@@ -63,10 +68,8 @@ class Keithley2400StreamInterface(StreamAdapter):
         self._device.set_voltage(float(value))
         return "Voltage set to: " + str(value)
 
-    def _get_option(self, get_method, option_lookup):
-        return option_lookup[get_method()]
-
     def _set_mode(self, set_method, mode, command):
+        """ The generic form of how mode sets are executed and responded to """
         set_method(mode)
         return command + " " + mode
 
@@ -125,5 +128,6 @@ class Keithley2400StreamInterface(StreamAdapter):
         return self._device.get_voltage_compliance()
 
     def handle_error(self, request, error):
-        print "An error occurred at request " + repr(request) + ": " + repr(error)
+        print  "An error occurred at request " + repr(request) + ": " + repr(error)
+        return str(error)
 
