@@ -326,6 +326,22 @@ class VolumetricRigStreamInterface(StreamAdapter):
         }
         return "VST Valve Status " + "".join([status_codes[v] for v in self._device.valves_status()])
 
+    @staticmethod
+    def _convert_raw_valve_to_int(raw):
+        """
+        Get the valve number from its identifier
+
+        :param raw: The raw valve identifier
+        :return: An integer indicating the valve number
+        """
+        if str(raw).lower() == "c":
+            n = 7
+        elif str(raw).lower() == "v":
+            n = 8
+        else:
+            n = convert_raw_to_int(raw)
+        return n
+
     def _set_valve_status(self, valve_number_raw, set_to_open=None, set_to_enabled=None):
         """
         Change the valve status
@@ -333,7 +349,7 @@ class VolumetricRigStreamInterface(StreamAdapter):
         Returns:
             string : Indicates the valve number, previous state, and new state
         """
-        valve_number = convert_raw_to_int(valve_number_raw)
+        valve_number = VolumetricRigStreamInterface._convert_raw_valve_to_int(valve_number_raw)
 
         # We should have exactly one of these arguments
         if set_to_open is not None:
