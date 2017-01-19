@@ -31,8 +31,8 @@ class NeoceraStreamInterface(StreamAdapter):
         Cmd("get_temperature_and_unit", get_regex("QSAMP?1")),
     }
 
-    in_terminator = ";\r\n"
-    out_terminator = ";\r\n"
+    in_terminator = ";"
+    out_terminator = ";\n"
 
     def get_state(self):
 

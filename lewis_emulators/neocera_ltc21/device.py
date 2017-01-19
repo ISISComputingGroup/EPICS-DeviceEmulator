@@ -1,13 +1,13 @@
 from collections import OrderedDict
 
 from lewis.devices import StateMachineDevice
-
-from lewis.core import approaches
-
 from lewis_emulators.neocera_ltc21.states import MonitorState, ControlState
 
 
 class SimulatedNeocera(StateMachineDevice):
+    """
+    Simulated Neocera LTG21 temperature controller
+    """
 
     def _initialize_data(self):
 
