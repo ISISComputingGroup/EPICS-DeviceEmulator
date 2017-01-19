@@ -18,6 +18,9 @@ class SimulatedNeocera(StateMachineDevice):
         """
 
         self.current_state = self._get_initial_state()
+        self.temperature = 0
+        self.setpoint = 0
+        self.unit = "C"
 
     def _get_state_handlers(self):
 

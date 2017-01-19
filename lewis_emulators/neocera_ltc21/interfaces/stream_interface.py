@@ -28,6 +28,7 @@ class NeoceraStreamInterface(StreamAdapter):
         Cmd("get_state", get_regex("QISTATE?")),
         Cmd("set_state_monitor", get_regex("SMON")),
         Cmd("set_state_control", get_regex("SCONT")),
+        Cmd("get_temperature_and_unit", get_regex("QSAMP?1")),
     }
 
     in_terminator = ";\r\n"
@@ -46,6 +47,9 @@ class NeoceraStreamInterface(StreamAdapter):
             return "0"
         elif self._device.state == ControlState.NAME:
             return "1"
+
+    def get_temperature_and_unit(self):
+        return "{0:10f}{1:1s}".format(self._device.temperature, self._device.unit)
 
     def handle_error(self, request, error):
         """
