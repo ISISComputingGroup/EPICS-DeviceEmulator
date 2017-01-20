@@ -1,8 +1,9 @@
 from collections import OrderedDict
 
 from lewis.devices import StateMachineDevice
-from lewis_emulators.neocera_ltc21.states import MonitorState, ControlState
 
+from lewis_emulators.neocera_ltc21.device_errors import NeoceraDeviceErrors
+from lewis_emulators.neocera_ltc21.states import MonitorState, ControlState
 
 class SimulatedNeocera(StateMachineDevice):
     """
@@ -18,9 +19,10 @@ class SimulatedNeocera(StateMachineDevice):
         """
 
         self.current_state = self._get_initial_state()
-        self.temperature = 0
-        self.setpoint = 0
-        self.unit = "C"
+        self.temperature = [0, 1]
+        self.set_point = [0, 2]
+        self.unit = ["C", "K"]
+        self.error = NeoceraDeviceErrors()
 
     def _get_state_handlers(self):
 
@@ -30,7 +32,8 @@ class SimulatedNeocera(StateMachineDevice):
 
         """
         return {
-            MonitorState.NAME: MonitorState()
+            MonitorState.NAME: MonitorState(),
+            ControlState.NAME: ControlState()
         }
 
     def _get_initial_state(self):
