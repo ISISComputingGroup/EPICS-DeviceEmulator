@@ -21,8 +21,10 @@ def get_regex(command, *args):
 
     command = re.escape(command)
     args_regex = ""
+    comma = ""
     for arg in args:
-        args_regex += "{stripped}({arg})".format(arg=arg, stripped=r"[\r\n\s]*")
+        args_regex += "{stripped}{comma}({arg})".format(arg=arg, stripped=r"[\r\n\s]*", comma=comma)
+        comma = ","
 
     return "{stripped}{command}{args_regex}{stripped}".format(
         stripped=r"[\r\n\s]*", args_regex=args_regex, command=command)
@@ -39,6 +41,7 @@ class NeoceraStreamInterface(StreamAdapter):
         Cmd("set_state_control", get_regex("SCONT")),
         Cmd("get_temperature_and_unit", get_regex("QSAMP?", "\d")),
         Cmd("get_setpoint_and_unit", get_regex("QSETP?", "\d")),
+        Cmd("set_setpoint", get_regex("SETP", "\d", "[+-]?\d+\.?\d+")),
     }
 
     in_terminator = ";"
@@ -100,12 +103,34 @@ class NeoceraStreamInterface(StreamAdapter):
         """
 
         Args:
-            set_point_number: the number of set point top return, 1=HEATER, 2=ANALOG
+            set_point_number: the number of set point top return; 1=HEATER, 2=ANALOG
 
         Returns: setpoint with unit
 
         """
         return self._get_indexed_value_with_unit(self._device.setpoints, set_point_number)
+
+    def set_setpoint(self, set_point_number, value):
+        """
+        Set the setpoint.
+        Args:
+            set_point_number: set point number; 1=HEATER, 2=ANALOG
+            value: value to set it to
+
+        Returns: blank
+
+        """
+        try:
+            sensor_number = int(set_point_number) - 1
+            setpoint = float(value)
+
+            temp, unit = self._device.setpoints[sensor_number]
+            self._device.setpoints[sensor_number] = (setpoint, unit)
+        except (IndexError, ValueError, TypeError):
+            print "Error: invalid sensor number, '{0}', or setpoint value, '{1}'".format(set_point_number, value)
+            self._device.error = NeoceraDeviceErrors(NeoceraDeviceErrors.BAD_PARAMETER)
+            return ""
+
 
     def handle_error(self, request, error):
         """
@@ -118,4 +143,3 @@ class NeoceraStreamInterface(StreamAdapter):
 
         """
         print "An error occurred at request " + repr(request) + ": " + repr(error)
-
