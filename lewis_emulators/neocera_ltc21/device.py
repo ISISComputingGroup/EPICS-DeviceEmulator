@@ -19,9 +19,10 @@ class SimulatedNeocera(StateMachineDevice):
         """
 
         self.current_state = self._get_initial_state()
-        self.temperature = [0, 1]
-        self.set_point = [0, 2]
-        self.unit = ["C", "K"]
+        self.temperatures = [(0, "C"), (1, "K")]
+
+        self.setpoints = [(2, "C"), (3, "K")]
+
         self.error = NeoceraDeviceErrors()
 
     def _get_state_handlers(self):
