@@ -2,6 +2,7 @@ import re
 
 from lewis.adapters.stream import StreamAdapter, Cmd
 
+from lewis_emulators.neocera_ltc21 import SimulatedNeocera
 from lewis_emulators.neocera_ltc21.device_errors import NeoceraDeviceErrors
 from lewis_emulators.neocera_ltc21.states import MonitorState, ControlState
 
@@ -43,6 +44,8 @@ class NeoceraStreamInterface(StreamAdapter):
         Cmd("get_setpoint_and_unit", get_regex("QSETP?", "\d")),
         Cmd("set_setpoint", get_regex("SETP", "\d", "[+-]?\d+\.?\d+")),
         Cmd("get_output_config", get_regex("QOUT?", "\d")),
+        Cmd("set_heater_control", get_regex("SHCONT", "\d")),
+        Cmd("set_analog_control", get_regex("SACONT", "\d")),
     }
 
     in_terminator = ";"
@@ -151,7 +154,7 @@ class NeoceraStreamInterface(StreamAdapter):
             output_config = "{sensor_source};{control}".format(
                 sensor_source=device.sensor_source[output_index], control=device.control[output_index])
 
-            if output_index == 1:
+            if output_index == SimulatedNeocera.HEATER_INDEX:
                 output_config += ";{heater_range}".format(heater_range=device.heater_range)
 
             return output_config
@@ -161,6 +164,54 @@ class NeoceraStreamInterface(StreamAdapter):
             device.error = NeoceraDeviceErrors(NeoceraDeviceErrors.BAD_PARAMETER)
             return ""
 
+    def set_heater_control(self, control_type_number):
+        """
+        Set the heater output control
+        Args:
+            control_type_number: control type to set the heater to
+
+        Returns: None
+
+        """
+
+        self._set_output_control(SimulatedNeocera.HEATER_INDEX, control_type_number)
+
+    def set_analog_control(self, control_type_number):
+        """
+        Set the analog output control
+        Args:
+            control_type_number: control type to set the heater to
+
+        Returns: None
+
+        """
+
+        self._set_output_control(SimulatedNeocera.ANALOG_INDEX, control_type_number)
+
+    def _set_output_control(self, output_index, control_type_number):
+        """
+        Set the output control for either the heater or the analog output
+        Args:
+            output_index: output index
+            control_type_number: control type to set
+
+        Returns: None
+
+        """
+        device = self._device
+        try:
+            control_type = int(control_type_number)
+
+            if control_type < SimulatedNeocera.CONTROL_TYPE_MIN[output_index] or \
+                    control_type > SimulatedNeocera.CONTROL_TYPE_MAX[output_index]:
+                raise ValueError("Bad control type number")
+
+            self._device.control[output_index] = control_type
+
+        except (IndexError, ValueError, TypeError):
+            print "Error: invalid control type number for output {output}, '{0}'".format(
+                control_type_number, output=output_index)
+            device.error = NeoceraDeviceErrors(NeoceraDeviceErrors.BAD_PARAMETER)
 
     def handle_error(self, request, error):
         """

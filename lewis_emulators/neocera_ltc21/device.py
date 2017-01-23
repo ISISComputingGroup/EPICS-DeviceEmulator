@@ -11,6 +11,15 @@ class SimulatedNeocera(StateMachineDevice):
     Simulated Neocera LTG21 temperature controller
     """
 
+    # Index in the arrays of the heater output
+    HEATER_INDEX = 0
+    # Index in the arrays of the analog output
+    ANALOG_INDEX = 1
+    # Minimum allowed output control type for the output index (see self.control)
+    CONTROL_TYPE_MIN = [0, 3]
+    # Maximum allowed output control type for the output index (see self.control)
+    CONTROL_TYPE_MAX = [5, 6]
+
     def _initialize_data(self):
 
         """
@@ -38,7 +47,7 @@ class SimulatedNeocera(StateMachineDevice):
         # 3 is no connected
         self.sensor_source = range(1, self.sensor_count + 1)
 
-        # output control method {0 = AUTO P, 1 = AUTO PI, 2 = AUTO PID, 3 = PID, 4 = TABLE, 5 = DEFAULT, 6 = MONITOR}
+        # output control method {0 = AUTO P, 1 = AUTO PI, 2 = AUTO PID, 3 = PID, 4 = TABLE, 5 = DEFAULT, 6 = MONITOR (only analogue)}
         self.control = [4] * self.sensor_count
 
         # heater range {0 = Off, 1 = 0.05W, 2=0.5W, 3=5W, 4=50W}
