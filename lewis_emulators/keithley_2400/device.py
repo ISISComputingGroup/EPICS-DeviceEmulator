@@ -59,12 +59,9 @@ class SimulatedKeithley2400(StateMachineDevice):
         Some properties like output mode and offset compensation affect the output without affecting the underlying
          model. Those adjustments are applied here.
         """
-        if self._output_mode == OutputMode.OFF:
-            output_value = 0.0
-        elif self._offset_compensation_mode == OffsetCompensationMode.ON:
-            output_value = value - offset
-        else:
-            output_value = value
+        output_value = value
+        if self._offset_compensation_mode == OffsetCompensationMode.ON:
+            output_value -= offset
         return format_value(output_value, as_string)
 
     def set_voltage(self, value):
