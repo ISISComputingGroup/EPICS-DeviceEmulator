@@ -7,28 +7,88 @@ from lewis_emulators.neocera_ltc21.device_errors import NeoceraDeviceErrors
 from lewis_emulators.neocera_ltc21.states import MonitorState, ControlState
 
 
-def get_regex(command, *args):
-
+class CmdBuilder(object):
+    """
+    Build a command for the stream adapter
     """
 
-    Takes a command and optional arguments and turns then into a regex for lewis
+    def __init__(self, target_method, arg_sep=",", ignore=""):
+        """
+        Create a builder. Use build to create the final objecy
+        Args:
+            target_method: name of the method target to call when the reg ex matches
+            arg_sep: seperators between the arguments
+            ignore: set of characters to ignore between text and arguments
 
-    Args:
-        command: the command to turn into a regex
+        Returns:
 
-    Returns: a regex for lewis
+        """
+        self._target_method = target_method
+        self._arg_sep = arg_sep
+        self._current_sep = ""
+        self._ignore = "[{0}]*".format(ignore)
+        self._reg_ex = self._ignore
 
-    """
+    def escape(self, text):
+        """
+        Add some text to the regex which is esacped
+        Args:
+            text: text to add
 
-    command = re.escape(command)
-    args_regex = ""
-    comma = ""
-    for arg in args:
-        args_regex += "{stripped}{comma}({arg})".format(arg=arg, stripped=r"[\r\n\s]*", comma=comma)
-        comma = ","
+        Returns: builder
 
-    return "{stripped}{command}{args_regex}{stripped}".format(
-        stripped=r"[\r\n\s]*", args_regex=args_regex, command=command)
+        """
+        self._reg_ex += re.escape(text) + self._ignore
+        return self
+
+    def arg(self, arg_regex):
+        """
+        Add an argument to the command
+        Args:
+            arg_regex: regex for the argument (capture group will be added)
+
+        Returns: builder
+
+        """
+        self._reg_ex += self._current_sep + "(" + arg_regex + ")" + self._ignore
+        self._current_sep = self._arg_sep
+        return self
+
+    def float(self):
+        """
+        Add a float argument
+        Returns: builder
+
+        """
+        return self.arg(r"[+-]?\d+\.?\d*")
+
+    def digit(self):
+        """
+        Add a single digit argument
+        Returns: builder
+
+        """
+        return self.arg(r"\d")
+
+    def int(self):
+        """
+        Add an integer argument
+        Returns: builder
+
+        """
+        return self.arg(r"\d*")
+
+    def build(self, *args, **kwargs):
+        """
+        Builds the CMd object based on the target and regular expression
+        Args:
+            *args: arguments to pass to Cmd constructor
+            **kwargs: key word arguments to pass to Cmd constructor
+
+        Returns: Cmd object
+
+        """
+        return Cmd(self._target_method, self._reg_ex, *args, **kwargs)
 
 
 class NeoceraStreamInterface(StreamAdapter):
@@ -37,17 +97,19 @@ class NeoceraStreamInterface(StreamAdapter):
     """
 
     commands = {
-        Cmd("get_state", get_regex("QISTATE?")),
-        Cmd("set_state_monitor", get_regex("SMON")),
-        Cmd("set_state_control", get_regex("SCONT")),
-        Cmd("get_temperature_and_unit", get_regex("QSAMP?", "\d")),
-        Cmd("get_setpoint_and_unit", get_regex("QSETP?", "\d")),
-        Cmd("set_setpoint", get_regex("SETP", "\d", "[+-]?\d+\.?\d*")),
-        Cmd("get_output_config", get_regex("QOUT?", "\d")),
-        Cmd("set_heater_control", get_regex("SHCONT", "\d")),
-        Cmd("set_analog_control", get_regex("SACONT", "\d")),
-        Cmd("get_heater", get_regex("QHEAT?")),
-        Cmd("get_pid", get_regex("QPID?", "\d")),
+        CmdBuilder("get_state", arg_sep=",", ignore=r"\r\n\s").escape("QISTATE?").build(),
+        CmdBuilder("set_state_monitor", arg_sep=",", ignore=r"\r\n\s").escape("SMON").build(),
+        CmdBuilder("set_state_control", arg_sep=",", ignore=r"\r\n\s").escape("SCONT").build(),
+        CmdBuilder("get_temperature_and_unit", arg_sep=",", ignore=r"\r\n\s").escape("QSAMP?").digit().build(),
+        CmdBuilder("get_setpoint_and_unit", arg_sep=",", ignore=r"\r\n\s").escape("QSETP?").digit().build(),
+        CmdBuilder("set_setpoint", arg_sep=",", ignore=r"\r\n\s").escape("SETP").digit().float().build(),
+        CmdBuilder("get_output_config", arg_sep=",", ignore=r"\r\n\s").escape("QOUT?").digit().build(),
+        CmdBuilder("set_heater_control", arg_sep=",", ignore=r"\r\n\s").escape("SHCONT").digit().build(),
+        CmdBuilder("set_analog_control", arg_sep=",", ignore=r"\r\n\s").escape("SACONT").digit().build(),
+        CmdBuilder("get_heater", arg_sep=",", ignore=r"\r\n\s").escape("QHEAT?").build(),
+        CmdBuilder("get_pid", arg_sep=",", ignore=r"\r\n\s").escape("QPID?").digit().build(),
+        CmdBuilder("set_pid_heater", arg_sep=",", ignore=r"\r\n\s").escape("SPID1,").int().int().int().float().float().build(),
+        CmdBuilder("set_pid_analog", arg_sep=",", ignore=r"\r\n\s").escape("SPID2,").int().int().int().float().float().float().build()
     }
 
     in_terminator = ";"
@@ -244,16 +306,81 @@ class NeoceraStreamInterface(StreamAdapter):
         try:
             output_index = int(output_number) - 1
 
-            pid_output = "{P};{I};{D};{fixed_power}".format(**device.pid[output_index])
+            pid_output = "{P:f};{I:f};{D:f};{fixed_power:f}".format(**device.pid[output_index])
 
             if output_index == HEATER_INDEX:
-                return "{pid_output};{limit}".format(pid_output=pid_output, **device.pid[output_index])
+                return "{pid_output};{limit:f}".format(pid_output=pid_output, **device.pid[output_index])
             else:
-                return "{pid_output};{gain};{offset}".format(pid_output=pid_output, **device.pid[output_index])
+                return "{pid_output};{gain:f};{offset:f}".format(pid_output=pid_output, **device.pid[output_index])
 
         except (IndexError, ValueError, TypeError):
             print "Error: invalid output number, '{output}'".format(output=output_number)
             device.error = NeoceraDeviceErrors(NeoceraDeviceErrors.BAD_PARAMETER)
+
+    def set_pid_heater(self, p, i, d, fixed_power, limit):
+        """
+        Set the pid settings for the heater
+        Args:
+            p: p
+            i: i
+            d: d
+            fixed_power: fixed power
+            limit: limit of the heater
+
+        Returns: None
+
+        """
+        pid_settings = self._device.pid[HEATER_INDEX]
+        try:
+            self._set_pid(p, i, d, fixed_power, pid_settings)
+            pid_settings["limit"] = float(limit)
+
+        except (IndexError, ValueError, TypeError):
+            print "Error: in pid settings for heater"
+            self._device.error = NeoceraDeviceErrors(NeoceraDeviceErrors.BAD_PARAMETER)
+
+    def set_pid_analog(self, p, i, d, fixed_power, gain, offset):
+        """
+        Set the pid settings for the analog output
+        Args:
+            p: p
+            i: i
+            d: d
+            fixed_power: fixed power
+            gain: gain of the output
+            offset: offset for the output
+
+        Returns: None
+
+        """
+        pid_settings = self._device.pid[ANALOG_INDEX]
+        try:
+            self._set_pid(p, i, d, fixed_power, pid_settings)
+            pid_settings["gain"] = float(gain)
+            pid_settings["offset"] = float(offset)
+
+        except (IndexError, ValueError, TypeError):
+            print "Error: in pid settings for analog"
+            self._device.error = NeoceraDeviceErrors(NeoceraDeviceErrors.BAD_PARAMETER)
+
+    def _set_pid(self, p, i, d, fixed_power, pid_settings):
+        """
+        Common function to set p,i,d and power
+        Args:
+        Args:
+            p: p
+            i: i
+            d: d
+            fixed_power: fixed power
+            pid_settings: in which to set them
+
+        Returns: None
+
+        """
+        pid_settings["P"] = int(p)
+        pid_settings["I"] = int(i)
+        pid_settings["D"] = int(d)
+        pid_settings["fixed_power"] = float(fixed_power)
 
     def handle_error(self, request, error):
         """

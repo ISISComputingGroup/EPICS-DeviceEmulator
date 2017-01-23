@@ -41,7 +41,7 @@ class ControlState(State):
                 device.temperatures[sensor_source] = approaches.linear(temp, setpoint, 0.1, dt)
 
         heater_sensor_source = device.sensor_source[HEATER_INDEX] - 1
-        if  heater_sensor_source != 2:
+        if heater_sensor_source != 2:
             # set heater between 0 and 100% proportional to diff in temp * 10
             temp = device.temperatures[heater_sensor_source]
             setpoint = device.setpoints[HEATER_INDEX]
