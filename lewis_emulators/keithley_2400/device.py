@@ -13,6 +13,7 @@ class SimulatedKeithley2400(StateMachineDevice):
     INITIAL_VOLTAGE = 10.0
     INITIAL_VOLTAGE_COMPLIANCE = INITIAL_VOLTAGE
     MINIMUM_CURRENT = 1.0e-20
+    RESISTANCE_RANGE_MULTIPLIER = 2.1
 
     def _initialize_data(self):
         """ Initialize all of the device's attributes """
@@ -31,7 +32,7 @@ class SimulatedKeithley2400(StateMachineDevice):
         self._source_mode = SourceMode.CURRENT
 
         # Mode settings
-        self._resistance_range = 2.1
+        self._resistance_range = SimulatedKeithley2400.RESISTANCE_RANGE_MULTIPLIER
         self._current_compliance = SimulatedKeithley2400.INITIAL_CURRENT_COMPLIANCE
         self._voltage_compliance = SimulatedKeithley2400.INITIAL_VOLTAGE_COMPLIANCE
 
@@ -157,8 +158,8 @@ class SimulatedKeithley2400(StateMachineDevice):
         from math import pow
         # Set the resistance range to the smallest value of 2.1En the requested
         # value exceeds
-        self._resistance_range = 2.1
-        for r in [2.1*pow(10,i) for i in range(1,8)]:
+        self._resistance_range = SimulatedKeithley2400.RESISTANCE_RANGE_MULTIPLIER
+        for r in [SimulatedKeithley2400.RESISTANCE_RANGE_MULTIPLIER*pow(10, i) for i in range(1, 8)]:
             if value < r:
                 self._resistance_range = r/10
                 break
