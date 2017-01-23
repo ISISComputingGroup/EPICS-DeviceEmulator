@@ -72,11 +72,11 @@ class NeoceraStreamInterface(StreamAdapter):
         """
         return self._get_indexed_value_with_unit(self._device.temperatures, sensor_number)
 
-    def _get_indexed_value_with_unit(self, device_temperatures, item_number):
+    def _get_indexed_value_with_unit(self, device_values, item_number):
         """
         Get a temperature like value back from device temperatures in the format produced by the device
         Args:
-            device_temperatures: device temperatures list
+            device_values: device value, e.g. temperatures list
             item_number: item to return
 
         Returns: temp and units; e.g. setpoint 1.2K
@@ -84,15 +84,15 @@ class NeoceraStreamInterface(StreamAdapter):
         """
         try:
             sensor_index = int(item_number) - 1
-            temperature_combined = device_temperatures[sensor_index]
+            device_value = device_values[sensor_index]
 
             # for temperatures it can not read
-            if temperature_combined is None:
+            if device_value is None:
                 return " ------ "
 
-            temp, unit = temperature_combined
+            unit = self._device.units[sensor_index]
 
-            return "{0:8f}{1:1s}".format(temp, unit)
+            return "{0:8f}{1:1s}".format(device_value, unit)
 
         except (IndexError, ValueError, TypeError):
             print "Error: invalid sensor number requested '{0}'".format(item_number)
@@ -124,8 +124,7 @@ class NeoceraStreamInterface(StreamAdapter):
             sensor_number = int(set_point_number) - 1
             setpoint = float(value)
 
-            temp, unit = self._device.setpoints[sensor_number]
-            self._device.setpoints[sensor_number] = (setpoint, unit)
+            self._device.setpoints[sensor_number] = setpoint
         except (IndexError, ValueError, TypeError):
             print "Error: invalid sensor number, '{0}', or setpoint value, '{1}'".format(set_point_number, value)
             self._device.error = NeoceraDeviceErrors(NeoceraDeviceErrors.BAD_PARAMETER)

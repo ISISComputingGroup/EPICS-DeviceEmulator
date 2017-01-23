@@ -5,6 +5,7 @@ from lewis.devices import StateMachineDevice
 from lewis_emulators.neocera_ltc21.device_errors import NeoceraDeviceErrors
 from lewis_emulators.neocera_ltc21.states import MonitorState, ControlState
 
+
 class SimulatedNeocera(StateMachineDevice):
     """
     Simulated Neocera LTG21 temperature controller
@@ -18,11 +19,22 @@ class SimulatedNeocera(StateMachineDevice):
 
         """
 
+        # desired current state of the system
         self.current_state = self._get_initial_state()
-        self.temperatures = [(0, "C"), (1, "K")]
 
-        self.setpoints = [(2, "C"), (3, "K")]
+        # number of sensors
+        self.sensor_count = 2
 
+        # temperature of the samples measure by sensor n
+        self.temperatures = [0] * self.sensor_count
+
+        # display units
+        self.units = ["K"] * self.sensor_count
+
+        # the set points
+        self.setpoints = [2] * self.sensor_count
+
+        # errors created within the device
         self.error = NeoceraDeviceErrors()
 
     def _get_state_handlers(self):
