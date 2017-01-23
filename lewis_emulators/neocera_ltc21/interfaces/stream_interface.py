@@ -47,6 +47,7 @@ class NeoceraStreamInterface(StreamAdapter):
         Cmd("set_heater_control", get_regex("SHCONT", "\d")),
         Cmd("set_analog_control", get_regex("SACONT", "\d")),
         Cmd("get_heater", get_regex("QHEAT?")),
+        Cmd("get_pid", get_regex("QPID?", "\d")),
     }
 
     in_terminator = ";"
@@ -221,6 +222,38 @@ class NeoceraStreamInterface(StreamAdapter):
 
         """
         return "{0:5.1f}".format(self._device.heater)
+
+    def get_pid(self, output_number):
+        """
+        Get the PID and other info of the output. Information is
+            P, I, D, fixed power settting,
+            for heater: power limit
+            for analog: gain and offset
+
+            Exmaples:
+              QPID?1; -> 24.999;32.;8.;0.0;100.;
+              QPID?2; -> 99.999;10.;0.0;0.0;1.;0.0;
+
+        Args:
+            output_number: output number;
+
+        Returns: various info as a string
+
+        """
+        device = self._device
+        try:
+            output_index = int(output_number) - 1
+
+            pid_output = "{P};{I};{D};{fixed_power}".format(**device.pid[output_index])
+
+            if output_index == HEATER_INDEX:
+                return "{pid_output};{limit}".format(pid_output=pid_output, **device.pid[output_index])
+            else:
+                return "{pid_output};{gain};{offset}".format(pid_output=pid_output, **device.pid[output_index])
+
+        except (IndexError, ValueError, TypeError):
+            print "Error: invalid output number, '{output}'".format(output=output_number)
+            device.error = NeoceraDeviceErrors(NeoceraDeviceErrors.BAD_PARAMETER)
 
     def handle_error(self, request, error):
         """

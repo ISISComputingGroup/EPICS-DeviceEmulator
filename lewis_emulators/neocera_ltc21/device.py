@@ -2,8 +2,9 @@ from collections import OrderedDict
 
 from lewis.devices import StateMachineDevice
 
-from lewis_emulators.neocera_ltc21.device_errors import NeoceraDeviceErrors
-from lewis_emulators.neocera_ltc21.states import MonitorState, ControlState
+from .constants import HEATER_INDEX, ANALOG_INDEX
+from .device_errors import NeoceraDeviceErrors
+from .states import MonitorState, ControlState
 
 
 class SimulatedNeocera(StateMachineDevice):
@@ -46,6 +47,10 @@ class SimulatedNeocera(StateMachineDevice):
 
         # heater setting 0 - off 100.0 full scale
         self.heater = 0
+
+        self.pid = [{}] * self.sensor_count
+        self.pid[HEATER_INDEX] = {"P": 10.0, "I": 11.0, "D": 12.0, "fixed_power": 13.0, "limit": 100.0}
+        self.pid[ANALOG_INDEX] = {"P": 10.0, "I": 11.0, "D": 12.0, "fixed_power": 13.0, "gain": 1.0, "offset": 2.0}
 
         # errors created within the device
         self.error = NeoceraDeviceErrors()
