@@ -19,7 +19,7 @@ class Keithley2400StreamInterface(StreamAdapter):
         Cmd("get_remote_sensing_mode", "^\:SYST:RSEN\?$"),
         Cmd("set_resistance_range_mode", "^\:SENS:RES:RANG:AUTO\s(0|1)$"),
         Cmd("get_resistance_range_mode", "^\:SENS:RES:RANG:AUTO\?$"),
-        Cmd("set_resistance_range", "^\:SENS:RES:RANG\s([2][0]*)$"),
+        Cmd("set_resistance_range", "^\:SENS:RES:RANG\s([-+]?[0-9]*\.?[0-9]+)$"),
         Cmd("get_resistance_range", "^\:SENS:RES:RANG\?$"),
         Cmd("set_source_mode", "^\:SOUR:FUNC\s(CURR|VOLT)$"),
         Cmd("get_source_mode", "^\:SOUR:FUNC\?$"),
@@ -105,7 +105,7 @@ class Keithley2400StreamInterface(StreamAdapter):
         return self._device.get_resistance_range_mode()
 
     def set_resistance_range(self, value):
-        return self._device.set_resistance_range(int(value))
+        return self._device.set_resistance_range(float(value))
 
     def get_resistance_range(self):
         return self._device.get_resistance_range()

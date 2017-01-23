@@ -154,7 +154,14 @@ class SimulatedKeithley2400(StateMachineDevice):
         return self._source_mode
 
     def set_resistance_range(self, value):
-        self._resistance_range = value
+        from math import pow
+        # Set the resistance range to the smallest value of 2.1En the requested
+        # value exceeds
+        self._resistance_range = 2.1
+        for r in [2.1*pow(10,i) for i in range(1,8)]:
+            if value < r:
+                self._resistance_range = r/10
+                break
         # Resistance range mode set to manual when range set
         self._resistance_range_mode = ResistanceRangeMode.MANUAL
 
