@@ -31,7 +31,7 @@ class SimulatedKeithley2400(StateMachineDevice):
         self._source_mode = SourceMode.CURRENT
 
         # Mode settings
-        self._resistance_range = 200000000
+        self._resistance_range = 2.1
         self._current_compliance = SimulatedKeithley2400.INITIAL_CURRENT_COMPLIANCE
         self._voltage_compliance = SimulatedKeithley2400.INITIAL_VOLTAGE_COMPLIANCE
 
