@@ -31,8 +31,8 @@ class ResistanceMode(AutoMode):
 
 
 class OnOffMode(Mode):
-    ON = "ON"
-    OFF = "OFF"
+    ON = "1"
+    OFF = "0"
     MODES = [ON, OFF]
 
 
