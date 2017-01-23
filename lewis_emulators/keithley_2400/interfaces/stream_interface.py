@@ -1,4 +1,5 @@
 from lewis.adapters.stream import StreamAdapter, Cmd
+from ..control_modes import OutputMode
 
 
 class Keithley2400StreamInterface(StreamAdapter):
@@ -49,7 +50,7 @@ class Keithley2400StreamInterface(StreamAdapter):
             self._device.get_voltage(as_string=True),
             self._device.get_current(as_string=True),
             self._device.get_resistance(as_string=True)
-        ])
+        ]) if self._device.get_output_mode() == OutputMode.ON else None
 
     def reset(self):
         """ Resets the device """
