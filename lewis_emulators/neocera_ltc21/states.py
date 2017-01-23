@@ -27,7 +27,9 @@ class ControlState(State):
 
     def in_state(self, dt):
         device = self._context
-        for sensor_num in range(device.sensor_count):
-            temp = device.temperatures[sensor_num]
-            setpoint = device.setpoints[sensor_num]
-            device.temperatures[sensor_num] = approaches.linear(temp, setpoint, 0.1, dt)
+        for setpoint_index in range(device.sensor_count):
+            sensor_source = device.sensor_source[setpoint_index] - 1  # sensor source is 1 indexed
+            if sensor_source != 3:
+                temp = device.temperatures[sensor_source]
+                setpoint = device.setpoints[setpoint_index]
+                device.temperatures[sensor_source] = approaches.linear(temp, setpoint, 0.1, dt)

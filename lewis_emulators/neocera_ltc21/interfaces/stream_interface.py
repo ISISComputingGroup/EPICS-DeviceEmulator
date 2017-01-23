@@ -42,6 +42,7 @@ class NeoceraStreamInterface(StreamAdapter):
         Cmd("get_temperature_and_unit", get_regex("QSAMP?", "\d")),
         Cmd("get_setpoint_and_unit", get_regex("QSETP?", "\d")),
         Cmd("set_setpoint", get_regex("SETP", "\d", "[+-]?\d+\.?\d+")),
+        Cmd("get_output_config", get_regex("QOUT?", "\d")),
     }
 
     in_terminator = ";"
@@ -99,35 +100,65 @@ class NeoceraStreamInterface(StreamAdapter):
             self._device.error = NeoceraDeviceErrors(NeoceraDeviceErrors.BAD_PARAMETER)
             return ""
 
-    def get_setpoint_and_unit(self, set_point_number):
+    def get_setpoint_and_unit(self, output_number):
         """
 
         Args:
-            set_point_number: the number of set point top return; 1=HEATER, 2=ANALOG
+            output_number: the number of set point top return; 1=HEATER, 2=ANALOG
 
         Returns: setpoint with unit
 
         """
-        return self._get_indexed_value_with_unit(self._device.setpoints, set_point_number)
+        return self._get_indexed_value_with_unit(self._device.setpoints, output_number)
 
-    def set_setpoint(self, set_point_number, value):
+    def set_setpoint(self, output_number, value):
         """
         Set the setpoint.
         Args:
-            set_point_number: set point number; 1=HEATER, 2=ANALOG
+            output_number: output number; 1=HEATER, 2=ANALOG
             value: value to set it to
 
         Returns: blank
 
         """
         try:
-            sensor_number = int(set_point_number) - 1
+            output_index = int(output_number) - 1
             setpoint = float(value)
 
-            self._device.setpoints[sensor_number] = setpoint
+            self._device.setpoints[output_index] = setpoint
         except (IndexError, ValueError, TypeError):
-            print "Error: invalid sensor number, '{0}', or setpoint value, '{1}'".format(set_point_number, value)
+            print "Error: invalid output number, '{0}', or setpoint value, '{1}'".format(output_number, value)
             self._device.error = NeoceraDeviceErrors(NeoceraDeviceErrors.BAD_PARAMETER)
+            return ""
+
+    def get_output_config(self, output_number):
+        """
+        Reply to output configuration query.
+            # Example QOUT?1;   produces -> 2;4;3;
+            # Example QOUT?2;   produces -> 3;5;
+
+        Args:
+            output_number: The output number being querries; 1 HEATER, 2 Analogue
+
+        Returns: configuration as a string; sensor source;control;heater_range
+
+        """
+
+        device = self._device
+        try:
+            output_index = int(output_number) - 1
+
+            output_config = "{sensor_source};{control}".format(
+                sensor_source=device.sensor_source[output_index], control=device.control[output_index])
+
+            if output_index == 1:
+                output_config += ";{heater_range}".format(heater_range=device.heater_range)
+
+            return output_config
+
+        except (IndexError, ValueError, TypeError):
+            print "Error: invalid output number, '{0}'".format(output_number)
+            device.error = NeoceraDeviceErrors(NeoceraDeviceErrors.BAD_PARAMETER)
             return ""
 
 
