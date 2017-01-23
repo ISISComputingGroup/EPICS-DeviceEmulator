@@ -133,6 +133,8 @@ class SimulatedKeithley2400(StateMachineDevice):
     def set_remote_sensing_mode(self, mode):
         if SimulatedKeithley2400._check_mode(mode, RemoteSensingMode):
             self._remote_sensing_mode = mode
+            # Output switched off when remote sensing mode changed
+            self._output_mode = OutputMode.OFF
 
     def get_remote_sensing_mode(self):
         return self._remote_sensing_mode
@@ -153,6 +155,8 @@ class SimulatedKeithley2400(StateMachineDevice):
 
     def set_resistance_range(self, value):
         self._resistance_range = value
+        # Resistance range mode set to manual when range set
+        self._resistance_range_mode = ResistanceRangeMode.MANUAL
 
     def get_resistance_range(self):
         return self._resistance_range
