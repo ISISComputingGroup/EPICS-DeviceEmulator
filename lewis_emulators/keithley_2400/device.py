@@ -23,7 +23,7 @@ class SimulatedKeithley2400(StateMachineDevice):
         self._voltage = SimulatedKeithley2400.INITIAL_VOLTAGE
 
         # Modes
-        self._output_mode = OutputMode.ON
+        self._output_mode = OutputMode.OFF
         self._offset_compensation_mode = OffsetCompensationMode.OFF
         self._resistance_mode = ResistanceMode.AUTO
         self._remote_sensing_mode = RemoteSensingMode.OFF
