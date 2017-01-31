@@ -53,7 +53,7 @@ class SimulatedNeocera(StateMachineDevice):
         self.pid[ANALOG_INDEX] = {"P": 10.0, "I": 11.0, "D": 12.0, "fixed_power": 13.0, "gain": 1.0, "offset": 2.0}
 
         # errors created within the device
-        self.error = NeoceraDeviceErrors()
+        self._error = NeoceraDeviceErrors()
 
     def _get_state_handlers(self):
 

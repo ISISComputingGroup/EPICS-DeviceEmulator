@@ -76,7 +76,7 @@ class CmdBuilder(object):
         Returns: builder
 
         """
-        return self.arg(r"\d*")
+        return self.arg(r"\d+")
 
     def build(self, *args, **kwargs):
         """
@@ -108,8 +108,8 @@ class NeoceraStreamInterface(StreamAdapter):
         CmdBuilder("set_analog_control", arg_sep=",", ignore=r"\r\n\s").escape("SACONT").digit().build(),
         CmdBuilder("get_heater", arg_sep=",", ignore=r"\r\n\s").escape("QHEAT?").build(),
         CmdBuilder("get_pid", arg_sep=",", ignore=r"\r\n\s").escape("QPID?").digit().build(),
-        CmdBuilder("set_pid_heater", arg_sep=",", ignore=r"\r\n\s").escape("SPID1,").int().int().int().float().float().build(),
-        CmdBuilder("set_pid_analog", arg_sep=",", ignore=r"\r\n\s").escape("SPID2,").int().int().int().float().float().float().build()
+        CmdBuilder("set_pid_heater", arg_sep=",", ignore=r"\r\n\s").escape("SPID1,").float().float().float().float().float().build(),
+        CmdBuilder("set_pid_analog", arg_sep=",", ignore=r"\r\n\s").escape("SPID2,").float().float().float().float().float().float().build()
     }
 
     in_terminator = ";"
@@ -205,7 +205,7 @@ class NeoceraStreamInterface(StreamAdapter):
             # Example QOUT?2;   produces -> 3;5;
 
         Args:
-            output_number: The output number being querries; 1 HEATER, 2 Analogue
+            output_number: The output number being queries; 1 HEATER, 2 Analogue
 
         Returns: configuration as a string; sensor source;control;heater_range
 
@@ -377,9 +377,9 @@ class NeoceraStreamInterface(StreamAdapter):
         Returns: None
 
         """
-        pid_settings["P"] = int(p)
-        pid_settings["I"] = int(i)
-        pid_settings["D"] = int(d)
+        pid_settings["P"] = float(p)
+        pid_settings["I"] = float(i)
+        pid_settings["D"] = float(d)
         pid_settings["fixed_power"] = float(fixed_power)
 
     def handle_error(self, request, error):
