@@ -26,7 +26,7 @@ class MonitorState(State):
 
 class ControlState(State):
     """
-    Temperature is being controller and monitored. The device will try to use the heater to make
+    Temperature is being controlled and monitored. The device will try to use the heater to make
     the temperature the same as the set point.
     """
     NAME = 'control'
