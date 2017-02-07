@@ -333,7 +333,10 @@ class NeoceraStreamInterface(StreamAdapter):
         pid_settings = self._device.pid[HEATER_INDEX]
         try:
             self._set_pid(p, i, d, fixed_power, pid_settings)
-            pid_settings["limit"] = float(limit)
+            limit_as_float = float(limit)
+            if limit_as_float < 0.0 or limit_as_float > 100.0:
+                raise ValueError("Outside allowed heater range")
+            pid_settings["limit"] = limit_as_float
 
         except (IndexError, ValueError, TypeError):
             print "Error: in pid settings for heater"

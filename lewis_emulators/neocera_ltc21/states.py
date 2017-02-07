@@ -49,7 +49,8 @@ class ControlState(State):
             temp = device.temperatures[heater_sensor_source]
             setpoint = device.setpoints[HEATER_INDEX]
             diff_in_temp = setpoint - temp
-            device.heater = max(0, min(diff_in_temp*10.0, 100))
+            heater_limit = device.pid[HEATER_INDEX]["limit"]
+            device.heater = max(0, min(diff_in_temp * 10.0, heater_limit))
         except IndexError:
             # heater is not connected to a sensor so it is off
             device.heater = 0
