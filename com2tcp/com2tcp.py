@@ -33,7 +33,7 @@ if __name__ == "__main__":
 
     while True:
         if ser.inWaiting():
-            data = ser.readline()
+            data = ser.read()
             print "Data on serial: " + data
             tcp.sendall(data)
 
