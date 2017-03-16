@@ -28,7 +28,7 @@ if __name__ == "__main__":
     listen_thread = threading.Thread(target=listen_to_tcp, args=(tcp, ser))
     listen_thread.start()
 
-    print "Listening on " + args.com_port + " and localhost:" + args.tcp_port
+    print "Listening on " + str(args.com_port) + " and localhost:" + str(args.tcp_port)
     print "Press Ctrl+C+Break to stop"
 
     while True:
