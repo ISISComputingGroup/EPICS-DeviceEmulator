@@ -36,8 +36,8 @@ class Mk2ChopperStreamInterface(StreamAdapter):
         Cmd("set_demanded_phase_error_window", "^WR([0-9]+)$")
     }
 
-    in_terminator = "\r\n"
-    out_terminator = "\r\n"
+    in_terminator = "\r"
+    out_terminator = "\r"
 
     def handle_error(self, request, error):
         print "An error occurred at request " + repr(request) + ": " + repr(error)
