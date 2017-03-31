@@ -17,7 +17,6 @@ class SimulatedMk2Chopper(StateMachineDevice):
         self._true_phase_delay = 0
 
         self._demanded_phase_error_window = 0
-        self._true_phase_error = 0
 
         self._started = False
         self._fault = False
@@ -70,7 +69,7 @@ class SimulatedMk2Chopper(StateMachineDevice):
         return self._demanded_phase_error_window
 
     def get_true_phase_error(self):
-        return self._true_phase_error
+        return abs(self._true_phase_delay - self._demanded_phase_delay)
 
     def get_temperature(self):
         return self._temperature
@@ -132,13 +131,16 @@ class SimulatedMk2Chopper(StateMachineDevice):
     def set_true_frequency(self, new_frequency):
         self._true_frequency = new_frequency
 
+    def set_true_phase_delay(self, new_delay):
+        self._true_phase_delay = new_delay
+
     def set_chopper_type(self, frequency, manufacturer):
         self._type = ChopperType(frequency, manufacturer)
         # Do this in case the current demanded frequency is invalid for the new type
         self.set_demanded_frequency(self._demanded_frequency)
 
     def set_temperature(self, temperature):
-        self._temperatrue = temperature
+        self._temperature = temperature
 
     def start(self):
         self._started = True
