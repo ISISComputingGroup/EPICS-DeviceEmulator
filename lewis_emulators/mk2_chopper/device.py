@@ -6,9 +6,6 @@ from chopper_type import ChopperType
 
 class SimulatedMk2Chopper(StateMachineDevice):
 
-    # Dictionary of valid (frequencies, max phase delay) for each chopper type: 50Hz/100Hz
-    CHOPPER_TYPES = [ChopperType(50,  [5, 10, 12.5, 16.67, 25, 50]), ChopperType(100, [12.5, 25, 50, 100])]
-
     def _initialize_data(self):
         """ Initialize all of the device's attributes """
         self._type = SimulatedMk2Chopper.CHOPPER_TYPES[0]
@@ -63,12 +60,8 @@ class SimulatedMk2Chopper(StateMachineDevice):
         return self._true_phase_error
 
     def set_demanded_frequency(self, new_frequency_int):
-        try:
-            self._demanded_frequency, self._max_phase_delay = next((f, p) for f, p in self._type.valid_states if
-                                                                   int(f)==int(new_frequency_int))
-        except StopIteration:
-            # No value found, do nothing
-            pass
+        self._demanded_frequency = self._type.get_closest_valid_frequency(new_frequency_int)
+        self._max_phase_delay = self._type.get_max_phase_for_closest_frequency(new_frequency_int)
 
     def set_demanded_phase_delay(self, new_phase_delay):
         self._demanded_phase_delay = min(new_phase_delay, self._max_phase_delay)
@@ -77,14 +70,9 @@ class SimulatedMk2Chopper(StateMachineDevice):
         self._true_frequency = new_frequency
 
     def set_chopper_type(self, frequency):
-        try:
-            self._type = next(ct for ct in SimulatedMk2Chopper.CHOPPER_TYPES if ct.system_frequency == frequency)
-        except StopIteration:
-            # The new type wasn't valid, do nothing
-            pass
-        else:
-            # Make sure the demanded frequency is a valid frequency for the new type
-            self.set_frequency(min(self._type.valid_frequencies, key=lambda x:abs(x - self._demanded_frequency)))
+        self._type = ChopperType(frequency)
+        # Do this in case the current demanded frequency is invalid for the new type
+        self.set_demanded_frequency(self._demanded_frequency)
 
     def start(self):
         self._started = True
