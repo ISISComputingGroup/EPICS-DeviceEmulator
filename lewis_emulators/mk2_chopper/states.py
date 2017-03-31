@@ -34,7 +34,7 @@ class DefaultStartedState(State):
                                                     device.get_demanded_frequency(), 1, dt))
         equilibrium_frequency_temperature = 2*MAX_TEMPERATURE*device.get_true_frequency()/device.get_system_frequency()
         device.set_temperature(approaches.linear(device.get_temperature(), equilibrium_frequency_temperature,
-                                                 device.get_true_frequency()*0.01,
+                                                 device.get_true_frequency()*0.001,
                                                  dt))
         device.set_true_phase_delay(approaches.linear(device.get_true_phase_delay(), device.get_demanded_phase_delay(),
                                                       1, dt))
