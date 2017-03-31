@@ -1,12 +1,9 @@
 from collections import OrderedDict
-from states import DefaultInitState, DefaultStoppedState, DefaultStartedState
+from states import DefaultInitState, DefaultStoppedState, DefaultStartedState, MAX_TEMPERATURE
 from lewis.devices import StateMachineDevice
 from chopper_type import ChopperType
 
-
 class SimulatedMk2Chopper(StateMachineDevice):
-
-    MAX_TEMPERATURE = 1
 
     def _initialize_data(self):
         """ Initialize all of the device's attributes """
@@ -28,6 +25,8 @@ class SimulatedMk2Chopper(StateMachineDevice):
         self._phase_delay_error = False
         self._phase_delay_correction_error = False
         self._phase_accuracy_window_error = False
+
+        self._temperature = 0
 
         # When initialisation is complete, this is set to true and the device will enter a running state
         self.ready = True
@@ -73,6 +72,9 @@ class SimulatedMk2Chopper(StateMachineDevice):
     def get_true_phase_error(self):
         return self._true_phase_error
 
+    def get_temperature(self):
+        return self._temperature
+
     def inverter_ready(self):
         return self._type.get_manufacturer() in [ChopperType.CORTINA]
 
@@ -102,7 +104,7 @@ class SimulatedMk2Chopper(StateMachineDevice):
         return self._overheat()
 
     def _overheat(self):
-        return self._temperature > SimulatedMk2Chopper.MAX_TEMPERATURE
+        return self._temperature > MAX_TEMPERATURE
 
     def chopper_overspeed(self):
         return self._true_frequency > self._demanded_frequency
@@ -134,6 +136,9 @@ class SimulatedMk2Chopper(StateMachineDevice):
         self._type = ChopperType(frequency, manufacturer)
         # Do this in case the current demanded frequency is invalid for the new type
         self.set_demanded_frequency(self._demanded_frequency)
+
+    def set_temperature(self, temperature):
+        self._temperatrue = temperature
 
     def start(self):
         self._started = True

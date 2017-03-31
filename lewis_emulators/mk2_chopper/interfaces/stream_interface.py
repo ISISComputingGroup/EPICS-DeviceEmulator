@@ -1,6 +1,20 @@
 from lewis.adapters.stream import StreamAdapter, Cmd
 from ..chopper_type import ChopperType
 
+def filled_int(val, length):
+    """
+    Takes a value and returns a zero padded representation of the integer component
+    :param val: The original value.
+    :param length: Minimum length of the returned string
+    :return: Zero-padded integer representation (if possible) of string. Original string used if integer conversion
+    fails
+    """
+    try:
+        converted_val = int(val)
+    except ValueError:
+        converted_val = val
+    return str(converted_val).zfill(length)
+
 
 class Mk2ChopperStreamInterface(StreamAdapter):
 
@@ -15,6 +29,7 @@ class Mk2ChopperStreamInterface(StreamAdapter):
         Cmd("get_chopper_interlocks", "^RC$"),
         Cmd("get_spectral_interlocks", "^RS$"),
         Cmd("get_error_flags", "^RX$"),
+        Cmd("read_all", "^RA$"),
         Cmd("set_chopper_started", "^WS([0-9]+)$"),
         Cmd("set_demanded_frequency", "^WM([0-9]+)$"),
         Cmd("set_demanded_phase_delay", "^WP([0-9]+)$"),
@@ -29,22 +44,22 @@ class Mk2ChopperStreamInterface(StreamAdapter):
         return str(error)
 
     def get_demanded_frequency(self):
-        return "RG{0:3d}".format(int(self._device.get_demanded_frequency()))
+        return "RG{0}".format(filled_int(self._device.get_demanded_frequency(), 3))
 
     def get_true_frequency(self):
-        return "RF{0:3d}".format(int(self._device.get_true_frequency()))
+        return "RF{0}".format(filled_int(self._device.get_true_frequency(), 3))
 
     def get_demanded_phase_delay(self):
-        return "RQ{0:5d}".format(self._device.get_demanded_phase_delay())
+        return "RQ{0}".format(filled_int(self._device.get_demanded_phase_delay(), 5))
 
     def get_true_phase_delay(self):
-        return "RP{0:5d}".format(int(self._device.get_true_phase_delay()))
+        return "RP{0}".format(filled_int(self._device.get_true_phase_delay(), 5))
 
     def get_demanded_phase_error_window(self):
-        return "RW{0:3d}".format(self._device.get_demanded_phase_error_window())
+        return "RW{0}".format(filled_int(self._device.get_demanded_phase_error_window(), 3))
 
     def get_true_phase_error(self):
-        return "RE{0:3d}".format(int(self._device.get_true_phase_error()))
+        return "RE{0}".format(filled_int(self._device.get_true_phase_error(), 3))
 
     def get_spectral_interlocks(self):
         bits = [0]*8
@@ -59,7 +74,7 @@ class Mk2ChopperStreamInterface(StreamAdapter):
         elif self._device.get_manufacturer() == ChopperType.SPECTRAL:
             bits[2] = 1 if self._device.external_fault() else 0
 
-        return "RC{0:8s}".format("".join(str(n) for n in bits))
+        return "RS{0:8s}".format("".join(str(n) for n in bits))
 
     def get_chopper_interlocks(self):
         bits = [
@@ -71,13 +86,13 @@ class Mk2ChopperStreamInterface(StreamAdapter):
             1 if self._device.chopper_overspeed() else 0,
             ]
         bits += [0]*2
-        return "RS{0:8s}".format("".join(str(n) for n in bits))
+        return "RC{0:8s}".format("".join(str(n) for n in bits))
 
     def get_error_flags(self):
         bits = [
             1 if self._device.phase_delay_error() else 0,
             1 if self._device.phase_delay_correction_error() else 0,
-            1 if self._device.phase_accuracy_window_error else 0,
+            1 if self._device.phase_accuracy_window_error() else 0,
             ]
         bits += [0]*5
         return "RX{0:8s}".format("".join(str(n) for n in bits))
@@ -108,6 +123,9 @@ class Mk2ChopperStreamInterface(StreamAdapter):
     def set_demanded_phase_error_window(self, new_phase_error_window_raw):
         return Mk2ChopperStreamInterface._set(new_phase_error_window_raw, self.get_demanded_phase_error_window,
                                               self._device.set_demanded_phase_error_window)
+
+    def read_all(self):
+        return "RA:Don't use, it causes the driver to lock up"
 
     @staticmethod
     def _set(raw, device_get, device_set):
