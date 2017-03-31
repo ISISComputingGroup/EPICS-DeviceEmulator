@@ -6,11 +6,14 @@ from chopper_type import ChopperType
 
 class SimulatedMk2Chopper(StateMachineDevice):
 
+    MAX_TEMPERATURE = 1
+
     def _initialize_data(self):
         """ Initialize all of the device's attributes """
-        self._type = SimulatedMk2Chopper.CHOPPER_TYPES[0]
+        self._type = ChopperType(50, ChopperType.INDRAMAT)
 
-        self._demanded_frequency, self._max_phase_delay = self._type.valid_states[-1]
+        self._demanded_frequency = self._type.get_frequency()
+        self._max_phase_delay = self._type.get_max_phase_for_closest_frequency(self._demanded_frequency)
         self._true_frequency = 0
 
         self._demanded_phase_delay = 0
@@ -20,6 +23,11 @@ class SimulatedMk2Chopper(StateMachineDevice):
         self._true_phase_error = 0
 
         self._started = False
+        self._fault = False
+
+        self._phase_delay_error = False
+        self._phase_delay_correction_error = False
+        self._phase_accuracy_window_error = False
 
         # When initialisation is complete, this is set to true and the device will enter a running state
         self.ready = True
@@ -41,6 +49,12 @@ class SimulatedMk2Chopper(StateMachineDevice):
             (('started', 'stopped'), lambda: self._started is False),
         ])
 
+    def get_system_frequency(self):
+        return self._type.get_frequency()
+
+    def get_manufacturer(self):
+        return self._type.get_manufacturer()
+
     def get_demanded_frequency(self):
         return self._demanded_frequency
 
@@ -59,18 +73,65 @@ class SimulatedMk2Chopper(StateMachineDevice):
     def get_true_phase_error(self):
         return self._true_phase_error
 
+    def inverter_ready(self):
+        return self._type.get_manufacturer() in [ChopperType.CORTINA]
+
+    def motor_running(self):
+        return self._true_frequency > 0
+
+    def in_sync(self):
+        tolerance = 0.001*self._type.get_frequency()
+        return abs(self._true_frequency - self._demanded_frequency) < tolerance
+
+    def reg_mode(self):
+        return False
+
+    def external_fault(self):
+        return self._fault
+
+    def clock_loss(self):
+        return False
+
+    def bearing_1_overheat(self):
+        return self._overheat()
+
+    def bearing_2_overheat(self):
+        return self._overheat()
+
+    def motor_overheat(self):
+        return self._overheat()
+
+    def _overheat(self):
+        return self._temperature > SimulatedMk2Chopper.MAX_TEMPERATURE
+
+    def chopper_overspeed(self):
+        return self._true_frequency > self._demanded_frequency
+
+    def phase_delay_error(self):
+        return self._phase_delay_error
+
+    def phase_delay_correction_error(self):
+        return self._phase_delay_correction_error
+
+    def phase_accuracy_window_error(self):
+        return self._phase_accuracy_window_error
+
     def set_demanded_frequency(self, new_frequency_int):
         self._demanded_frequency = self._type.get_closest_valid_frequency(new_frequency_int)
         self._max_phase_delay = self._type.get_max_phase_for_closest_frequency(new_frequency_int)
 
     def set_demanded_phase_delay(self, new_phase_delay):
         self._demanded_phase_delay = min(new_phase_delay, self._max_phase_delay)
+        self._phase_delay_error = self._demanded_phase_delay != new_phase_delay
+
+    def set_demanded_phase_error_window(self, new_phase_window):
+        self._demanded_phase_error_window = new_phase_window
 
     def set_true_frequency(self, new_frequency):
         self._true_frequency = new_frequency
 
-    def set_chopper_type(self, frequency):
-        self._type = ChopperType(frequency)
+    def set_chopper_type(self, frequency, manufacturer):
+        self._type = ChopperType(frequency, manufacturer)
         # Do this in case the current demanded frequency is invalid for the new type
         self.set_demanded_frequency(self._demanded_frequency)
 

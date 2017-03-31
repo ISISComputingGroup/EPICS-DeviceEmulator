@@ -1,4 +1,5 @@
 from lewis.adapters.stream import StreamAdapter, Cmd
+from ..chopper_type import ChopperType
 
 
 class Mk2ChopperStreamInterface(StreamAdapter):
@@ -11,6 +12,9 @@ class Mk2ChopperStreamInterface(StreamAdapter):
         Cmd("get_demanded_phase_delay", "^RQ$"),
         Cmd("get_true_phase_error", "^RE$"),
         Cmd("get_demanded_phase_error_window", "^RW$"),
+        Cmd("get_chopper_interlocks", "^RC$"),
+        Cmd("get_spectral_interlocks", "^RS$"),
+        Cmd("get_error_flags", "^RX$"),
         Cmd("set_chopper_started", "^WS([0-9]+)$"),
         Cmd("set_demanded_frequency", "^WM([0-9]+)$"),
         Cmd("set_demanded_phase_delay", "^WP([0-9]+)$"),
@@ -25,22 +29,61 @@ class Mk2ChopperStreamInterface(StreamAdapter):
         return str(error)
 
     def get_demanded_frequency(self):
-        return "RG{0:03d}".format(int(self._device.get_demanded_frequency()))
+        return "RG{0:3d}".format(int(self._device.get_demanded_frequency()))
 
     def get_true_frequency(self):
-        return "RF{0:03d}".format(int(self._device.get_true_frequency()))
+        return "RF{0:3d}".format(int(self._device.get_true_frequency()))
 
     def get_demanded_phase_delay(self):
-        return "RQ{0:05d}".format(self._device.get_demanded_phase_delay())
+        return "RQ{0:5d}".format(self._device.get_demanded_phase_delay())
 
     def get_true_phase_delay(self):
-        return "RP{0:05d}".format(int(self._device.get_true_phase_delay()))
+        return "RP{0:5d}".format(int(self._device.get_true_phase_delay()))
 
     def get_demanded_phase_error_window(self):
-        return "RW{0:03d}".format(self._device.get_demanded_phase_error_window())
+        return "RW{0:3d}".format(self._device.get_demanded_phase_error_window())
 
     def get_true_phase_error(self):
-        return "RE{0:03d}".format(int(self._device.get_true_phase_error()))
+        return "RE{0:3d}".format(int(self._device.get_true_phase_error()))
+
+    def get_spectral_interlocks(self):
+        bits = [0]*8
+        if self._device.get_manufacturer() == ChopperType.CORTINA:
+            bits[0] = 1 if self._device.inverter_ready() else 0
+            bits[1] = 1 if self._device.motor_running() else 0
+            bits[2] = 1 if self._device.in_sync() else 0
+        elif self._device.get_manufacturer() == ChopperType.INDRAMAT:
+            bits[0] = 1 if self._device.motor_running() else 0
+            bits[1] = 1 if self._device.reg_mode() else 0
+            bits[2] = 1 if self._device.in_sync() else 0
+        elif self._device.get_manufacturer() == ChopperType.SPECTRAL:
+            bits[2] = 1 if self._device.external_fault() else 0
+
+        return "RC{0:8s}".format("".join(str(n) for n in bits))
+
+    def get_chopper_interlocks(self):
+        bits = [
+            1 if self._device.get_system_frequency() is 100 else 0,
+            1 if self._device.clock_loss() else 0,
+            1 if self._device.bearing_1_overheat() else 0,
+            1 if self._device.bearing_2_overheat() else 0,
+            1 if self._device.motor_overheat() else 0,
+            1 if self._device.chopper_overspeed() else 0,
+            ]
+        bits += [0]*2
+        return "RS{0:8s}".format("".join(str(n) for n in bits))
+
+    def get_error_flags(self):
+        bits = [
+            1 if self._device.phase_delay_error() else 0,
+            1 if self._device.phase_delay_correction_error() else 0,
+            1 if self._device.phase_accuracy_window_error else 0,
+            ]
+        bits += [0]*5
+        return "RX{0:8s}".format("".join(str(n) for n in bits))
+
+    def get_manufacturer(self):
+        return self._type.get_manufacturer()
 
     def set_chopper_started(self, start_flag_raw):
         try:

@@ -9,12 +9,19 @@ class ChopperType(object):
         100: [(12.5, 79995), (25, 39995), (50, 19995), (100, 9995)]
     }
 
-    def __init__(self, max_frequency):
+    CORTINA = "cortina"
+    INDRAMAT = "indramat"
+    SPECTRAL = "spectral"
+    MANUFACTURERS = [CORTINA, INDRAMAT, SPECTRAL]
+
+    def __init__(self, max_frequency, manufacturer):
         possible_max_frequencies = ChopperType.VALID_SYSTEM_STATES.keys()
-        if max_frequency in possible_max_frequencies:
-            self.max_frequency = max_frequency
-        else:
-            self.max_frequency = min(possible_max_frequencies)
+        self._max_frequency = max_frequency if max_frequency in possible_max_frequencies\
+            else min(possible_max_frequencies)
+
+        manufacturer_low = manufacturer.lower()
+        self._manufacturer = manufacturer_low if manufacturer_low in ChopperType.MANUFACTURERS else ChopperType.INDRAMAT
+
 
     def get_closest_valid_frequency(self, frequency):
         return self._get_frequency_and_phase_closest_to_frequency(frequency)[0]
@@ -23,4 +30,10 @@ class ChopperType(object):
         return self._get_frequency_and_phase_closest_to_frequency(frequency)[1]
 
     def _get_frequency_and_phase_closest_to_frequency(self, frequency):
-        return min(ChopperType.VALID_SYSTEM_STATES[self.max_frequency], key=lambda x: abs(x - frequency))
+        return min(ChopperType.VALID_SYSTEM_STATES[self._max_frequency], key=lambda x: abs(x[0] - frequency))
+
+    def get_manufacturer(self):
+        return self._manufacturer
+
+    def get_frequency(self):
+        return self._max_frequency
