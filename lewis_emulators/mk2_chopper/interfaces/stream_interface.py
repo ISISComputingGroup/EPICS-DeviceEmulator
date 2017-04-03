@@ -74,28 +74,25 @@ class Mk2ChopperStreamInterface(StreamAdapter):
         elif self._device.get_manufacturer() == ChopperType.SPECTRAL:
             bits[2] = 1 if self._device.external_fault() else 0
 
-        return "RS{0:8s}".format("".join(str(n) for n in bits))
+        return "RS{0:8s}".format(Mk2ChopperStreamInterface._string_from_bits(bits))
 
     def get_chopper_interlocks(self):
-        bits = [
-            1 if self._device.get_system_frequency() is 100 else 0,
-            1 if self._device.clock_loss() else 0,
-            1 if self._device.bearing_1_overheat() else 0,
-            1 if self._device.bearing_2_overheat() else 0,
-            1 if self._device.motor_overheat() else 0,
-            1 if self._device.chopper_overspeed() else 0,
-            ]
-        bits += [0]*2
-        return "RC{0:8s}".format("".join(str(n) for n in bits))
+        bits = [0]*8
+        bits[0] = 1 if self._device.get_system_frequency() is 50 else 0
+        bits[1] = 1 if self._device.clock_loss() else 0
+        bits[2] = 1 if self._device.bearing_1_overheat() else 0
+        bits[3] = 1 if self._device.bearing_2_overheat() else 0
+        bits[4] = 1 if self._device.motor_overheat() else 0
+        bits[5] = 1 if self._device.chopper_overspeed() else 0
+
+        return "RC{0:8s}".format(Mk2ChopperStreamInterface._string_from_bits(bits))
 
     def get_error_flags(self):
-        bits = [
-            1 if self._device.phase_delay_error() else 0,
-            1 if self._device.phase_delay_correction_error() else 0,
-            1 if self._device.phase_accuracy_window_error() else 0,
-            ]
-        bits += [0]*5
-        return "RX{0:8s}".format("".join(str(n) for n in bits))
+        bits = [0]*8
+        bits[0] = 1 if self._device.phase_delay_error() else 0
+        bits[1] = 1 if self._device.phase_delay_correction_error() else 0
+        bits[2] = 1 if self._device.phase_accuracy_window_error() else 0
+        return "RX{0:8s}".format(Mk2ChopperStreamInterface._string_from_bits(bits))
 
     def get_manufacturer(self):
         return self._type.get_manufacturer()
@@ -136,3 +133,7 @@ class Mk2ChopperStreamInterface(StreamAdapter):
         else:
             device_set(int_value)
         return device_get()
+
+    @staticmethod
+    def _string_from_bits(bits):
+        return "".join(str(n) for n in reversed(bits))
