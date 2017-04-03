@@ -73,7 +73,6 @@ class Mk2ChopperStreamInterface(StreamAdapter):
             bits[2] = 1 if self._device.in_sync() else 0
         elif self._device.get_manufacturer() == ChopperType.SPECTRAL:
             bits[2] = 1 if self._device.external_fault() else 0
-
         return "RS{0:8s}".format(Mk2ChopperStreamInterface._string_from_bits(bits))
 
     def get_chopper_interlocks(self):
@@ -84,7 +83,6 @@ class Mk2ChopperStreamInterface(StreamAdapter):
         bits[3] = 1 if self._device.bearing_2_overheat() else 0
         bits[4] = 1 if self._device.motor_overheat() else 0
         bits[5] = 1 if self._device.chopper_overspeed() else 0
-
         return "RC{0:8s}".format(Mk2ChopperStreamInterface._string_from_bits(bits))
 
     def get_error_flags(self):
@@ -92,7 +90,6 @@ class Mk2ChopperStreamInterface(StreamAdapter):
         bits[0] = 1 if self._device.phase_delay_error() else 0
         bits[1] = 1 if self._device.phase_delay_correction_error() else 0
         bits[2] = 1 if self._device.phase_accuracy_window_error() else 0
-        print "RX{0:8s}".format(Mk2ChopperStreamInterface._string_from_bits(bits))
         return "RX{0:8s}".format(Mk2ChopperStreamInterface._string_from_bits(bits))
 
     def get_manufacturer(self):
