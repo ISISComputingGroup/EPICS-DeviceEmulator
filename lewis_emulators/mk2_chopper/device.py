@@ -16,14 +16,12 @@ class SimulatedMk2Chopper(StateMachineDevice):
         self._demanded_phase_delay = 0
         self._true_phase_delay = 0
 
-        self._demanded_phase_error_window = 0
+        self._demanded_phase_error_window = 1
 
         self._started = False
         self._fault = False
 
         self._phase_delay_error = False
-        self._phase_delay_correction_error = False
-        self._phase_accuracy_window_error = False
 
         self._temperature = 0
 
@@ -112,10 +110,11 @@ class SimulatedMk2Chopper(StateMachineDevice):
         return self._phase_delay_error
 
     def phase_delay_correction_error(self):
-        return self._phase_delay_correction_error
+        tolerance = 0.001*self._demanded_phase_delay
+        return abs(self._true_phase_delay - self._demanded_phase_delay) > tolerance
 
     def phase_accuracy_window_error(self):
-        return self._phase_accuracy_window_error
+        return abs(self._true_phase_delay - self._demanded_phase_delay) > self._demanded_phase_error_window
 
     def set_demanded_frequency(self, new_frequency_int):
         self._demanded_frequency = self._type.get_closest_valid_frequency(new_frequency_int)

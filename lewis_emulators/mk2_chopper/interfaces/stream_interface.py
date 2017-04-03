@@ -92,6 +92,7 @@ class Mk2ChopperStreamInterface(StreamAdapter):
         bits[0] = 1 if self._device.phase_delay_error() else 0
         bits[1] = 1 if self._device.phase_delay_correction_error() else 0
         bits[2] = 1 if self._device.phase_accuracy_window_error() else 0
+        print "RX{0:8s}".format(Mk2ChopperStreamInterface._string_from_bits(bits))
         return "RX{0:8s}".format(Mk2ChopperStreamInterface._string_from_bits(bits))
 
     def get_manufacturer(self):
