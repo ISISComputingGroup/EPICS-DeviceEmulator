@@ -76,7 +76,7 @@ class SimulatedMk2Chopper(StateMachineDevice):
         return self._type.get_manufacturer() in [ChopperType.CORTINA]
 
     def motor_running(self):
-        return self._true_frequency > 0
+        return self._started
 
     def in_sync(self):
         tolerance = 0.001*self._type.get_frequency()
@@ -104,7 +104,7 @@ class SimulatedMk2Chopper(StateMachineDevice):
         return self._temperature > MAX_TEMPERATURE
 
     def chopper_overspeed(self):
-        return self._true_frequency > self._demanded_frequency
+        return self._true_frequency > self._type.get_frequency()
 
     def phase_delay_error(self):
         return self._phase_delay_error

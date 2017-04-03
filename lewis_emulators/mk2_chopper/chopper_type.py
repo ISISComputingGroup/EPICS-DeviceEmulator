@@ -3,10 +3,13 @@ class ChopperType(object):
     A type of chopper that the system can represent. Typically MK2 choppers come in 50Hz and 100Hz varieties.
     """
 
+    # An overspeed system state used to check the overspeed error flag
+    OVERSPEED = (999, 95)
+
     # A dictionary of states the system can be in {Maximum frequency: [(Actual frequency, Max phase delay), ...]}
     VALID_SYSTEM_STATES = {
-        50: [(5, 99995), (10,99995), (12.5, 79995), (16.67, 59995), (25, 39995), (50, 19995)],
-        100: [(12.5, 79995), (25, 39995), (50, 19995), (100, 9995)]
+        50: [(5, 99995), (10,99995), (12.5, 79995), (16.67, 59995), (25, 39995), (50, 19995), OVERSPEED],
+        100: [(12.5, 79995), (25, 39995), (50, 19995), (100, 9995), OVERSPEED]
     }
 
     CORTINA = "cortina"
