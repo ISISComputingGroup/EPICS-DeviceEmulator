@@ -25,13 +25,14 @@ class HRPDSampleChangerStreamInterface(StreamAdapter):
         if code == self._device.NO_ERR:
             return "ok"
         else:
+            self._device.current_err = code
             return "rf-%02d" % code
 
     def get_id(self):
         return "0001 0001 ISIS HRPD Sample Changer V1.00"
 
     def get_position(self):
-        return "Position = " + str(self._device.carousel_position)
+        return "Position = " + str(self._device.car_pos)
 
     def get_status(self):
         return str(self._device.get_status())
@@ -43,7 +44,7 @@ class HRPDSampleChangerStreamInterface(StreamAdapter):
         return self._check_error_code(self._device.go_forward())
 
     def read_variable(self, variable):
-        return "READ VARIABLE  " + str(variable)
+        return "- VR " + str(variable) + " = 17 hx 11"
 
     def halt(self):
         return "ok"
