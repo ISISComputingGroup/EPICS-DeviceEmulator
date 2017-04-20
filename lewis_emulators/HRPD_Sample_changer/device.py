@@ -42,18 +42,11 @@ class SimulatedHRPDSampleChanger(StateMachineDevice):
             (('idle', 'moving'), lambda: self.car_target != self.car_pos),
             (('moving', 'idle'), lambda: self.car_pos == self.car_target)])
 
-    def get_status(self):
-        # Based on the labview VI, appears to be different than doc
-        return_string = "01000{0:b}01{1:b}{2:b}{3:b}00000"
-        car_at_one = (self.car_pos == self.MIN_CAROUSEL)
-        return_string = return_string.format(not self.arm_lowered, car_at_one, not self.arm_lowered, self.arm_lowered)
+    def is_car_at_one(self):
+        return self.car_pos == self.MIN_CAROUSEL
 
-        return_string += " 0{0:b}1".format(self._csm.state == 'moving')
-
-        return_string += " %02d" % self.current_err
-        return_string += " %02d" % self.car_pos
-
-        return return_string
+    def is_moving(self):
+        return self._csm.state == 'moving'
 
     def go_forward(self):
         if self._csm.state == 'init':
@@ -95,6 +88,9 @@ class SimulatedHRPDSampleChanger(StateMachineDevice):
                 return self.ERR_ARM_UP
         self.arm_lowered = lowered
         return self.NO_ERR
+
+    def get_arm_lowered(self):
+        return self.arm_lowered
 
     def init(self):
         self.arm_lowered = False

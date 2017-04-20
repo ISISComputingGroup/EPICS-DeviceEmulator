@@ -35,7 +35,19 @@ class HRPDSampleChangerStreamInterface(StreamAdapter):
         return "Position = " + str(self._device.car_pos)
 
     def get_status(self):
-        return str(self._device.get_status())
+        lowered = self._device.get_arm_lowered()
+
+        # Based on the labview VI, appears to be different than doc
+        return_string = "01000{0:b}01{1:b}{2:b}{3:b}00000"
+        return_string = return_string.format(not lowered, self._device.is_car_at_one(), not lowered,
+                                             lowered)
+
+        return_string += " 0{0:b}1".format(self._device.is_moving())
+
+        return_string += " %02d" % self._device.current_err
+        return_string += " %02d" % self._device.car_pos
+
+        return return_string
 
     def go_back(self):
         return self._check_error_code(self._device.go_backward())
