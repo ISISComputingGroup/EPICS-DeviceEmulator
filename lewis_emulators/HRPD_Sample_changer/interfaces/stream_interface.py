@@ -18,6 +18,7 @@ class HRPDSampleChangerStreamInterface(StreamAdapter):
         Cmd("read_variable", "^vr([0-9]{4})$", argument_mappings=[int])
     }
 
+    # Labview VI expects a \r\n for out_terminator
     in_terminator = "\r"
     out_terminator = "\r\n"
 
@@ -32,20 +33,20 @@ class HRPDSampleChangerStreamInterface(StreamAdapter):
         return "0001 0001 ISIS HRPD Sample Changer V1.00"
 
     def get_position(self):
-        return "Position = " + str(self._device.car_pos)
+        return "Position = {:2d}".format(int(self._device.car_pos))
 
     def get_status(self):
         lowered = self._device.get_arm_lowered()
 
-        # Based on the labview VI, appears to be different than doc
+        # Based on testing with actual device, appears to be different than doc
         return_string = "01000{0:b}01{1:b}{2:b}{3:b}00000"
         return_string = return_string.format(not lowered, self._device.is_car_at_one(), not lowered,
                                              lowered)
 
-        return_string += " 0{0:b}1".format(self._device.is_moving())
+        return_string += " 0 {:b}".format(self._device.is_moving())
 
-        return_string += " %02d" % self._device.current_err
-        return_string += " %02d" % self._device.car_pos
+        return_string += " {:2d}".format(int(self._device.current_err))
+        return_string += " {:2d}".format(int(self._device.car_pos))
 
         return return_string
 
