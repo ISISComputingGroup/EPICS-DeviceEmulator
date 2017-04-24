@@ -16,11 +16,12 @@ class SimulatedHRPDSampleChanger(StateMachineDevice):
     MIN_CAROUSEL = 1
     MAX_CAROUSEL = 20
 
-    SPEED = 1
+    ARM_SPEED = 1.0/25.0  # Arm takes 25s to raise/lower (measured on actual device)
+    CAR_SPEED = 1.0/6.0  # Carousel takes 6 seconds per position (measured on actual device)
 
     def _initialize_data(self):
-        self.car_pos = 0
-        self.car_target = 0
+        self.car_pos = -1
+        self.car_target = -1
         self.arm_lowered = False
         self.current_err = self.NO_ERR
 
@@ -29,7 +30,7 @@ class SimulatedHRPDSampleChanger(StateMachineDevice):
             'init': State(),
             'initialising': MovingState(),
             'idle': State(),
-            'moving': MovingState()
+            'car_moving': MovingState()
         }
 
     def _get_initial_state(self):
@@ -37,32 +38,37 @@ class SimulatedHRPDSampleChanger(StateMachineDevice):
 
     def _get_transition_handlers(self):
         return OrderedDict([
-            (('init', 'initialising'), lambda: self.car_target != 0),
+            (('init', 'initialising'), lambda: self.car_target > 0),
             (('initialising', 'idle'), lambda: self.car_pos == 1),
-            (('idle', 'moving'), lambda: self.car_target != self.car_pos),
-            (('moving', 'idle'), lambda: self.car_pos == self.car_target)])
+            (('idle', 'car_moving'), lambda: self.car_target != self.car_pos),
+            (('car_moving', 'idle'), lambda: self.car_pos == self.car_target)])
 
     def is_car_at_one(self):
         return self.car_pos == self.MIN_CAROUSEL
 
     def is_moving(self):
-        return self._csm.state == 'moving'
+        return self._csm.state == 'car_moving'
 
-    def go_forward(self):
+    def _check_can_move(self):
         if self._csm.state == 'init':
             return self.ERR_NOT_INITIALISED
         if self.arm_lowered:
             return self.ERR_CANT_ROT_IF_NOT_UP
+        return self.ERR_OK
+
+    def go_forward(self):
+        err_state = self._check_can_move()
+        if err_state:
+            return err_state
         self.car_target += 1
         if self.car_target > self.MAX_CAROUSEL:
             self.car_target = self.MIN_CAROUSEL
         return self.NO_ERR
 
     def go_backward(self):
-        if self._csm.state == 'init':
-            return self.ERR_NOT_INITIALISED
-        if self.arm_lowered:
-            return self.ERR_CANT_ROT_IF_NOT_UP
+        err_state = self._check_can_move()
+        if err_state:
+            return err_state
         self.car_target -= 1
         if self.car_target < self.MIN_CAROUSEL:
             self.car_target = self.MAX_CAROUSEL
