@@ -1,7 +1,9 @@
-from lewis.adapters.stream import StreamAdapter, Cmd
+from lewis.adapters.stream import Cmd, StreamAdapter
+from ..states import Errors
 
 
 class HRPDSampleChangerStreamInterface(StreamAdapter):
+    protocol = "HRPD"
 
     commands = {
         Cmd("get_id", "^id$"),
@@ -18,12 +20,18 @@ class HRPDSampleChangerStreamInterface(StreamAdapter):
         Cmd("read_variable", "^vr([0-9]{4})$", argument_mappings=[int])
     }
 
-    # Labview VI expects a \r\n for out_terminator
+    error_codes = {Errors.NO_ERR: 0,
+                   Errors.ERR_INV_DEST: 5,
+                   Errors.ERR_NOT_INITIALISED: 6,
+                   Errors.ERR_ARM_DROPPED: 7,
+                   Errors.ERR_ARM_UP: 8,
+                   Errors.ERR_CANT_ROT_IF_NOT_UP: 7}
+
     in_terminator = "\r"
     out_terminator = "\r\n"
 
     def _check_error_code(self, code):
-        if code == self._device.NO_ERR:
+        if code == Errors.NO_ERR:
             return "ok"
         else:
             self._device.current_err = code
@@ -45,7 +53,9 @@ class HRPDSampleChangerStreamInterface(StreamAdapter):
 
         return_string += " 0 {:b}".format(self._device.is_moving())
 
-        return_string += " {:2d}".format(int(self._device.current_err))
+        return_error = int(self.error_codes[self._device.current_err])
+
+        return_string += " {:2d}".format(return_error)
         return_string += " {:2d}".format(int(self._device.car_pos))
 
         return return_string

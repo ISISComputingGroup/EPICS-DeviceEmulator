@@ -1,3 +1,3 @@
-from .device import SimulatedHRPDSampleChanger
+from .device import SimulatedSampleChanger
 
-__all__ = ['SimulatedHRPDSampleChanger']
+__all__ = ['SimulatedSampleChanger']
