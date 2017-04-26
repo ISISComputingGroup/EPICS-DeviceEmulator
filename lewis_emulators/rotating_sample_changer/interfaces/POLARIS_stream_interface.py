@@ -30,7 +30,7 @@ class POLARISSampleChangerStreamInterface(StreamAdapter):
     out_terminator = "\r\n"
 
     def get_id(self):
-        return ""
+        return "0001 0001 ISIS Polaris Sample Changer V"
 
     def get_position(self):
         return "Position = {:2d}".format(int(self._device.car_pos))
