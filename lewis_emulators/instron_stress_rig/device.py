@@ -8,10 +8,10 @@ class SimulatedInstron(StateMachineDevice):
     def _initialize_data(self):
         """ Initialize all of the device's attributes """
 
-
         # When initialisation is complete, this is set to true and the device will enter a running state
         self.ready = True
         self._control_channel = 0
+        self._watchdog_status = (0, 0)
 
     def _get_state_handlers(self):
         return {
@@ -32,9 +32,15 @@ class SimulatedInstron(StateMachineDevice):
 
     def get_control_channel(self):
         return self._control_channel
-		
+
     def set_control_channel(self, channel):
         self._control_channel = channel
+
+    def get_watchdog_status(self):
+        return self._watchdog_status
+
+    def set_watchdog_status(self, enabled, status):
+        self._watchdog_status = (enabled, status)
 
     def start(self):
         self._started = True
