@@ -12,6 +12,7 @@ class SimulatedInstron(StateMachineDevice):
         self.ready = True
         self._control_channel = 0
         self._watchdog_status = (0, 0)
+        self._control_mode = 0
 
     def _get_state_handlers(self):
         return {
@@ -41,6 +42,12 @@ class SimulatedInstron(StateMachineDevice):
 
     def set_watchdog_status(self, enabled, status):
         self._watchdog_status = (enabled, status)
+
+    def get_control_mode(self):
+        return self._control_mode
+
+    def set_control_mode(self, mode):
+        self._control_mode = mode
 
     def start(self):
         self._started = True
