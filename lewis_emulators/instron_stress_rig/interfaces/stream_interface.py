@@ -11,6 +11,7 @@ class InstronStreamInterface(StreamAdapter):
         Cmd("set_watchdog_status", "^C904,([0-2]),([0-3])$"),
         Cmd("get_control_mode", "^Q909$"),
         Cmd("set_control_mode", "^P909,([0-1])$"),
+        Cmd("get_status", "^Q22$"),
     }
 
     in_terminator = "\r\n"
@@ -38,3 +39,6 @@ class InstronStreamInterface(StreamAdapter):
 
     def set_control_mode(self, mode):
         self._device.set_control_mode(mode)
+
+    def get_status(self):
+        return 7680
