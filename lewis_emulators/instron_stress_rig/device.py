@@ -13,6 +13,7 @@ class SimulatedInstron(StateMachineDevice):
         self._control_channel = 0
         self._watchdog_status = (0, 0)
         self._control_mode = 0
+        self._actuator_status = 0
 
     def _get_state_handlers(self):
         return {
@@ -54,3 +55,11 @@ class SimulatedInstron(StateMachineDevice):
 
     def stop(self):
         self._started = False
+
+    def get_actuator_status(self):
+        return self._actuator_status
+
+    def set_actuator_status(self, status):
+        print "Actuator status was " + str(self._actuator_status)
+        self._actuator_status = int(status)
+        print "Now it is " + str(status)

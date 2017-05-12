@@ -12,6 +12,9 @@ class InstronStreamInterface(StreamAdapter):
         Cmd("get_control_mode", "^Q909$"),
         Cmd("set_control_mode", "^P909,([0-1])$"),
         Cmd("get_status", "^Q22$"),
+        Cmd("arbitrary_command", "^(_[a-zA-Z0-9]*)$"),
+        Cmd("get_actuator_status", "^Q23$"),
+        Cmd("set_actuator_status", "^C23,([0-1])$"),
     }
 
     in_terminator = "\r\n"
@@ -42,3 +45,15 @@ class InstronStreamInterface(StreamAdapter):
 
     def get_status(self):
         return 7680
+
+    def arbitrary_command(self, command):
+        if command.startswith("Q"):
+            return "Arb_com_response_" + str(command)
+        else:
+            return
+
+    def get_actuator_status(self):
+        return self._device.get_actuator_status()
+
+    def set_actuator_status(self, mode):
+        self._device.set_actuator_status(mode)
