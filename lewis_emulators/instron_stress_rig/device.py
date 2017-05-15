@@ -14,6 +14,11 @@ class SimulatedInstron(StateMachineDevice):
         self._watchdog_status = (0, 0)
         self._control_mode = 0
         self._actuator_status = 0
+        self._movement_type = 2
+
+    def raise_exception_if_cannot_write(self):
+        if int(self._control_mode) != int(1):
+            raise Exception("Not in the correct control mode to execute that command! Current control mode is " + str(self._control_mode))
 
     def _get_state_handlers(self):
         return {
@@ -60,6 +65,12 @@ class SimulatedInstron(StateMachineDevice):
         return self._actuator_status
 
     def set_actuator_status(self, status):
-        print "Actuator status was " + str(self._actuator_status)
+        self.raise_exception_if_cannot_write()
         self._actuator_status = int(status)
-        print "Now it is " + str(status)
+
+    def get_movement_type(self):
+        return self._movement_type
+
+    def set_movement_type(self, mov_type):
+        self.raise_exception_if_cannot_write()
+        self._movement_type = mov_type
