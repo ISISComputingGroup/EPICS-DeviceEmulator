@@ -44,8 +44,9 @@ class CCD100StreamInterface(StreamAdapter):
         return self.create_response(UNITS_COMM)
 
     def get_reading(self):
-        rand = random.random() * 10.0
-        data_str = "READ: {:0.3f}".format(rand) + ";" + str(self._device.setpoint_mode)
+        rand = random.random() * 100.0
+        min_width = 10
+        data_str = "READ:" + "{:0.3f}".format(rand).ljust(min_width) + ";" + str(self._device.setpoint_mode)
         return self.create_response(READING_COMM + "  ", data=data_str)
 
     def handle_error(self, request, error):
