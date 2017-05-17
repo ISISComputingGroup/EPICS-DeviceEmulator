@@ -22,7 +22,10 @@ class CmdBuilder(object):
         self._target_method = target_method
         self._arg_sep = arg_sep
         self._current_sep = ""
-        self._ignore = "[{0}]*".format(ignore)
+        if ignore is None or ignore == "":
+            self._ignore = ""
+        else:
+            self._ignore = "[{0}]*".format(ignore)
         self._reg_ex = self._ignore
 
     def escape(self, text):

@@ -1,8 +1,4 @@
-import re
-
-from lewis.adapters.stream import StreamAdapter, Cmd
-
-from lewis_emulators.amint2l.constants import ADDRESS_HIGH, ADDRESS_LOW
+from lewis.adapters.stream import StreamAdapter
 from lewis_emulators.utils.command_builder import CmdBuilder
 
 
@@ -12,8 +8,7 @@ class Amint2lStreamInterface(StreamAdapter):
     """
 
     commands = {
-        CmdBuilder("get_pressure").stx().
-            escape("{address_high}{address_low}r".format(address_high=ADDRESS_HIGH, address_low=ADDRESS_LOW)).build()
+        CmdBuilder("get_pressure").stx().arg("[A-Fa-f0-9]+").escape("r").build()
     }
 
     in_terminator = chr(3)
@@ -30,15 +25,19 @@ class Amint2lStreamInterface(StreamAdapter):
         """
         print "An error occurred at request " + repr(request) + ": " + repr(error)
 
-    def get_pressure(self):
+    def get_pressure(self, address):
 
         """
         Gets the current pressure
 
+        :param address: address of request
         Returns: pressure in correct format if pressure has a value; if None returns None as if it is disconnected
 
         """
-
+        if address.upper() != self._device.address.upper():
+            print "unknown address {0}".format(address)
+            return None
+        print str(self._device.pressure)
         if self._device.pressure is None:
             return None
         else:

@@ -18,6 +18,7 @@ class SimulatedAmint2l(StateMachineDevice):
         """
 
         self._pressure = 2.0
+        self.address = "AB"
 
     def _get_state_handlers(self):
 
