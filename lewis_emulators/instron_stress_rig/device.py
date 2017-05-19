@@ -1,5 +1,5 @@
 from collections import OrderedDict
-from states import DefaultInitState, DefaultStoppedState, DefaultStartedState
+from states import DefaultState
 from lewis.devices import StateMachineDevice
 
 
@@ -15,27 +15,28 @@ class SimulatedInstron(StateMachineDevice):
         self._control_mode = 0
         self._actuator_status = 0
         self._movement_type = 2
+        self.current_time = 0
+        self.watchdog_refresh_time = 0
+
+        # Mode 0 = Ramp waveform
+        # Mode 1 = Random waveform
+        self._waveform_mode = 0
+
 
     def raise_exception_if_cannot_write(self):
         if int(self._control_mode) != int(1):
-            raise Exception("Not in the correct control mode to execute that command! Current control mode is " + str(self._control_mode))
+            raise Exception("Not in the correct control mode to execute that command!")
 
     def _get_state_handlers(self):
         return {
-            'init': DefaultInitState(),
-            'stopped': DefaultStoppedState(),
-            'started': DefaultStartedState(),
+            'default': DefaultState(),
         }
 
     def _get_initial_state(self):
-        return 'init'
+        return 'default'
 
     def _get_transition_handlers(self):
-        return OrderedDict([
-            (('init', 'stopped'), lambda: self.ready),
-            (('stopped', 'started'), lambda: self._started is True),
-            (('started', 'stopped'), lambda: self._started is False),
-        ])
+        return OrderedDict([])
 
     def get_control_channel(self):
         return self._control_channel
@@ -48,6 +49,7 @@ class SimulatedInstron(StateMachineDevice):
 
     def set_watchdog_status(self, enabled, status):
         self._watchdog_status = (enabled, status)
+        self.watchdog_refresh_time = self.current_time
 
     def get_control_mode(self):
         return self._control_mode
@@ -73,4 +75,12 @@ class SimulatedInstron(StateMachineDevice):
 
     def set_movement_type(self, mov_type):
         self.raise_exception_if_cannot_write()
-        self._movement_type = mov_type
+
+        if self._waveform_mode == 0:
+            self._movement_type = mov_type
+        else:
+            self._movement_type = mov_type + 3
+
+    def set_current_time(self, dt):
+        self.current_time = dt
+
