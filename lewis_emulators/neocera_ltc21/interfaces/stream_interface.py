@@ -1,94 +1,11 @@
 import re
 
-from lewis.adapters.stream import StreamAdapter, Cmd
+from lewis.adapters.stream import StreamAdapter
 
 from lewis_emulators.neocera_ltc21.constants import HEATER_INDEX, CONTROL_TYPE_MAX, CONTROL_TYPE_MIN, ANALOG_INDEX
 from lewis_emulators.neocera_ltc21.device_errors import NeoceraDeviceErrors
 from lewis_emulators.neocera_ltc21.states import MonitorState, ControlState
-
-
-class CmdBuilder(object):
-    """
-    Build a command for the stream adapter
-    """
-
-    def __init__(self, target_method, arg_sep=",", ignore=""):
-        """
-        Create a builder. Use build to create the final objecy
-        Args:
-            target_method: name of the method target to call when the reg ex matches
-            arg_sep: seperators between the arguments
-            ignore: set of characters to ignore between text and arguments
-
-        Returns:
-
-        """
-        self._target_method = target_method
-        self._arg_sep = arg_sep
-        self._current_sep = ""
-        self._ignore = "[{0}]*".format(ignore)
-        self._reg_ex = self._ignore
-
-    def escape(self, text):
-        """
-        Add some text to the regex which is esacped
-        Args:
-            text: text to add
-
-        Returns: builder
-
-        """
-        self._reg_ex += re.escape(text) + self._ignore
-        return self
-
-    def arg(self, arg_regex):
-        """
-        Add an argument to the command
-        Args:
-            arg_regex: regex for the argument (capture group will be added)
-
-        Returns: builder
-
-        """
-        self._reg_ex += self._current_sep + "(" + arg_regex + ")" + self._ignore
-        self._current_sep = self._arg_sep
-        return self
-
-    def float(self):
-        """
-        Add a float argument
-        Returns: builder
-
-        """
-        return self.arg(r"[+-]?\d+\.?\d*")
-
-    def digit(self):
-        """
-        Add a single digit argument
-        Returns: builder
-
-        """
-        return self.arg(r"\d")
-
-    def int(self):
-        """
-        Add an integer argument
-        Returns: builder
-
-        """
-        return self.arg(r"\d+")
-
-    def build(self, *args, **kwargs):
-        """
-        Builds the CMd object based on the target and regular expression
-        Args:
-            *args: arguments to pass to Cmd constructor
-            **kwargs: key word arguments to pass to Cmd constructor
-
-        Returns: Cmd object
-
-        """
-        return Cmd(self._target_method, self._reg_ex, *args, **kwargs)
+from lewis_emulators.utils.command_builder import CmdBuilder
 
 
 class NeoceraStreamInterface(StreamAdapter):
