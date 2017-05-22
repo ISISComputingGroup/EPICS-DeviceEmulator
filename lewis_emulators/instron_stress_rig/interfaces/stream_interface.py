@@ -30,20 +30,20 @@ class InstronStreamInterface(StreamAdapter):
         return self._device.get_control_channel()
 
     def set_control_channel(self, channel):
-        self._device.set_control_channel(channel)
+        self._device.set_control_channel(int(channel))
 
     def get_watchdog_status(self):
         enabled, status = self._device.get_watchdog_status()
         return "{},{}".format(enabled, status)
 
     def set_watchdog_status(self, cv1, cv2):
-        self._device.set_watchdog_status(cv1, cv2)
+        self._device.set_watchdog_status(int(cv1), int(cv2))
 
     def get_control_mode(self):
         return self._device.get_control_mode()
 
     def set_control_mode(self, mode):
-        self._device.set_control_mode(mode)
+        self._device.set_control_mode(int(mode))
 
     def get_status(self):
         return 7680
@@ -55,10 +55,10 @@ class InstronStreamInterface(StreamAdapter):
         return self._device.get_actuator_status()
 
     def set_actuator_status(self, mode):
-        self._device.set_actuator_status(mode)
+        self._device.set_actuator_status(int(mode))
 
     def get_movement_type(self):
         return self._device.get_movement_type()
 
     def set_movement_type(self, mov_type):
-        self._device.set_movement_type(mov_type)
+        self._device.set_movement_type(int(mov_type))

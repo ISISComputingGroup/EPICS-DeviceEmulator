@@ -24,7 +24,7 @@ class SimulatedInstron(StateMachineDevice):
 
 
     def raise_exception_if_cannot_write(self):
-        if int(self._control_mode) != int(1):
+        if self._control_mode != 1:
             raise Exception("Not in the correct control mode to execute that command!")
 
     def _get_state_handlers(self):
