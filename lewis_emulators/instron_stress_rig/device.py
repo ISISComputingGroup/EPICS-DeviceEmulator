@@ -69,6 +69,8 @@ class SimulatedInstron(StateMachineDevice):
     def set_actuator_status(self, status):
         self.raise_exception_if_cannot_write()
         self._actuator_status = int(status)
+        if status == 0:
+            self._movement_type = 0
 
     def get_movement_type(self):
         return self._movement_type
