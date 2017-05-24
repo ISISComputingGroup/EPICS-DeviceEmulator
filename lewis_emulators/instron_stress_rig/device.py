@@ -2,6 +2,8 @@ from collections import OrderedDict
 from states import DefaultState
 from lewis.devices import StateMachineDevice
 
+import time
+
 
 class SimulatedInstron(StateMachineDevice):
 
@@ -10,7 +12,7 @@ class SimulatedInstron(StateMachineDevice):
 
         # When initialisation is complete, this is set to true and the device will enter a running state
         self.ready = True
-        self._control_channel = 0
+        self._control_channel = 1
         self._watchdog_status = (0, 0)
         self._control_mode = 0
         self._actuator_status = 0
@@ -83,6 +85,6 @@ class SimulatedInstron(StateMachineDevice):
         else:
             self._movement_type = mov_type + 3
 
-    def set_current_time(self, dt):
-        self.current_time = dt
+    def set_current_time(self):
+        self.current_time = time.time()
 
