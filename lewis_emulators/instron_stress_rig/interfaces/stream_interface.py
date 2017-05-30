@@ -46,7 +46,7 @@ class InstronStreamInterface(StreamAdapter):
         self._device.set_control_mode(int(mode))
 
     def get_status(self):
-        return 7680
+        return int(self._device.get_status())
 
     def arbitrary_command(self, command):
         return "Arb_com_response_" + str(command)

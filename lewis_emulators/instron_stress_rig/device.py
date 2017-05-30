@@ -19,6 +19,7 @@ class SimulatedInstron(StateMachineDevice):
         self._movement_type = 2
         self.current_time = 0
         self.watchdog_refresh_time = 0
+        self.status = 7680
 
         # Mode 0 = Ramp waveform
         # Mode 1 = Random waveform
@@ -67,6 +68,9 @@ class SimulatedInstron(StateMachineDevice):
 
     def get_actuator_status(self):
         return self._actuator_status
+
+    def get_status(self):
+        return self.status
 
     def set_actuator_status(self, status):
         self.raise_exception_if_cannot_write()
