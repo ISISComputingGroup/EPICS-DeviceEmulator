@@ -25,6 +25,10 @@ class SimulatedInstron(StateMachineDevice):
         # Mode 1 = Random waveform
         self._waveform_mode = 0
 
+        self.position_step_time = 0
+        self.stress_step_time = 0
+        self.strain_step_time = 0
+
 
     def raise_exception_if_cannot_write(self):
         if self._control_mode != 1:
@@ -92,3 +96,18 @@ class SimulatedInstron(StateMachineDevice):
     def set_current_time(self):
         self.current_time = time.time()
 
+    def set_step_time(self, channel, value):
+        if channel == 1:
+            self.position_step_time = value
+        elif channel == 2:
+            self.stress_step_time = value
+        elif channel == 3:
+            self.strain_step_time = value
+
+    def get_step_time(self, channel):
+        if channel == 1:
+            return self.position_step_time
+        elif channel == 2:
+            return self.stress_step_time
+        elif channel == 3:
+            return self.strain_step_time

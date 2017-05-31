@@ -17,6 +17,8 @@ class InstronStreamInterface(StreamAdapter):
         Cmd("set_actuator_status", "^C23,([0-1])$"),
         Cmd("get_movement_type", "^Q1$"),
         Cmd("set_movement_type", "^C1,([0-3])$"),
+        Cmd("get_step_time", "^Q2,([1-3])$"),
+        Cmd("set_step_time", "^C2,([1-3]),([0-9]*.[0-9]*)$"),
     }
 
     in_terminator = "\r\n"
@@ -62,3 +64,9 @@ class InstronStreamInterface(StreamAdapter):
 
     def set_movement_type(self, mov_type):
         self._device.set_movement_type(int(mov_type))
+
+    def get_step_time(self, channel):
+        return float(self._device.get_step_time(int(channel)))
+
+    def set_step_time(self, channel, value):
+        self._device.set_step_time(int(channel), float(value))
