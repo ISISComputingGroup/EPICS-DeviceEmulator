@@ -108,7 +108,21 @@ class CmdBuilder(object):
 
     def etx(self):
         """
-        Add the ETX character (0xe) to the string
+        Add the ETX character (0x3) to the string
         :return: builder
         """
         return self.add_ascii_character(3)
+
+    def enq(self):
+        """
+        Add the ENQ character (0x5) to the string
+        :return: builder
+        """
+        return self.add_ascii_character(5)
+
+    def ack(self):
+        """
+        Add the ACK character (0x6) to the string
+        :return: builder
+        """
+        return self.add_ascii_character(6)
