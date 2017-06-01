@@ -12,6 +12,7 @@ class Tpg26xStreamInterface(StreamAdapter):
 
     commands = {
         CmdBuilder("get_pressure").escape("PRX").build(),
+        CmdBuilder("get_units").escape("UNI").build(),
         CmdBuilder("handle_enquiry").enq().build()
     }
 
@@ -37,6 +38,8 @@ class Tpg26xStreamInterface(StreamAdapter):
 
         if self._last_command == "PRX":
             return self.get_pressure()
+        elif self._last_command == "UNI":
+            return self.get_units()
         else:
             print "Last command was unknown: " + repr(self._last_command)
 
@@ -49,7 +52,20 @@ class Tpg26xStreamInterface(StreamAdapter):
         if self._last_command is None:
             self._last_command = "PRX"
             return self.ACK
-        else:
-            self._last_command = None
-            return "0,{0},0,{1}".format(self._device.pressure1, self._device.pressure2)
+
+        self._last_command = None
+        return "0,{0},0,{1}".format(self._device.pressure1, self._device.pressure2)
+
+    def get_units(self):
+        """
+        Get the current units of the TPG26x
+
+        Returns: a string representing the units
+        """
+        if self._last_command is None:
+            self._last_command = "UNI"
+            return self.ACK
+
+        self._last_command = None
+        return self._device.units
 

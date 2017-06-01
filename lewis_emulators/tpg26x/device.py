@@ -19,6 +19,7 @@ class SimulatedTpg26x(StateMachineDevice):
 
         self._pressure1 = 2.0
         self._pressure2 = 3.0
+        self._units = 1
 
     def _get_state_handlers(self):
 
@@ -79,3 +80,19 @@ class SimulatedTpg26x(StateMachineDevice):
         :param pressure: the pressure value to set the second pressure to
         """
         self._pressure2 = pressure
+
+    @property
+    def units(self):
+        """
+        Returns: the units of the TPG26x
+        """
+        return self._units
+
+    @units.setter
+    def units(self, units):
+        """
+        Set the units for the TPG26x
+        :param units: the units to set the device to as a string
+        """
+        self._units = units
+
