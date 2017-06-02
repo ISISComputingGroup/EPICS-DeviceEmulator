@@ -24,6 +24,7 @@ class InstronStreamInterface(StreamAdapter):
         Cmd("get_ramp_amplitude_setpoint", "^Q4,([1-3])$"),
         Cmd("set_ramp_amplitude_setpoint", "^C4,([1-3]),([0-9]*.[0-9]*)$"),
         Cmd("get_single_point_feedback_data", "^Q134,([1-3]),([0-9]+)$"),
+        Cmd("get_chan_scale", "^Q308,([1-3])$"),
     }
 
     in_terminator = "\r\n"
@@ -93,4 +94,7 @@ class InstronStreamInterface(StreamAdapter):
         # Actual rig accepts values 0-12
         assert int(type) == 0
         return float(self._device.get_ramp_amplitude_setpoint(int(channel)))
+
+    def get_chan_scale(self, channel):
+        return self._device.get_chan_scale(int(channel))
 

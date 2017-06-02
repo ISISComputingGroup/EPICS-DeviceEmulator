@@ -114,9 +114,13 @@ class SimulatedInstron(StateMachineDevice):
     def get_ramp_amplitude_setpoint(self, channel):
         return self._channels[channel].ramp_amplitude_setpoint
 
+    def get_chan_scale(self, channel):
+        return self._channels[channel].chan_scale
+
 class Channel(object):
     def __init__(self):
         self.waveform_type = 0
         self.step_time = 0
         self.ramp_amplitude_setpoint = 0
+        self.chan_scale = 10
 
