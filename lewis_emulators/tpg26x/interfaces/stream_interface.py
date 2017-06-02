@@ -66,7 +66,8 @@ class Tpg26xStreamInterface(StreamAdapter):
 
         Returns: a string with pressure and error codes
         """
-        return "0,{0},0,{1}".format(self._device.pressure1, self._device.pressure2)
+        return "{0},{1},{2},{3}".format(self._device.error1, self._device.pressure1,
+                                        self._device.error2, self._device.pressure2)
 
     def get_units(self):
         """
