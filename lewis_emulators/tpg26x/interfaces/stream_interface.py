@@ -13,6 +13,7 @@ class Tpg26xStreamInterface(StreamAdapter):
     commands = {
         CmdBuilder("get_pressure").escape("PRX").build(),
         CmdBuilder("get_units").escape("UNI").build(),
+        CmdBuilder("set_units").escape("UNI").arg("{0|1|2}").build(),
         CmdBuilder("handle_enquiry").enq().build()
     }
 
@@ -68,4 +69,15 @@ class Tpg26xStreamInterface(StreamAdapter):
 
         self._last_command = None
         return self._device.units
+
+    def set_units(self, units):
+        """
+        Set the units of the TPG26x
+        :param: the unit flag to change the units too
+        """
+        if self._last_command is None:
+            self._last_command = "UNI"
+            return self.ACK
+
+        self._device.units = units
 
