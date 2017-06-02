@@ -23,6 +23,7 @@ class InstronStreamInterface(StreamAdapter):
         Cmd("set_chan_waveform_type", "^C2,([1-3]),([0-5])$"),
         Cmd("get_ramp_amplitude_setpoint", "^Q4,([1-3])$"),
         Cmd("set_ramp_amplitude_setpoint", "^C4,([1-3]),([0-9]*.[0-9]*)$"),
+        Cmd("get_single_point_feedback_data", "^Q134,([1-3]),([0-9]+)$"),
     }
 
     in_terminator = "\r\n"
@@ -86,4 +87,10 @@ class InstronStreamInterface(StreamAdapter):
 
     def set_ramp_amplitude_setpoint(self, channel, value):
         self._device.set_ramp_amplitude_setpoint(int(channel), float(value))
+
+    def get_single_point_feedback_data(self, channel, type):
+        # Emulator/IOC only currently supports getting current value (type 0).
+        # Actual rig accepts values 0-12
+        assert int(type) == 0
+        return float(self._device.get_ramp_amplitude_setpoint(int(channel)))
 
