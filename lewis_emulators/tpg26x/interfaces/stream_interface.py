@@ -11,8 +11,8 @@ class Tpg26xStreamInterface(StreamAdapter):
     ACK = chr(6)
 
     commands = {
-        CmdBuilder("get_pressure").escape("PRX").build(),
-        CmdBuilder("get_units").escape("UNI").build(),
+        CmdBuilder("acknowledge_pressure").escape("PRX").build(),
+        CmdBuilder("acknowledge_units").escape("UNI").build(),
         CmdBuilder("set_units").escape("UNI").arg("{0|1|2}").build(),
         CmdBuilder("handle_enquiry").enq().build()
     }
@@ -30,6 +30,22 @@ class Tpg26xStreamInterface(StreamAdapter):
 
         """
         print "An error occurred at request " + repr(request) + ": " + repr(error)
+
+    def acknowledge_pressure(self):
+        """
+        Acknowledge that the request for current pressure was received
+        :return: ASCII acknowledgement character (0x6)
+        """
+        self._last_command = "PRX"
+        return self.ACK
+
+    def acknowledge_units(self):
+        """
+        Acknowledge that the request for current units was received
+        :return: ASCII acknowledgement character (0x6)
+        """
+        self._last_command = "UNI"
+        return self.ACK
 
     def handle_enquiry(self):
         """
@@ -50,11 +66,6 @@ class Tpg26xStreamInterface(StreamAdapter):
 
         Returns: a string with pressure and error codes
         """
-        if self._last_command is None:
-            self._last_command = "PRX"
-            return self.ACK
-
-        self._last_command = None
         return "0,{0},0,{1}".format(self._device.pressure1, self._device.pressure2)
 
     def get_units(self):
@@ -63,11 +74,6 @@ class Tpg26xStreamInterface(StreamAdapter):
 
         Returns: a string representing the units
         """
-        if self._last_command is None:
-            self._last_command = "UNI"
-            return self.ACK
-
-        self._last_command = None
         return self._device.units
 
     def set_units(self, units):
@@ -80,4 +86,5 @@ class Tpg26xStreamInterface(StreamAdapter):
             return self.ACK
 
         self._device.units = units
+        self._last_command = None
 
