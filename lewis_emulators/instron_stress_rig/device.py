@@ -28,7 +28,7 @@ class SimulatedInstron(StateMachineDevice):
         # Maps a channel number to a channel object
         # Usually 1=position, 2=stress, 3=strain but in the
         # context of the emulator it doesn't matter as all channels are treated equally.
-        self._channels = {1 : Channel(), 2 : Channel(), 3 : Channel()}
+        self.channels = {1 : Channel(), 2 : Channel(), 3 : Channel()}
 
     def raise_exception_if_cannot_write(self):
         if self._control_mode != 1:
@@ -97,25 +97,25 @@ class SimulatedInstron(StateMachineDevice):
         self.current_time = time.time()
 
     def set_step_time(self, channel, value):
-        self._channels[channel].step_time = value
+        self.channels[channel].step_time = value
 
     def get_step_time(self, channel):
-        return self._channels[channel].step_time
+        return self.channels[channel].step_time
 
     def set_chan_waveform_type(self, channel, value):
-        self._channels[channel].waveform_type = value
+        self.channels[channel].waveform_type = value
 
     def get_chan_waveform_type(self, channel):
-        return self._channels[channel].waveform_type
+        return self.channels[channel].waveform_type
 
     def set_ramp_amplitude_setpoint(self, channel, value):
-        self._channels[channel].ramp_amplitude_setpoint = value
+        self.channels[channel].ramp_amplitude_setpoint = value
 
     def get_ramp_amplitude_setpoint(self, channel):
-        return self._channels[channel].ramp_amplitude_setpoint
+        return self.channels[channel].ramp_amplitude_setpoint
 
     def get_chan_scale(self, channel):
-        return self._channels[channel].chan_scale
+        return self.channels[channel].chan_scale
 
 class Channel(object):
     def __init__(self):
