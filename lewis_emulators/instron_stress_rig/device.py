@@ -28,7 +28,7 @@ class SimulatedInstron(StateMachineDevice):
         # Maps a channel number to a channel object
         # Usually 1=position, 2=stress, 3=strain but in the
         # context of the emulator it doesn't matter as all channels are treated equally.
-        self.channels = {1 : Channel(), 2 : Channel(), 3 : Channel()}
+        self.channels = {1: PositionChannel(), 2: StressChannel(), 3: StrainChannel()}
 
     def raise_exception_if_cannot_write(self):
         if self._control_mode != 1:
@@ -128,6 +128,13 @@ class SimulatedInstron(StateMachineDevice):
     def get_chan_value(self, channel):
         return self.channels[channel].value
 
+    def get_strain_channel_length(self, channel):
+        # Getting the length is only supported for channel 3 (strain).
+        assert channel == 3, "Channel was not 3"
+        # This number gets divided by in the IOC - if it's zero things will break.
+        assert self.channels[channel].length != 0, "Strain channel length was zero"
+        return self.channels[channel].length
+
 
 class Channel(object):
     def __init__(self):
@@ -137,3 +144,18 @@ class Channel(object):
         self.scale = 10
         self.value = 0
 
+
+class PositionChannel(Channel):
+    def __init__(self):
+        super(PositionChannel, self).__init__()
+
+
+class StressChannel(Channel):
+    def __init__(self):
+        super(StressChannel, self).__init__()
+
+
+class StrainChannel(Channel):
+    def __init__(self):
+        super(StrainChannel, self).__init__()
+        self.length = 1

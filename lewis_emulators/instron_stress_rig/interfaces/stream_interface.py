@@ -25,6 +25,7 @@ class InstronStreamInterface(StreamAdapter):
         Cmd("set_ramp_amplitude_setpoint", "^C4,([1-3]),([0-9]*.[0-9]*)$"),
         Cmd("get_single_point_feedback_data", "^Q134,([1-3]),([0-9]+)$"),
         Cmd("get_chan_scale", "^Q308,([1-3])$"),
+        Cmd("get_strain_channel_length", "^Q340,([1-3])$"),
     }
 
     in_terminator = "\r\n"
@@ -97,4 +98,7 @@ class InstronStreamInterface(StreamAdapter):
 
     def get_chan_scale(self, channel):
         return self._device.get_chan_scale(int(channel))
+
+    def get_strain_channel_length(self, channel):
+        return self._device.get_strain_channel_length(int(channel))
 
