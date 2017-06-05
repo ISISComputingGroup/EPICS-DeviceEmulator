@@ -39,6 +39,15 @@ class SimulatedInstron(StateMachineDevice):
             'default': DefaultState(),
         }
 
+    # This is a workaround for https://github.com/DMSC-Instrument-Data/lewis/issues/248
+    def set_channel_param(self, index, param, value):
+        print "Backdoor set: {index} {param} {value}".format(index=index, param=param, value=value)
+        setattr(self.channels[int(index)], str(param), value)
+
+    # This is a workaround for https://github.com/DMSC-Instrument-Data/lewis/issues/248
+    def get_channel_param(self, index, param):
+        return getattr(self.channels[int(index)], str(param))
+
     def _get_initial_state(self):
         return 'default'
 
@@ -117,10 +126,15 @@ class SimulatedInstron(StateMachineDevice):
     def get_chan_scale(self, channel):
         return self.channels[channel].chan_scale
 
+    def get_chan_value(self, channel):
+        return self.channels[channel].value
+
+
 class Channel(object):
     def __init__(self):
         self.waveform_type = 0
         self.step_time = 0
         self.ramp_amplitude_setpoint = 0
         self.chan_scale = 10
+        self.value = 0
 

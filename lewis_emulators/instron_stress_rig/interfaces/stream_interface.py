@@ -93,7 +93,7 @@ class InstronStreamInterface(StreamAdapter):
         # Emulator/IOC only currently supports getting current value (type 0).
         # Actual rig accepts values 0-12
         assert int(type) == 0
-        return float(self._device.get_ramp_amplitude_setpoint(int(channel)))
+        return float(self._device.get_chan_value(int(channel)))
 
     def get_chan_scale(self, channel):
         return self._device.get_chan_scale(int(channel))
