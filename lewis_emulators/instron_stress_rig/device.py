@@ -141,7 +141,7 @@ class SimulatedInstron(StateMachineDevice):
     def get_chan_area(self, channel):
         # Area is only applicable to stress channel
         assert isinstance(self.channels[channel], StressChannel), "Area only applies to stress channel"
-        return self.channels[channel]
+        return self.channels[channel].area
 
     def set_chan_area(self, channel, value):
         # Area is only applicable to stress channel
