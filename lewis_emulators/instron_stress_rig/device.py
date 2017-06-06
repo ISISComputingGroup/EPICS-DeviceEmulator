@@ -125,15 +125,28 @@ class SimulatedInstron(StateMachineDevice):
     def get_chan_scale(self, channel):
         return self.channels[channel].scale
 
-    def get_chan_value(self, channel):
+    def get_chan_value(self, channel, type):
+        # Emulator/IOC only currently supports getting current value (type 0).
+        # Actual rig accepts values 0-12
+        assert int(type) == 0, "Emulator only supports getting current value"
         return self.channels[channel].value
 
     def get_strain_channel_length(self, channel):
         # Getting the length is only supported for channel 3 (strain).
-        assert channel == 3, "Channel was not 3"
+        assert isinstance(self.channels[channel], StrainChannel), "Length only applies to strain channel"
         # This number gets divided by in the IOC - if it's zero things will break.
         assert self.channels[channel].length != 0, "Strain channel length was zero"
         return self.channels[channel].length
+
+    def get_chan_area(self, channel):
+        # Area is only applicable to stress channel
+        assert isinstance(self.channels[channel], StressChannel), "Area only applies to stress channel"
+        return self.channels[channel]
+
+    def set_chan_area(self, channel, value):
+        # Area is only applicable to stress channel
+        assert isinstance(self.channels[channel], StressChannel), "Area only applies to stress channel"
+        self.channels[channel].area = value
 
 
 class Channel(object):
@@ -153,6 +166,7 @@ class PositionChannel(Channel):
 class StressChannel(Channel):
     def __init__(self):
         super(StressChannel, self).__init__()
+        self.area = 1
 
 
 class StrainChannel(Channel):

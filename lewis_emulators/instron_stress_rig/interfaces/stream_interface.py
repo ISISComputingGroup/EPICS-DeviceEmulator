@@ -26,6 +26,8 @@ class InstronStreamInterface(StreamAdapter):
         Cmd("get_single_point_feedback_data", "^Q134,([1-3]),([0-9]+)$"),
         Cmd("get_chan_scale", "^Q308,([1-3])$"),
         Cmd("get_strain_channel_length", "^Q340,([1-3])$"),
+        Cmd("get_chan_area", "^Q341,([1-3])$"),
+        Cmd("set_chan_area", "^C341,([1-3]),([0-9]*.[0-9]*)$"),
     }
 
     in_terminator = "\r\n"
@@ -91,14 +93,17 @@ class InstronStreamInterface(StreamAdapter):
         self._device.set_ramp_amplitude_setpoint(int(channel), float(value))
 
     def get_single_point_feedback_data(self, channel, type):
-        # Emulator/IOC only currently supports getting current value (type 0).
-        # Actual rig accepts values 0-12
-        assert int(type) == 0
-        return float(self._device.get_chan_value(int(channel)))
+        return float(self._device.get_chan_value(int(channel), int(type)))
 
     def get_chan_scale(self, channel):
         return self._device.get_chan_scale(int(channel))
 
     def get_strain_channel_length(self, channel):
         return self._device.get_strain_channel_length(int(channel))
+
+    def get_chan_area(self, channel):
+        return self._device.get_chan_area(int(channel))
+
+    def set_chan_area(self, channel, value):
+        self._device.set_chan_area(int(channel), float(value))
 
