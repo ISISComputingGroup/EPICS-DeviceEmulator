@@ -60,10 +60,17 @@ class SimulatedSuperlogics(StateMachineDevice):
         """
         return self._values[0]
 
-    @value1.setter
-    def value1(self, value):
+    @property
+    def values(self):
         """
+        :return: All values on this channel
+        """
+        return self._values
 
-        :param values: set the value for a the Value1 PV
+    @values.setter
+    def values(self, values):
         """
-        self._values[0] = value
+        :param values: set all the values on this channel
+        """
+        self._values = values
+
