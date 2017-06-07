@@ -28,6 +28,7 @@ class InstronStreamInterface(StreamAdapter):
         Cmd("get_strain_channel_length", "^Q340,([1-3])$"),
         Cmd("get_chan_area", "^Q341,([1-3])$"),
         Cmd("set_chan_area", "^C341,([1-3]),([0-9]*.[0-9]*)$"),
+        Cmd("get_chan_type", "^Q307,([1-3])$"),
     }
 
     in_terminator = "\r\n"
@@ -107,3 +108,7 @@ class InstronStreamInterface(StreamAdapter):
     def set_chan_area(self, channel, value):
         self._device.set_chan_area(int(channel), float(value))
 
+    def get_chan_type(self, channel):
+        type_1 = self._device.get_chan_type_1(int(channel))
+        type_2 = self._device.get_chan_type_2(int(channel))
+        return "{a},{b}".format(a=type_1, b=type_2)

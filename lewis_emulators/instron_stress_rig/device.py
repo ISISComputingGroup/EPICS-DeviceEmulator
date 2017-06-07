@@ -148,6 +148,12 @@ class SimulatedInstron(StateMachineDevice):
         assert isinstance(self.channels[channel], StressChannel), "Area only applies to stress channel"
         self.channels[channel].area = value
 
+    def get_chan_type_1(self, channel):
+        return self.channels[channel].type_1
+
+    def get_chan_type_2(self, channel):
+        return self.channels[channel].type_2
+
 
 class Channel(object):
     def __init__(self):
@@ -156,6 +162,8 @@ class Channel(object):
         self.ramp_amplitude_setpoint = 0
         self.scale = 10
         self.value = 0
+        self.type_1 = 0
+        self.type_2 = 0
 
 
 class PositionChannel(Channel):
