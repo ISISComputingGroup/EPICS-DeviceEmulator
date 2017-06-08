@@ -26,8 +26,6 @@ class SimulatedInstron(StateMachineDevice):
         self._waveform_mode = 0
 
         # Maps a channel number to a channel object
-        # Usually 1=position, 2=stress, 3=strain but in the
-        # context of the emulator it doesn't matter as all channels are treated equally.
         self.channels = {1: PositionChannel(), 2: StressChannel(), 3: StrainChannel()}
 
     def raise_exception_if_cannot_write(self):
