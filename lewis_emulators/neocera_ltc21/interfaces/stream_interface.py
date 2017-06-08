@@ -10,7 +10,7 @@ from lewis_emulators.utils.command_builder import CmdBuilder
 
 class NeoceraStreamInterface(StreamAdapter):
     """
-    Stream interface for the serial port
+    Stream interface for the serial port.
     """
 
     commands = {
@@ -33,12 +33,10 @@ class NeoceraStreamInterface(StreamAdapter):
     out_terminator = ";\n"
 
     def get_state(self):
-
         """
-        Gets the current state of the device
+        Gets the current state of the device.
 
-        Returns: a single character string containing a number which represents the state of the device
-
+        :return: a single character string containing a number which represents the state of the device
         """
 
         if self._device.state == MonitorState.NAME:
@@ -49,23 +47,19 @@ class NeoceraStreamInterface(StreamAdapter):
     def get_temperature_and_unit(self, sensor_number):
         """
         Return the temperature and unit for the sensor number given.
-        Args:
-            sensor_number: sensor number
 
-        Returns: formatted temperature and unit for the device
-
+        :param sensor_number: sensor number
+        :return: formatted temperature and unit for the device
         """
         return self._get_indexed_value_with_unit(self._device.temperatures, sensor_number)
 
     def _get_indexed_value_with_unit(self, device_values, item_number):
         """
-        Get a temperature like value back from device temperatures in the format produced by the device
-        Args:
-            device_values: device value, e.g. temperatures list
-            item_number: item to return
+        Get a temperature like value back from device temperatures in the format produced by the device.
 
-        Returns: temp and units; e.g. setpoint 1.2K
-
+        :param device_values: device value, e.g. temperatures list
+        :param item_number: item to return
+        :return: temp and units; e.g. setpoint 1.2K
         """
         try:
             sensor_index = int(item_number) - 1
@@ -86,24 +80,18 @@ class NeoceraStreamInterface(StreamAdapter):
 
     def get_setpoint_and_unit(self, output_number):
         """
-
-        Args:
-            output_number: the number of set point top return; 1=HEATER, 2=ANALOG
-
-        Returns: setpoint with unit
-
+        :param output_number: the number of set point top return; 1=HEATER, 2=ANALOG
+        :return: setpoint with unit
         """
         return self._get_indexed_value_with_unit(self._device.setpoints, output_number)
 
     def set_setpoint(self, output_number, value):
         """
         Set the setpoint.
-        Args:
-            output_number: output number; 1=HEATER, 2=ANALOG
-            value: value to set it to
 
-        Returns: blank
-
+        :param output_number: output number; 1=HEATER, 2=ANALOG
+        :param value: value to set it to
+        :return:
         """
         try:
             output_index = int(output_number) - 1
@@ -118,14 +106,12 @@ class NeoceraStreamInterface(StreamAdapter):
     def get_output_config(self, output_number):
         """
         Reply to output configuration query.
-            # Example QOUT?1;   produces -> 2;4;3;
-            # Example QOUT?2;   produces -> 3;5;
 
-        Args:
-            output_number: The output number being queries; 1 HEATER, 2 Analogue
+        Example QOUT?1;   produces -> 2;4;3;
+        Example QOUT?2;   produces -> 3;5;
 
-        Returns: configuration as a string; sensor source;control;heater_range
-
+        :param output_number: The output number being queries; 1 HEATER, 2 Analogue
+        :return: configuration as a string; sensor source;control;heater_range
         """
 
         device = self._device
@@ -147,37 +133,29 @@ class NeoceraStreamInterface(StreamAdapter):
 
     def set_heater_control(self, control_type_number):
         """
-        Set the heater output control
-        Args:
-            control_type_number: control type to set the heater to
+        Set the heater output control.
 
-        Returns: None
-
+        :param control_type_number: control type to set the heater to
+        :return: None
         """
-
         self._set_output_control(HEATER_INDEX, control_type_number)
 
     def set_analog_control(self, control_type_number):
         """
-        Set the analog output control
-        Args:
-            control_type_number: control type to set the heater to
+        Set the analog output control.
 
-        Returns: None
-
+        :param control_type_number: control type to set the heater to
+        :return: None
         """
-
         self._set_output_control(ANALOG_INDEX, control_type_number)
 
     def _set_output_control(self, output_index, control_type_number):
         """
-        Set the output control for either the heater or the analog output
-        Args:
-            output_index: output index
-            control_type_number: control type to set
+        Set the output control for either the heater or the analog output.
 
-        Returns: None
-
+        :param output_index: output index
+        :param control_type_number: control type to set
+        :return: None
         """
         device = self._device
         try:
@@ -196,28 +174,25 @@ class NeoceraStreamInterface(StreamAdapter):
 
     def get_heater(self):
         """
-
-        Returns: Heater output
-
+        :return: Heater output
         """
         return "{0:5.1f}".format(self._device.heater)
 
     def get_pid(self, output_number):
         """
-        Get the PID and other info of the output. Information is
+        Get the PID and other info of the output.
+
+        Information is:
             P, I, D, fixed power settting,
             for heater: power limit
             for analog: gain and offset
 
-            Exmaples:
+            Examples:
               QPID?1; -> 24.999;32.;8.;0.0;100.;
               QPID?2; -> 99.999;10.;0.0;0.0;1.;0.0;
 
-        Args:
-            output_number: output number;
-
-        Returns: various info as a string
-
+        :param output_number: output number;
+        :return: various info as a string
         """
         device = self._device
         try:
@@ -236,16 +211,14 @@ class NeoceraStreamInterface(StreamAdapter):
 
     def set_pid_heater(self, p, i, d, fixed_power, limit):
         """
-        Set the pid settings for the heater
-        Args:
-            p: p
-            i: i
-            d: d
-            fixed_power: fixed power
-            limit: limit of the heater
+        Set the pid settings for the heater.
 
-        Returns: None
-
+        :param p: p
+        :param i: i
+        :param d: d
+        :param fixed_power: fixed power
+        :param limit: limit of the heater
+        :returns: None
         """
         pid_settings = self._device.pid[HEATER_INDEX]
         try:
@@ -261,17 +234,15 @@ class NeoceraStreamInterface(StreamAdapter):
 
     def set_pid_analog(self, p, i, d, fixed_power, gain, offset):
         """
-        Set the pid settings for the analog output
-        Args:
-            p: p
-            i: i
-            d: d
-            fixed_power: fixed power
-            gain: gain of the output
-            offset: offset for the output
+        Set the pid settings for the analog output.
 
-        Returns: None
-
+        :param p: p
+        :param i: i
+        :param d: d
+        :param fixed_power: fixed power
+        :param gain: gain of the output
+        :param offset: offset for the output
+        :return: None
         """
         pid_settings = self._device.pid[ANALOG_INDEX]
         try:
@@ -285,17 +256,15 @@ class NeoceraStreamInterface(StreamAdapter):
 
     def _set_pid(self, p, i, d, fixed_power, pid_settings):
         """
-        Common function to set p,i,d and power
-        Args:
-        Args:
-            p: p
-            i: i
-            d: d
-            fixed_power: fixed power
-            pid_settings: in which to set them
+        Common function to set p,i,d and power.
 
-        Returns: None
+        :param p: p
+        :param i: i
+        :param d: d
+        :param fixed_power: fixed power
+        :param pid_settings: in which to set them
 
+        :return: None
         """
         pid_settings["P"] = float(p)
         pid_settings["I"] = float(i)
@@ -304,12 +273,9 @@ class NeoceraStreamInterface(StreamAdapter):
 
     def handle_error(self, request, error):
         """
-
         Handles errors.
 
-        Args:
-            request:
-            error:
-
+        :param request:
+        :param error:
         """
         print "An error occurred at request " + repr(request) + ": " + repr(error)

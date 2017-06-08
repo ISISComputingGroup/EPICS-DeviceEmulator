@@ -8,7 +8,9 @@ import time
 class SimulatedInstron(StateMachineDevice):
 
     def _initialize_data(self):
-        """ Initialize all of the device's attributes """
+        """
+        Initialize all of the device's attributes.
+        """
 
         # When initialisation is complete, this is set to true and the device will enter a running state
         self.ready = True
@@ -87,4 +89,3 @@ class SimulatedInstron(StateMachineDevice):
 
     def set_current_time(self):
         self.current_time = time.time()
-

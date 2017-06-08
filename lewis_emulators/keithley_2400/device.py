@@ -16,7 +16,9 @@ class SimulatedKeithley2400(StateMachineDevice):
     RESISTANCE_RANGE_MULTIPLIER = 2.1
 
     def _initialize_data(self):
-        """ Initialize all of the device's attributes """
+        """
+        Initialize all of the device's attributes.
+        """
         self.serial_command_mode = True
 
         # Power properties
@@ -81,7 +83,9 @@ class SimulatedKeithley2400(StateMachineDevice):
         return self._format_power_output(self._resistance(), as_string)
 
     def update(self, dt):
-        """ Update the current and voltage values based on the current mode and time elapsed """
+        """
+        Update the current and voltage values based on the current mode and time elapsed.
+        """
         def update_value(value):
             return abs(value + uniform(-1,1)*dt)
         new_current = max(update_value(self._current), SimulatedKeithley2400.MINIMUM_CURRENT)
@@ -98,12 +102,16 @@ class SimulatedKeithley2400(StateMachineDevice):
             self._voltage = new_voltage
 
     def reset(self):
-        """ Set all the attributes back to their initial values """
+        """
+        Set all the attributes back to their initial values.
+        """
         self._initialize_data()
 
     @staticmethod
     def _check_mode(mode, mode_class):
-        """ Make sure the mode requested exists in the related class """
+        """
+        Make sure the mode requested exists in the related class.
+        """
         if mode in mode_class.MODES:
             return True
         else:

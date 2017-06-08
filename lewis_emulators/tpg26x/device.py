@@ -6,17 +6,13 @@ from .states import DefaultState
 
 class SimulatedTpg26x(StateMachineDevice):
     """
-    Simulated TPG26x
+    Simulated TPG26x.
     """
 
     def _initialize_data(self):
-
         """
-
-        Sets the initial state of the device
-
+        Sets the initial state of the device.
         """
-
         self._pressure1 = 2.0
         self._pressure2 = 3.0
         self._error1 = 0
@@ -24,34 +20,22 @@ class SimulatedTpg26x(StateMachineDevice):
         self._units = 0
 
     def _get_state_handlers(self):
-
         """
-
         Returns: states and their names
-
         """
-        return {
-            DefaultState.NAME: DefaultState(),
-        }
+        return {DefaultState.NAME: DefaultState()}
 
     def _get_initial_state(self):
         """
-
         Returns: the name of the initial state
-
         """
         return DefaultState.NAME
 
     def _get_transition_handlers(self):
-
         """
-
         Returns: the state transitions
-
         """
-
-        return OrderedDict([
-        ])
+        return OrderedDict()
 
     @property
     def pressure1(self):
@@ -63,7 +47,8 @@ class SimulatedTpg26x(StateMachineDevice):
     @pressure1.setter
     def pressure1(self, pressure):
         """
-        Set the pressure for pressure 1
+        Set the pressure for pressure 1.
+
         :param pressure: the pressure value to set the first pressure to
         """
         self._pressure1 = pressure
@@ -71,14 +56,15 @@ class SimulatedTpg26x(StateMachineDevice):
     @property
     def pressure2(self):
         """
-        Returns: the second pressure
+        Returns: the second pressure.
         """
         return self._pressure2
 
     @pressure2.setter
     def pressure2(self, pressure):
         """
-        Set the pressure for pressure 2
+        Set the pressure for pressure 2.
+
         :param pressure: the pressure value to set the second pressure to
         """
         self._pressure2 = pressure
@@ -93,7 +79,8 @@ class SimulatedTpg26x(StateMachineDevice):
     @units.setter
     def units(self, units):
         """
-        Set the units for the TPG26x
+        Set the units for the TPG26x.
+
         :param units: the units to set the device to as a string
         """
         self._units = units
@@ -108,7 +95,8 @@ class SimulatedTpg26x(StateMachineDevice):
     @error1.setter
     def error1(self, state):
         """
-        Set the error state for pressure 1
+        Set the error state for pressure 1.
+
         :param state: the error code state for pressure 1
         """
         self._error1 = state
@@ -123,8 +111,8 @@ class SimulatedTpg26x(StateMachineDevice):
     @error2.setter
     def error2(self, state):
         """
-        Set the error state for pressure 2
+        Set the error state for pressure 2.
+
         :param state: the error code state for pressure 2
         """
         self._error2 = state
-

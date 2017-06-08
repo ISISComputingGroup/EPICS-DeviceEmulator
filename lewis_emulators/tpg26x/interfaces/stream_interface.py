@@ -6,7 +6,6 @@ class Tpg26xStreamInterface(StreamAdapter):
     """
     Stream interface for the serial port
     """
-
     _last_command = None
     ACK = chr(6)
 
@@ -22,18 +21,18 @@ class Tpg26xStreamInterface(StreamAdapter):
 
     def handle_error(self, request, error):
         """
-        If command is not recognised print and error
+        If command is not recognised print and error.
 
-        Args:
-            request: requested string
-            error: problem
-
+        :param request: requested string
+        :param error: problem
+        :return:
         """
         print "An error occurred at request " + repr(request) + ": " + repr(error)
 
     def acknowledge_pressure(self):
         """
-        Acknowledge that the request for current pressure was received
+        Acknowledge that the request for current pressure was received.
+
         :return: ASCII acknowledgement character (0x6)
         """
         self._last_command = "PRX"
@@ -41,7 +40,8 @@ class Tpg26xStreamInterface(StreamAdapter):
 
     def acknowledge_units(self):
         """
-        Acknowledge that the request for current units was received
+        Acknowledge that the request for current units was received.
+
         :return: ASCII acknowledgement character (0x6)
         """
         self._last_command = "UNI"
@@ -50,6 +50,7 @@ class Tpg26xStreamInterface(StreamAdapter):
     def handle_enquiry(self):
         """
         Handle an enquiry using the last command sent.
+
         :return:
         """
 
@@ -62,7 +63,7 @@ class Tpg26xStreamInterface(StreamAdapter):
 
     def get_pressure(self):
         """
-        Get the current pressure of the TPG26x
+        Get the current pressure of the TPG26x.
 
         Returns: a string with pressure and error codes
         """
@@ -71,7 +72,7 @@ class Tpg26xStreamInterface(StreamAdapter):
 
     def get_units(self):
         """
-        Get the current units of the TPG26x
+        Get the current units of the TPG26x.
 
         Returns: a string representing the units
         """
@@ -79,8 +80,9 @@ class Tpg26xStreamInterface(StreamAdapter):
 
     def set_units(self, units):
         """
-        Set the units of the TPG26x
-        :param: the unit flag to change the units too
+        Set the units of the TPG26x.
+
+        :param units: the unit flag to change the units to
         """
         if self._last_command is None:
             self._last_command = "UNI"
@@ -88,4 +90,3 @@ class Tpg26xStreamInterface(StreamAdapter):
 
         self._device.units = units
         self._last_command = None
-

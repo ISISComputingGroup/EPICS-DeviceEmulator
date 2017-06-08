@@ -1,5 +1,5 @@
 """
-Constants associated with the NEOCERA
+Constants associated with the NEOCERA.
 """
 
 # Index in the arrays of the heater output
