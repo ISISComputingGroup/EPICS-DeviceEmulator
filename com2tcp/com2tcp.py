@@ -51,8 +51,7 @@ if __name__ == "__main__":
 
             time.sleep(0.1)
     except (KeyboardInterrupt, SystemExit) as e:
-        sys.exit()
-        raise
+        pass
     finally:
         tcp_conn.close()
         serial_conn.close()
