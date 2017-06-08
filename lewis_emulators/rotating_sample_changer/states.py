@@ -22,3 +22,4 @@ class MovingState(State):
 
     def on_exit(self, dt):
         self._context.arm_lowered = True
+        
