@@ -1,5 +1,5 @@
 from collections import OrderedDict
-from states import DefaultState
+from states import DefaultState, GoingToSetpointState
 from lewis.devices import StateMachineDevice
 
 import time
@@ -12,7 +12,7 @@ class SimulatedInstron(StateMachineDevice):
 
         # When initialisation is complete, this is set to true and the device will enter a running state
         self.ready = True
-        self._control_channel = 1
+        self.control_channel = 1
         self._watchdog_status = (0, 0)
         self._control_mode = 0
         self._actuator_status = 0
@@ -37,6 +37,7 @@ class SimulatedInstron(StateMachineDevice):
     def _get_state_handlers(self):
         return {
             'default': DefaultState(),
+            'going': GoingToSetpointState(),
         }
 
     # This is a workaround for https://github.com/DMSC-Instrument-Data/lewis/issues/248
@@ -51,13 +52,16 @@ class SimulatedInstron(StateMachineDevice):
         return 'default'
 
     def _get_transition_handlers(self):
-        return OrderedDict([])
+        return OrderedDict([
+            (('default', 'going'), lambda: self._movement_type != 0 and self.channels[self.control_channel].value != self.channels[self.control_channel].ramp_amplitude_setpoint),
+            (('going', 'default'), lambda: self._movement_type == 0 or self.channels[self.control_channel].value == self.channels[self.control_channel].ramp_amplitude_setpoint),
+        ])
 
     def get_control_channel(self):
-        return self._control_channel
+        return self.control_channel
 
     def set_control_channel(self, channel):
-        self._control_channel = channel
+        self.control_channel = channel
 
     def get_watchdog_status(self):
         return self._watchdog_status
