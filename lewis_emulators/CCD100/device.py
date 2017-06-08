@@ -6,5 +6,3 @@ class SimulatedCCD100(Device):
     setpoint = 0.00
     units = ""
     setpoint_mode = 1
-
-

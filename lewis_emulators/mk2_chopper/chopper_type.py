@@ -25,7 +25,6 @@ class ChopperType(object):
         manufacturer_low = manufacturer.lower()
         self._manufacturer = manufacturer_low if manufacturer_low in ChopperType.MANUFACTURERS else ChopperType.INDRAMAT
 
-
     def get_closest_valid_frequency(self, frequency):
         return self._get_frequency_and_phase_closest_to_frequency(frequency)[0]
 

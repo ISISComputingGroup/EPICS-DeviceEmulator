@@ -9,15 +9,12 @@ from .states import MonitorState, ControlState
 
 class SimulatedNeocera(StateMachineDevice):
     """
-    Simulated Neocera LTG21 temperature controller
+    Simulated Neocera LTG21 temperature controller.
     """
 
     def _initialize_data(self):
-
         """
-
-        Sets the initial state of the device
-
+        Sets the initial state of the device.
         """
 
         # desired current state of the system
@@ -56,11 +53,8 @@ class SimulatedNeocera(StateMachineDevice):
         self._error = NeoceraDeviceErrors()
 
     def _get_state_handlers(self):
-
         """
-
-        Returns: states and their names
-
+        :return: states and their names
         """
         return {
             MonitorState.NAME: MonitorState(),
@@ -69,20 +63,14 @@ class SimulatedNeocera(StateMachineDevice):
 
     def _get_initial_state(self):
         """
-
-        Returns: the name of the initial state
-
+        :return: the name of the initial state
         """
         return ControlState.NAME
 
     def _get_transition_handlers(self):
-
         """
-
-        Returns: the state transitions
-
+        :return: the state transitions
         """
-
         return OrderedDict([
             ((MonitorState.NAME, ControlState.NAME), lambda: self.current_state == ControlState.NAME),
             ((ControlState.NAME, MonitorState.NAME), lambda: self.current_state == MonitorState.NAME),
@@ -90,25 +78,19 @@ class SimulatedNeocera(StateMachineDevice):
 
     def set_state_monitor(self):
         """
-
-        Sets the current state to MONITOR
-
+        Sets the current state to MONITOR.
         """
         self.current_state = MonitorState.NAME
 
     def set_state_control(self):
         """
-
-        Sets the current state to CONTROL
-
+        Sets the current state to CONTROL.
         """
         self.current_state = ControlState.NAME
 
     @property
     def state(self):
         """
-
-        Returns: the state
-
+        :return: the state
         """
         return self._csm.state
