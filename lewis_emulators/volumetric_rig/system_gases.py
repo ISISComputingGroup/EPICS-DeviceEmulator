@@ -3,7 +3,7 @@ from gas import Gas
 
 class SystemGases(object):
     """
-    The collection of gases that are available within the system
+    The collection of gases that are available within the system.
     """
     def __init__(self, gases=list()):
         self._gases = set()

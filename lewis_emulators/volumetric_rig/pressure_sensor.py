@@ -12,7 +12,7 @@ class PressureSensor(Sensor):
 
     def set_value(self, v, target):
         """
-        Updates the pressure reading with a new value along with the sensor's status
+        Updates the pressure reading with a new value along with the sensor's status.
 
         :param v: The new value
         :param target: The target/limit value

@@ -7,15 +7,15 @@ from constants import HEATER_INDEX
 class OffState(State):
     """
     Device is in off state.
-    It does not display the temperature on the front it is not monitoring or controlling it.
 
+    It does not display the temperature on the front it is not monitoring or controlling it.
     """
     NAME = 'off'
 
 
 class MonitorState(State):
     """
-    Temperature is being monitored but heater is switched off
+    Temperature is being monitored but heater is switched off.
     """
     NAME = 'monitor'
 

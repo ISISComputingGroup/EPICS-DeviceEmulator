@@ -60,7 +60,7 @@ class VolumetricRigStreamInterface(StreamAdapter):
 
     def purge(self, chars):
         """
-        Responds any current input to the screen without executing it
+        Responds any current input to the screen without executing it.
 
         :param chars: Whatever characters are left over in the buffer
         :return: Purge message including ignored input
@@ -73,7 +73,8 @@ class VolumetricRigStreamInterface(StreamAdapter):
         ])
 
     def get_identity(self):
-        """ Responds with the devices identity
+        """
+        Responds with the devices identity.
 
         :return: Device identity
         """
@@ -104,7 +105,7 @@ class VolumetricRigStreamInterface(StreamAdapter):
         Get information about a specific buffer, its valve state and the gases connected to it.
 
         :param buffer_number_raw : The buffer "number" entered by a user. Although a number is expected, the command
-         will accept other types of input
+            will accept other types of input
         :return: Information about the requested buffer
         """
         buffer_number = convert_raw_to_int(buffer_number_raw)
@@ -123,7 +124,7 @@ class VolumetricRigStreamInterface(StreamAdapter):
 
     def get_ethernet_and_hmi_status(self):
         """
-        Get information about the rig's hmi and plc ethernet devices
+        Get information about the rig's hmi and plc ethernet devices.
 
         :return: Information about the ethernet devices status. The syntax of the return string is odd: the
              separators are not consistent
@@ -137,7 +138,7 @@ class VolumetricRigStreamInterface(StreamAdapter):
 
     def get_gas_control_and_status(self):
         """
-        Get a list of information about all the buffers, their associated gases and valve statuses
+        Get a list of information about all the buffers, their associated gases and valve statuses.
 
         :return: Buffer information. One line per buffer with a header
         """
@@ -149,7 +150,7 @@ class VolumetricRigStreamInterface(StreamAdapter):
 
     def get_gas_mix_matrix(self):
         """
-        Get information about which gases can be mixed together
+        Get information about which gases can be mixed together.
 
         :return: A 2D matrix representation of the ability to mix different gases with column and row titles
         """
@@ -185,13 +186,11 @@ class VolumetricRigStreamInterface(StreamAdapter):
 
     def gas_mix_check(self, gas1_index_raw, gas2_index_raw):
         """
-        Query whether two gases can be mixed
+        Query whether two gases can be mixed.
 
-        Args:
-            gas1_index_raw : The index of the first gas. Although a number is expected, the command will
+        :param gas1_index_raw : The index of the first gas. Although a number is expected, the command will
              accept other types of input
-            gas2_index_raw : As above for the 2nd gas
-
+        :param gas2_index_raw : As above for the 2nd gas
 
         :return: An echo of the name and index of the requested gases as well as an ok/NO indicating whether the
              gases can be mixed
@@ -210,8 +209,7 @@ class VolumetricRigStreamInterface(StreamAdapter):
 
     def get_gas_number_available(self):
         """
-        Get the number of available gases
-
+        Get the number of available gases.
 
         :return: The number of available gases
         """
@@ -219,7 +217,7 @@ class VolumetricRigStreamInterface(StreamAdapter):
 
     def get_hmi_status(self):
         """
-        Get the current status of the HMI
+        Get the current status of the HMI.
 
         :return: Information about the HMI
         """
@@ -234,7 +232,7 @@ class VolumetricRigStreamInterface(StreamAdapter):
 
     def get_hmi_count_cycles(self):
         """
-        Get information about how frequently the HMI is disconnected
+        Get information about how frequently the HMI is disconnected.
 
         :return: A list of integers indicating the number of occurrences of a disconnected count cycle of a specific
              length
@@ -243,10 +241,9 @@ class VolumetricRigStreamInterface(StreamAdapter):
 
     def get_memory_location(self, location_raw):
         """
-        Get the value stored in a particular location in memory
+        Get the value stored in a particular location in memory.
 
-        Args:
-            location_raw : The memory location to read. Although a number is expected, the command will accept other
+        :param location_raw : The memory location to read. Although a number is expected, the command will accept other
              types of input
 
         :return: The memory location and the value stored there
@@ -257,7 +254,7 @@ class VolumetricRigStreamInterface(StreamAdapter):
 
     def get_pressure_and_temperature_status(self):
         """
-        Get the status of the temperature and pressure sensors
+        Get the status of the temperature and pressure sensors.
 
         :return: A letter for each sensor indicating its status. Refer to the spec for the meaning and sensor order
         """
@@ -277,7 +274,7 @@ class VolumetricRigStreamInterface(StreamAdapter):
 
     def get_pressures(self):
         """
-        Get the current pressure sensor readings, and target pressure
+        Get the current pressure sensor readings, and target pressure.
 
         :return: The pressure readings from each of the pressure sensors and the target pressure which, if exceeded,
              will cause all buffer valves to close and disable
@@ -288,7 +285,7 @@ class VolumetricRigStreamInterface(StreamAdapter):
 
     def get_temperatures(self):
         """
-        Get the current temperature reading
+        Get the current temperature reading.
 
         :return: The current temperature for each of the temperature sensors
         """
@@ -297,7 +294,7 @@ class VolumetricRigStreamInterface(StreamAdapter):
 
     def get_valve_status(self):
         """
-        Get the status of the buffer and system valves
+        Get the status of the buffer and system valves.
 
         :return: The status of each of the system valves represented by a letter. Refer to the specification for the
             exact meaning and order
@@ -313,7 +310,7 @@ class VolumetricRigStreamInterface(StreamAdapter):
     @staticmethod
     def _convert_raw_valve_to_int(raw):
         """
-        Get the valve number from its identifier
+        Get the valve number from its identifier.
 
         :param raw: The raw valve identifier
         :return: An integer indicating the valve number
@@ -328,7 +325,7 @@ class VolumetricRigStreamInterface(StreamAdapter):
 
     def _set_valve_status(self, valve_identifier_raw, set_to_open=None, set_to_enabled=None):
         """
-        Change the valve status
+        Change the valve status.
 
         :param valve_identifier_raw: A raw value that identifies the valve
         :param set_to_open: Whether to set the valve to open(True)/closed(False)/do noting(None)
@@ -409,7 +406,7 @@ class VolumetricRigStreamInterface(StreamAdapter):
 
     def close_valve(self, valve_number_raw):
         """
-        Close a valve
+        Close a valve.
 
         :param valve_number_raw: The number of the valve to close. The first n valves correspond to the buffers where n
              is the number of buffers. The n+1th valve is the cell valve, the n+2nd valve is for the vacuum. The supply
@@ -421,7 +418,7 @@ class VolumetricRigStreamInterface(StreamAdapter):
 
     def open_valve(self, valve_number_raw):
         """
-        Open a valve
+        Open a valve.
 
         :param valve_number_raw : The number of the valve to close. The first n valves correspond to the buffers where n
              is the number of buffers. The n+1th valve is the cell valve, the n+2nd valve is for the vacuum. The supply
@@ -433,7 +430,7 @@ class VolumetricRigStreamInterface(StreamAdapter):
 
     def enable_valve(self, valve_number_raw):
         """
-        Enable a valve
+        Enable a valve.
 
         :param valve_number_raw: The number of the valve to close. The first n valves correspond to the buffers where n
              is the number of buffers. The n+1th valve is the cell valve, the n+2nd valve is for the vacuum. The supply
@@ -445,7 +442,7 @@ class VolumetricRigStreamInterface(StreamAdapter):
 
     def disable_valve(self, valve_number_raw):
         """
-        Disable a valve
+        Disable a valve.
 
         :param valve_number_raw: The number of the valve to close. The first n valves correspond to the buffers where n
              is the number of buffers. The n+1th valve is the cell valve, the n+2nd valve is for the vacuum. The supply
@@ -520,7 +517,7 @@ class VolumetricRigStreamInterface(StreamAdapter):
 
     def set_buffer_system_gas(self, buffer_index_raw, gas_index_raw):
         """
-        Changes the system gas associated with a particular buffer
+        Changes the system gas associated with a particular buffer.
 
         :param buffer_index_raw: The index of the buffer to update
         :param gas_index_raw: The index of the gas to update
@@ -559,7 +556,7 @@ class VolumetricRigStreamInterface(StreamAdapter):
 
     def set_pressures(self, value_raw):
         """
-        Set the reading for all pressure sensors to a fixed value
+        Set the reading for all pressure sensors to a fixed value.
 
         :param value_raw: The value to apply to the pressure sensors
         :return: Echo the new pressure
@@ -570,7 +567,7 @@ class VolumetricRigStreamInterface(StreamAdapter):
 
     def set_pressure_target(self, value_raw):
         """
-        Set the target (limit) pressure for the system
+        Set the target (limit) pressure for the system.
 
         :param value_raw: The new pressure target
         :return: Echo the new target
