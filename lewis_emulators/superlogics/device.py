@@ -18,7 +18,7 @@ class SimulatedSuperlogics(StateMachineDevice):
         """
 
         self._values = [0.]*8
-        self.address = "AB"
+        self._version = "A1.0"
 
     def _get_state_handlers(self):
 
@@ -50,16 +50,6 @@ class SimulatedSuperlogics(StateMachineDevice):
         return OrderedDict([
         ])
 
-    def get_values(self):
-        return self._values
-
-    @property
-    def value1(self):
-        """
-        Returns: the value of PV Value1
-        """
-        return self._values[0]
-
     @property
     def values(self):
         """
@@ -74,3 +64,17 @@ class SimulatedSuperlogics(StateMachineDevice):
         """
         self._values = values
 
+    @property
+    def version(self):
+        """
+        :return: The firmware version of the device
+        """
+        return self._version
+
+    @version.setter
+    def version(self, version):
+        """
+        Set the firmware version of this device
+        :param version: the firmware version as a string
+        """
+        self._version = version

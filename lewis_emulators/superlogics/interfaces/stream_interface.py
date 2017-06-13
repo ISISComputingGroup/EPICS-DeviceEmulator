@@ -8,7 +8,8 @@ class SuperlogicsStreamInterface(StreamAdapter):
     """
 
     commands = {
-        CmdBuilder("get_values").escape("#").arg("[0-9]+").build()
+        CmdBuilder("get_values").escape("#").arg("[0-9]+").build(),
+        CmdBuilder("get_version").escape("$").arg("[0-9]+").escape("F").build()
     }
 
     in_terminator = "\r"
@@ -31,5 +32,13 @@ class SuperlogicsStreamInterface(StreamAdapter):
 
         Returns: List of values, one for each connected channel
         """
-        formatted_values = map(lambda s: "+{0:.2f}".format(s), self._device.get_values())
+        formatted_values = map(lambda s: "+{0:.2f}".format(s), self._device.values)
         return ",".join(formatted_values)
+
+    def get_version(self, address):
+        """
+        Get the firmware version from the device
+        :param address: the address to read the version from
+        :return: string representing the firmware version for the address
+        """
+        return "!{0}{1}".format(address, self._device.version)
