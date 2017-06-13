@@ -17,8 +17,11 @@ class SimulatedSuperlogics(StateMachineDevice):
 
         """
 
-        self._values = [0.]*8
-        self._version = "A1.0"
+        self._disconnected = False
+        self._values_1 = [0.]*8
+        self._values_2 = [0.]*8
+        self._version_1 = "A1.0"
+        self._version_2 = "A1.0"
 
     def _get_state_handlers(self):
 
@@ -51,30 +54,77 @@ class SimulatedSuperlogics(StateMachineDevice):
         ])
 
     @property
-    def values(self):
+    def values_1(self):
         """
-        :return: All values on this channel
+        :return: All values on this address
         """
-        return self._values
+        return self._values_1
 
-    @values.setter
-    def values(self, values):
+    @values_1.setter
+    def values_1(self, values):
         """
-        :param values: set all the values on this channel
+        :param values: set all the values on this address
         """
-        self._values = values
+        self._values_1 = values
 
     @property
-    def version(self):
+    def values_2(self):
         """
-        :return: The firmware version of the device
+        :return: All values on this address
         """
-        return self._version
+        return self._values_2
 
-    @version.setter
-    def version(self, version):
+    @values_2.setter
+    def values_2(self, values):
         """
-        Set the firmware version of this device
+        :param values: set all the values on this address
+        """
+        self._values_2 = values
+
+    @property
+    def version_1(self):
+        """
+        :return: The firmware version of address 1 of the device
+        """
+        return self._version_1
+
+    @version_1.setter
+    def version_1(self, version):
+        """
+        Set the firmware version of address 1 this device
+        :param version: the firmware version of address 1 as a string
+        """
+        self._version_1 = version
+
+    @property
+    def version_2(self):
+        """
+        :return: The firmware version of address 2 of the device
+        """
+        print self._version_2
+        return self._version_2
+
+    @version_2.setter
+    def version_2(self, version):
+        """
+        Set the firmware version on address 2 of this device
         :param version: the firmware version as a string
         """
-        self._version = version
+        print version
+        self._version_2 = version
+
+    @property
+    def disconnected(self):
+        """
+        Get if the current device is in a "disconnected" state
+        :return: bool for if the device is disconnected
+        """
+        return self._disconnected
+
+    @disconnected.setter
+    def disconnected(self, value):
+        """
+        Set if the device is disconnected (for testing purposes)
+        :param value: bool to set whether the device is disconnected
+        """
+        self._disconnected = value

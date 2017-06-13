@@ -32,7 +32,11 @@ class SuperlogicsStreamInterface(StreamAdapter):
 
         Returns: List of values, one for each connected channel
         """
-        formatted_values = map(lambda s: "+{0:.2f}".format(s), self._device.values)
+        if self._device.disconnected:
+            return None
+
+        values = self._device.values_1 if address == "01" else self._device.values_2
+        formatted_values = map(lambda s: "+{0:.2f}".format(s), values)
         return ",".join(formatted_values)
 
     def get_version(self, address):
@@ -41,4 +45,8 @@ class SuperlogicsStreamInterface(StreamAdapter):
         :param address: the address to read the version from
         :return: string representing the firmware version for the address
         """
-        return "!{0}{1}".format(address, self._device.version)
+        if self._device.disconnected:
+            return None
+
+        version = self._device.version_1 if address == "01" else self._device.version_2
+        return "!{0}{1}".format(address, version)
