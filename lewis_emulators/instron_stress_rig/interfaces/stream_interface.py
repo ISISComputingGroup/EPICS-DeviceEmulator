@@ -36,7 +36,7 @@ class InstronStreamInterface(StreamAdapter):
         Cmd("get_waveform_status", "^Q200$"),
         Cmd("abort_waveform_generation", "^C200,0$"),
         Cmd("start_waveform_generation", "^C200,1$"),
-        Cmd("stop_waveform_generation", "^C200,4$"),
+        Cmd("request_stop_waveform_generation", "^C200,4$"),
     }
 
     in_terminator = "\r\n"
@@ -127,5 +127,5 @@ class InstronStreamInterface(StreamAdapter):
     def abort_waveform_generation(self):
         return self._device.abort_waveform_generation()
 
-    def stop_waveform_generation(self):
-        return self._device.stop_waveform_generation()
+    def request_stop_waveform_generation(self):
+        return self._device.finish_waveform_generation()

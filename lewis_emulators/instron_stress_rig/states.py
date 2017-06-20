@@ -12,6 +12,8 @@ class DefaultState(State):
             print "Watchdog time expired, going back to front panel control mode"
             device.set_control_mode(0)
 
+        device.stop_waveform_generator_if_requested()
+
 
 class GoingToSetpointState(DefaultState):
     def in_state(self, dt):

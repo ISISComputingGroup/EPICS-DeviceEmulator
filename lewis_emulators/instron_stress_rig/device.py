@@ -168,9 +168,12 @@ class SimulatedInstron(StateMachineDevice):
     def abort_waveform_generation(self):
         self._waveform_generator.abort()
 
-    def stop_waveform_generation(self):
-        self._waveform_generator.stop()
+    def finish_waveform_generation(self):
+        self._waveform_generator.finish()
 
     def start_waveform_generation(self):
         self._waveform_generator.start()
 
+    def stop_waveform_generation_if_requested(self):
+        if self._waveform_generator.time_to_stop():
+            self._waveform_generator.stop()

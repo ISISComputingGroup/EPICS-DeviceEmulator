@@ -2,11 +2,12 @@ from waveform_generator_states import WaveformGeneratorStates
 from waveform_types import WaveformTypes
 from quart_counter_actions import QuarterCycleCounterActions
 from quart_counter_states import QuarterCycleCounterStates
-from multiprocessing import Pool
-from time import sleep
+from datetime import datetime, timedelta
 
 
 class WaveformGenerator(object):
+    STOP_DELAY = timedelta(seconds=3)
+
     def __init__(self):
         self.state = WaveformGeneratorStates.STOPPED
         self.amplitude = 1.0
@@ -15,21 +16,24 @@ class WaveformGenerator(object):
         self.quart_action = QuarterCycleCounterActions.NO_ACTION
         self.quart = 0
         self.quart_state = QuarterCycleCounterStates.OFF
+        self.stop_requested_at_time = None
 
     def abort(self):
         self.state = WaveformGeneratorStates.ABORTED
+        self.stop_requested_at_time = None
+
+    def finish(self):
+        self.stop_requested_at_time = datetime.now()
+        self.state = WaveformGeneratorStates.FINISHING
+
+    def time_to_stop(self):
+        return self.stop_requested_at_time is not None and \
+               (datetime.now() - self.stop_requested_at_time) > WaveformGenerator.STOP_DELAY
 
     def stop(self):
-        def finish():
-            self.state = WaveformGeneratorStates.STOPPED
-
-        def wait_for_finish():
-            time_to_finish = 3
-            sleep(time_to_finish)
-
-        if self.state in [WaveformGeneratorStates.RUNNING, WaveformGeneratorStates.HOLDING]:
-            self.state = WaveformGeneratorStates.FINISHING
-            Pool(processes=1).apply_async(wait_for_finish, [], finish)
+        self.stop_requested_at_time = None
+        self.state = WaveformGeneratorStates.STOPPED
 
     def start(self):
         self.state = WaveformGeneratorStates.RUNNING
+        self.stop_requested_at_time = None
