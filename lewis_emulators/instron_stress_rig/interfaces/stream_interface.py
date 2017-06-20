@@ -19,6 +19,8 @@ class InstronStreamInterface(StreamAdapter):
         Cmd("set_movement_type", "^C1,([0-3])$"),
         Cmd("get_step_time", "^Q86,([1-3])$"),
         Cmd("set_step_time", "^C86,([1-3]),([0-9]*.[0-9]*)$"),
+
+        # Channel commands
         Cmd("get_chan_waveform_type", "^Q2,([1-3])$"),
         Cmd("set_chan_waveform_type", "^C2,([1-3]),([0-5])$"),
         Cmd("get_ramp_amplitude_setpoint", "^Q4,([1-3])$"),
@@ -29,6 +31,12 @@ class InstronStreamInterface(StreamAdapter):
         Cmd("get_chan_area", "^Q341,([1-3])$"),
         Cmd("set_chan_area", "^C341,([1-3]),([0-9]*.[0-9]*)$"),
         Cmd("get_chan_type", "^Q307,([1-3])$"),
+
+        # Waveform commands
+        Cmd("get_waveform_status", "^Q200$"),
+        Cmd("abort_waveform_generation", "^C200,0$"),
+        Cmd("start_waveform_generation", "^C200,1$"),
+        Cmd("stop_waveform_generation", "^C200,4$"),
     }
 
     in_terminator = "\r\n"
@@ -112,3 +120,12 @@ class InstronStreamInterface(StreamAdapter):
         type_1 = self._device.get_chan_type_1(int(channel))
         type_2 = self._device.get_chan_type_2(int(channel))
         return "{a},{b}".format(a=type_1, b=type_2)
+
+    def get_waveform_status(self):
+        return self._device.get_waveform_status()
+
+    def abort_waveform_generation(self):
+        return self._device.abort_waveform_generation()
+
+    def stop_waveform_generation(self):
+        return self._device.stop_waveform_generation()

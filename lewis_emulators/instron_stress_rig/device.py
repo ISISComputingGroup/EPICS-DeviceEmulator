@@ -2,6 +2,7 @@ from collections import OrderedDict
 from states import DefaultState, GoingToSetpointState
 from lewis.devices import StateMachineDevice
 from channel import PositionChannel, StrainChannel, StressChannel
+from waveform_generator import WaveformGenerator
 
 import time
 
@@ -30,6 +31,8 @@ class SimulatedInstron(StateMachineDevice):
 
         # Maps a channel number to a channel object
         self.channels = {1: PositionChannel(), 2: StressChannel(), 3: StrainChannel()}
+
+        self._waveform_generator = WaveformGenerator()
 
     def raise_exception_if_cannot_write(self):
         if self._control_mode != 1:
@@ -158,3 +161,16 @@ class SimulatedInstron(StateMachineDevice):
 
     def get_chan_type_2(self, channel):
         return self.channels[channel].type_2
+
+    def get_waveform_status(self):
+        return self._waveform_generator.state
+
+    def abort_waveform_generation(self):
+        self._waveform_generator.abort()
+
+    def stop_waveform_generation(self):
+        self._waveform_generator.stop()
+
+    def start_waveform_generation(self):
+        self._waveform_generator.start()
+
