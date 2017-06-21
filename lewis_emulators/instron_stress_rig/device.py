@@ -52,6 +52,10 @@ class SimulatedInstron(StateMachineDevice):
     def get_channel_param(self, index, param):
         return getattr(self.channels[int(index)], str(param))
 
+    # This is a workaround for https://github.com/DMSC-Instrument-Data/lewis/issues/248
+    def set_waveform_state(self, value):
+        self._waveform_generator.state = value
+
     def _get_initial_state(self):
         return 'default'
 
@@ -177,3 +181,39 @@ class SimulatedInstron(StateMachineDevice):
     def stop_waveform_generation_if_requested(self):
         if self._waveform_generator.time_to_stop():
             self._waveform_generator.stop()
+
+    def get_waveform_type(self, channel):
+        try:
+            return self._waveform_generator.type[channel]
+        except NameError:
+            print "Unable to get waveform generator type. Channel: {0}".format(channel)
+
+    def set_waveform_type(self, channel, value):
+        try:
+            self._waveform_generator.type[channel] = value
+        except NameError:
+            print "Unable to set waveform generator type. Channel: {0}, Value: {1}".format(channel, value)
+
+    def get_waveform_amplitude(self, channel):
+        try:
+            return self._waveform_generator.amplitude[channel]
+        except NameError:
+            print "Unable to get waveform generator amplitude. Channel: {0}".format(channel)
+
+    def set_waveform_amplitude(self, channel, value):
+        try:
+            self._waveform_generator.amplitude[channel] = value
+        except NameError:
+            print "Unable to set waveform generator amplitude. Channel: {0}, Value: {1}".format(channel, value)
+
+    def get_waveform_frequency(self, channel):
+        try:
+            return self._waveform_generator.frequency[channel]
+        except NameError:
+            print "Unable to get waveform generator frequency. Channel: {0}".format(channel)
+
+    def set_waveform_frequency(self, channel, value):
+        try:
+            self._waveform_generator.frequency[channel] = value
+        except NameError:
+            print "Unable to set waveform generator frequency. Channel: {0}, Value: {1}".format(channel, value)

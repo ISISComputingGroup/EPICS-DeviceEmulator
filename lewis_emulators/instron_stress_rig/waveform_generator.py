@@ -10,9 +10,9 @@ class WaveformGenerator(object):
 
     def __init__(self):
         self.state = GenStates.STOPPED
-        self.amplitude = 1.0
-        self.frequency = 1.0
-        self.type = WaveformTypes.SINE
+        self.amplitude = {i+1: 0.0 for i in range(3)}
+        self.frequency = {i+1: 0.0 for i in range(3)}
+        self.type = {i+1: WaveformTypes.SINE for i in range(3)}
         self.quart_action = QuartActions.NO_ACTION
         self.quart = 0
         self.quart_state = QuartStates.OFF
@@ -29,7 +29,6 @@ class WaveformGenerator(object):
             self.state = GenStates.FINISHING
 
     def time_to_stop(self):
-        print "Waveform generator state: " + str(self.state)
         return self.stop_requested_at_time is not None and \
                (datetime.now() - self.stop_requested_at_time) > WaveformGenerator.STOP_DELAY
 
@@ -43,4 +42,3 @@ class WaveformGenerator(object):
 
     def _active(self):
         return self.state in [GenStates.RUNNING, GenStates.HOLDING]
-
