@@ -43,6 +43,7 @@ class InstronStreamInterface(StreamAdapter):
         Cmd("set_waveform_amplitude", "^C202,([1-3]),([0-9]*.[0-9]*)$"),
         Cmd("get_waveform_frequency", "^Q203,([1-3])$"),
         Cmd("set_waveform_frequency", "^C203,([1-3]),([0-9]*.[0-9]*)$"),
+        Cmd("set_waveform_hold", "^C213,3$"),
 
         # Waveform (quarter counter event detector) commands
         Cmd("arm_quarter_counter", "^C212,2$"),
@@ -139,29 +140,35 @@ class InstronStreamInterface(StreamAdapter):
     def get_waveform_status(self):
         return self._device.get_waveform_status()
 
+    def start_waveform_generation(self):
+        self._device.start_waveform_generation()
+
     def abort_waveform_generation(self):
-        return self._device.abort_waveform_generation()
+        self._device.abort_waveform_generation()
 
     def request_stop_waveform_generation(self):
-        return self._device.finish_waveform_generation()
+        self._device.finish_waveform_generation()
 
     def get_waveform_type(self, channel):
         return self._device.get_waveform_type(int(channel))
 
     def set_waveform_type(self, channel, type):
-        return self._device.set_waveform_type(int(channel), int(type))
+        self._device.set_waveform_type(int(channel), int(type))
 
     def get_waveform_amplitude(self, channel):
         return self._device.get_waveform_amplitude(int(channel))
 
     def set_waveform_amplitude(self, channel, value):
-        return self._device.set_waveform_amplitude(int(channel), float(value))
+        self._device.set_waveform_amplitude(int(channel), float(value))
 
     def get_waveform_frequency(self, channel):
         return self._device.get_waveform_frequency(int(channel))
 
     def set_waveform_frequency(self, channel, value):
-        return self._device.set_waveform_frequency(int(channel), float(value))
+        self._device.set_waveform_frequency(int(channel), float(value))
+
+    def set_waveform_hold(self):
+        self._device.set_waveform_hold()
 
     # Waveform quarter counter
 

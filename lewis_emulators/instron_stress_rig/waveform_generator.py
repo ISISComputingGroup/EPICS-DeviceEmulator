@@ -36,7 +36,10 @@ class WaveformGenerator(object):
     def start(self):
         self.state = GenStates.RUNNING
         self.stop_requested_at_time = None
-        self.quart_counter.start()
+
+    def hold(self):
+        if self._active():
+            self.state = GenStates.HOLDING
 
     def _active(self):
         return self.state in [GenStates.RUNNING, GenStates.HOLDING]
