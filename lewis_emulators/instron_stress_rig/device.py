@@ -238,3 +238,6 @@ class SimulatedInstron(StateMachineDevice):
 
     def get_quarter_counter_status(self):
         return self._waveform_generator.quart_counter.state
+
+    def set_waveform_maintain_log(self):
+        return self._waveform_generator.maintain_log()

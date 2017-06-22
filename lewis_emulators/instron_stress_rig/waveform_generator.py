@@ -41,5 +41,9 @@ class WaveformGenerator(object):
         if self._active():
             self.state = GenStates.HOLDING
 
+    def maintain_log(self):
+        # Does nothing in current emulator
+        pass
+
     def _active(self):
         return self.state in [GenStates.RUNNING, GenStates.HOLDING]

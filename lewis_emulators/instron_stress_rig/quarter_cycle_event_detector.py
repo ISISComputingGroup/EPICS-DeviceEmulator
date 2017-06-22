@@ -1,5 +1,4 @@
 from quarter_cycle_event_detector_states import QuarterCycleEventDetectorStates as QCEDStates
-from quart_cycle_event_detector_actions import QuarterCycleEventDetectorActions as QCEDActions
 
 
 class QuarterCycleEventDetector(object):
@@ -8,7 +7,6 @@ class QuarterCycleEventDetector(object):
         self.counts = 0
         self.max_counts = 0
         self.state = QCEDStates.PREPARED
-        self.action = QCEDActions.NO_ACTION
 
     def reset(self):
         self.__init__()

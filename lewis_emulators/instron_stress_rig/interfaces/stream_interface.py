@@ -44,6 +44,7 @@ class InstronStreamInterface(StreamAdapter):
         Cmd("get_waveform_frequency", "^Q203,([1-3])$"),
         Cmd("set_waveform_frequency", "^C203,([1-3]),([0-9]*.[0-9]*)$"),
         Cmd("set_waveform_hold", "^C213,3$"),
+        Cmd("set_waveform_maintain_log", "^C214,0$"),
 
         # Waveform (quarter counter event detector) commands
         Cmd("arm_quarter_counter", "^C212,2$"),
@@ -186,3 +187,6 @@ class InstronStreamInterface(StreamAdapter):
 
     def get_quarter_counter_status(self):
         return self._device.get_quarter_counter_status()
+
+    def set_waveform_maintain_log(self):
+        self._device.set_waveform_maintain_log()
