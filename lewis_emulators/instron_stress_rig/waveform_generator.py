@@ -1,8 +1,7 @@
 from waveform_generator_states import WaveformGeneratorStates as GenStates
 from waveform_types import WaveformTypes
-from quart_counter_actions import QuarterCycleCounterActions as QuartActions
-from quart_counter_states import QuarterCycleCounterStates as QuartStates
 from datetime import datetime, timedelta
+from quarter_cycle_event_detector import QuarterCycleEventDetector as QCED
 
 
 class WaveformGenerator(object):
@@ -13,10 +12,8 @@ class WaveformGenerator(object):
         self.amplitude = {i+1: 0.0 for i in range(3)}
         self.frequency = {i+1: 0.0 for i in range(3)}
         self.type = {i+1: WaveformTypes.SINE for i in range(3)}
-        self.quart_action = QuartActions.NO_ACTION
-        self.quart = 0
-        self.quart_state = QuartStates.OFF
         self.stop_requested_at_time = None
+        self.quart_counter = QCED()
 
     def abort(self):
         if self._active():
@@ -39,6 +36,7 @@ class WaveformGenerator(object):
     def start(self):
         self.state = GenStates.RUNNING
         self.stop_requested_at_time = None
+        self.quart_counter.start()
 
     def _active(self):
         return self.state in [GenStates.RUNNING, GenStates.HOLDING]

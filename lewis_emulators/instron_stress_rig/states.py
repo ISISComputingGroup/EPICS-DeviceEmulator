@@ -4,6 +4,8 @@ from lewis.core import approaches
 
 
 class DefaultState(State):
+    TIME_SINCE_LAST_QUART_COUNT = 0
+
     def in_state(self, dt):
         device = self._context
         device.set_current_time()
@@ -14,12 +16,17 @@ class DefaultState(State):
 
         device.stop_waveform_generation_if_requested()
 
+        GoingToSetpointState.TIME_SINCE_LAST_QUART_COUNT += dt
+        if GoingToSetpointState.TIME_SINCE_LAST_QUART_COUNT > 1.0:
+            GoingToSetpointState.TIME_SINCE_LAST_QUART_COUNT = 0.0
+            device.quarter_cycle_event()
+
 
 class GoingToSetpointState(DefaultState):
+
     def in_state(self, dt):
         super(GoingToSetpointState, self).in_state(dt)
         device = self._context
         device.channels[device.control_channel].value = approaches.linear(device.channels[device.control_channel].value,
                                                                           device.channels[device.control_channel].ramp_amplitude_setpoint,
                                                                           0.001, dt)
-

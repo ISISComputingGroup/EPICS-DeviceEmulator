@@ -43,6 +43,13 @@ class InstronStreamInterface(StreamAdapter):
         Cmd("set_waveform_amplitude", "^C202,([1-3]),([0-9]*.[0-9]*)$"),
         Cmd("get_waveform_frequency", "^Q203,([1-3])$"),
         Cmd("set_waveform_frequency", "^C203,([1-3]),([0-9]*.[0-9]*)$"),
+
+        # Waveform (quarter counter event detector) commands
+        Cmd("arm_quarter_counter", "^C212,2$"),
+        Cmd("get_quarter_counts", "^Q210$"),
+        Cmd("set_max_quarter_counts", "^Q209,([0-9]+)$"),
+        Cmd("set_quarter_counter_off", "^C212,0$"),
+        Cmd("get_quarter_counter_status", "^Q212$"),
     }
 
     in_terminator = "\r\n"
@@ -155,3 +162,20 @@ class InstronStreamInterface(StreamAdapter):
 
     def set_waveform_frequency(self, channel, value):
         return self._device.set_waveform_frequency(int(channel), float(value))
+
+    # Waveform quarter counter
+
+    def arm_quarter_counter(self):
+        self._device.arm_quarter_counter()
+
+    def get_quarter_counts(self):
+        return self._device.get_quarter_counts()
+
+    def set_max_quarter_counts(self, val):
+        self._device.set_max_quarter_counts(int(val))
+
+    def set_quarter_counter_off(self):
+        self._device.set_quarter_counter_off()
+
+    def get_quarter_counter_status(self):
+        return self._device.get_quarter_counter_status()

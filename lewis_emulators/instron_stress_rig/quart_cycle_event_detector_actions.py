@@ -1,4 +1,4 @@
-class QuarterCycleCounterActions(object):
+class QuarterCycleEventDetectorActions(object):
     NO_ACTION = 0
     ACTUATOR_OFF = 1
     STOP = 2

@@ -217,3 +217,21 @@ class SimulatedInstron(StateMachineDevice):
             self._waveform_generator.frequency[channel] = value
         except NameError:
             print "Unable to set waveform generator frequency. Channel: {0}, Value: {1}".format(channel, value)
+
+    def quarter_cycle_event(self):
+        self._waveform_generator.quart_counter.count()
+
+    def arm_quarter_counter(self):
+        self._waveform_generator.quart_counter.arm()
+
+    def get_quarter_counts(self):
+        return self._waveform_generator.quart_counter.counts
+
+    def set_max_quarter_counts(self, val):
+        self._waveform_generator.quart_counter.max_counts = val
+
+    def set_quarter_counter_off(self):
+        self._waveform_generator.quart_counter.off()
+
+    def get_quarter_counter_status(self):
+        return self._waveform_generator.quart_counter.state
