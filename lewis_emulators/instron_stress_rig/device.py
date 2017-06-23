@@ -1,5 +1,5 @@
 from collections import OrderedDict
-from states import DefaultState, GoingToSetpointState
+from states import DefaultState, GoingToSetpointState, GeneratingWaveformState
 from lewis.devices import StateMachineDevice
 from channel import PositionChannel, StrainChannel, StressChannel
 from waveform_generator import WaveformGenerator
@@ -42,6 +42,7 @@ class SimulatedInstron(StateMachineDevice):
         return {
             'default': DefaultState(),
             'going': GoingToSetpointState(),
+            'waveform': GeneratingWaveformState(),
         }
 
     # This is a workaround for https://github.com/DMSC-Instrument-Data/lewis/issues/248
@@ -63,6 +64,8 @@ class SimulatedInstron(StateMachineDevice):
         return OrderedDict([
             (('default', 'going'), lambda: self._movement_type != 0 and self.channels[self.control_channel].value != self.channels[self.control_channel].ramp_amplitude_setpoint),
             (('going', 'default'), lambda: self._movement_type == 0 or self.channels[self.control_channel].value == self.channels[self.control_channel].ramp_amplitude_setpoint),
+            (('default', 'waveform'), lambda: self._waveform_generator.active()),
+            (('waveform', 'default'), lambda: not self._waveform_generator.active())
         ])
 
     def get_control_channel(self):
@@ -241,3 +244,6 @@ class SimulatedInstron(StateMachineDevice):
 
     def set_waveform_maintain_log(self):
         return self._waveform_generator.maintain_log()
+
+    def get_waveform_value(self):
+        return self._waveform_generator.get_value(self.control_channel)

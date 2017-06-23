@@ -24,3 +24,9 @@ class QuarterCycleEventDetector(object):
     def off(self):
         self.state = QCEDStates.OFF
         self.counts = 0
+
+    def cycles(self, fractional=True):
+        if fractional:
+            return self.counts/4.0
+        else:
+            return self.counts//4
