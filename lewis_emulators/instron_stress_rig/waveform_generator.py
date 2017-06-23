@@ -59,7 +59,7 @@ class WaveformGenerator(object):
             return math.copysign(a, sin(a, x, f))
 
         def sawtooth(a, x, f):
-            return a*(x % 1.0/f)
+            return a*(x % (1.0/f))
 
         def triangle(a, x, f):
             return a*(1 - 2*abs((f*x-0.5) % 2 - 1))
