@@ -90,9 +90,9 @@ class WaveformGenerator(object):
             elif wave_type == WaveformTypes.HAVERSINE:
                 return haversine(amp, val, freq)
             elif wave_type == WaveformTypes.HAVERSQUARE:
-                return havertriangle(amp, val, freq)
-            elif wave_type == WaveformTypes.HAVERTRIANGLE:
                 return haversquare(amp, val, freq)
+            elif wave_type == WaveformTypes.HAVERTRIANGLE:
+                return havertriangle(amp, val, freq)
             else:
                 return sin(amp, val, freq)
 
