@@ -18,7 +18,7 @@ class SimulatedInstron(StateMachineDevice):
         self._watchdog_status = (0, 0)
         self._control_mode = 0
         self._actuator_status = 0
-        self._movement_type = 2
+        self.movement_type = 0
         self.current_time = 0
         self.watchdog_refresh_time = 0
         self.status = 7680
@@ -53,8 +53,8 @@ class SimulatedInstron(StateMachineDevice):
 
     def _get_transition_handlers(self):
         return OrderedDict([
-            (('default', 'going'), lambda: self._movement_type != 0 and self.channels[self.control_channel].value != self.channels[self.control_channel].ramp_amplitude_setpoint),
-            (('going', 'default'), lambda: self._movement_type == 0 or self.channels[self.control_channel].value == self.channels[self.control_channel].ramp_amplitude_setpoint),
+            (('default', 'going'), lambda: self.movement_type != 0 and self.channels[self.control_channel].value != self.channels[self.control_channel].ramp_amplitude_setpoint),
+            (('going', 'default'), lambda: self.movement_type == 0 or self.channels[self.control_channel].value == self.channels[self.control_channel].ramp_amplitude_setpoint),
         ])
 
     def get_control_channel(self):
@@ -92,18 +92,18 @@ class SimulatedInstron(StateMachineDevice):
         self.raise_exception_if_cannot_write()
         self._actuator_status = int(status)
         if status == 0:
-            self._movement_type = 0
+            self.movement_type = 0
 
     def get_movement_type(self):
-        return self._movement_type
+        return self.movement_type
 
     def set_movement_type(self, mov_type):
         self.raise_exception_if_cannot_write()
 
         if self._waveform_mode == 0:
-            self._movement_type = mov_type
+            self.movement_type = mov_type
         else:
-            self._movement_type = mov_type + 3
+            self.movement_type = mov_type + 3
 
     def set_current_time(self):
         self.current_time = time.time()
@@ -152,11 +152,11 @@ class SimulatedInstron(StateMachineDevice):
         assert isinstance(self.channels[channel], StressChannel), "Area only applies to stress channel"
         self.channels[channel].area = value
 
-    def get_chan_type_1(self, channel):
-        return self.channels[channel].type_1
+    def get_chan_transducer_type(self, channel):
+        return self.channels[channel].transducer_type
 
-    def get_chan_type_2(self, channel):
-        return self.channels[channel].type_2
+    def get_chan_type(self, channel):
+        return self.channels[channel].channel_type
 
 
 class Channel(object):
@@ -166,22 +166,22 @@ class Channel(object):
         self.ramp_amplitude_setpoint = 0
         self.scale = 10
         self.value = 0
-        self.type_1 = 0
-        self.type_2 = 0
-
+        self.transducer_type = 0
 
 class PositionChannel(Channel):
     def __init__(self):
         super(PositionChannel, self).__init__()
-
+        self.channel_type = 3
 
 class StressChannel(Channel):
     def __init__(self):
         super(StressChannel, self).__init__()
         self.area = 1
+        self.channel_type = 2
 
 
 class StrainChannel(Channel):
     def __init__(self):
         super(StrainChannel, self).__init__()
         self.length = 1
+        self.channel_type = 4

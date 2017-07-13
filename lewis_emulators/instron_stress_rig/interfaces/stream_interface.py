@@ -109,6 +109,6 @@ class InstronStreamInterface(StreamAdapter):
         self._device.set_chan_area(int(channel), float(value))
 
     def get_chan_type(self, channel):
-        type_1 = self._device.get_chan_type_1(int(channel))
-        type_2 = self._device.get_chan_type_2(int(channel))
-        return "{a},{b}".format(a=type_1, b=type_2)
+        transducer_type = self._device.get_chan_transducer_type(int(channel))
+        chan_type = self._device.get_chan_type(int(channel))
+        return "{a},{b}".format(a=transducer_type, b=chan_type)
