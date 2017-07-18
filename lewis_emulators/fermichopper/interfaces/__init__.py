@@ -1,3 +1,3 @@
-from .stream_interface import Mk2ChopperStreamInterface
+from .stream_interface import FermichopperStreamInterface
 
-__all__ = ['Mk2ChopperStreamInterface']
+__all__ = ['FermichopperStreamInterface']

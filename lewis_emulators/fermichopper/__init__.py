@@ -1,3 +1,3 @@
-from .device import SimulatedMk2Chopper
+from .device import SimulatedFermichopper
 
-__all__ = ['SimulatedMk2Chopper2400']
+__all__ = ['SimulatedFermichopper']
