@@ -3,59 +3,48 @@ from lewis.adapters.stream import StreamAdapter, Cmd
 
 class JulichChecksum(object):
     @staticmethod
-    def hex_value(char):
-        if char == '0':
-            return 0x30
-        elif char == '1':
-            return 0x31
-        elif char == '2':
-            return 0x32
-        elif char == '3':
-            return 0x33
-        elif char == '4':
-            return 0x34
-        elif char == '5':
-            return 0x35
-        elif char == '6':
-            return 0x36
-        elif char == '7':
-            return 0x37
-        elif char == '8':
-            return 0x38
-        elif char == '9':
-            return 0x39
-        elif char == 'A':
-            return 0x41
-        elif char == 'B':
-            return 0x42
-        elif char == 'C':
-            return 0x43
-        elif char == 'D':
-            return 0x44
-        elif char == 'E':
-            return 0x45
-        elif char == 'F':
-            return 0x46
-        else:
-            assert False, "Invalid character - can't calculate hex value!"
+    def _hex_value(char):
+        """
+        Converts an uppercase hexed character to it's ASCII identifier
+        :param char: The character to convert
+        :return: the ascii code of the given character
+        """
+        assert char in list("0123456789ABCDEF"), "Invalid character - can't calculate hex value!"
+        return ord(char)
 
     @staticmethod
-    def julich_checksum(initialbyte, data):
-        assert len(initialbyte) == 1, "Checksum was called with more than one initial byte."
-        assert len(data) == 4, "Checksum was called with more than four data bytes"
-
-        alldata = list(data) + [initialbyte]
-
-        if all(x == '0' for x in alldata):
-            total = 0
-        else:
-            total = sum(JulichChecksum.hex_value(i) for i in alldata)
-
-        return hex(total).upper()[2:]
+    def calculate(data):
+        """
+        Calculates the Julich checksum of the given data
+        :param data: the input data (list of chars, length 5)
+        :return: the Julich checksum of the given input data
+        """
+        assert len(data) == 5, "Unexpected data length."
+        return "00" if all(x == '0' for x in data) else hex(sum(JulichChecksum._hex_value(i) for i in data)).upper()[-2:]
 
     @staticmethod
-    def verify_checksum(initialbyte, data, actual_checksum):
-        assert JulichChecksum.julich_checksum(initialbyte, data) == actual_checksum, "Checksum did not match"
+    def verify(initialbyte, data, actual_checksum):
+        """
+        Verifies that the checksum of received data is correct.
+        :param initialbyte: The first byte (str, length 1)
+        :param data: The data bytes (str, length 4)
+        :param actual_checksum: The transmitted checksum (str, length 2)
+        :return: Nothing
+        :raises: AssertionError: If the checksum didn't match or the inputs were invalid
+        """
+        assert len(initialbyte) == 1, "Initial byte should have length 1"
+        assert len(data) == 4, "Data should have length 4"
+        assert len(actual_checksum) == 2, "Actual checksum should have length 2"
+        assert JulichChecksum.calculate([initialbyte] + list(data)) == actual_checksum, "Checksum did not match"
+
+    @staticmethod
+    def append_checksum(data):
+        """
+        Utility method for appending the Julich checksum to the input data
+        :param data: the input data
+        :return: the input data with it's checksum appended
+        """
+        return data + JulichChecksum.calculate(data)
 
 
 class FermichopperStreamInterface(StreamAdapter):
@@ -74,14 +63,18 @@ class FermichopperStreamInterface(StreamAdapter):
         return str(error)
 
     def get_all_data(self, checksum):
-        # This is "known good" example data from the documentation.
+        JulichChecksum.verify('0', '0000', checksum)
         return "#10003F4"
 
     def execute_command(self, command, checksum):
-        # This is "known good" example data from the documentation.
-        print "Command was {command} and checksum was {checksum}".format(command=command, checksum=checksum)
+        JulichChecksum.verify('1', command, checksum)
 
-        JulichChecksum.verify_checksum('1', command, checksum)
+        valid_commands = ["0001", "0002", "0003", "0006", "0007"]
 
-        return "#10003F4"
+        assert command in valid_commands, "Invalid command."
+
+        if command == "0001":
+            self._device.set_property(4)
+
+        return "#" + JulichChecksum.append_checksum('2003F')
 

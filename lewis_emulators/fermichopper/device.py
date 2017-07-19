@@ -9,6 +9,7 @@ class SimulatedFermichopper(StateMachineDevice):
         """
         Initialize all of the device's attributes.
         """
+        self.property = 5
 
     def _get_state_handlers(self):
         return {
@@ -20,4 +21,10 @@ class SimulatedFermichopper(StateMachineDevice):
 
     def _get_transition_handlers(self):
         return OrderedDict([])
+
+    def set_property(self, value):
+        self.property = value
+
+    def get_property(self, value):
+        return self.property
 
