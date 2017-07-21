@@ -53,13 +53,14 @@ class FermichopperStreamInterface(StreamAdapter):
     commands = {
         Cmd("get_all_data", "^#00000([0-9A-F]{2})\$$"),
         Cmd("execute_command", "^#1([0-9A-F]{4})([0-9A-F]{2})\$$"),
-        # Cmd("bla", "^.*$"), # Catch-all command for debugging
+        # Cmd("catch_all", "^.*$"), # Catch-all command for debugging
     }
 
     in_terminator = "\n"
     out_terminator = "\n"
 
-    # def bla(self):
+    # Catch all command for debugging if the IOC sends strange characters in the checksum.
+    # def catch_all(self):
     #    pass
 
     def handle_error(self, request, error):
@@ -68,7 +69,15 @@ class FermichopperStreamInterface(StreamAdapter):
 
     def get_all_data(self, checksum):
         JulichChecksum.verify('#0', '0000', checksum)
-        return JulichChecksum.append_checksum('#1' + self._device.get_last_command()) + "#2003F0B#300061C"
+        return JulichChecksum.append_checksum('#1' + self._device.get_last_command()) \
+                + JulichChecksum.append_checksum("#2006F") \
+                + JulichChecksum.append_checksum("#30006") \
+                + JulichChecksum.append_checksum("#4464F") \
+                + JulichChecksum.append_checksum("#55208") \
+                + JulichChecksum.append_checksum("#60000") \
+                + JulichChecksum.append_checksum("#75209") \
+                + JulichChecksum.append_checksum("#80000") \
+                + JulichChecksum.append_checksum("#9002A")
 
     def execute_command(self, command, checksum):
         JulichChecksum.verify('#1', command, checksum)
