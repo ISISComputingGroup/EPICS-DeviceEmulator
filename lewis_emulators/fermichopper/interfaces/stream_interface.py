@@ -9,33 +9,32 @@ class JulichChecksum(object):
         :param char: The character to convert
         :return: the ascii code of the given character
         """
-        assert char in list("0123456789ABCDEF"), "Invalid character - can't calculate hex value!"
+        assert char in list("#0123456789ABCDEF"), "Invalid character - can't calculate hex value!"
         return ord(char)
 
     @staticmethod
-    def calculate(data):
+    def _calculate(alldata):
         """
         Calculates the Julich checksum of the given data
-        :param data: the input data (list of chars, length 5)
+        :param alldata: the input data (list of chars, length 5)
         :return: the Julich checksum of the given input data
         """
-        assert len(data) == 5, "Unexpected data length."
-        return "00" if all(x == '0' for x in data) else hex(sum(JulichChecksum._hex_value(i) for i in data)).upper()[-2:]
+        return "00" if all(x in ['0', '#'] for x in alldata) else hex(sum(JulichChecksum._hex_value(i) for i in alldata)).upper()[-2:]
 
     @staticmethod
-    def verify(initialbyte, data, actual_checksum):
+    def verify(header, data, actual_checksum):
         """
         Verifies that the checksum of received data is correct.
-        :param initialbyte: The first byte (str, length 1)
+        :param header: The leading # and the first byte (str, length 2)
         :param data: The data bytes (str, length 4)
         :param actual_checksum: The transmitted checksum (str, length 2)
         :return: Nothing
         :raises: AssertionError: If the checksum didn't match or the inputs were invalid
         """
-        assert len(initialbyte) == 1, "Initial byte should have length 1"
+        assert len(header) == 2, "Header should have length 2"
         assert len(data) == 4, "Data should have length 4"
         assert len(actual_checksum) == 2, "Actual checksum should have length 2"
-        assert JulichChecksum.calculate([initialbyte] + list(data)) == actual_checksum, "Checksum did not match"
+        assert JulichChecksum._calculate(list(header) + list(data)) == actual_checksum, "Checksum did not match"
 
     @staticmethod
     def append_checksum(data):
@@ -44,7 +43,8 @@ class JulichChecksum(object):
         :param data: the input data
         :return: the input data with it's checksum appended
         """
-        return data + JulichChecksum.calculate(data)
+        assert len(data) == 6, "Unexpected data length."
+        return data + JulichChecksum._calculate(data)
 
 
 class FermichopperStreamInterface(StreamAdapter):
@@ -53,21 +53,25 @@ class FermichopperStreamInterface(StreamAdapter):
     commands = {
         Cmd("get_all_data", "^#00000([0-9A-F]{2})\$$"),
         Cmd("execute_command", "^#1([0-9A-F]{4})([0-9A-F]{2})\$$"),
+        # Cmd("bla", "^.*$"), # Catch-all command for debugging
     }
 
     in_terminator = "\n"
     out_terminator = "\n"
+
+    # def bla(self):
+    #    pass
 
     def handle_error(self, request, error):
         print "An error occurred at request " + repr(request) + ": " + repr(error)
         return str(error)
 
     def get_all_data(self, checksum):
-        JulichChecksum.verify('0', '0000', checksum)
-        return "#" + JulichChecksum.append_checksum('1' + self._device.get_last_command())
+        JulichChecksum.verify('#0', '0000', checksum)
+        return JulichChecksum.append_checksum('#1' + self._device.get_last_command()) + "#2003F0B"
 
     def execute_command(self, command, checksum):
-        JulichChecksum.verify('1', command, checksum)
+        JulichChecksum.verify('#1', command, checksum)
 
         valid_commands = ["0001", "0002", "0003", "0006", "0007"]
 
