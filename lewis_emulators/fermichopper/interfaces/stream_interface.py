@@ -68,7 +68,7 @@ class FermichopperStreamInterface(StreamAdapter):
 
     def get_all_data(self, checksum):
         JulichChecksum.verify('#0', '0000', checksum)
-        return JulichChecksum.append_checksum('#1' + self._device.get_last_command()) + "#2003F0B"
+        return JulichChecksum.append_checksum('#1' + self._device.get_last_command()) + "#2003F0B#300061C"
 
     def execute_command(self, command, checksum):
         JulichChecksum.verify('#1', command, checksum)
