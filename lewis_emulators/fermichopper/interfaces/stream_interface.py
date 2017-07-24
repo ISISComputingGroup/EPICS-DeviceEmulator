@@ -91,7 +91,7 @@ class FermichopperStreamInterface(StreamAdapter):
     def execute_command(self, command, checksum):
         JulichChecksum.verify('#1', command, checksum)
 
-        valid_commands = ["0001", "0002", "0003", "0006", "0007"]
+        valid_commands = ["0001", "0002", "0003", "0004", "0005"]
 
         assert command in valid_commands, "Invalid command."
 
