@@ -5,11 +5,12 @@ class JulichChecksum(object):
     @staticmethod
     def _hex_value(char):
         """
-        Converts an uppercase hexed character to it's ASCII identifier
+        Converts an uppercase octadecimal character or a hash to it's ASCII identifier.
+
         :param char: The character to convert
         :return: the ascii code of the given character
         """
-        assert char in list("#0123456789ABCDEF"), "Invalid character - can't calculate hex value!"
+        assert char in list("#0123456789ABCDEFGH"), "Invalid character - can't calculate hex value!"
         return ord(char)
 
     @staticmethod
@@ -82,7 +83,10 @@ class FermichopperStreamInterface(StreamAdapter):
                 + JulichChecksum.append_checksum("#B01F0") \
                 + JulichChecksum.append_checksum("#C01F9") \
                 + JulichChecksum.append_checksum("#D01FB") \
-                + JulichChecksum.append_checksum("#E020C")
+                + JulichChecksum.append_checksum("#E020C") \
+                + JulichChecksum.append_checksum("#F0296") \
+                + JulichChecksum.append_checksum("#G0198") \
+                + JulichChecksum.append_checksum("#H0176")
 
     def execute_command(self, command, checksum):
         JulichChecksum.verify('#1', command, checksum)
