@@ -71,7 +71,7 @@ class FermichopperStreamInterface(StreamAdapter):
     def get_all_data(self, checksum):
         JulichChecksum.verify('#0', '0000', checksum)
         return JulichChecksum.append_checksum('#1' + self._device.get_last_command()) \
-                + JulichChecksum.append_checksum("#2006F") \
+                + JulichChecksum.append_checksum("#2003F") \
                 + JulichChecksum.append_checksum("#30006") \
                 + JulichChecksum.append_checksum("#4464F") \
                 + JulichChecksum.append_checksum("#55208") \
