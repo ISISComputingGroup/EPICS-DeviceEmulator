@@ -54,6 +54,7 @@ class FermichopperStreamInterface(StreamAdapter):
     commands = {
         Cmd("get_all_data", "^#00000([0-9A-F]{2})\$$"),
         Cmd("execute_command", "^#1([0-9A-F]{4})([0-9A-F]{2})\$$"),
+        Cmd("set_speed", "^#3([0-9A-F]{4})([0-9A-F]{2})\$$"),
         # Cmd("catch_all", "^.*$"), # Catch-all command for debugging
     }
 
@@ -72,8 +73,8 @@ class FermichopperStreamInterface(StreamAdapter):
         JulichChecksum.verify('#0', '0000', checksum)
         return JulichChecksum.append_checksum('#1' + self._device.get_last_command()) \
                 + JulichChecksum.append_checksum("#2003F") \
-                + JulichChecksum.append_checksum("#30006") \
-                + JulichChecksum.append_checksum("#4464F") \
+                + JulichChecksum.append_checksum("#3000{:01X}".format(12 - (self._device.get_speed_setpoint()/50))) \
+                + JulichChecksum.append_checksum("#4{:04X}".format(self._device.get_speed())) \
                 + JulichChecksum.append_checksum("#55208") \
                 + JulichChecksum.append_checksum("#60000") \
                 + JulichChecksum.append_checksum("#75209") \
@@ -97,3 +98,7 @@ class FermichopperStreamInterface(StreamAdapter):
 
         self._device.set_last_command(command)
 
+    def set_speed(self, command, checksum):
+        JulichChecksum.verify("#3", command, checksum)
+        assert int(command, 16) in range(0,12), "Chopper speed unexpected"
+        self._device.set_speed((12-int(command, 16))*50)

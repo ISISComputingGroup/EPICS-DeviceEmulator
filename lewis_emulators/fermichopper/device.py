@@ -10,6 +10,7 @@ class SimulatedFermichopper(StateMachineDevice):
         Initialize all of the device's attributes.
         """
         self.last_command = "0000"
+        self.speed_setpoint = 0
 
     def _get_state_handlers(self):
         return {
@@ -28,3 +29,12 @@ class SimulatedFermichopper(StateMachineDevice):
     def get_last_command(self):
         return self.last_command
 
+    def set_speed(self, value):
+        self.speed_setpoint = value
+
+    def get_speed_setpoint(self):
+        return self.speed_setpoint
+
+    def get_speed(self):
+        # TODO
+        return self.speed_setpoint
