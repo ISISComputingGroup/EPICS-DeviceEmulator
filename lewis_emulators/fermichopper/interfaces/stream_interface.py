@@ -60,15 +60,15 @@ class FermichopperStreamInterface(StreamAdapter):
         Cmd("set_delay_highword", "^#6([0-9A-F]{4})([0-9A-F]{2})\$$"),
         Cmd("set_delay_lowword", "^#5([0-9A-F]{4})([0-9A-F]{2})\$$"),
         Cmd("set_gate_width", "^#9([0-9A-F]{4})([0-9A-F]{2})\$$"),
-        Cmd("catch_all", "^#9.*$"), # Catch-all command for debugging
+        # Cmd("catch_all", "^#9.*$"), # Catch-all command for debugging
     }
 
     in_terminator = "\n"
     out_terminator = "\n"
 
     # Catch all command for debugging if the IOC sends strange characters in the checksum.
-    def catch_all(self):
-       pass
+    # def catch_all(self):
+    #    pass
 
     def handle_error(self, request, error):
         print "An error occurred at request " + repr(request) + ": " + repr(error)
@@ -79,7 +79,7 @@ class FermichopperStreamInterface(StreamAdapter):
         return JulichChecksum.append_checksum('#1' + self._device.get_last_command()) \
                 + JulichChecksum.append_checksum("#2003F") \
                 + JulichChecksum.append_checksum("#3000{:01X}".format(12 - (self._device.get_speed_setpoint()/50))) \
-                + JulichChecksum.append_checksum("#4{:04X}".format(self._device.get_speed())) \
+                + JulichChecksum.append_checksum("#4{:04X}".format(self._device.get_true_speed())) \
                 + JulichChecksum.append_checksum("#5{:04X}".format(int(math.floor((self._device.delay * 50.4) % 65536)))) \
                 + JulichChecksum.append_checksum("#6{:04X}".format(int(math.floor((self._device.delay * 50.4) / 65536)))) \
                 + JulichChecksum.append_checksum("#75209") \
@@ -101,11 +101,11 @@ class FermichopperStreamInterface(StreamAdapter):
 
         assert command in valid_commands, "Invalid command."
 
-        self._device.set_last_command(command)
+        self._device.do_command(command)
 
     def set_speed(self, command, checksum):
         JulichChecksum.verify("#3", command, checksum)
-        self._device.set_speed((12-int(command, 16))*50)
+        self._device.set_speed_setpoint((12-int(command, 16))*50)
 
     def set_delay_lowword(self, command, checksum):
         JulichChecksum.verify('#5', command, checksum)
