@@ -85,14 +85,14 @@ class FermichopperStreamInterface(StreamAdapter):
                 + JulichChecksum.append_checksum("#75209") \
                 + JulichChecksum.append_checksum("#80000") \
                 + JulichChecksum.append_checksum("#9{:04X}".format(int(math.floor(self._device.get_gate_width() * 50.4)))) \
-                + JulichChecksum.append_checksum("#A01EB") \
-                + JulichChecksum.append_checksum("#B01F0") \
-                + JulichChecksum.append_checksum("#C01F9") \
-                + JulichChecksum.append_checksum("#D01FB") \
-                + JulichChecksum.append_checksum("#E020C") \
-                + JulichChecksum.append_checksum("#F0296") \
-                + JulichChecksum.append_checksum("#G{:04X}".format(int(math.floor((self._device.get_electronics_temp()+25.0) / 0.14663)))) \
-                + JulichChecksum.append_checksum("#H{:04X}".format(int(math.floor((self._device.get_motor_temp()+12.124) / 0.1263))))
+                + JulichChecksum.append_checksum("#A{:04X}".format(int(round(self._device.get_current() / 0.002016)))) \
+                + JulichChecksum.append_checksum("#B{:04X}".format(int(round((self._device.autozero_1_upper + 22.86647) / 0.04486)))) \
+                + JulichChecksum.append_checksum("#C{:04X}".format(int(round((self._device.autozero_2_upper + 22.86647) / 0.04486)))) \
+                + JulichChecksum.append_checksum("#D{:04X}".format(int(round((self._device.autozero_1_lower + 22.86647) / 0.04486)))) \
+                + JulichChecksum.append_checksum("#E{:04X}".format(int(round((self._device.autozero_2_lower + 22.86647) / 0.04486)))) \
+                + JulichChecksum.append_checksum("#F{:04X}".format(int(round(self._device.get_voltage() / 0.4274)))) \
+                + JulichChecksum.append_checksum("#G{:04X}".format(int(round((self._device.get_electronics_temp()+25.0) / 0.14663)))) \
+                + JulichChecksum.append_checksum("#H{:04X}".format(int(round((self._device.get_motor_temp()+12.124) / 0.1263))))
 
     def execute_command(self, command, checksum):
         JulichChecksum.verify('#1', command, checksum)
@@ -107,13 +107,13 @@ class FermichopperStreamInterface(StreamAdapter):
         JulichChecksum.verify("#3", command, checksum)
         self._device.set_speed((12-int(command, 16))*50)
 
-    def set_delay_highword(self, command, checksum):
-        JulichChecksum.verify('#6', command, checksum)
-        self._device.set_delay_highword(int(command, 16))
-
     def set_delay_lowword(self, command, checksum):
         JulichChecksum.verify('#5', command, checksum)
         self._device.set_delay_lowword(int(command, 16))
+
+    def set_delay_highword(self, command, checksum):
+        JulichChecksum.verify('#6', command, checksum)
+        self._device.set_delay_highword(int(command, 16))
 
     def set_gate_width(self, command, checksum):
         JulichChecksum.verify('#9', command, checksum)

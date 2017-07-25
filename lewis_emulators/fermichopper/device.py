@@ -22,6 +22,14 @@ class SimulatedFermichopper(StateMachineDevice):
         self.electronics_temp = 30.0
         self.motor_temp = 30.0
 
+        self.voltage = 0
+        self.current = 0
+
+        self.autozero_1_lower = 0
+        self.autozero_2_lower = 0
+        self.autozero_1_upper = 0
+        self.autozero_2_upper = 0
+
     def _get_state_handlers(self):
         return {
             'default': DefaultState(),
@@ -72,3 +80,9 @@ class SimulatedFermichopper(StateMachineDevice):
 
     def get_motor_temp(self):
         return self.motor_temp
+
+    def get_voltage(self):
+        return self.voltage
+
+    def get_current(self):
+        return self.current
