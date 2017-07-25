@@ -12,9 +12,8 @@ class DefaultState(State):
         if device.watchdog_refresh_time + 3 < time.time() and device.get_control_mode() != 0:
             print "Watchdog time expired, going back to front panel control mode"
             device.set_control_mode(0)
-
+            
         device.stop_waveform_generation_if_requested()
-
 
 class GoingToSetpointState(DefaultState):
 
@@ -24,6 +23,10 @@ class GoingToSetpointState(DefaultState):
         device.channels[device.control_channel].value = approaches.linear(device.channels[device.control_channel].value,
                                                                           device.channels[device.control_channel].ramp_amplitude_setpoint,
                                                                           0.001, dt)
+                                                                          
+    def on_exit(self, dt):
+        device = self._context
+        device._movement_type = 3
 
 class GeneratingWaveformState(DefaultState):
 
@@ -42,3 +45,4 @@ class GeneratingWaveformState(DefaultState):
 
         GeneratingWaveformState.increment_cycle(device,dt)
         device.channels[device.control_channel].value = device.get_waveform_value()
+
