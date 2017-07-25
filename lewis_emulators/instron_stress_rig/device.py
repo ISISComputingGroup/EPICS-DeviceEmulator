@@ -227,7 +227,6 @@ class SimulatedInstron(StateMachineDevice):
     def quarter_cycle_event(self):
         self._waveform_generator.quart_counter.count()
 
-<<<<<<< HEAD
     def arm_quarter_counter(self):
         self._waveform_generator.quart_counter.arm()
 
@@ -242,38 +241,9 @@ class SimulatedInstron(StateMachineDevice):
 
     def get_quarter_counter_status(self):
         return self._waveform_generator.quart_counter.state
-=======
-class Channel(object):
-    def __init__(self):
-        self.waveform_type = 0
-        self.step_time = 0
-        self.ramp_amplitude_setpoint = 0
-        self.scale = 10
-        self.value = 0
-        self.transducer_type = 0
-
-class PositionChannel(Channel):
-    def __init__(self):
-        super(PositionChannel, self).__init__()
-        self.channel_type = 3
-
-class StressChannel(Channel):
-    def __init__(self):
-        super(StressChannel, self).__init__()
-        self.area = 1
-        self.channel_type = 2
->>>>>>> Ticket2112_stress_rig_channel_commands
 
     def set_waveform_maintain_log(self):
         return self._waveform_generator.maintain_log()
-
-<<<<<<< HEAD
+        
     def get_waveform_value(self):
         return self._waveform_generator.get_value(self.control_channel)
-=======
-class StrainChannel(Channel):
-    def __init__(self):
-        super(StrainChannel, self).__init__()
-        self.length = 1
-        self.channel_type = 4
->>>>>>> Ticket2112_stress_rig_channel_commands
