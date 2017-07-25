@@ -59,15 +59,16 @@ class FermichopperStreamInterface(StreamAdapter):
         Cmd("set_speed", "^#3([0-9A-F]{4})([0-9A-F]{2})\$$"),
         Cmd("set_delay_highword", "^#6([0-9A-F]{4})([0-9A-F]{2})\$$"),
         Cmd("set_delay_lowword", "^#5([0-9A-F]{4})([0-9A-F]{2})\$$"),
-        # Cmd("catch_all", "^#6.*$"), # Catch-all command for debugging
+        Cmd("set_gate_width", "^#9([0-9A-F]{4})([0-9A-F]{2})\$$"),
+        Cmd("catch_all", "^#9.*$"), # Catch-all command for debugging
     }
 
     in_terminator = "\n"
     out_terminator = "\n"
 
     # Catch all command for debugging if the IOC sends strange characters in the checksum.
-    # def catch_all(self):
-    #    pass
+    def catch_all(self):
+       pass
 
     def handle_error(self, request, error):
         print "An error occurred at request " + repr(request) + ": " + repr(error)
@@ -83,7 +84,7 @@ class FermichopperStreamInterface(StreamAdapter):
                 + JulichChecksum.append_checksum("#6{:04X}".format(int(math.floor((self._device.delay * 50.4) / 65536)))) \
                 + JulichChecksum.append_checksum("#75209") \
                 + JulichChecksum.append_checksum("#80000") \
-                + JulichChecksum.append_checksum("#9002A") \
+                + JulichChecksum.append_checksum("#9{:04X}".format(int(math.floor(self._device.get_gate_width() * 50.4)))) \
                 + JulichChecksum.append_checksum("#A01EB") \
                 + JulichChecksum.append_checksum("#B01F0") \
                 + JulichChecksum.append_checksum("#C01F9") \
@@ -113,3 +114,7 @@ class FermichopperStreamInterface(StreamAdapter):
     def set_delay_lowword(self, command, checksum):
         JulichChecksum.verify('#5', command, checksum)
         self._device.set_delay_lowword(int(command, 16))
+
+    def set_gate_width(self, command, checksum):
+        JulichChecksum.verify('#9', command, checksum)
+        self._device.set_gate_width(int(command, 16) / 50.4)

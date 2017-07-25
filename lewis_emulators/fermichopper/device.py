@@ -17,6 +17,8 @@ class SimulatedFermichopper(StateMachineDevice):
         self.delay_lowword = 0
         self.delay = 0
 
+        self.gatewidth = 0
+
     def _get_state_handlers(self):
         return {
             'default': DefaultState(),
@@ -55,3 +57,9 @@ class SimulatedFermichopper(StateMachineDevice):
 
     def update_delay(self):
         self.delay = (self.delay_highword * 65536 + self.delay_lowword)/50400
+
+    def set_gate_width(self, value):
+        self.gatewidth = value
+
+    def get_gate_width(self):
+        return self.gatewidth
