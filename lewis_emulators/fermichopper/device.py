@@ -19,6 +19,9 @@ class SimulatedFermichopper(StateMachineDevice):
 
         self.gatewidth = 0
 
+        self.electronics_temp = 30.0
+        self.motor_temp = 30.0
+
     def _get_state_handlers(self):
         return {
             'default': DefaultState(),
@@ -44,7 +47,7 @@ class SimulatedFermichopper(StateMachineDevice):
         return self.speed_setpoint
 
     def get_speed(self):
-        # TODO
+        # TODO - gradually ramp to speed?
         return self.speed_setpoint
 
     def set_delay_highword(self, value):
@@ -63,3 +66,9 @@ class SimulatedFermichopper(StateMachineDevice):
 
     def get_gate_width(self):
         return self.gatewidth
+
+    def get_electronics_temp(self):
+        return self.electronics_temp
+
+    def get_motor_temp(self):
+        return self.motor_temp

@@ -91,8 +91,8 @@ class FermichopperStreamInterface(StreamAdapter):
                 + JulichChecksum.append_checksum("#D01FB") \
                 + JulichChecksum.append_checksum("#E020C") \
                 + JulichChecksum.append_checksum("#F0296") \
-                + JulichChecksum.append_checksum("#G0198") \
-                + JulichChecksum.append_checksum("#H0176")
+                + JulichChecksum.append_checksum("#G{:04X}".format(int(math.floor((self._device.get_electronics_temp()+25.0) / 0.14663)))) \
+                + JulichChecksum.append_checksum("#H{:04X}".format(int(math.floor((self._device.get_motor_temp()+12.124) / 0.1263))))
 
     def execute_command(self, command, checksum):
         JulichChecksum.verify('#1', command, checksum)
