@@ -1,5 +1,7 @@
 from lewis.adapters.stream import StreamAdapter, Cmd
 
+import math
+
 
 class JulichChecksum(object):
     @staticmethod
@@ -55,7 +57,9 @@ class FermichopperStreamInterface(StreamAdapter):
         Cmd("get_all_data", "^#00000([0-9A-F]{2})\$$"),
         Cmd("execute_command", "^#1([0-9A-F]{4})([0-9A-F]{2})\$$"),
         Cmd("set_speed", "^#3([0-9A-F]{4})([0-9A-F]{2})\$$"),
-        # Cmd("catch_all", "^.*$"), # Catch-all command for debugging
+        Cmd("set_delay_highword", "^#6([0-9A-F]{4})([0-9A-F]{2})\$$"),
+        Cmd("set_delay_lowword", "^#5([0-9A-F]{4})([0-9A-F]{2})\$$"),
+        # Cmd("catch_all", "^#6.*$"), # Catch-all command for debugging
     }
 
     in_terminator = "\n"
@@ -75,8 +79,8 @@ class FermichopperStreamInterface(StreamAdapter):
                 + JulichChecksum.append_checksum("#2003F") \
                 + JulichChecksum.append_checksum("#3000{:01X}".format(12 - (self._device.get_speed_setpoint()/50))) \
                 + JulichChecksum.append_checksum("#4{:04X}".format(self._device.get_speed())) \
-                + JulichChecksum.append_checksum("#55208") \
-                + JulichChecksum.append_checksum("#60000") \
+                + JulichChecksum.append_checksum("#5{:04X}".format(int(math.floor((self._device.delay * 50.4) % 65536)))) \
+                + JulichChecksum.append_checksum("#6{:04X}".format(int(math.floor((self._device.delay * 50.4) / 65536)))) \
                 + JulichChecksum.append_checksum("#75209") \
                 + JulichChecksum.append_checksum("#80000") \
                 + JulichChecksum.append_checksum("#9002A") \
@@ -100,5 +104,12 @@ class FermichopperStreamInterface(StreamAdapter):
 
     def set_speed(self, command, checksum):
         JulichChecksum.verify("#3", command, checksum)
-        assert int(command, 16) in range(0,12), "Chopper speed unexpected"
         self._device.set_speed((12-int(command, 16))*50)
+
+    def set_delay_highword(self, command, checksum):
+        JulichChecksum.verify('#6', command, checksum)
+        self._device.set_delay_highword(int(command, 16))
+
+    def set_delay_lowword(self, command, checksum):
+        JulichChecksum.verify('#5', command, checksum)
+        self._device.set_delay_lowword(int(command, 16))

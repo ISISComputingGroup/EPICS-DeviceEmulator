@@ -11,6 +11,11 @@ class SimulatedFermichopper(StateMachineDevice):
         """
         self.last_command = "0000"
         self.speed_setpoint = 0
+        self._allowed_speed_setpoints = (50*i for i in range(1, 13))
+
+        self.delay_highword = 0
+        self.delay_lowword = 0
+        self.delay = 0
 
     def _get_state_handlers(self):
         return {
@@ -30,6 +35,7 @@ class SimulatedFermichopper(StateMachineDevice):
         return self.last_command
 
     def set_speed(self, value):
+        assert value in self._allowed_speed_setpoints
         self.speed_setpoint = value
 
     def get_speed_setpoint(self):
@@ -38,3 +44,14 @@ class SimulatedFermichopper(StateMachineDevice):
     def get_speed(self):
         # TODO
         return self.speed_setpoint
+
+    def set_delay_highword(self, value):
+        self.delay_highword = value
+        self.update_delay()
+
+    def set_delay_lowword(self, value):
+        self.delay_lowword = value
+        self.update_delay()
+
+    def update_delay(self):
+        self.delay = (self.delay_highword * 65536 + self.delay_lowword)/50400
