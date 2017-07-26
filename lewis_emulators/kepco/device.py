@@ -1,8 +1,6 @@
 from lewis.devices import StateMachineDevice
-
 from collections import OrderedDict
 from .states import DefaultState
-
 
 class SimulatedKepco(StateMachineDevice):
     """
@@ -42,8 +40,7 @@ class SimulatedKepco(StateMachineDevice):
     @property
     def idn(self):
         """
-
-        :return: IDN
+        :return: IDN- Identificaiton String
         """
         return self._idn
 
@@ -62,10 +59,9 @@ class SimulatedKepco(StateMachineDevice):
     @voltage.setter
     def voltage(self, voltage):
         """
-        :param VOLTAGE: Write the Voltage
+        :param voltage: Write the Voltage
         """
         self._voltage = voltage
-
 
     @property
     def current(self):
@@ -80,7 +76,6 @@ class SimulatedKepco(StateMachineDevice):
         :param write the current:
         """
         self._current = current
-
 
     @property
     def setpoint_voltage(self):
@@ -139,6 +134,3 @@ class SimulatedKepco(StateMachineDevice):
         :param status: set Output status
         """
         self._output_status = status
-
-
-

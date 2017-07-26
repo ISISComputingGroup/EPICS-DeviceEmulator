@@ -1,8 +1,6 @@
 from lewis.adapters.stream import StreamAdapter
 from utils.command_builder import CmdBuilder
-
 from lewis.core.logging import has_log
-
 
 @has_log
 class KepcoStreamInterface(StreamAdapter):
@@ -59,15 +57,4 @@ class KepcoStreamInterface(StreamAdapter):
         return "{0}".format(self._device.output_status)
 
     def get_IDN(self):
-        self.log.error("IDN I{0}".format(self._device.idn))
         return "{0}".format(self._device.idn)
-
-
-
-
-
-
-
-
-
-
