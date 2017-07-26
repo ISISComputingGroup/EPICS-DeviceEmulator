@@ -1,6 +1,6 @@
-from collections import OrderedDict
-
 from lewis.devices import StateMachineDevice
+
+from collections import OrderedDict
 from .states import DefaultState
 
 
@@ -19,6 +19,38 @@ class SimulatedKepco(StateMachineDevice):
         self._setpoint_current = 10.0
         self._output_mode = 0
         self._output_status = 0
+        self._idn = "000000000000000000000000000000000000000"
+
+    def _get_state_handlers(self):
+        """
+        Returns: states and their names
+        """
+        return {DefaultState.NAME: DefaultState()}
+
+    def _get_initial_state(self):
+        """
+        Returns: the name of the initial state
+        """
+        return DefaultState.NAME
+
+    def _get_transition_handlers(self):
+        """
+        Returns: the state transitions
+        """
+        return OrderedDict()
+
+    @property
+    def idn(self):
+        """
+
+        :return: IDN
+        """
+        return self._idn
+
+    @idn.setter
+    def idn(self, idn):
+
+        self._idn = idn
 
     @property
     def voltage(self):
@@ -107,5 +139,6 @@ class SimulatedKepco(StateMachineDevice):
         :param status: set Output status
         """
         self._output_status = status
+
 
 

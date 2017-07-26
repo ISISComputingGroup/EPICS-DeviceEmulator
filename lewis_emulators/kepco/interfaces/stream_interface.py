@@ -20,8 +20,9 @@ class KepcoStreamInterface(StreamAdapter):
         CmdBuilder("set_output_mode").escape("FUNC:MODE ").arg("VOLT|CURR").build(),
         CmdBuilder("read_output_mode").escape("FUNC:MODE?").build(),
         CmdBuilder("read_output_status").escape("OUTP?").build(),
-        CmdBuilder("set_output_status").escape("OUTP ").arg("0|1").build()
-       }
+        CmdBuilder("set_output_status").escape("OUTP ").arg("0|1").build(),
+        CmdBuilder("get_IDN").escape("*IDN?").build()
+    }
 
     def handle_error(self,request, error):
         self.log.error("An error occurred at request" + repr(request) + ": " + repr(error))
@@ -46,7 +47,7 @@ class KepcoStreamInterface(StreamAdapter):
         return "{0}".format(self._device.setpoint_current)
 
     def set_output_mode(self, mode):
-        self._device.output_mode  = mode
+        self._device.output_mode = mode
 
     def read_output_mode(self):
         return "{0}".format(self._device.output_mode)
@@ -56,6 +57,13 @@ class KepcoStreamInterface(StreamAdapter):
 
     def read_output_status(self):
         return "{0}".format(self._device.output_status)
+
+    def get_IDN(self):
+        self.log.error("IDN I{0}".format(self._device.idn))
+        return "{0}".format(self._device.idn)
+
+
+
 
 
 
