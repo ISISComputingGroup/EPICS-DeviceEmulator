@@ -1,14 +1,13 @@
 from lewis.adapters.stream import StreamAdapter, Cmd
-from math import log10, floor
-from decimal import Decimal
+
 
 class AG33220AStreamInterface(StreamAdapter):
 
     commands = {
         Cmd("get_voltage", "^VOLT\?$"),
-        Cmd("set_voltage", "^VOLT " + "([\-0-9.]+)$", argument_mappings=[float]),
+        Cmd("set_voltage", "^VOLT " + "([\-0-9.]+|MAX|MIN)$", argument_mappings=[str]),
         Cmd("get_freq", "^FREQ\?$"),
-        Cmd("set_freq", "^FREQ " + "([\-0-9.]+)$", argument_mappings=[float]),
+        Cmd("set_freq", "^FREQ " + "([\-0-9.]+|MAX|MIN)$", argument_mappings=[str]),
         Cmd("get_offset", "^VOLT:OFFS\?$"),
         Cmd("set_offset", "^VOLT:OFFS " + "([\-0-9.]+)$", argument_mappings=[float]),
         Cmd("get_units", "^VOLT:UNIT\?$"),
@@ -24,25 +23,44 @@ class AG33220AStreamInterface(StreamAdapter):
         Cmd("set_voltage_low", "^VOLT:LOW" + "([\-0-9.]+)$", argument_mappings=[float]),
     }
 
-    in_terminator = "\n"    # \r\n for putty
-    out_terminator = "\n"
+    in_terminator = "\r\n"    # \r\n for putty
+    out_terminator = "\r\n"
 
     # Takes in a value and returns a value in the form of x.xxxxxxxxxxxxxEYY
     def float_output(self, value):
-        value = float('%s' % float('%.4g' % value))
-        return "{:.13E}".format(value)
+        value = float('%s' % float('%.4g' % float(value)))
+        return "{:+.13E}".format(value)
+
+    # If the value is above or below the upper or lower bound
+    # then the upper or lower bound will be returned respectively
+    # otherwise the value is returned
+    def limit(self,value,upper_bound,lower_bound):
+        if value >= upper_bound:
+            return upper_bound
+        elif value < lower_bound:
+            return lower_bound
+        else:
+            return value
 
     def get_voltage(self):
         return self.float_output(self._device.voltage)
 
     def set_voltage(self, new_voltage):
-        self._device.voltage = new_voltage
+        try:
+            self._device.voltage = self.limit(float(new_voltage), 10, 0.01)
+        except:
+            self._device.voltage = {"MIN": 0.01, "MAX": 10}[new_voltage]
 
     def get_freq(self):
         return self.float_output(self._device.frequency)
 
     def set_freq(self, new_frequency):
-        self._device.frequency = new_frequency
+        lower_bound = {"SIN": 10**-6, "SQU": 10**-6, "RAMP": 10**-6, "PULS": 5*10**-4, "NOIS": 1*10**-6, "USER": 10**-6}[self._device.function]
+        upper_bound = {"SIN": 2*10**7, "SQU": 2*10**7, "RAMP": 2*10**5, "PULS": 5*10**6, "NOIS": 2*10**7, "USER": 6*10**6}[self._device.function]
+        try:
+            self._device.frequency = self.limit(float(new_frequency), upper_bound, lower_bound)
+        except:
+            self._device.frequency = {"MIN": lower_bound, "MAX": upper_bound}[new_frequency]
 
     def get_offset(self):
         return self.float_output(self._device.offset)
@@ -61,6 +79,7 @@ class AG33220AStreamInterface(StreamAdapter):
 
     def set_function(self, new_function):
         self._device.function = new_function
+        self.set_freq(self._device.frequency)
 
     def get_output(self):
         return self._device.output
@@ -86,6 +105,9 @@ class AG33220AStreamInterface(StreamAdapter):
 
     def set_voltage_low(self, new_voltage_low):
         self._device.voltageLow = new_voltage_low
+
+    def handle_error(self, request, error):
+        print(str(error))
 
 ###################
 #    def get_reading(self):
