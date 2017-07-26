@@ -46,7 +46,10 @@ class SimulatedKepco(StateMachineDevice):
 
     @idn.setter
     def idn(self, idn):
-
+        """
+        :param idn:
+        :return: sets IDN- Identificaiton String
+        """
         self._idn = idn
 
     @property
