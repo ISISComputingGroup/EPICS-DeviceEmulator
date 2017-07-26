@@ -8,10 +8,12 @@ class SimulatedAG33220A(Device):
     asicRevNum = "22"
     printedCircuitBoardRevNum = "2"
     idn = make+"-"+firmwareRevNum+"-"+bootKernelRevisionNumber+"-"+asicRevNum+"-"+printedCircuitBoardRevNum
-    voltage = 1
+    voltage = 0.1
     frequency = 1000
     offset = 0
     units = "VPP"
     function = "SIN"
     output = 0
+    voltageHigh = 0.05
+    voltageLow = -0.05
     pass

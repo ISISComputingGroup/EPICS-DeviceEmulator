@@ -1,4 +1,6 @@
 from lewis.adapters.stream import StreamAdapter, Cmd
+from math import log10, floor
+from decimal import Decimal
 
 class AG33220AStreamInterface(StreamAdapter):
 
@@ -16,26 +18,34 @@ class AG33220AStreamInterface(StreamAdapter):
         Cmd("get_output", "^OUTP\?$"),
         Cmd("set_output", "^OUTP " + "(0|1|ON|OFF)$", argument_mappings=[str]),
         Cmd("get_idn", "^\*IDN\?$"),
-
+        Cmd("get_voltage_high", "^VOLT:HIGH\?$"),
+        Cmd("set_voltage_high", "^VOLT:HIGH" + "([\-0-9.]+)$", argument_mappings=[float]),
+        Cmd("get_voltage_low", "^VOLT:LOW\?$"),
+        Cmd("set_voltage_low", "^VOLT:LOW" + "([\-0-9.]+)$", argument_mappings=[float]),
     }
 
-    in_terminator = "\n"
+    in_terminator = "\n"    # \r\n for putty
     out_terminator = "\n"
 
+    # Takes in a value and returns a value in the form of x.xxxxxxxxxxxxxEYY
+    def float_output(self, value):
+        value = float('%s' % float('%.4g' % value))
+        return "{:.13E}".format(value)
+
     def get_voltage(self):
-        return self._device.voltage
+        return self.float_output(self._device.voltage)
 
     def set_voltage(self, new_voltage):
         self._device.voltage = new_voltage
 
     def get_freq(self):
-        return self._device.frequency
+        return self.float_output(self._device.frequency)
 
     def set_freq(self, new_frequency):
         self._device.frequency = new_frequency
 
     def get_offset(self):
-        return self._device.offset
+        return self.float_output(self._device.offset)
 
     def set_offset(self, new_offset):
         self._device.offset = new_offset
@@ -65,6 +75,17 @@ class AG33220AStreamInterface(StreamAdapter):
     def get_idn(self):
         return self._device.idn
 
+    def get_voltage_high(self):
+        return self.float_output(self._device.voltageHigh)
+
+    def set_voltage_high(self, new_voltage_high):
+        self._device.voltageHigh = new_voltage_high
+
+    def get_voltage_low(self):
+        return self.float_output(self._device.voltageLow)
+
+    def set_voltage_low(self, new_voltage_low):
+        self._device.voltageLow = new_voltage_low
 
 ###################
 #    def get_reading(self):
