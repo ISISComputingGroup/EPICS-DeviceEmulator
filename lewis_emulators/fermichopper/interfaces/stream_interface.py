@@ -4,16 +4,6 @@ import math
 
 
 class JulichChecksum(object):
-    @staticmethod
-    def _hex_value(char):
-        """
-        Converts an uppercase octadecimal character or a hash to it's ASCII identifier.
-
-        :param char: The character to convert
-        :return: the ascii code of the given character
-        """
-        assert char in list("#0123456789ABCDEFGH"), "Invalid character - can't calculate hex value!"
-        return ord(char)
 
     @staticmethod
     def _calculate(alldata):
@@ -22,7 +12,8 @@ class JulichChecksum(object):
         :param alldata: the input data (list of chars, length 5)
         :return: the Julich checksum of the given input data
         """
-        return "00" if all(x in ['0', '#'] for x in alldata) else hex(sum(JulichChecksum._hex_value(i) for i in alldata)).upper()[-2:]
+        assert all(i in list("#0123456789ABCDEFGH") for i in alldata), "Invalid character can't calculate checksum"
+        return "00" if all(x in ['0', '#'] for x in alldata) else hex(sum(ord(i) for i in alldata)).upper()[-2:]
 
     @staticmethod
     def verify(header, data, actual_checksum):
@@ -40,7 +31,7 @@ class JulichChecksum(object):
         assert JulichChecksum._calculate(list(header) + list(data)) == actual_checksum, "Checksum did not match"
 
     @staticmethod
-    def append_checksum(data):
+    def append(data):
         """
         Utility method for appending the Julich checksum to the input data
         :param data: the input data
@@ -75,7 +66,7 @@ class FermichopperStreamInterface(StreamAdapter):
 
         if True:
             status += 1
-        if self._device.get_true_speed() == self._device.get_speed_setpoint():
+        if True:
             status += 2
         if self._device.magneticbearing:
             status += 8
@@ -94,23 +85,24 @@ class FermichopperStreamInterface(StreamAdapter):
 
     def get_all_data(self, checksum):
         JulichChecksum.verify('#0', '0000', checksum)
-        return JulichChecksum.append_checksum('#1' + self._device.get_last_command()) \
-                + JulichChecksum.append_checksum("#2{:04X}".format(self.build_status_code())) \
-                + JulichChecksum.append_checksum("#3000{:01X}".format(12 - (self._device.get_speed_setpoint()/50))) \
-                + JulichChecksum.append_checksum("#4{:04X}".format(self._device.get_true_speed()*60)) \
-                + JulichChecksum.append_checksum("#5{:04X}".format(int(math.floor((self._device.delay * 50.4) % 65536)))) \
-                + JulichChecksum.append_checksum("#6{:04X}".format(int(math.floor((self._device.delay * 50.4) / 65536)))) \
-                + JulichChecksum.append_checksum("#75209") \
-                + JulichChecksum.append_checksum("#80000") \
-                + JulichChecksum.append_checksum("#9{:04X}".format(int(math.floor(self._device.get_gate_width() * 50.4)))) \
-                + JulichChecksum.append_checksum("#A{:04X}".format(int(round(self._device.get_current() / 0.002016)))) \
-                + JulichChecksum.append_checksum("#B{:04X}".format(int(round((self._device.autozero_1_upper + 22.86647) / 0.04486)))) \
-                + JulichChecksum.append_checksum("#C{:04X}".format(int(round((self._device.autozero_2_upper + 22.86647) / 0.04486)))) \
-                + JulichChecksum.append_checksum("#D{:04X}".format(int(round((self._device.autozero_1_lower + 22.86647) / 0.04486)))) \
-                + JulichChecksum.append_checksum("#E{:04X}".format(int(round((self._device.autozero_2_lower + 22.86647) / 0.04486)))) \
-                + JulichChecksum.append_checksum("#F{:04X}".format(int(round(self._device.get_voltage() / 0.4274)))) \
-                + JulichChecksum.append_checksum("#G{:04X}".format(int(round((self._device.get_electronics_temp()+25.0) / 0.14663)))) \
-                + JulichChecksum.append_checksum("#H{:04X}".format(int(round((self._device.get_motor_temp()+12.124) / 0.1263))))
+
+        return JulichChecksum.append('#1' + self._device.get_last_command()) \
+            + JulichChecksum.append("#2{:04X}".format(self.build_status_code())) \
+            + JulichChecksum.append("#3000{:01X}".format(12 - (self._device.get_speed_setpoint() / 50))) \
+            + JulichChecksum.append("#4{:04X}".format(self._device.get_true_speed() * 60)) \
+            + JulichChecksum.append("#5{:04X}".format(int(round((self._device.delay * 50.4) % 65536)))) \
+            + JulichChecksum.append("#6{:04X}".format(int(round((self._device.delay * 50.4) / 65536)))) \
+            + JulichChecksum.append("#7{:04X}".format(int(round((self._device.delay * 50.4) % 65536)))) \
+            + JulichChecksum.append("#8{:04X}".format(int(round((self._device.delay * 50.4) / 65536)))) \
+            + JulichChecksum.append("#9{:04X}".format(int(round(self._device.get_gate_width() * 50.4)))) \
+            + JulichChecksum.append("#A{:04X}".format(int(round(self._device.get_current() / 0.002016)))) \
+            + JulichChecksum.append("#B{:04X}".format(int(round((self._device.autozero_1_upper + 22.86647) / 0.04486)))) \
+            + JulichChecksum.append("#C{:04X}".format(int(round((self._device.autozero_2_upper + 22.86647) / 0.04486)))) \
+            + JulichChecksum.append("#D{:04X}".format(int(round((self._device.autozero_1_lower + 22.86647) / 0.04486)))) \
+            + JulichChecksum.append("#E{:04X}".format(int(round((self._device.autozero_2_lower + 22.86647) / 0.04486)))) \
+            + JulichChecksum.append("#F{:04X}".format(int(round(self._device.get_voltage() / 0.4274)))) \
+            + JulichChecksum.append("#G{:04X}".format(int(round((self._device.get_electronics_temp() + 25.0) / 0.14663)))) \
+            + JulichChecksum.append("#H{:04X}".format(int(round((self._device.get_motor_temp() + 12.124) / 0.1263))))
 
     def execute_command(self, command, checksum):
         JulichChecksum.verify('#1', command, checksum)
