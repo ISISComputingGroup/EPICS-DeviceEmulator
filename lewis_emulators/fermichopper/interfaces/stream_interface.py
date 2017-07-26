@@ -70,6 +70,24 @@ class FermichopperStreamInterface(StreamAdapter):
     # def catch_all(self):
     #    pass
 
+    def build_status_code(self):
+        status = 0
+
+        if True:
+            status += 1
+        if self._device.get_true_speed() == self._device.get_speed_setpoint():
+            status += 2
+        if self._device.magneticbearing:
+            status += 8
+        if self._device.get_voltage() > 0:
+            status += 16
+        if self._device.speed > 600:
+            status += 1024
+        if self._device.speed > 10 and not self._device.magneticbearing:
+            status += 2048
+
+        return status
+
     def handle_error(self, request, error):
         print "An error occurred at request " + repr(request) + ": " + repr(error)
         return str(error)
@@ -77,9 +95,9 @@ class FermichopperStreamInterface(StreamAdapter):
     def get_all_data(self, checksum):
         JulichChecksum.verify('#0', '0000', checksum)
         return JulichChecksum.append_checksum('#1' + self._device.get_last_command()) \
-                + JulichChecksum.append_checksum("#2003F") \
+                + JulichChecksum.append_checksum("#2{:04X}".format(self.build_status_code())) \
                 + JulichChecksum.append_checksum("#3000{:01X}".format(12 - (self._device.get_speed_setpoint()/50))) \
-                + JulichChecksum.append_checksum("#4{:04X}".format(self._device.get_true_speed())) \
+                + JulichChecksum.append_checksum("#4{:04X}".format(self._device.get_true_speed()*60)) \
                 + JulichChecksum.append_checksum("#5{:04X}".format(int(math.floor((self._device.delay * 50.4) % 65536)))) \
                 + JulichChecksum.append_checksum("#6{:04X}".format(int(math.floor((self._device.delay * 50.4) / 65536)))) \
                 + JulichChecksum.append_checksum("#75209") \

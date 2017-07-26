@@ -15,7 +15,8 @@ class StoppingState(State):
         if device.drive:
             rate += 50
 
-        device.set_true_speed(approaches.linear(device.get_true_speed(), 0, rate, dt))
+        # device.set_true_speed(approaches.linear(device.get_true_speed(), 0, rate*1000, dt))
+        device.set_true_speed(0)
 
 class GoingState(State):
     def in_state(self, dt):
@@ -25,10 +26,11 @@ class GoingState(State):
 
         if device.drive:
             rate += 50
-        if not device.magneticbearing:
-            rate -= 1
+            if not device.magneticbearing:
+                rate -= 1
 
-        device.set_true_speed(approaches.linear(device.get_true_speed(), device.get_speed_setpoint(), rate, dt))
+        # device.set_true_speed(approaches.linear(device.get_true_speed(), device.get_speed_setpoint(), rate*1000, dt))
+        device.set_true_speed(device.get_speed_setpoint())
 
 class StoppedState(State):
     def in_state(self, dt):
