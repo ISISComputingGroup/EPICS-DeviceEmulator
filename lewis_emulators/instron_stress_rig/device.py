@@ -57,6 +57,9 @@ class SimulatedInstron(StateMachineDevice):
     def set_waveform_state(self, value):
         self._waveform_generator.state = value
 
+    def reset(self):
+        self._initialize_data()
+
     def _get_initial_state(self):
         return 'default'
 
