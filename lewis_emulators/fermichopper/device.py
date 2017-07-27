@@ -12,7 +12,7 @@ class SimulatedFermichopper(StateMachineDevice):
         self.last_command = "0000"
         self.speed = 0
         self.speed_setpoint = 0
-        self._allowed_speed_setpoints = (50*i for i in range(1, 13))
+        self._allowed_speed_setpoints = list(50*i for i in range(1, 13))
 
         self.delay_highword = 0
         self.delay_lowword = 0

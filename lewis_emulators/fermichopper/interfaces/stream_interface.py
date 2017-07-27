@@ -66,7 +66,7 @@ class FermichopperStreamInterface(StreamAdapter):
 
         if True:
             status += 1
-        if True:
+        if self._device.get_true_speed() == self._device.get_speed_setpoint():
             status += 2
         if self._device.magneticbearing:
             status += 8
@@ -115,7 +115,7 @@ class FermichopperStreamInterface(StreamAdapter):
 
     def set_speed(self, command, checksum):
         JulichChecksum.verify("#3", command, checksum)
-        self._device.set_speed_setpoint((12-int(command, 16))*50)
+        self._device.set_speed_setpoint(int((12-int(command, 16))*50))
 
     def set_delay_lowword(self, command, checksum):
         JulichChecksum.verify('#5', command, checksum)
