@@ -2,7 +2,6 @@ from collections import OrderedDict
 from states import DefaultState, GoingState, BrokenState, StoppedState, StoppingState
 from lewis.devices import StateMachineDevice
 
-
 class SimulatedFermichopper(StateMachineDevice):
 
     def _initialize_data(self):
@@ -35,6 +34,8 @@ class SimulatedFermichopper(StateMachineDevice):
         self.runmode = False
         self.magneticbearing = False
 
+        self.parameters = None
+
     def _get_state_handlers(self):
         return {
             'default': DefaultState(),
@@ -59,6 +60,10 @@ class SimulatedFermichopper(StateMachineDevice):
         ])
 
     def do_command(self, command):
+
+        valid_commands = ["0001", "0002", "0003", "0004", "0005", "0006", "0007", "0008"]
+        assert command in valid_commands, "Invalid command."
+
         self.last_command = command
 
         if command == "0001":
@@ -73,6 +78,12 @@ class SimulatedFermichopper(StateMachineDevice):
             self.magneticbearing = True
         elif command == "0005":
             self.magneticbearing = False
+        elif command == "0006":
+            self.parameters = ChopperParameters.MERLIN_LARGE
+        elif command == "0007":
+            self.parameters = ChopperParameters.HET_MARI
+        elif command == "0008":
+            self.parameters = ChopperParameters.MERLIN_SMALL
 
     def get_last_command(self):
         return self.last_command
@@ -118,3 +129,9 @@ class SimulatedFermichopper(StateMachineDevice):
 
     def get_current(self):
         return self.current
+
+class ChopperParameters(object):
+    MERLIN_SMALL = 1
+    MERLIN_LARGE = 2
+    HET_MARI = 3
+

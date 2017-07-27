@@ -2,6 +2,8 @@ from lewis.adapters.stream import StreamAdapter, Cmd
 
 import math
 
+from ..device import ChopperParameters
+
 
 class JulichChecksum(object):
 
@@ -64,7 +66,7 @@ class FermichopperStreamInterface(StreamAdapter):
     def build_status_code(self):
         status = 0
 
-        if True:
+        if True: # Microcontroller OK?
             status += 1
         if self._device.get_true_speed() == self._device.get_speed_setpoint():
             status += 2
@@ -72,10 +74,22 @@ class FermichopperStreamInterface(StreamAdapter):
             status += 8
         if self._device.get_voltage() > 0:
             status += 16
+        if True: # Drive inverter on?
+            status += 32
+        if self._device.parameters == ChopperParameters.MERLIN_LARGE:
+            status += 64
+        if False: # Interlock open?
+            status += 128
+        if self._device.parameters == ChopperParameters.HET_MARI:
+            status += 256
+        if self._device.parameters == ChopperParameters.MERLIN_SMALL:
+            status += 512
         if self._device.speed > 600:
             status += 1024
         if self._device.speed > 10 and not self._device.magneticbearing:
             status += 2048
+        if any(abs(voltage) > 3 for voltage in [self._device.autozero_1_lower, self._device.autozero_2_lower, self._device.autozero_1_upper, self._device.autozero_2_upper,]):
+            status += 4096
 
         return status
 
@@ -106,11 +120,6 @@ class FermichopperStreamInterface(StreamAdapter):
 
     def execute_command(self, command, checksum):
         JulichChecksum.verify('#1', command, checksum)
-
-        valid_commands = ["0001", "0002", "0003", "0004", "0005"]
-
-        assert command in valid_commands, "Invalid command."
-
         self._device.do_command(command)
 
     def set_speed(self, command, checksum):
