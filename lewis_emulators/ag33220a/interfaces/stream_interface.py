@@ -23,8 +23,8 @@ class AG33220AStreamInterface(StreamAdapter):
         Cmd("set_voltage_low", "^VOLT:LOW" + "([\-0-9.]+)$", argument_mappings=[float]),
     }
 
-    in_terminator = "\r\n"    # \r\n for putty
-    out_terminator = "\r\n"
+    in_terminator = "\n"    # \r\n for putty
+    out_terminator = "\n"
 
     # Takes in a value and returns a value in the form of x.xxxxxxxxxxxxxEYY
     def float_output(self, value):
@@ -78,8 +78,10 @@ class AG33220AStreamInterface(StreamAdapter):
         return self._device.function
 
     def set_function(self, new_function):
+        print(new_function,"\n",self._device.function)
         self._device.function = new_function
         self.set_freq(self._device.frequency)
+        print(new_function, "\n\n", self._device.function)
 
     def get_output(self):
         return self._device.output
