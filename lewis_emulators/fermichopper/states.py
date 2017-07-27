@@ -1,8 +1,10 @@
 from lewis.core.statemachine import State
 from lewis.core import approaches
 
+
 class DefaultState(State):
     pass
+
 
 class StoppingState(State):
     def in_state(self, dt):
@@ -15,8 +17,9 @@ class StoppingState(State):
         if device.drive:
             rate += 50
 
-        # device.set_true_speed(approaches.linear(device.get_true_speed(), 0, rate*1000, dt))
-        device.set_true_speed(0)
+        device.set_true_speed(approaches.linear(device.get_true_speed(), 0, rate, dt))
+        # device.set_true_speed(0)
+
 
 class GoingState(State):
     def in_state(self, dt):
@@ -29,12 +32,17 @@ class GoingState(State):
             if not device.magneticbearing:
                 rate -= 1
 
-        # device.set_true_speed(approaches.linear(device.get_true_speed(), device.get_speed_setpoint(), rate*1000, dt))
-        device.set_true_speed(device.get_speed_setpoint())
+        device.set_true_speed(approaches.linear(device.get_true_speed(), device.get_speed_setpoint(), rate, dt))
+        # device.set_true_speed(device.get_speed_setpoint())
+
 
 class StoppedState(State):
     def in_state(self, dt):
         pass
+
+    def on_entry(self, dt):
+        self._context.drive = False
+
 
 class BrokenState(State):
     def in_state(self, dt):

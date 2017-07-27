@@ -74,7 +74,7 @@ class FermichopperStreamInterface(StreamAdapter):
             status += 8
         if self._device.get_voltage() > 0:
             status += 16
-        if True: # Drive inverter on?
+        if self._device.drive:
             status += 32
         if self._device.parameters == ChopperParameters.MERLIN_LARGE:
             status += 64
@@ -103,7 +103,7 @@ class FermichopperStreamInterface(StreamAdapter):
         return JulichChecksum.append('#1' + self._device.get_last_command()) \
             + JulichChecksum.append("#2{:04X}".format(self.build_status_code())) \
             + JulichChecksum.append("#3000{:01X}".format(12 - (self._device.get_speed_setpoint() / 50))) \
-            + JulichChecksum.append("#4{:04X}".format(self._device.get_true_speed() * 60)) \
+            + JulichChecksum.append("#4{:04X}".format(int(round(self._device.get_true_speed() * 60)))) \
             + JulichChecksum.append("#5{:04X}".format(int(round((self._device.delay * 50.4) % 65536)))) \
             + JulichChecksum.append("#6{:04X}".format(int(round((self._device.delay * 50.4) / 65536)))) \
             + JulichChecksum.append("#7{:04X}".format(int(round((self._device.delay * 50.4) % 65536)))) \
