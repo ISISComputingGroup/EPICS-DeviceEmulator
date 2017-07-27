@@ -1,5 +1,5 @@
 from lewis.adapters.stream import StreamAdapter
-from utils.command_builder import CmdBuilder
+from lewis_emulators.utils.command_builder import CmdBuilder
 from lewis.core.logging import has_log
 
 @has_log
