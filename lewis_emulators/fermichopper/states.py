@@ -18,7 +18,6 @@ class StoppingState(State):
             rate += 50
 
         device.set_true_speed(approaches.linear(device.get_true_speed(), 0, rate, dt))
-        # device.set_true_speed(0)
 
 
 class GoingState(State):
@@ -33,7 +32,6 @@ class GoingState(State):
                 rate -= 1
 
         device.set_true_speed(approaches.linear(device.get_true_speed(), device.get_speed_setpoint(), rate, dt))
-        # device.set_true_speed(device.get_speed_setpoint())
 
 
 class StoppedState(State):
