@@ -19,9 +19,9 @@ class AG33220AStreamInterface(StreamAdapter):
         Cmd("set_output", "^OUTP " + "(0|1|ON|OFF)$", argument_mappings=[str]),
         Cmd("get_idn", "^\*IDN\?$"),
         Cmd("get_voltage_high", "^VOLT:HIGH\?$"),
-        Cmd("set_voltage_high", "^VOLT:HIGH " + "([\-0-9.]+)$", argument_mappings=[float]),
+        Cmd("set_voltage_high", "^VOLT:HIGH " + "([\-0-9.]+|MAX|MIN)$", argument_mappings=[str]),
         Cmd("get_voltage_low", "^VOLT:LOW\?$"),
-        Cmd("set_voltage_low", "^VOLT:LOW " + "([\-0-9.]+)$", argument_mappings=[float]),
+        Cmd("set_voltage_low", "^VOLT:LOW " + "([\-0-9.]+|MAX|MIN)$", argument_mappings=[str]),
     }
 
     in_terminator = "\n"    # \r\n for putty
