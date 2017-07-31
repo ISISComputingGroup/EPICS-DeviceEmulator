@@ -160,7 +160,7 @@ class SimulatedAG33220A(Device):
 
         :return: lower bound for the frequency for a given function
         """
-        return {"SIN": 10 ** -6, "SQU": 10 ** -6, "RAMP": 10 ** -6, "PULS": 5 * 10 ** -4, "NOIS": 1 * 10 ** -6, "USER": 10 ** -6}[self.function]
+        return {"SIN": 10 ** -6, "SQU": 10 ** -6, "RAMP": 10 ** -6, "PULS": 5 * 10 ** -4, "NOIS": 10 ** -6, "USER": 10 ** -6}[self.function]
 
     def frequency_upper_bound(self):
         """
