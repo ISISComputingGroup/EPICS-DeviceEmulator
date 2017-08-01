@@ -10,8 +10,8 @@ class CybamanStreamInterface(StreamAdapter):
     commands = {
     }
 
-    in_terminator = "\r\n"
-    out_terminator = "\r\n"
+    in_terminator = "\r"
+    out_terminator = ""
 
     def handle_error(self, request, error):
         """
