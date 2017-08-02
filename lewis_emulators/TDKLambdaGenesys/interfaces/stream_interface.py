@@ -1,16 +1,18 @@
 from lewis.adapters.stream import StreamAdapter, Cmd
 from lewis.core.logging import has_log
-frin utils.command_builder import CmdBuilder
+from utils.command_builder import CmdBuilder
 
 class TDKLambdaGenesysStreamInterface(StreamAdapter):
 
     commands = {
-        CmdBuilder("write_voltage").escape("VOLT ").float().build(),
+        CmdBuilder("write_voltage").escape("PV ").float().build(),
         CmdBuilder("read_setpoint_voltage").escape("PV?").build(),
         CmdBuilder("read_voltage").escape("MV?").build(),
         CmdBuilder("write_current").escape("PC").float().build(),
         CmdBuilder("read_setpoint_current").escape("PC?").build(),
         CmdBuilder("read_current").escape("MC?").build(),
+        CmdBuilder("read_power").escape("OUT?").build(),
+        CmdBuilder("write_power").escape("OUT ").string().build(),
     }
 
     in_terminator = "\r"
@@ -40,9 +42,11 @@ class TDKLambdaGenesysStreamInterface(StreamAdapter):
         self._device.setpoint_current = c
         return "VOLTAGE SET TO: " + c
 
-    def read_powerstate(self):
-        return self._device.power_state
+    def read_power(self):
+        return self._device.powerstate
 
-    def write_powerstate(self, p):
-        self._device.power_state = p
+    def write_power(self, p):
+        self._device.powerstate = p
         return "POWER SET TO " + p
+
+
