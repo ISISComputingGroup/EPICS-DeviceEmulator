@@ -13,7 +13,13 @@ class SimulatedCybaman(StateMachineDevice):
         """
         Sets the initial state of the device.
         """
-        pass
+        self.a = 0
+        self.b = 0
+        self.c = 0
+
+        self.home_position_axis_a = 66
+        self.home_position_axis_b = 77
+        self.home_position_axis_c = 88
 
     def _get_state_handlers(self):
         """
@@ -32,5 +38,15 @@ class SimulatedCybaman(StateMachineDevice):
         Returns: the state transitions
         """
         return OrderedDict()
+
+    def home_axis_a(self):
+        self.a = self.home_position_axis_a
+
+    def home_axis_b(self):
+        self.b = self.home_position_axis_b
+
+    def home_axis_c(self):
+        self.c = self.home_position_axis_c
+
 
 
