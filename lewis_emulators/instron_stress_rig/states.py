@@ -26,7 +26,7 @@ class GoingToSetpointState(DefaultState):
                                                                           
     def on_exit(self, dt):
         device = self._context
-        device._movement_type = 3
+        device.movement_type = 0
 
 class GeneratingWaveformState(DefaultState):
 
