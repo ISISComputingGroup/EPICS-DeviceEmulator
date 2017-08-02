@@ -54,10 +54,3 @@ class TDKLambdaGenesysStreamInterface(StreamAdapter):
     def write_powerstate(self, p):
         self._device.power_state = p
         return "POWER SET TO " + p
-
-
-
-
-
-
-
