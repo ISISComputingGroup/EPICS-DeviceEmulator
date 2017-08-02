@@ -34,35 +34,25 @@ class CybamanStreamInterface(StreamAdapter):
         """
         print "An error occurred at request " + repr(request) + ": " + repr(error)
 
-    def wait_before_response(self):
-        sleep(0)
-
     def ignore(self):
-        self.wait_before_response()
         return ""
 
     def initialize(self):
-        self.wait_before_response()
         return ""
 
     def get_a(self):
-        self.wait_before_response()
         print "Returning input A as {}".format(self._device.a)
         return self._device.a*3577
 
     def get_b(self):
-        self.wait_before_response()
         print "Returning input B as {}".format(self._device.b)
         return self._device.b*3663
 
     def get_c(self):
-        self.wait_before_response()
         print "Returning input C as {}".format(self._device.c)
         return self._device.c*3663
 
     def set_all(self, a, b, c, tm):
-        self.wait_before_response()
-
         self._verify_tm(a, b, c, tm)
 
         self._device.a = float(a)
@@ -82,21 +72,17 @@ class CybamanStreamInterface(StreamAdapter):
             assert False, "Wrong TM value! Expected {} but got {}".format(expected_tm, tm)
 
     def reset(self):
-        self.wait_before_response()
         self._device._initialize_data()
         return ""
 
     def home_a(self):
-        self.wait_before_response()
         self._device.home_axis_a()
         return ""
 
     def home_b(self):
-        self.wait_before_response()
         self._device.home_axis_b()
         return ""
 
     def home_c(self):
-        self.wait_before_response()
         self._device.home_axis_c()
         return ""
