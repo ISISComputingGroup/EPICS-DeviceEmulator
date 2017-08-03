@@ -21,13 +21,13 @@ class SimulatedTDKLambdaGenesys(StateMachineDevice):
         return OrderedDict()
 
     @property
-    # Return current actual voltage
     def voltage(self):
+        # Return current actual voltage
         return self._voltage
 
     @property
-    # Return the set voltage
     def setpoint_voltage(self):
+        # Return the set voltage
         return self._setpoint_voltage
 
     @property
