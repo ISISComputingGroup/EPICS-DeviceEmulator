@@ -4,7 +4,6 @@ from lewis_emulators.utils.command_builder import CmdBuilder
 
 
 class TDKLambdaGenesysStreamInterface(StreamAdapter):
-
     commands = {
         CmdBuilder("write_voltage").escape("PV ").float().build(),
         CmdBuilder("read_setpoint_voltage").escape("PV?").build(),
@@ -13,8 +12,8 @@ class TDKLambdaGenesysStreamInterface(StreamAdapter):
         CmdBuilder("read_setpoint_current").escape("PC?").build(),
         CmdBuilder("read_current").escape("MC?").build(),
         CmdBuilder("remote").escape("RMT 1").build(),
-        CmdBuilder("write_powerstate").escape("OUT ").arg("[Off|On]").build(),
-        CmdBuilder("read_powerstate").escape("OUT?").build(),
+        CmdBuilder("write_power").escape("OUT ").arg("[Off|On]").build(),
+        CmdBuilder("read_power").escape("OUT?").build(),
     }
 
     in_terminator = "\r"
@@ -44,13 +43,14 @@ class TDKLambdaGenesysStreamInterface(StreamAdapter):
         self._device.setpoint_current = c
         return "VOLTAGE SET TO: " + c
 
-    def read_powerstate(self):
+    def read_power(self):
         return self._device.powerstate
 
-    def write_powerstate(self, p):
+    def write_power(self, p):
         self._device.powerstate = p
         return "POWER SET TO " + p
 
     def remote(self):
         # We can ignore this command
         pass
+

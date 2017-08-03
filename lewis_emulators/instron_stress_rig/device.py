@@ -1,5 +1,5 @@
 from collections import OrderedDict
-from states import DefaultState
+from states import DefaultState, GoingToSetpointState
 from lewis.devices import StateMachineDevice
 
 import time
@@ -14,11 +14,11 @@ class SimulatedInstron(StateMachineDevice):
 
         # When initialisation is complete, this is set to true and the device will enter a running state
         self.ready = True
-        self._control_channel = 1
+        self.control_channel = 1
         self._watchdog_status = (0, 0)
         self._control_mode = 0
         self._actuator_status = 0
-        self._movement_type = 2
+        self.movement_type = 0
         self.current_time = 0
         self.watchdog_refresh_time = 0
         self.status = 7680
@@ -27,6 +27,8 @@ class SimulatedInstron(StateMachineDevice):
         # Mode 1 = Random waveform
         self._waveform_mode = 0
 
+        # Maps a channel number to a channel object
+        self.channels = {1: PositionChannel(), 2: StressChannel(), 3: StrainChannel()}
 
     def raise_exception_if_cannot_write(self):
         if self._control_mode != 1:
@@ -35,19 +37,31 @@ class SimulatedInstron(StateMachineDevice):
     def _get_state_handlers(self):
         return {
             'default': DefaultState(),
+            'going': GoingToSetpointState(),
         }
+
+    # This is a workaround for https://github.com/DMSC-Instrument-Data/lewis/issues/248
+    def set_channel_param(self, index, param, value):
+        setattr(self.channels[int(index)], str(param), value)
+
+    # This is a workaround for https://github.com/DMSC-Instrument-Data/lewis/issues/248
+    def get_channel_param(self, index, param):
+        return getattr(self.channels[int(index)], str(param))
 
     def _get_initial_state(self):
         return 'default'
 
     def _get_transition_handlers(self):
-        return OrderedDict([])
+        return OrderedDict([
+            (('default', 'going'), lambda: self.movement_type != 0 and self.channels[self.control_channel].value != self.channels[self.control_channel].ramp_amplitude_setpoint),
+            (('going', 'default'), lambda: self.movement_type == 0 or self.channels[self.control_channel].value == self.channels[self.control_channel].ramp_amplitude_setpoint),
+        ])
 
     def get_control_channel(self):
-        return self._control_channel
+        return self.control_channel
 
     def set_control_channel(self, channel):
-        self._control_channel = channel
+        self.control_channel = channel
 
     def get_watchdog_status(self):
         return self._watchdog_status
@@ -78,18 +92,96 @@ class SimulatedInstron(StateMachineDevice):
         self.raise_exception_if_cannot_write()
         self._actuator_status = int(status)
         if status == 0:
-            self._movement_type = 0
+            self.movement_type = 0
 
     def get_movement_type(self):
-        return self._movement_type
+        return self.movement_type
 
     def set_movement_type(self, mov_type):
         self.raise_exception_if_cannot_write()
 
         if self._waveform_mode == 0:
-            self._movement_type = mov_type
+            self.movement_type = mov_type
         else:
-            self._movement_type = mov_type + 3
+            self.movement_type = mov_type + 3
 
     def set_current_time(self):
         self.current_time = time.time()
+
+    def set_step_time(self, channel, value):
+        self.channels[channel].step_time = value
+
+    def get_step_time(self, channel):
+        return self.channels[channel].step_time
+
+    def set_chan_waveform_type(self, channel, value):
+        self.channels[channel].waveform_type = value
+
+    def get_chan_waveform_type(self, channel):
+        return self.channels[channel].waveform_type
+
+    def set_ramp_amplitude_setpoint(self, channel, value):
+        self.channels[channel].ramp_amplitude_setpoint = value
+
+    def get_ramp_amplitude_setpoint(self, channel):
+        return self.channels[channel].ramp_amplitude_setpoint
+
+    def get_chan_scale(self, channel):
+        return self.channels[channel].scale
+
+    def get_chan_value(self, channel, type):
+        # Emulator/IOC only currently supports getting current value (type 0).
+        # Actual rig accepts values 0-12
+        assert int(type) == 0, "Emulator only supports getting current value"
+        return self.channels[channel].value
+
+    def get_strain_channel_length(self, channel):
+        # Getting the length is only supported for channel 3 (strain).
+        assert isinstance(self.channels[channel], StrainChannel), "Length only applies to strain channel"
+        # This number gets divided by in the IOC - if it's zero things will break.
+        assert self.channels[channel].length != 0, "Strain channel length was zero"
+        return self.channels[channel].length
+
+    def get_chan_area(self, channel):
+        # Area is only applicable to stress channel
+        assert isinstance(self.channels[channel], StressChannel), "Area only applies to stress channel"
+        return self.channels[channel].area
+
+    def set_chan_area(self, channel, value):
+        # Area is only applicable to stress channel
+        assert isinstance(self.channels[channel], StressChannel), "Area only applies to stress channel"
+        self.channels[channel].area = value
+
+    def get_chan_transducer_type(self, channel):
+        return self.channels[channel].transducer_type
+
+    def get_chan_type(self, channel):
+        return self.channels[channel].channel_type
+
+
+class Channel(object):
+    def __init__(self):
+        self.waveform_type = 0
+        self.step_time = 0
+        self.ramp_amplitude_setpoint = 0
+        self.scale = 10
+        self.value = 0
+        self.transducer_type = 0
+
+class PositionChannel(Channel):
+    def __init__(self):
+        super(PositionChannel, self).__init__()
+        self.channel_type = 3
+
+class StressChannel(Channel):
+    def __init__(self):
+        super(StressChannel, self).__init__()
+        self.area = 1
+        self.channel_type = 2
+
+
+class StrainChannel(Channel):
+    def __init__(self):
+        super(StrainChannel, self).__init__()
+        self.length = 1
+        self.channel_type = 4
