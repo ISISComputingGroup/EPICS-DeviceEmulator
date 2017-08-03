@@ -17,6 +17,18 @@ class InstronStreamInterface(StreamAdapter):
         Cmd("set_actuator_status", "^C23,([0-1])$"),
         Cmd("get_movement_type", "^Q1$"),
         Cmd("set_movement_type", "^C1,([0-3])$"),
+        Cmd("get_step_time", "^Q86,([1-3])$"),
+        Cmd("set_step_time", "^C86,([1-3]),([0-9]*.[0-9]*)$"),
+        Cmd("get_chan_waveform_type", "^Q2,([1-3])$"),
+        Cmd("set_chan_waveform_type", "^C2,([1-3]),([0-5])$"),
+        Cmd("get_ramp_amplitude_setpoint", "^Q4,([1-3])$"),
+        Cmd("set_ramp_amplitude_setpoint", "^C4,([1-3]),([0-9]*.[0-9]*)$"),
+        Cmd("get_single_point_feedback_data", "^Q134,([1-3]),([0-9]+)$"),
+        Cmd("get_chan_scale", "^Q308,([1-3])$"),
+        Cmd("get_strain_channel_length", "^Q340,([1-3])$"),
+        Cmd("get_chan_area", "^Q341,([1-3])$"),
+        Cmd("set_chan_area", "^C341,([1-3]),([0-9]*.[0-9]*)$"),
+        Cmd("get_chan_type", "^Q307,([1-3])$"),
     }
 
     in_terminator = "\r\n"
@@ -62,3 +74,41 @@ class InstronStreamInterface(StreamAdapter):
 
     def set_movement_type(self, mov_type):
         self._device.set_movement_type(int(mov_type))
+
+    def get_step_time(self, channel):
+        return float(self._device.get_step_time(int(channel)))
+
+    def set_step_time(self, channel, value):
+        self._device.set_step_time(int(channel), float(value))
+
+    def get_chan_waveform_type(self, channel):
+        return int(self._device.get_chan_waveform_type(int(channel)))
+
+    def set_chan_waveform_type(self, channel, value):
+        self._device.set_chan_waveform_type(int(channel), int(value))
+
+    def get_ramp_amplitude_setpoint(self, channel):
+        return float(self._device.get_ramp_amplitude_setpoint(int(channel)))
+
+    def set_ramp_amplitude_setpoint(self, channel, value):
+        self._device.set_ramp_amplitude_setpoint(int(channel), float(value))
+
+    def get_single_point_feedback_data(self, channel, type):
+        return float(self._device.get_chan_value(int(channel), int(type)))
+
+    def get_chan_scale(self, channel):
+        return self._device.get_chan_scale(int(channel))
+
+    def get_strain_channel_length(self, channel):
+        return self._device.get_strain_channel_length(int(channel))
+
+    def get_chan_area(self, channel):
+        return self._device.get_chan_area(int(channel))
+
+    def set_chan_area(self, channel, value):
+        self._device.set_chan_area(int(channel), float(value))
+
+    def get_chan_type(self, channel):
+        transducer_type = self._device.get_chan_transducer_type(int(channel))
+        chan_type = self._device.get_chan_type(int(channel))
+        return "{a},{b}".format(a=transducer_type, b=chan_type)
