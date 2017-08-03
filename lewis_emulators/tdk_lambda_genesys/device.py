@@ -2,16 +2,14 @@ from lewis.devices import StateMachineDevice
 from collections import OrderedDict
 from .states import DefaultState
 
+
 class SimulatedTDKLambdaGenesys(StateMachineDevice):
-
     def _initialize_data(self):
-
         self._voltage = 10.0
         self._current = 2.0
         self._setpoint_voltage = 10.0
         self._setpoint_current = 2.0
         self._powerstate = "Off"
-
 
     def _get_state_handlers(self):
         return {DefaultState.NAME: DefaultState()}
@@ -23,12 +21,12 @@ class SimulatedTDKLambdaGenesys(StateMachineDevice):
         return OrderedDict()
 
     @property
-    # return current actual voltage
+    # Return current actual voltage
     def voltage(self):
         return self._voltage
 
     @property
-    # return the set voltage
+    # Return the set voltage
     def setpoint_voltage(self):
         return self._setpoint_voltage
 
@@ -44,7 +42,6 @@ class SimulatedTDKLambdaGenesys(StateMachineDevice):
     def powerstate(self):
         return self._powerstate
 
-    # setters
     @voltage.setter
     def voltage(self, voltage):
         self._voltage = voltage
@@ -64,9 +61,3 @@ class SimulatedTDKLambdaGenesys(StateMachineDevice):
     @powerstate.setter
     def powerstate(self, p):
         self._powerstate = p
-
-
-
-
-
-
