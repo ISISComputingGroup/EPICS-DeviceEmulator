@@ -92,7 +92,3 @@ ENV/
 *.pid
 *.port
 .project
-
-
-#pycharm
-.idea/
