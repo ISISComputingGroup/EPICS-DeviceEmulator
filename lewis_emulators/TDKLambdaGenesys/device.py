@@ -23,7 +23,6 @@ class SimulatedTDKLambdaGenesys(StateMachineDevice):
 
     @property    
     def voltage(self):
-        # return current actual voltage
         return self._voltage
 
     @property    
@@ -42,7 +41,6 @@ class SimulatedTDKLambdaGenesys(StateMachineDevice):
     def powerstate(self):
         return self._powerstate
 
-    # setters
     @voltage.setter
     def voltage(self, voltage):
         self._voltage = voltage

@@ -1,9 +1,9 @@
 from lewis.adapters.stream import StreamAdapter, Cmd
 from lewis.core.logging import has_log
-from utils.command_builder import CmdBuilder
+from lewis_emulators.utils.command_builder import CmdBuilder
+
 
 class TDKLambdaGenesysStreamInterface(StreamAdapter):
-
     commands = {
         CmdBuilder("write_voltage").escape("PV ").float().build(),
         CmdBuilder("read_setpoint_voltage").escape("PV?").build(),
@@ -48,5 +48,3 @@ class TDKLambdaGenesysStreamInterface(StreamAdapter):
     def write_power(self, p):
         self._device.powerstate = p
         return "POWER SET TO " + p
-
-
