@@ -70,6 +70,14 @@ class CmdBuilder(object):
         """
         return self.arg(r"\d+")
 
+    def string(self):
+        """
+        Add a string argument.
+
+        :return: builder
+        """
+        return self.arg(r".*")
+
     def build(self, *args, **kwargs):
         """
         Builds the CMd object based on the target and regular expression.
