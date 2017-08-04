@@ -60,15 +60,12 @@ class CybamanStreamInterface(StreamAdapter):
         return ""
 
     def get_a(self):
-        print "Returning input A as {}".format(self._device.a)
         return self._device.a*3577
 
     def get_b(self):
-        print "Returning input B as {}".format(self._device.b)
         return self._device.b*3663
 
     def get_c(self):
-        print "Returning input C as {}".format(self._device.c)
         return self._device.c*3663
 
     def set_all(self, a, b, c, tm):
