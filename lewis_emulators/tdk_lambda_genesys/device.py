@@ -9,7 +9,7 @@ class SimulatedTDKLambdaGenesys(StateMachineDevice):
         self._current = 2.0
         self._setpoint_voltage = 10.0
         self._setpoint_current = 2.0
-        self._powerstate = "Off"
+        self._powerstate = "OFF"
 
     def _get_state_handlers(self):
         return {DefaultState.NAME: DefaultState()}
