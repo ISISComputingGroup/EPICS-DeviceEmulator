@@ -85,9 +85,10 @@ class CybamanStreamInterface(StreamAdapter):
         new_position = (float(a), float(b), float(c))
 
         max_difference = max([abs(a-b) for a, b in zip(old_position, new_position)])
-        expected_tm = max([int(round(max_difference * 1000)), 4000])
+        expected_tm = max([int(round(max_difference/5.0)) * 1000, 4000])
 
-        # Allow a difference of 1000 for rounding errors (error would get multiplied by 1000)
+        # Allow a difference of 1000 for rounding errors / differences between labview and epics
+        # (error would get multiplied by 1000)
         if abs(tm - expected_tm) > 1000:
             assert False, "Wrong TM value! Expected {} but got {}".format(expected_tm, tm)
 
