@@ -12,7 +12,7 @@ class TDKLambdaGenesysStreamInterface(StreamAdapter):
         CmdBuilder("read_setpoint_current").escape("PC?").build(),
         CmdBuilder("read_current").escape("MC?").build(),
         CmdBuilder("remote").escape("RMT 1").build(),
-        CmdBuilder("write_power").escape("OUT ").arg("[Off|On]").build(),
+        CmdBuilder("write_power").escape("OUT ").arg("[OFF|ON]").build(),
         CmdBuilder("read_power").escape("OUT?").build(),
     }
 
