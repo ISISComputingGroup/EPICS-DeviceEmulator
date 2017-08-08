@@ -17,6 +17,8 @@ class SimulatedIeg(StateMachineDevice):
 
         self.operatingmode = 0
 
+        self.error = 0
+
     def _get_state_handlers(self):
         return {
             'dormant': DormantState(),
@@ -43,3 +45,4 @@ class SimulatedIeg(StateMachineDevice):
             (('dormant', 'single_shot'), lambda: self.operatingmode == 4),
             (('single_shot', 'dormant'), lambda: self.operatingmode != 4),
         ])
+

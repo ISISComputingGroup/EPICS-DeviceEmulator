@@ -32,7 +32,7 @@ class IegStreamInterface(StreamAdapter):
             .add_data_block("IEG", self._device.unique_id) \
             .add_data_block("OPM", self._device.operatingmode) \
             .add_data_block("VST", self._build_valve_state()) \
-            .add_data_block("ERR", 0) \
+            .add_data_block("ERR", self._device.error) \
             .add_data_block("BPH", 0) \
             .add_data_block("SPL", 0) \
             .add_data_block("SPH", 0) \
