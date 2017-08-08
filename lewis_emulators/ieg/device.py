@@ -23,6 +23,8 @@ class SimulatedIeg(StateMachineDevice):
 
         self.error = 0
 
+        self.buffer_pressure_high = True
+
     def _get_state_handlers(self):
         return {
             'dormant': DormantState(),
@@ -55,3 +57,27 @@ class SimulatedIeg(StateMachineDevice):
 
     def is_sample_pressure_low(self):
         return self.sample_pressure < self.sample_pressure_low_limit
+
+    def get_id(self):
+        return self.unique_id
+
+    def get_pressure(self):
+        return self.sample_pressure
+
+    def get_error(self):
+        return self.error
+
+    def is_pump_valve_open(self):
+        return self.pump_valve_open
+
+    def is_buffer_valve_open(self):
+        return self.buffer_valve_open
+
+    def is_gas_valve_open(self):
+        return self.gas_valve_open
+
+    def get_operating_mode(self):
+        return self.operatingmode
+
+    def is_buffer_pressure_high(self):
+        return self.buffer_pressure_high
