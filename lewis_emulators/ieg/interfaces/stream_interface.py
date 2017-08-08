@@ -27,8 +27,6 @@ class IegStreamInterface(StreamAdapter):
 
     def get_status(self):
         return ResponseBuilder() \
-            .ack() \
-            .startpacket() \
             .add_data_block("IEG", self._device.get_id()) \
             .add_data_block("OPM", self._device.get_operating_mode()) \
             .add_data_block("VST", self._build_valve_state()) \
@@ -37,33 +35,32 @@ class IegStreamInterface(StreamAdapter):
             .add_data_block("SPL", 1 if self._device.is_sample_pressure_low() else 0) \
             .add_data_block("SPH", 1 if self._device.is_sample_pressure_high() else 0) \
             .add_data_block("SPR", int(self._device.get_pressure())) \
-            .endpacket() \
             .build()
 
     def change_operating_mode(self, mode):
         self._device.operatingmode = int(mode)
         return ResponseBuilder()\
-            .ack()\
-            .startpacket()\
             .add_data_block("IEG", self._device.get_id()) \
             .add_data_block("OPM", self._device.get_operating_mode())\
-            .endpacket()\
             .build()
 
     def abort(self):
         self._device.operatingmode = 0
         return ResponseBuilder() \
-            .ack() \
-            .startpacket() \
             .add_data_block("IEG", self._device.get_id()) \
             .add_data_block("KILL") \
-            .endpacket() \
             .build()
 
 
 class ResponseBuilder(object):
     """
-    Response builder for the IEG
+    Response builder for the IEG.
+
+    Outputs:
+    - An ACK packet before the response, properly terminated.
+    - A "start of data block" character
+    - Any number of data blocks added by add_data_block()
+    - An "end of data block" character
     """
     packet_start = "&"
     packet_end = "!"
@@ -71,35 +68,14 @@ class ResponseBuilder(object):
 
     def __init__(self):
         """
-        Initialize a new response
+        Initialize a new response.
         """
-        self.response = ""
+        self.response = "{pack_start}ACK{pack_end}{term}{pack_start}".format(pack_start=self.packet_start,
+                                                                             pack_end=self.packet_end,
+                                                                             term=IegStreamInterface.out_terminator)
 
-    def ack(self):
-        """
-        Add an ACK data packet, complete with terminator, to the response
-        :return: ResponseBuilder
-        """
-        self.response += "{pack_start}ACK{pack_end}{term}".format(pack_start=self.packet_start,
-                                                                  pack_end=self.packet_end,
-                                                                  term=IegStreamInterface.out_terminator)
-        return self
-
-    def startpacket(self):
-        """
-        Adds the character signifying the start of a data block
-        :return: ResponseBuilder
-        """
-        self.response += self.packet_start
-        return self
-
-    def endpacket(self):
-        """
-        Adds the 'end data' character to the response
-        :return: ResponseBuilder
-        """
-        self.response += self.packet_end
-        return self
+        # Not yet in a valid state - set to true once at least one data block is added
+        self.valid = False
 
     def add_data_block(self, *data):
         """
@@ -114,6 +90,9 @@ class ResponseBuilder(object):
 
         for item in data:
             self.response += "{}".format(item)
+
+        # At least one data block has now been added so this is a valid message
+        self.valid = True
         return self
 
     def build(self):
@@ -121,4 +100,6 @@ class ResponseBuilder(object):
         Extract the response from the builder
         :return: (str) response
         """
+        assert self.valid, "At least one data block must be added before calling build"
+        self.response += self.packet_end
         return self.response
