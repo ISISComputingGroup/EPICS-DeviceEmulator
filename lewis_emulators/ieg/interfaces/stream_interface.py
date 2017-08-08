@@ -26,29 +26,48 @@ class IegStreamInterface(StreamAdapter):
         return str(error)
 
     def get_status(self):
-        pass
+        return ResponseBuilder() \
+            .ack() \
+            .startpacket() \
+            .add_data_block("IEG", self._device.unique_id) \
+            .add_data_block("OPM", self._device.operatingmode) \
+            .add_data_block("VST", self._build_valve_state()) \
+            .add_data_block("ERR", 0) \
+            .add_data_block("BPH", 0) \
+            .add_data_block("SPL", 0) \
+            .add_data_block("SPH", 0) \
+            .add_data_block("SPR", 0) \
+            .endpacket() \
+            .build()
 
-    @has_log
     def change_operating_mode(self, mode):
-        self.log.info("Setting mode to {}".format(mode))
         self._device.operatingmode = int(mode)
         return ResponseBuilder()\
             .ack()\
-            .startdata()\
-            .data("IEG").data(self._device.unique_id)\
-            .separator()\
-            .data("OPM").data(self._build_valve_state())\
-            .enddata()\
+            .startpacket()\
+            .add_data_block("IEG", self._device.unique_id) \
+            .add_data_block("OPM", self._device.operatingmode)\
+            .endpacket()\
             .build()
 
     def abort(self):
         self._device.operatingmode = 0
+        return ResponseBuilder() \
+            .ack() \
+            .startpacket() \
+            .add_data_block("IEG", self._device.unique_id) \
+            .add_data_block("KILL") \
+            .endpacket() \
+            .build()
 
 
 class ResponseBuilder(object):
     """
     Response builder for the IEG
     """
+    packet_start = "&"
+    packet_end = "!"
+    data_block_sep = ","
 
     def __init__(self):
         """
@@ -58,43 +77,36 @@ class ResponseBuilder(object):
 
     def ack(self):
         """
-        Add an ACK data packet to the response
+        Add an ACK data packet, complete with terminator, to the response
         :return: ResponseBuilder
         """
-        self.response += "&ACK!{term}".format(term=IegStreamInterface.out_terminator)
+        self.response += "{pack_start}ACK{pack_end}{term}".format(pack_start=self.packet_start,
+                                                                  pack_end=self.packet_end,
+                                                                  term=IegStreamInterface.out_terminator)
         return self
 
-    def startdata(self):
+    def startpacket(self):
         """
         Adds the character signifying the start of a data block
         :return: ResponseBuilder
         """
-        self.response += "&"
+        self.response += self.packet_start
         return self
 
-    def separator(self):
-        """
-        Adds the character signifying the seperator between bits of data
-        :return: ResponseBuilder
-        """
-        self.response += ","
-        return self
-
-    def data(self, data):
-        """
-        Adds data to the response being built
-        :param data: the data to add
-        :return: ResponseBuilder
-        """
-        self.response += str(data)
-        return self
-
-    def enddata(self):
+    def endpacket(self):
         """
         Adds the 'end data' character to the response
         :return: ResponseBuilder
         """
-        self.response += "!"
+        self.response += self.packet_end
+        return self
+
+    def add_data_block(self, *data):
+        if not self.response[-1:] == self.data_block_sep and not self.response[-1:] == self.packet_start:
+            self.response += self.data_block_sep
+
+        for item in data:
+            self.response += "{}".format(item)
         return self
 
     def build(self):
