@@ -34,9 +34,9 @@ class IegStreamInterface(StreamAdapter):
             .add_data_block("VST", self._build_valve_state()) \
             .add_data_block("ERR", self._device.error) \
             .add_data_block("BPH", 0) \
-            .add_data_block("SPL", 0) \
-            .add_data_block("SPH", 0) \
-            .add_data_block("SPR", 0) \
+            .add_data_block("SPL", 1 if self._device.is_sample_pressure_low() else 0) \
+            .add_data_block("SPH", 1 if self._device.is_sample_pressure_high() else 0) \
+            .add_data_block("SPR", int(self._device.sample_pressure)) \
             .endpacket() \
             .build()
 

@@ -17,6 +17,10 @@ class SimulatedIeg(StateMachineDevice):
 
         self.operatingmode = 0
 
+        self.sample_pressure_high_limit = 100
+        self.sample_pressure_low_limit = 10
+        self.sample_pressure = 0
+
         self.error = 0
 
     def _get_state_handlers(self):
@@ -46,3 +50,8 @@ class SimulatedIeg(StateMachineDevice):
             (('single_shot', 'dormant'), lambda: self.operatingmode != 4),
         ])
 
+    def is_sample_pressure_high(self):
+        return self.sample_pressure > self.sample_pressure_high_limit
+
+    def is_sample_pressure_low(self):
+        return self.sample_pressure < self.sample_pressure_low_limit
