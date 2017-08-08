@@ -4,13 +4,12 @@ from .states import DefaultState
 
 
 class SimulatedTDKLambdaGenesys(StateMachineDevice):
-
     def _initialize_data(self):
         self._voltage = 10.0
         self._current = 2.0
         self._setpoint_voltage = 10.0
         self._setpoint_current = 2.0
-        self._powerstate = "Off"
+        self._powerstate = "OFF"
 
     def _get_state_handlers(self):
         return {DefaultState.NAME: DefaultState()}
@@ -21,12 +20,14 @@ class SimulatedTDKLambdaGenesys(StateMachineDevice):
     def _get_transition_handlers(self):
         return OrderedDict()
 
-    @property    
+    @property
     def voltage(self):
+        # Return current actual voltage
         return self._voltage
 
-    @property    
+    @property
     def setpoint_voltage(self):
+        # Return the set voltage
         return self._setpoint_voltage
 
     @property
