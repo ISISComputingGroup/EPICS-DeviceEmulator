@@ -40,7 +40,7 @@ class IegStreamInterface(StreamAdapter):
             .build()
 
     def change_operating_mode(self, mode):
-        self._device.operatingmode = int(mode)
+        self._device.set_operating_mode(int(mode))
         return ResponseBuilder()\
             .add_data_block("IEG", self._device.get_id()) \
             .add_data_block("OPM", self._device.get_operating_mode())\
