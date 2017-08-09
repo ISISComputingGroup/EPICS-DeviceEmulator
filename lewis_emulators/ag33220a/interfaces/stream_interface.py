@@ -1,32 +1,35 @@
 from lewis.adapters.stream import StreamAdapter, Cmd
 import traceback
 
+NUM_MIN_MAX = "([\-0-9.]+|MAX|MIN)"
+
 
 class AG33220AStreamInterface(StreamAdapter):
 
     commands = {
         Cmd("get_amplitude", "^VOLT\?$"),
-        Cmd("set_amplitude", "^VOLT " + "([\-0-9.]+|MAX|MIN)$", argument_mappings=[str]),
+        Cmd("set_amplitude", "^VOLT " + NUM_MIN_MAX, argument_mappings=[str]),
         Cmd("get_frequency", "^FREQ\?$"),
-        Cmd("set_frequency", "^FREQ " + "([\-0-9.]+|MAX|MIN)$", argument_mappings=[str]),
+        Cmd("set_frequency", "^FREQ " + NUM_MIN_MAX, argument_mappings=[str]),
         Cmd("get_offset", "^VOLT:OFFS\?$"),
-        Cmd("set_offset", "^VOLT:OFFS " + "([\-0-9.]+|MAX|MIN)$", argument_mappings=[str]),
+        Cmd("set_offset", "^VOLT:OFFS " + NUM_MIN_MAX, argument_mappings=[str]),
         Cmd("get_units", "^VOLT:UNIT\?$"),
-        Cmd("set_units", "^VOLT:UNIT " + "(VPP|VRMS|DBM)$", argument_mappings=[str]),
+        Cmd("set_units", "^VOLT:UNIT (VPP|VRMS|DBM)$", argument_mappings=[str]),
         Cmd("get_function", "^FUNC\?$"),
-        Cmd("set_function", "^FUNC " + "(SIN|SQU|RAMP|PULS|NOIS|DC|USER)$", argument_mappings=[str]),
+        Cmd("set_function", "^FUNC (SIN|SQU|RAMP|PULS|NOIS|DC|USER)$", argument_mappings=[str]),
         Cmd("get_output", "^OUTP\?$"),
-        Cmd("set_output", "^OUTP " + "(0|1|ON|OFF)$", argument_mappings=[str]),
+        Cmd("set_output", "^OUTP (ON|OFF)$", argument_mappings=[str]),
         Cmd("get_idn", "^\*IDN\?$"),
         Cmd("get_voltage_high", "^VOLT:HIGH\?$"),
-        Cmd("set_voltage_high", "^VOLT:HIGH " + "([\-0-9.]+|MAX|MIN)$", argument_mappings=[str]),
+        Cmd("set_voltage_high", "^VOLT:HIGH " + NUM_MIN_MAX, argument_mappings=[str]),
         Cmd("get_voltage_low", "^VOLT:LOW\?$"),
-        Cmd("set_voltage_low", "^VOLT:LOW " + "([\-0-9.]+|MAX|MIN)$", argument_mappings=[str]),
+        Cmd("set_voltage_low", "^VOLT:LOW " + NUM_MIN_MAX, argument_mappings=[str]),
+        Cmd("get_voltage_range_auto", "^VOLT:RANG:AUTO\?$"),
+        Cmd("set_voltage_range_auto", "^VOLT:RANG:AUTO (OFF|ON|ONCE)$", argument_mappings=[str]),
     }
 
-    in_terminator = "\n"    # \r\n for putty
+    in_terminator = "\n"
     out_terminator = "\n"
-
 
     # Takes in a value and returns a value in the form of x.xxx0000000000Eyy
     def float_output(self, value):
@@ -61,17 +64,12 @@ class AG33220AStreamInterface(StreamAdapter):
         return self._device.function
 
     def set_function(self, new_function):
-        self._device.function = new_function
-        self.set_frequency(self._device.frequency)
+        self._device.set_function(new_function)
 
     def get_output(self):
-        return self._device.output
+        return self._device.get_output()
 
     def set_output(self, new_output):
-        try:
-            new_output = int(new_output)
-        except:
-            new_output = ["OFF", "ON"].index(new_output)
         self._device.output = new_output
 
     def get_idn(self):
@@ -88,6 +86,12 @@ class AG33220AStreamInterface(StreamAdapter):
 
     def set_voltage_low(self, new_voltage_low):
         self._device.set_new_voltage_low(new_voltage_low)
+
+    def get_voltage_range_auto(self):
+        return self._device.get_range_auto()
+
+    def set_voltage_range_auto(self, range_auto):
+        self._device.range_auto = range_auto
 
     def handle_error(self, request, error):
         print traceback.format_exc()

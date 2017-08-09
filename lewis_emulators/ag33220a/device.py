@@ -5,36 +5,36 @@ class SimulatedAG33220A(Device):
     """
     Simulated AG33220A
     """
-    make = "Agilent Technologies,33220A"
-    firmware_rev_num = "MY44033103,2.02"
-    boot_kernel_revision_number = "2.02"
-    asic_rev_num = "22"
-    printed_circuit_board_rev_num = "2"
-    idn = make+"-"+firmware_rev_num+"-"+boot_kernel_revision_number+"-"+asic_rev_num+"-"+printed_circuit_board_rev_num
+
+    # Constants
+    AMP_MIN = 0.01
+    AMP_MAX = 10
+    OFF_MAX = 4.995
+    VOLT_MAX = 5
+    VOLT_MIN = -5
+    VOLT_LOW_MAX = 4.99
+    VOLT_HIGH_MIN = -4.99
+    VOLT_PRECISION = 0.01
+    FREQ_MINS = {"SIN": 10 ** -6, "SQU": 10 ** -6, "RAMP": 10 ** -6, "PULS": 5 * 10 ** -4,
+                 "NOIS": 10 ** -6, "USER": 10 ** -6}
+    FREQ_MAXS = {"SIN": 2 * 10 ** 7, "SQU": 2 * 10 ** 7, "RAMP": 2 * 10 ** 5, "PULS": 5 * 10 ** 6,
+                 "NOIS": 2 * 10 ** 7, "USER": 6 * 10 ** 6}
+
+    # Device variables
+    idn = "Agilent Technologies,33220A-MY44033103,2.02-2.02-22-2"
     amplitude = 0.1
     frequency = 1000
     offset = 0
     units = "VPP"
     function = "SIN"
-    output = 0
+    output = "ON"
     voltage_high = 0.05
     voltage_low = -0.05
-    amplitude_lower_bound = 0.01
-    amplitude_upper_bound = 10
-    offset_lower_bound = -4.995
-    offset_upper_bound = 4.995
-    voltage_lower_bound = -5
-    voltage_upper_bound = 5
-    voltage_low_lower_bound = -5
-    voltage_low_upper_bound = 4.99
-    voltage_high_lower_bound = -4.99
-    voltage_high_upper_bound = 5
-    voltage_precision = 0.01
+    range_auto = "OFF"
 
     def limit(self, value, minimum, maximum):
         """
-        Limits an input number between two given numbers
-        or sets the value to the maximum or minimum.
+        Limits an input number between two given numbers or sets the value to the maximum or minimum.
 
         :param value: the value to be limited
         :param minimum: the smallest that the value can be
@@ -42,109 +42,99 @@ class SimulatedAG33220A(Device):
 
         :return: the value after it has been limited
         """
-        try:
-            value = float(value)
-            if value >= maximum:
-                return maximum
-            elif value < minimum:
-                return minimum
-            else:
-                return value
-        except:
-            return {"MIN": minimum, "MAX": maximum}[value]
+        if type(value) is str:
+            try:
+                value = float(value)
+            except ValueError:
+                return {"MIN": minimum, "MAX": maximum}[value]
+
+        return max(min(value, maximum), minimum)
 
     def set_new_amplitude(self, new_amplitude):
         """
-        Changing the amplitude to the new amplitude whilst also changing
-        voltage high, voltage low, and offset if voltage high or low is outside the boundary.
+        Changing the amplitude to the new amplitude whilst also changing the offset if voltage high or low is
+        outside the boundary. The volt high and low are then updated.
 
-        :param new_amplitude; the amplitude to set the devices amplitude to
+        :param new_amplitude: the amplitude to set the devices amplitude to
         """
-        new_amplitude = self.limit(new_amplitude, self.amplitude_lower_bound, self.amplitude_upper_bound)
-        if 0.5 * new_amplitude + self.offset > self.voltage_upper_bound or self.offset - 0.5 * new_amplitude < self.voltage_lower_bound:
-            if 0.5 * new_amplitude + self.offset > self.voltage_upper_bound:
-                offset_difference = 0.5 * new_amplitude + self.offset - self.voltage_upper_bound
-            elif self.offset - 0.5 * new_amplitude < self.voltage_lower_bound:
-                offset_difference = -0.5 * new_amplitude + self.offset + self.voltage_upper_bound
-            self.offset -= offset_difference
-            self.voltage_high -= offset_difference
-            self.voltage_low -= offset_difference
-        else:
-            self.update_volt_high_and_low(new_amplitude, self.offset)
+        new_amplitude = self.limit(new_amplitude, self.AMP_MIN, self.AMP_MAX)
+
+        peak_amp = 0.5 * new_amplitude
+        if self.offset + peak_amp > self.VOLT_MAX:
+            self.offset = self.VOLT_MAX - peak_amp
+        elif self.offset - peak_amp < self.VOLT_MIN:
+            self.offset = self.VOLT_MIN + peak_amp
+
         self.amplitude = new_amplitude
+
+        self._update_volt_high_and_low(self.amplitude, self.offset)
 
     def set_new_frequency(self, new_frequency):
         """
-        Sets the frequency within limits between upper and lower bound
-        which are different for each function.
+        Sets the frequency within limits between upper and lower bound (depends on the function).
 
-        :param new_frequency: the frequency which wants to be set
+        :param new_frequency: the frequency to set to
         """
-        self.frequency = self.limit(new_frequency, self.frequency_lower_bound(), self.frequency_upper_bound())
+        self.frequency = self.limit(new_frequency, self.FREQ_MINS[self.function], self.FREQ_MAXS[self.function])
 
-    def set_new_voltage_high(self,new_voltage_high):
+    def set_new_voltage_high(self, new_voltage_high):
         """
-        Sets a new voltage high which then changes the voltage low if voltage high
-        is set to a value lower than the voltage low.
+        Sets a new voltage high which then changes the voltage low to keep it lower.
         The voltage offset and amplitude are then updated.
 
-        :param new_voltage_high: the value of voltage high which is to be set
+        :param new_voltage_high: the value of voltage high to set to
         """
-        new_voltage_high = self.limit(new_voltage_high, self.voltage_high_lower_bound, self.voltage_high_upper_bound)
+        new_voltage_high = self.limit(new_voltage_high, self.VOLT_HIGH_MIN, self.VOLT_MAX)
         if new_voltage_high <= self.voltage_low:
-            self.voltage_low = self.limit(new_voltage_high - self.voltage_precision, self.voltage_low_lower_bound, new_voltage_high)
-        self.update_volt_and_offs(self.voltage_low, new_voltage_high)
+            self.voltage_low = self.limit(new_voltage_high - self.VOLT_PRECISION, self.VOLT_MIN, new_voltage_high)
+        self._update_volt_and_offs(self.voltage_low, new_voltage_high)
 
-    def set_new_voltage_low(self,new_voltage_low):
+    def set_new_voltage_low(self, new_voltage_low):
         """
-        Sets a new voltage low which then changes the voltage high if voltage low
-        is set to a value higher than the voltage high.
+        Sets a new voltage high which then changes the voltage low to keep it higher.
         The voltage offset and amplitude are then updated.
 
         :param new_voltage_low: the value of voltage low which is to be set
         """
-        new_voltage_low = self.limit(new_voltage_low, self.voltage_low_lower_bound, self.voltage_low_upper_bound)
+        new_voltage_low = self.limit(new_voltage_low, self.VOLT_MIN, self.VOLT_LOW_MAX)
         if new_voltage_low >= self.voltage_high:
-            self.voltage_high = self.limit(new_voltage_low + self.voltage_precision, new_voltage_low, self.voltage_high_upper_bound)
-        self.update_volt_and_offs(new_voltage_low, self.voltage_high)
+            self.voltage_high = self.limit(new_voltage_low + self.VOLT_PRECISION, new_voltage_low, self.VOLT_MAX)
+        self._update_volt_and_offs(new_voltage_low, self.voltage_high)
 
-    def update_volt_and_offs(self, new_low, new_high):
+    def _update_volt_and_offs(self, new_low, new_high):
         """
-        Updates the value of amplitude and offset if there is a change in
-        voltage low or voltage high.
+        Updates the value of amplitude and offset if there is a change in voltage low or voltage high.
 
         :param new_low: the value of voltage low
         :param new_high: the value of voltage high
         """
         self.voltage_high = new_high
         self.voltage_low = new_low
-        self.amplitude = self.voltage_high-self.voltage_low
-        self.offset = (self.voltage_high+self.voltage_low)/2
+        self.amplitude = self.voltage_high - self.voltage_low
+        self.offset = (self.voltage_high + self.voltage_low)/2
 
     def set_offs_and_update_voltage(self, new_offset):
         """
-        Sets the value of offset and updates the amplitude, voltage low and
-        voltage high for a new value of the offset.
+        Sets the value of offset and updates the amplitude, voltage low and voltage high for a new value of the offset.
 
         :param new_offset: the new offset to be set
         """
-        new_offset = self.limit(new_offset, self.offset_lower_bound, self.offset_upper_bound)
-        if new_offset+self.voltage_high > self.voltage_upper_bound:
-            self.amplitude = 2/(self.voltage_upper_bound-new_offset)
-            self.voltage_high = self.voltage_upper_bound
-            self.voltage_low = self.voltage_upper_bound - self.amplitude
-        elif new_offset+self.voltage_low < self.voltage_lower_bound:
-            self.amplitude = 2/(self.voltage_lower_bound-new_offset)
-            self.voltage_low = self.voltage_lower_bound
-            self.voltage_high = self.voltage_lower_bound + self.amplitude
+        new_offset = self.limit(new_offset, -self.OFF_MAX, self.OFF_MAX)
+        if new_offset + self.voltage_high > self.VOLT_MAX:
+            self.amplitude = 2*(self.VOLT_MAX-new_offset)
+            self.voltage_high = self.VOLT_MAX
+            self.voltage_low = self.VOLT_MAX - self.amplitude
+        elif new_offset + self.voltage_low < self.VOLT_MIN:
+            self.amplitude = 2*(self.VOLT_MIN-new_offset)
+            self.voltage_low = self.VOLT_MIN
+            self.voltage_high = self.VOLT_MIN + self.amplitude
         else:
-            self.update_volt_high_and_low(self.amplitude, new_offset)
+            self._update_volt_high_and_low(self.amplitude, new_offset)
         self.offset = new_offset
 
-    def update_volt_high_and_low(self, new_volt, new_offs):
+    def _update_volt_high_and_low(self, new_volt, new_offs):
         """
-        Updates the value of voltage high and low for a given value of
-        amplitude and offset.
+        Updates the value of voltage high and low for a given value of amplitude and offset.
 
         :param new_volt: the value of the amplitude
         :param new_offs: the value of the offset
@@ -154,20 +144,13 @@ class SimulatedAG33220A(Device):
         self.voltage_high = new_offs + new_volt / 2
         self.voltage_low = new_offs - new_volt / 2
 
-    def frequency_lower_bound(self):
-        """
-        Returning the appropriate lower bound for the frequency for a given function.
+    def get_output(self):
+        return ["OFF", "ON"].index(self.output)
 
-        :return: lower bound for the frequency for a given function
-        """
-        return {"SIN": 10 ** -6, "SQU": 10 ** -6, "RAMP": 10 ** -6, "PULS": 5 * 10 ** -4, "NOIS": 10 ** -6, "USER": 10 ** -6}[self.function]
+    def get_range_auto(self):
+        possible_ranges = ["OFF", "ON", "ONCE"]
+        return possible_ranges.index(self.range_auto)
 
-    def frequency_upper_bound(self):
-        """
-            Returning the appropriate upper bound for the frequency for a given function.
-
-            :return: upper bound for the frequency for a given function
-        """
-        return {"SIN": 2 * 10 ** 7, "SQU": 2 * 10 ** 7, "RAMP": 2 * 10 ** 5, "PULS": 5 * 10 ** 6, "NOIS": 2 * 10 ** 7,"USER": 6 * 10 ** 6}[self.function]
-
-    pass
+    def set_function(self, new_function):
+        self.function = new_function
+        self.frequency = self.limit(self.frequency, self.FREQ_MINS[new_function], self.FREQ_MAXS[new_function])
