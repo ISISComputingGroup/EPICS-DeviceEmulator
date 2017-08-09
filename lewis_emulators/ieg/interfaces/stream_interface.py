@@ -12,7 +12,9 @@ class IegStreamInterface(StreamAdapter):
     }
 
     in_terminator = "!"
-    out_terminator = "\r\n"
+
+    # Out terminator is defined in ResponseBuilder instead as we need to add it to two messages.
+    out_terminator = ""
 
     def _build_valve_state(self):
         val = 0
@@ -63,16 +65,14 @@ class ResponseBuilder(object):
     - An "end of data block" character
     """
     packet_start = "&"
-    packet_end = "!"
+    packet_end = "!\r\n"
     data_block_sep = ","
 
     def __init__(self):
         """
         Initialize a new response.
         """
-        self.response = "{pack_start}ACK{pack_end}{term}{pack_start}".format(pack_start=self.packet_start,
-                                                                             pack_end=self.packet_end,
-                                                                             term=IegStreamInterface.out_terminator)
+        self.response = "{pack_start}ACK{pack_end}{pack_start}".format(pack_start=self.packet_start, pack_end=self.packet_end)
 
         # Not yet in a valid state - set to true once at least one data block is added
         self.valid = False
@@ -101,5 +101,4 @@ class ResponseBuilder(object):
         :return: (str) response
         """
         assert self.valid, "At least one data block must be added before calling build"
-        self.response += self.packet_end
-        return self.response
+        return "{response}{packet_end}".format(response=self.response, packet_end=self.packet_end)
