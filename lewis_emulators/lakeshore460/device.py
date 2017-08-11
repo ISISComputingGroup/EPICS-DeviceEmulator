@@ -6,7 +6,7 @@ from .states import DefaultState
 
 class SimulatedLakeshore460(StateMachineDevice):
     """
-    Simulated AM Int2-L pressure transducer.
+    Simulated Lakeshore 460
     """
 
     def _initialize_data(self):
@@ -119,171 +119,280 @@ class SimulatedLakeshore460(StateMachineDevice):
 
     @prms.setter
     def prms(self, prms):
+        """
+        :param prms: Sets the value to Peak or RMS
+        :return:
+        """
         self._prms = prms
 
     @property
     def filter(self):
         """
-        :return: Peajk /RMS Field reading
+        :return: returns filter
         """
         return self._filter
 
     @filter.setter
     def filter(self, state):
+        """
+        :param state:  sets filter state (binary)
+        :return:
+        """
         self._filter = state
 
     @property
     def max_hold(self):
         """
-        :return: Peajk /RMS Field reading
+        :return: returns binary max hold
         """
         return self._max_hold
 
     @max_hold.setter
     def max_hold(self, max_hold):
+        """
+        :param max_hold: sets the max hold value
+        :return:
+        """
         self._max_hold = max_hold
 
     @property
     def rel_mode(self):
         """
-        :return: Peajk /RMS Field reading
+        :return: Return relative mode reading
         """
         return self._rel_mode
 
     @rel_mode.setter
     def rel_mode(self, rel_mode):
+        """
+        :param rel_mode:  Sets the relative mode reading
+        :return:
+        """
         self._rel_mode = rel_mode
 
     @property
     def auto_range(self):
         """
-        :return: Peajk /RMS Field reading
+        :return: Returns the auto range
         """
         return self._auto_range
 
     @auto_range.setter
     def auto_range(self, range):
+        """
+        :param range: sets the auto range
+        :return:
+        """
         self._auto_range = range
 
     @property
     def manual_range(self):
         """
-        :return: Peajk /RMS Field reading
+        :return: the value that has been set for the manual range
         """
         return self._manual_range
 
     @manual_range.setter
     def manual_range(self, range):
+        """
+        :param range: sets the manual range
+        :return:
+        """
         self._manual_range = range
 
     @property
     def total_fields(self):
+        """
+        :return:  the total field value X Y Z Field
+        """
         return self._total_fields
 
     @total_fields.setter
     def total_fields(self, total):
+        """
+        :param total:  sets the total field value for X Y Z Field
+        :return:
+        """
         self._total_fields = total
 
     @property
     def source(self):
-       return self._source
+        """
+        :return:  Returns magnetic field source XYZ, XYZ
+        """
+        return self._source
 
     @source.setter
     def source(self, source):
+        """
+        :param source: Sets magnetic field source XYZ, XYZ
+        :return:
+        """
         self._source = source
 
     @property
     def channel(self):
+        """
+        :return: returns the channel value i.e Channel X, Channel Y
+        """
         return self._channel
 
     @channel.setter
     def channel(self, channel):
+        """
+        :param channel:  sets channel i.e Channel X, Channel Y
+        :return:
+        """
         self._channel = channel
 
     @property
     def display_filter(self):
+        """
+        :return: returns the percentage for display field opening
+        """
         return self._display_filter
 
     @display_filter.setter
     def display_filter(self, percentage):
+        """
+        :param percentage: sets the percentage for display filter opening
+        :return:
+        """
         self._display_filter = percentage
 
     @property
     def filter_points(self):
+        """
+        :return: returns filter points value should be between 1 to 10
+        """
         return self._filter_points
 
     @filter_points.setter
     def filter_points(self, points):
+        """
+        :param points: sets filter points value should be between 1 to 10
+        :return:
+        """
         self._filter_points = points
 
     @property
     def rel_multiplier(self):
+        """
+        :return: Returns relative multiplier for device
+        """
         return self._rel_multiplier
 
     @rel_multiplier.setter
     def rel_multiplier(self, multiplier):
+        """
+        :param multiplier:
+        :return: sets the relative multiplier for the device
+        """
         self._rel_multiplier = multiplier
 
     @property
     def reading_multiplier(self):
+        """
+        :return:  return reading multiplier
+        """
         return self._reading_multiplier
 
     @reading_multiplier.setter
     def reading_multiplier(self, multiplier):
+        """
+        :param multiplier:  sets the reading multiplier for the device
+        :return:
+        """
         self._reading_multiplier = multiplier
 
     @property
     def rel_set_point(self):
-        return self._rel_set_point
+        """
+        :return: return relative mode setpoint for Lakeshore 460
+        """
+        return self._rel_set_points
 
     @rel_set_point.setter
     def rel_set_point(self, setpoint):
+        """
+        :param setpoint:  sets the relative mode set point
+        :return:
+        """
         self._rel_set_point = setpoint
 
     @property
     def max_reading(self):
+        """
+        :return: returns max reading for Lakeshore 460
+        """
         return self._max_reading
 
     @max_reading.setter
     def max_reading(self, reading):
+        """
+        :param reading:  sets max_reading for device
+        :return:
+        """
         self._max_reading = reading
 
     @property
     def rel_mode_reading(self):
         """
-        :return: Peajk /RMS Field reading
+        :return: Return relative mode reading
         """
         return self._rel_mode_reading
 
     @rel_mode_reading.setter
     def rel_mode_reading(self, rel_mode):
+        """
+        :param rel_mode: sets relative mode reading
+        :return:
+        """
         self._rel_mode_reading = rel_mode
 
     @property
     def rel_mode_reading_multiplier(self):
         """
-        :return: Peajk /RMS Field reading
+        :return: Return relative mode multiplier
         """
         return self._rel_mode_reading_multiplier
 
     @rel_mode_reading_multiplier.setter
     def rel_mode_reading_multiplier(self, multiplier):
+        """
+        :param multiplier:  sets relative mode multiplier
+        :return:
+        """
         self._rel_mode_reading_multiplier = multiplier
 
     @property
     def magnetic_field_multiplier(self):
+        """
+        :return: Returns Magnetic Field Multiplier
+        """
         return self._magnetic_field_multiplier
 
     @magnetic_field_multiplier.setter
     def magnetic_field_multiplier(self, multiplier):
+        """
+        :param multiplier:  Sets Magnetic field multiplier i.e micro, kilo, etc.
+        :return:
+        """
         self._magnetic_field_multiplier = multiplier
 
     @property
     def magnetic_field_reading(self):
+        """
+        :return: Magnetic field Reading
+        """
         return self._magnetic_field_reading
 
     @magnetic_field_reading.setter
     def magnetic_field_reading(self, field):
+        """
+        :param field: sets Magnetic Field Reading
+        :return:
+        """
         self._magnetic_field_reading = field
 
 
