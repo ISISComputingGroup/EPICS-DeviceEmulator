@@ -22,8 +22,8 @@ class SimulatedRknps(StateMachineDevice):
         self._cmd  = {"001":"REM","002":"LOC"}
         self._pol = {"001":"+", "002":"-"}
         self._status = {
-            "001":[".",".",".",".",".",".",".",".",".",".",".",".",".",".",".",".",".",".",".",".",".",".",".","."],
-            "002":["!",".",".",".",".",".",".",".",".","!",".",".",".",".",".",".",".",".",".",".",".",".",".","."]}
+            "001":["."]*24,
+            "002":["."]*24}
         self._set_curr = {"001":123456,"002":456789}
 
     def _get_state_handlers(self):
@@ -69,7 +69,7 @@ class SimulatedRknps(StateMachineDevice):
 
             Returns: value of the output current.
         """
-        return self._curr[self._active_adr]
+        return int(self._curr[self._active_adr])
 
     @property
     def ad_volt(self):
@@ -78,7 +78,7 @@ class SimulatedRknps(StateMachineDevice):
 
             Returns: value of the output voltage.
         """
-        return self._volt[self._active_adr]
+        return int(self._volt[self._active_adr])
 
     @property
     def cmd(self):
@@ -209,7 +209,6 @@ class SimulatedRknps(StateMachineDevice):
         self.set_current_values(0)
         self._status[self._active_adr][0] = "!"
 
-    @has_log
     def set_both_volt_values(self, volt):
         """
         Update the voltage value of both devices.
@@ -220,5 +219,4 @@ class SimulatedRknps(StateMachineDevice):
             volt: the voltage value to set.
         """
         for PSU in self._volt.keys():
-            self.log.info("setting for %s" % PSU)
             self._volt[PSU] = float(volt)

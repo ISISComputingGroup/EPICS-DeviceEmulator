@@ -76,7 +76,7 @@ class RknpsStreamInterface(StreamAdapter):
             # Channel 2 is the AD for the voltage
             return "{0}".format(self._device.ad_volt)
         elif channel == "8":
-            # Channel 0 is the AD for the current
+            # Channel 8 is the AD for the current
             return "{0}".format(self._device.ad_curr)
         # All other channels are not considered under the requirements of this emulator
 
