@@ -1,5 +1,5 @@
 from lewis.adapters.stream import StreamAdapter
-from utils.command_builder import CmdBuilder
+from lewis_emulators.utils.command_builder import CmdBuilder
 from lewis.core.logging import has_log
 
 @has_log
@@ -49,8 +49,8 @@ class Lakeshore460StreamInterface(StreamAdapter):
     }
 
     def handle_error(self,request, error):
-        self.log.error("An error occurred at request" + repr(request) + ": " + repr(error))
-        print("An error occurred at request" + repr(request) + ": " + repr(error))
+        self.log.error("An error occurred at request {0} : {1} ").format(request, error)
+        print("An error occurred at request {0} : {1} ").format(request, error)
 
     def get_IDN(self):
         return "{0}".format(self._device.idn)
@@ -120,7 +120,6 @@ class Lakeshore460StreamInterface(StreamAdapter):
         return "{0}".format(self._device.source)
 
     def set_channel(self, channel):
-        self.log.error("My Channel is: {0}".format(self._device.channel))
         self._device.channel = channel
 
     def get_channel(self):
@@ -139,12 +138,9 @@ class Lakeshore460StreamInterface(StreamAdapter):
         return "{0}".format(self._device.filter_points)
 
     def read_relative_mode_set_point_multiplier(self):
-        self.log.error("My Multiplier is: {0}".format(self._device.rel_multiplier))
-
         return "{0}".format(self._device.rel_multiplier)
 
     def read_relative_mode_set_point(self):
-
         return "{0}".format(self._device.rel_set_point)
 
     def set_relative_mode_set_point(self, setpoint):
