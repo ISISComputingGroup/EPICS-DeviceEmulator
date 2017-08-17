@@ -49,7 +49,8 @@ class InstronStreamInterface(StreamAdapter):
         # Waveform (quarter counter event detector) commands
         Cmd("arm_quarter_counter", "^C212,2$"),
         Cmd("get_quarter_counts", "^Q210$"),
-        Cmd("set_max_quarter_counts", "^Q209,([0-9]+)$"),
+        Cmd("get_max_quarter_counts", "^Q209$"),
+        Cmd("set_max_quarter_counts", "^C209,([0-9]+)$"),
         Cmd("set_quarter_counter_off", "^C212,0$"),
         Cmd("get_quarter_counter_status", "^Q212$"),
     }
@@ -178,6 +179,9 @@ class InstronStreamInterface(StreamAdapter):
 
     def get_quarter_counts(self):
         return self._device.get_quarter_counts()
+
+    def get_max_quarter_counts(self):
+        return self._device.get_max_quarter_counts()
 
     def set_max_quarter_counts(self, val):
         self._device.set_max_quarter_counts(int(val))

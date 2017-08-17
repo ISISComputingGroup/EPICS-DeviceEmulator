@@ -236,6 +236,9 @@ class SimulatedInstron(StateMachineDevice):
     def get_quarter_counts(self):
         return self._waveform_generator.quart_counter.counts
 
+    def get_max_quarter_counts(self):
+        return self._waveform_generator.quart_counter.max_counts
+
     def set_max_quarter_counts(self, val):
         self._waveform_generator.quart_counter.max_counts = val
 
