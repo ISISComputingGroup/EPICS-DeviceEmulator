@@ -19,6 +19,8 @@ class InstronStreamInterface(StreamAdapter):
         Cmd("set_movement_type", "^C1,([0-3])$"),
         Cmd("get_step_time", "^Q86,([1-3])$"),
         Cmd("set_step_time", "^C86,([1-3]),([0-9]*.[0-9]*)$"),
+
+        # Channel commands
         Cmd("get_chan_waveform_type", "^Q2,([1-3])$"),
         Cmd("set_chan_waveform_type", "^C2,([1-3]),([0-5])$"),
         Cmd("get_ramp_amplitude_setpoint", "^Q4,([1-3])$"),
@@ -29,6 +31,28 @@ class InstronStreamInterface(StreamAdapter):
         Cmd("get_chan_area", "^Q341,([1-3])$"),
         Cmd("set_chan_area", "^C341,([1-3]),([0-9]*.[0-9]*)$"),
         Cmd("get_chan_type", "^Q307,([1-3])$"),
+
+        # Waveform commands
+        Cmd("get_waveform_status", "^Q200$"),
+        Cmd("abort_waveform_generation", "^C200,0$"),
+        Cmd("start_waveform_generation", "^C200,1$"),
+        Cmd("request_stop_waveform_generation", "^C200,4$"),
+        Cmd("get_waveform_type", "^Q201,([1-3])$"),
+        Cmd("set_waveform_type", "^C201,([1-3]),([0-8])$"),
+        Cmd("get_waveform_amplitude", "^Q203,([1-3])$"),
+        Cmd("set_waveform_amplitude", "^C203,([1-3]),([0-9]*.[0-9]*)$"),
+        Cmd("get_waveform_frequency", "^Q202,([1-3])$"),
+        Cmd("set_waveform_frequency", "^C202,([1-3]),([0-9]*.[0-9]*)$"),
+        Cmd("set_waveform_hold", "^C213,3$"),
+        Cmd("set_waveform_maintain_log", "^C214,0$"),
+
+        # Waveform (quarter counter event detector) commands
+        Cmd("arm_quarter_counter", "^C212,2$"),
+        Cmd("get_quarter_counts", "^Q210$"),
+        Cmd("get_max_quarter_counts", "^Q209$"),
+        Cmd("set_max_quarter_counts", "^C209,([0-9]+)$"),
+        Cmd("set_quarter_counter_off", "^C212,0$"),
+        Cmd("get_quarter_counter_status", "^Q212$"),
     }
 
     in_terminator = "\r\n"
@@ -112,3 +136,61 @@ class InstronStreamInterface(StreamAdapter):
         transducer_type = self._device.get_chan_transducer_type(int(channel))
         chan_type = self._device.get_chan_type(int(channel))
         return "{a},{b}".format(a=transducer_type, b=chan_type)
+
+    # Waveform generation
+
+    def get_waveform_status(self):
+        return self._device.get_waveform_status()
+
+    def start_waveform_generation(self):
+        self._device.start_waveform_generation()
+
+    def abort_waveform_generation(self):
+        self._device.abort_waveform_generation()
+
+    def request_stop_waveform_generation(self):
+        self._device.finish_waveform_generation()
+
+    def get_waveform_type(self, channel):
+        return self._device.get_waveform_type(int(channel))
+
+    def set_waveform_type(self, channel, type):
+        self._device.set_waveform_type(int(channel), int(type))
+
+    def get_waveform_amplitude(self, channel):
+        return self._device.get_waveform_amplitude(int(channel))
+
+    def set_waveform_amplitude(self, channel, value):
+        self._device.set_waveform_amplitude(int(channel), float(value))
+
+    def get_waveform_frequency(self, channel):
+        return self._device.get_waveform_frequency(int(channel))
+
+    def set_waveform_frequency(self, channel, value):
+        self._device.set_waveform_frequency(int(channel), float(value))
+
+    def set_waveform_hold(self):
+        self._device.set_waveform_hold()
+
+    # Waveform quarter counter
+
+    def arm_quarter_counter(self):
+        self._device.arm_quarter_counter()
+
+    def get_quarter_counts(self):
+        return self._device.get_quarter_counts()
+
+    def get_max_quarter_counts(self):
+        return self._device.get_max_quarter_counts()
+
+    def set_max_quarter_counts(self, val):
+        self._device.set_max_quarter_counts(int(val))
+
+    def set_quarter_counter_off(self):
+        self._device.set_quarter_counter_off()
+
+    def get_quarter_counter_status(self):
+        return self._device.get_quarter_counter_status()
+
+    def set_waveform_maintain_log(self):
+        self._device.set_waveform_maintain_log()
