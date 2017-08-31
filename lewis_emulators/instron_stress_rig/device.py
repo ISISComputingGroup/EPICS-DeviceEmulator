@@ -77,11 +77,7 @@ class SimulatedInstron(StateMachineDevice):
     def set_control_channel(self, channel):
         self.control_channel = channel
 
-    def get_watchdog_status(self):
-        return self._watchdog_status
-
-    def set_watchdog_status(self, enabled, status):
-        self._watchdog_status = (enabled, status)
+    def disable_watchdog(self):
         self.watchdog_refresh_time = self.current_time
 
     def get_control_mode(self):
