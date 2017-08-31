@@ -1,6 +1,8 @@
 from collections import OrderedDict
-from states import DefaultState, GoingToSetpointState
+from states import DefaultState, GoingToSetpointState, GeneratingWaveformState
 from lewis.devices import StateMachineDevice
+from channel import PositionChannel, StrainChannel, StressChannel
+from waveform_generator import WaveformGenerator
 
 import time
 
@@ -30,6 +32,8 @@ class SimulatedInstron(StateMachineDevice):
         # Maps a channel number to a channel object
         self.channels = {1: PositionChannel(), 2: StressChannel(), 3: StrainChannel()}
 
+        self._waveform_generator = WaveformGenerator()
+
     def raise_exception_if_cannot_write(self):
         if self._control_mode != 1:
             raise Exception("Not in the correct control mode to execute that command!")
@@ -38,6 +42,7 @@ class SimulatedInstron(StateMachineDevice):
         return {
             'default': DefaultState(),
             'going': GoingToSetpointState(),
+            'waveform': GeneratingWaveformState(),
         }
 
     # This is a workaround for https://github.com/DMSC-Instrument-Data/lewis/issues/248
@@ -48,6 +53,13 @@ class SimulatedInstron(StateMachineDevice):
     def get_channel_param(self, index, param):
         return getattr(self.channels[int(index)], str(param))
 
+    # This is a workaround for https://github.com/DMSC-Instrument-Data/lewis/issues/248
+    def set_waveform_state(self, value):
+        self._waveform_generator.state = value
+
+    def reset(self):
+        self._initialize_data()
+
     def _get_initial_state(self):
         return 'default'
 
@@ -55,6 +67,8 @@ class SimulatedInstron(StateMachineDevice):
         return OrderedDict([
             (('default', 'going'), lambda: self.movement_type != 0 and self.channels[self.control_channel].value != self.channels[self.control_channel].ramp_amplitude_setpoint),
             (('going', 'default'), lambda: self.movement_type == 0 or self.channels[self.control_channel].value == self.channels[self.control_channel].ramp_amplitude_setpoint),
+            (('default', 'waveform'), lambda: self._waveform_generator.active()),
+            (('waveform', 'default'), lambda: not self._waveform_generator.active()),
         ])
 
     def get_control_channel(self):
@@ -158,30 +172,84 @@ class SimulatedInstron(StateMachineDevice):
     def get_chan_type(self, channel):
         return self.channels[channel].channel_type
 
+    def get_waveform_status(self):
+        return self._waveform_generator.state
 
-class Channel(object):
-    def __init__(self):
-        self.waveform_type = 0
-        self.step_time = 0
-        self.ramp_amplitude_setpoint = 0
-        self.scale = 10
-        self.value = 0
-        self.transducer_type = 0
+    def abort_waveform_generation(self):
+        self._waveform_generator.abort()
 
-class PositionChannel(Channel):
-    def __init__(self):
-        super(PositionChannel, self).__init__()
-        self.channel_type = 3
+    def finish_waveform_generation(self):
+        self._waveform_generator.finish()
 
-class StressChannel(Channel):
-    def __init__(self):
-        super(StressChannel, self).__init__()
-        self.area = 1
-        self.channel_type = 2
+    def start_waveform_generation(self):
+        self._waveform_generator.start()
 
+    def stop_waveform_generation_if_requested(self):
+        if self._waveform_generator.time_to_stop():
+            self._waveform_generator.stop()
 
-class StrainChannel(Channel):
-    def __init__(self):
-        super(StrainChannel, self).__init__()
-        self.length = 1
-        self.channel_type = 4
+    def get_waveform_type(self, channel):
+        try:
+            return self._waveform_generator.type[channel]
+        except NameError:
+            print "Unable to get waveform generator type. Channel: {0}".format(channel)
+
+    def set_waveform_type(self, channel, value):
+        try:
+            self._waveform_generator.type[channel] = value
+        except NameError:
+            print "Unable to set waveform generator type. Channel: {0}, Value: {1}".format(channel, value)
+
+    def get_waveform_amplitude(self, channel):
+        try:
+            return self._waveform_generator.amplitude[channel]
+        except NameError:
+            print "Unable to get waveform generator amplitude. Channel: {0}".format(channel)
+
+    def set_waveform_amplitude(self, channel, value):
+        try:
+            self._waveform_generator.amplitude[channel] = value
+        except NameError:
+            print "Unable to set waveform generator amplitude. Channel: {0}, Value: {1}".format(channel, value)
+
+    def get_waveform_frequency(self, channel):
+        try:
+            return self._waveform_generator.frequency[channel]
+        except NameError:
+            print "Unable to get waveform generator frequency. Channel: {0}".format(channel)
+
+    def set_waveform_frequency(self, channel, value):
+        try:
+            self._waveform_generator.frequency[channel] = value
+        except NameError:
+            print "Unable to set waveform generator frequency. Channel: {0}, Value: {1}".format(channel, value)
+
+    def set_waveform_hold(self):
+        self._waveform_generator.hold()
+
+    def quarter_cycle_event(self):
+        self._waveform_generator.quart_counter.count()
+
+    def arm_quarter_counter(self):
+        self._waveform_generator.quart_counter.arm()
+
+    def get_quarter_counts(self):
+        return self._waveform_generator.quart_counter.counts
+
+    def get_max_quarter_counts(self):
+        return self._waveform_generator.quart_counter.max_counts
+
+    def set_max_quarter_counts(self, val):
+        self._waveform_generator.quart_counter.max_counts = val
+
+    def set_quarter_counter_off(self):
+        self._waveform_generator.quart_counter.off()
+
+    def get_quarter_counter_status(self):
+        return self._waveform_generator.quart_counter.state
+
+    def set_waveform_maintain_log(self):
+        return self._waveform_generator.maintain_log()
+        
+    def get_waveform_value(self):
+        return self._waveform_generator.get_value(self.control_channel)
