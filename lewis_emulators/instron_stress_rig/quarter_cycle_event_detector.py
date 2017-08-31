@@ -13,6 +13,7 @@ class QuarterCycleEventDetector(object):
 
     def arm(self):
         self.state = QCEDStates.ARMED
+        self.counts = 0
 
     def count(self):
         if self.state == QCEDStates.ARMED:
@@ -23,7 +24,8 @@ class QuarterCycleEventDetector(object):
 
     def off(self):
         self.state = QCEDStates.OFF
-        self.counts = 0
+        # When the QCED is turned off it does not automatically reset it's count
+        # So don't do self.counts = 0 here.
 
     def cycles(self, fractional=True):
         if fractional:
