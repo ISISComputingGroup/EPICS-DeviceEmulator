@@ -1,3 +1,3 @@
-from .device import SimulatedAmint2l
+from .device import SimulatedEurotherm
 
-__all__ = ['SimulatedAmint2l']
+__all__ = ['SimulatedEurotherm']
