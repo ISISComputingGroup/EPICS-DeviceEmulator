@@ -1,8 +1,7 @@
 from lewis.adapters.stream import StreamAdapter
 from lewis_emulators.utils.command_builder import CmdBuilder
-from lewis.core.logging import has_log
 
-@has_log
+
 class EurothermStreamInterface(StreamAdapter):
     """
     Stream interface for the serial port
@@ -32,13 +31,28 @@ class EurothermStreamInterface(StreamAdapter):
         self.log.error("An error occurred at request " + repr(request) + ": " + repr(error))
 
     def get_current_temperature(self):
+        """
+        Get the current temperature of the device.
+
+        Returns: the current temperature formatted like the Eurotherm protocol.
+        """
         return "\x02PV{}".format(self._device.current_temperature)
 
-    def set_temperature_setpoint(self, temperature):
-        self._device.setpoint_temperature = temperature
-
     def get_ramp_setpoint(self):
+        """
+        Get the set point temperature.
+
+        Returns: the current set point temperature formatted like the Eurotherm protocol.
+        """
         return "\x02SP{}".format(self._device.ramp_setpoint_temperature)
 
     def set_ramp_setpoint(self, temperature, _):
+        """
+        Set the set point temperature.
+
+        Args:
+            temperature: the temperature to set the setpoint to.
+            _: unused argument captured by the command.
+
+        """
         self._device.ramp_setpoint_temperature = temperature
