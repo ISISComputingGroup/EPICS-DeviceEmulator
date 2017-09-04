@@ -24,12 +24,12 @@ class HFMAGPSUStreamInterface(StreamAdapter):
         CmdBuilder("write_output_mode").escape("T ").arg("AMPS|TESLA").build(),
         CmdBuilder("write_ramp_target").escape("RAMP ").arg("ZERO|MID|MAX").build(),
         CmdBuilder("write_heater_status").escape("H ").arg("OFF|ON").build(),
+        CmdBuilder("write_pause").escape("P ").arg("OFF|ON").build(),
         CmdBuilder("write_heater_value").escape("S H ").float().build(),
         CmdBuilder("write_max_target").escape("SET MAX ").float().build(),
         CmdBuilder("write_mid_target").escape("SET MID ").float().build(),
         CmdBuilder("write_ramp_rate").escape("SET RAMP ").float().build(),
-        CmdBuilder("write_limit").escape("S L ").float().build(),
-        CmdBuilder("write_pause").escape("P ").arg("OFF|ON").build(),
+        CmdBuilder("write_limit").escape("S L ").float().build()
     }
 
     def handle_error(self, request, error):
@@ -82,6 +82,17 @@ class HFMAGPSUStreamInterface(StreamAdapter):
         self._device.logMessage = "HH:MM:SS HEATER STATUS: [" + str(hs) + "]"
         return self._device.logMessage
 
+    def read_pause(self):
+        return "ON" if self._device.isPaused else "OFF"
+
+    def write_pause(self, paused):
+        if paused == "ON":
+            self._device.isPaused = True
+        else:
+            self._device.isPaused = False
+        self._device.logMessage = "HH:MM:SS PAUSE STATUS: [" + str(paused) + "]"
+        return self._device.logMessage
+
     def read_heater_value(self):
         return self._device.heaterValue
 
@@ -112,15 +123,4 @@ class HFMAGPSUStreamInterface(StreamAdapter):
     def write_limit(self, l):
         self._device.limit = l
         self._device.logMessage = "HH:MM:SS VOLTAGE LIMIT: [" + str(l) + "]"
-        return self._device.logMessage
-
-    def read_pause(self):
-        return "ON" if self._device.isPaused else "OFF"
-
-    def write_pause(self, p):
-        if p == "ON":
-            self._device.isPaused = True
-        else:
-            self._device.isPaused = False
-        self._device.logMessage = "HH:MM:SS PAUSE STATUS: [" + str(p) + "]"
         return self._device.logMessage
