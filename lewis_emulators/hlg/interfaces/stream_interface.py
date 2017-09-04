@@ -50,7 +50,7 @@ class HlgStreamInterface(StreamAdapter):
 
         """
         verbosity_as_int = int(verbosity)
-        if verbosity_as_int != 0 and verbosity_as_int != 1:
+        if verbosity_as_int not in [0, 1]:
             raise AssertionError("Verbosity must be 0 or 1 was '{0}'".format(verbosity))
         self._device.verbosity = verbosity_as_int
         if verbosity_as_int == 0:
@@ -69,8 +69,8 @@ class HlgStreamInterface(StreamAdapter):
 
         """
         prefix_as_int = int(prefix)
-        if prefix_as_int < 0 or prefix_as_int >= len(PREFIXES):
-            raise AssertionError("Prefix must be between 0 and 5 '{0}'".format(prefix))
+        if not 0 <= prefix_as_int < len(PREFIXES):
+            raise AssertionError("Prefix must be between 0 and {1} '{0}'".format(prefix, len(PREFIXES)))
         self._device.prefix = prefix_as_int
         return self._format_output("CP{0}".format(prefix_as_int), "Verbose=", prefix)
 
@@ -79,7 +79,7 @@ class HlgStreamInterface(StreamAdapter):
         """
         Gets the current level
 
-        Returns: level in correct units
+        Returns: level in correct units or None if no level is set
 
         """
         if self._device.level is None:
