@@ -2,22 +2,25 @@ from lewis.devices import StateMachineDevice
 from collections import OrderedDict
 from .states import DefaultState
 
+
+
+
+
 class SimulatedHFMAGPSU(StateMachineDevice):
 
 
     def _initialize_data(self):
-        self._direction = '-'
-        self._outputMode = 'OFF'
-        self._rampTarget = 'ZERO'
-        self._heaterStatus = 'OFF'   # off or on
-        self._heaterValue = 1.0 # V
+        self._isOutputModeTesla = False
+        self._isHeaterOn = False
+        self._isPaused = False
+        self._direction = 0
+        self._rampTarget = 0
+        self._heaterValue = 1.0
         self._maxTarget = 5.0
         self._midTarget = 2.5
         self._rampRate = 10.0
-        self._pause = 'OFF'
         self._limit = 10
-        self._logMessage = "test"
-        #self._update = "update field"
+        self._logMessage = "this is the initial log message"
 
     def _get_state_handlers(self):
         return {DefaultState.NAME: DefaultState()}
@@ -33,16 +36,16 @@ class SimulatedHFMAGPSU(StateMachineDevice):
         return self._direction
 
     @property
-    def outputMode(self):
-        return self._outputMode
+    def isOutputModeTesla(self):
+        return self._isOutputModeTesla
 
     @property
     def rampTarget(self):
         return self._rampTarget
 
     @property
-    def heaterStatus(self):
-        return self._heaterStatus
+    def isHeaterOn(self):
+        return self._isHeaterOn
 
     @property
     def heaterValue(self):
@@ -61,16 +64,12 @@ class SimulatedHFMAGPSU(StateMachineDevice):
         return self._rampRate
 
     @property
-    def pause(self):
-        return self._pause
+    def isPaused(self):
+        return self._isPaused
 
     @property
     def limit(self):
         return self._limit
-
-    #@property
-    #def update(self):
-       # return self._update
 
     @property
     def logMessage(self):
@@ -80,17 +79,17 @@ class SimulatedHFMAGPSU(StateMachineDevice):
     def direction(self, d):
         self._direction = d
 
-    @outputMode.setter
-    def outputMode(self, om):
-        self._outputMode = om
+    @isOutputModeTesla.setter
+    def isOutputModeTesla(self, om):
+        self._isOutputModeTesla = om
 
     @rampTarget.setter
     def rampTarget(self, rt):
         self._rampTarget = rt
 
-    @heaterStatus.setter
-    def heaterStatus(self, hs):
-        self._heaterStatus = hs
+    @isHeaterOn.setter
+    def isHeaterOn(self, hs):
+        self._isHeaterOn = hs
 
     @heaterValue.setter
     def heaterValue(self, hv):
@@ -108,9 +107,9 @@ class SimulatedHFMAGPSU(StateMachineDevice):
     def rampRate(self, rate):
         self._rampRate = rate
 
-    @pause.setter
-    def pause(self, p):
-        self._pause = p
+    @isPaused.setter
+    def isPaused(self, p):
+        self._isPaused = p
 
     @limit.setter
     def limit(self, lim):

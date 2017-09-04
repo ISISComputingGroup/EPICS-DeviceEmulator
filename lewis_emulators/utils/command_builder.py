@@ -8,17 +8,20 @@ class CmdBuilder(object):
     Build a command for the stream adapter.
     """
 
-    def __init__(self, target_method, arg_sep=",", ignore=""):
+    def __init__(self, target_method, arg_sep=",", ignore="", default_regex_chars=True):
         """
         Create a builder. Use build to create the final object
 
         :param target_method: name of the method target to call when the reg ex matches
         :param arg_sep: separators between the arguments
         :param ignore: set of characters to ignore between text and arguments
+        :param default_regex_chars: forces CmdBuilder to match entire argument (e.g if read/write commands
+                                    have the same starting argument but one has additional args)
         """
         self._target_method = target_method
         self._arg_sep = arg_sep
         self._current_sep = ""
+        self._default_regex_chars = default_regex_chars
         if ignore is None or ignore == "":
             self._ignore = ""
         else:
@@ -86,6 +89,11 @@ class CmdBuilder(object):
         :param **kwargs: key word arguments to pass to Cmd constructor
         :return: Cmd object
         """
+        startRegex = '^'
+        endRegex = '$'
+        if self._default_regex_chars:
+            self._reg_ex = startRegex + self._reg_ex + endRegex
+
         return Cmd(self._target_method, self._reg_ex, *args, **kwargs)
 
     def add_ascii_character(self, char_number):
