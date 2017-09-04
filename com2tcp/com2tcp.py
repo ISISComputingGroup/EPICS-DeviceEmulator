@@ -49,7 +49,7 @@ if __name__ == "__main__":
                 print "Data on serial: " + data
                 tcp_conn.sendall(data)
 
-            time.sleep(0.1)
+            time.sleep(0.001)
     except (KeyboardInterrupt, SystemExit) as e:
         pass
     finally:
