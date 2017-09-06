@@ -1,5 +1,7 @@
 from lewis.adapters.stream import StreamAdapter
 from lewis_emulators.utils.command_builder import CmdBuilder
+from datetime import datetime
+
 
 class HFMAGPSUStreamInterface(StreamAdapter):
 
@@ -32,95 +34,109 @@ class HFMAGPSUStreamInterface(StreamAdapter):
         CmdBuilder("write_limit").escape("S L ").float().build()
     }
 
+    def _create_log_message(self, pv, value):
+        current_time = datetime.now().strftime('%H:%M:%S')
+        self._device.log_message = "{} {}: [{}]".format(current_time, pv, value)
+
     def handle_error(self, request, error):
-        self.log.error("Beep boop. Error occurred at " + repr(request) + ": " + repr(error))
-        print("Beep boop. Error occurred at " + repr(request) + ": " + repr(error))
+        self.log.error("Error occurred at " + repr(request) + ": " + repr(error))
+        print("Error occurred at " + repr(request) + ": " + repr(error))
 
     def read_direction(self):
         return self._device.direction
 
-    def write_direction(self, d):
-        self._device.direction = d
-        self._device.logMessage = "HH:MM:SS DIRECTION: [" + str(d) + "]"
-        return self._device.logMessage
+    def write_direction(self, direction):
+        self._device.direction = direction
+        self._create_log_message("DIRECTION", str(direction))
+        return self._device.log_message
 
     def read_output_mode(self):
-        return "TESLA" if self._device.isOutputModeTesla else "AMPS"
+        return "TESLA" if self._device.is_output_mode_tesla else "AMPS"
 
-    def write_output_mode(self, om):
-        if om == "TESLA":
-            self._device.isOutputModeTesla = True
+    def write_output_mode(self, output_mode):
+        if output_mode == "TESLA":
+            self._device.is_output_mode_tesla = True
+            self._create_log_message("OUTPUT MODE", str(output_mode))
+        elif output_mode == "AMPS":
+            self._device.is_output_mode_tesla = False
+            self._create_log_message("OUTPUT MODE", str(output_mode))
         else:
-            self._device.isOutputModeTesla = False
-        self._device.logMessage = "HH:MM:SS UNITS: [" + str(om) + "]"
-        return self._device.logMessage
+            raise AssertionError("Invalid arguments sent")
+        return self._device.log_message
 
     def read_ramp_target(self):
-        return self._device.rampTarget
+        return self._device.ramp_target
 
-    def write_ramp_target(self, rt):
-        self._device.rampTarget = rt
-        self._device.logMessage = "HH:MM:SS RAMP TARGET: [" + str(rt) + "]"
-        return self._device.logMessage
+    def write_ramp_target(self, ramp_target):
+        self._device.ramp_target = ramp_target
+        self._create_log_message("RAMP TARGET", str(ramp_target))
+        return self._device.log_message
 
     def read_ramp_rate(self):
-        return self._device.rampRate
+        return self._device.ramp_rate
 
-    def write_ramp_rate(self, rr):
-        self._device.rampRate = rr
-        self._device.logMessage = "HH:MM:SS RAMP RATE: [" + str(rr) + "]"
-        return self._device.logMessage
+    def write_ramp_rate(self, ramp_rate):
+        self._device.ramp_rate = ramp_rate
+        self._create_log_message("RAMP RATE", str(ramp_rate))
+        return self._device.log_message
 
     def read_heater_status(self):
-        return "ON" if self._device.isHeaterOn else "OFF"
+        return "ON" if self._device.is_heater_on else "OFF"
 
-    def write_heater_status(self, hs):
-        if hs == "ON":
-            self._device.isHeaterOn = True
+    def write_heater_status(self, heater_status):
+        if heater_status == "ON":
+            self._device.is_heater_on = True
+            self._create_log_message("HEATER STATUS", str(heater_status))
+        elif heater_status == "OFF":
+            self._device.is_heater_on = False
+            self._create_log_message("HEATER STATUS", str(heater_status))
         else:
-            self._device.isHeaterOn = False
-        self._device.logMessage = "HH:MM:SS HEATER STATUS: [" + str(hs) + "]"
-        return self._device.logMessage
+            raise AssertionError("Invalid arguments sent")
+        return self._device.log_message
 
     def read_pause(self):
-        return "ON" if self._device.isPaused else "OFF"
+        return "ON" if self._device.is_paused else "OFF"
 
     def write_pause(self, paused):
         if paused == "ON":
-            self._device.isPaused = True
+            self._device.is_paused = True
+            self._create_log_message("PAUSE STATUS", str(paused))
+        elif paused == "OFF":
+            self._device.is_paused = False
+            self._create_log_message("PAUSE STATUS", str(paused))
         else:
-            self._device.isPaused = False
-        self._device.logMessage = "HH:MM:SS PAUSE STATUS: [" + str(paused) + "]"
-        return self._device.logMessage
+            raise AssertionError("Invalid arguments sent")
+
+        return self._device.log_message
 
     def read_heater_value(self):
-        return self._device.heaterValue
+        return self._device.heater_value
 
-    def write_heater_value(self, hv):
-        self._device.heaterValue = hv
-        self._device.logMessage = "HH:MM:SS HEATER OUTPUT: [" + str(hv) + "]"
-        return self._device.logMessage
+    def write_heater_value(self, heater_value):
+        self._device.heater_value = heater_value
+        self._create_log_message("HEATER OUTPUT", str(heater_value))
+        return self._device.log_message
 
     def read_max_target(self):
-        return self._device.maxTarget
+        return self._device.max_target
 
-    def write_max_target(self, mt):
-        self._device.maxTarget = mt
-        self._device.logMessage = "HH:MM:SS MAX SETTING: [" + str(mt) + "]"
-        return self._device.logMessage
+    def write_max_target(self, max_target):
+        self._device.max_target = max_target
+        self._create_log_message("MAX SETTING", str(max_target))
+        return self._device.log_message
 
     def read_mid_target(self):
-        return self._device.midTarget
+        return self._device.mid_target
 
-    def write_mid_target(self, mt):
-        self._device.midTarget = mt
-        self._device.logMessage = "HH:MM:SS MID SETTING: [" + str(mt) + "]"
-        return self._device.logMessage
+    def write_mid_target(self, mid_target):
+        self._device.mid_target = mid_target
+        self._create_log_message("MID SETTING", str(mid_target))
+        return self._device.log_message
 
     def read_limit(self):
         return self._device.limit
 
-    def write_limit(self, l):
-        self._device.limit = l
-        self._device.logMessage = "HH:MM:SS VOLTAGE LIMIT: [" + str(l) + "]"
-        return self._device.logMessage
+    def write_limit(self, limit):
+        self._device.limit = limit
+        self._create_log_message("VOLTAGE LIMIT", limit)
+        return self._device.log_message

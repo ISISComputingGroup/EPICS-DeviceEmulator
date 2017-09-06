@@ -3,24 +3,21 @@ from collections import OrderedDict
 from .states import DefaultState
 
 
-
-
-
 class SimulatedHFMAGPSU(StateMachineDevice):
 
 
     def _initialize_data(self):
-        self._isOutputModeTesla = False
-        self._isHeaterOn = False
-        self._isPaused = False
+        self._is_output_mode_tesla = False
+        self._is_heater_on = False
+        self._is_paused = False
         self._direction = 0
-        self._rampTarget = 0
-        self._heaterValue = 1.0
-        self._maxTarget = 5.0
-        self._midTarget = 2.5
-        self._rampRate = 10.0
+        self._ramp_target = 0
+        self._heater_value = 1.0
+        self._max_target = 5.0
+        self._mid_target = 2.5
+        self._ramp_rate = 10.0
         self._limit = 10
-        self._logMessage = "this is the initial log message"
+        self._log_message = "this is the initial log message"
 
     def _get_state_handlers(self):
         return {DefaultState.NAME: DefaultState()}
@@ -36,85 +33,85 @@ class SimulatedHFMAGPSU(StateMachineDevice):
         return self._direction
 
     @property
-    def isOutputModeTesla(self):
-        return self._isOutputModeTesla
+    def is_output_mode_tesla(self):
+        return self._is_output_mode_tesla
 
     @property
-    def rampTarget(self):
-        return self._rampTarget
+    def ramp_target(self):
+        return self._ramp_target
 
     @property
-    def isHeaterOn(self):
-        return self._isHeaterOn
+    def is_heater_on(self):
+        return self._is_heater_on
 
     @property
-    def heaterValue(self):
-        return self._heaterValue
+    def heater_value(self):
+        return self._heater_value
 
     @property
-    def maxTarget(self):
-        return self._maxTarget
+    def max_target(self):
+        return self._max_target
 
     @property
-    def midTarget(self):
-        return self._midTarget
+    def mid_target(self):
+        return self._mid_target
 
     @property
-    def rampRate(self):
-        return self._rampRate
+    def ramp_rate(self):
+        return self._ramp_rate
 
     @property
-    def isPaused(self):
-        return self._isPaused
+    def is_paused(self):
+        return self._is_paused
 
     @property
     def limit(self):
         return self._limit
 
     @property
-    def logMessage(self):
-        return self._logMessage
+    def log_message(self):
+        return self._log_message
 
     @direction.setter
     def direction(self, d):
         self._direction = d
 
-    @isOutputModeTesla.setter
-    def isOutputModeTesla(self, om):
-        self._isOutputModeTesla = om
+    @is_output_mode_tesla.setter
+    def is_output_mode_tesla(self, om):
+        self._is_output_mode_tesla = om
 
-    @rampTarget.setter
-    def rampTarget(self, rt):
-        self._rampTarget = rt
+    @ramp_target.setter
+    def ramp_target(self, rt):
+        self._ramp_target = rt
 
-    @isHeaterOn.setter
-    def isHeaterOn(self, hs):
-        self._isHeaterOn = hs
+    @is_heater_on.setter
+    def is_heater_on(self, hs):
+        self._is_heater_on = hs
 
-    @heaterValue.setter
-    def heaterValue(self, hv):
-        self._heaterValue = hv
+    @heater_value.setter
+    def heater_value(self, hv):
+        self._heater_value = hv
 
-    @maxTarget.setter
-    def maxTarget(self, mt):
-        self._maxTarget = mt
+    @max_target.setter
+    def max_target(self, mt):
+        self._max_target = mt
 
-    @midTarget.setter
-    def midTarget(self, mt):
-        self._midTarget = mt
+    @mid_target.setter
+    def mid_target(self, mt):
+        self._mid_target = mt
 
-    @rampRate.setter
-    def rampRate(self, rate):
-        self._rampRate = rate
+    @ramp_rate.setter
+    def ramp_rate(self, rate):
+        self._ramp_rate = rate
 
-    @isPaused.setter
-    def isPaused(self, p):
-        self._isPaused = p
+    @is_paused.setter
+    def is_paused(self, p):
+        self._is_paused = p
 
     @limit.setter
     def limit(self, lim):
         self._limit = lim
 
-    @logMessage.setter
-    def logMessage(self, lm):
-        self._logMessage = lm
+    @log_message.setter
+    def log_message(self, lm):
+        self._log_message = lm
