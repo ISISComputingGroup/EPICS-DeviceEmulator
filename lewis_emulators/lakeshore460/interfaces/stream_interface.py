@@ -56,7 +56,6 @@ class Lakeshore460StreamInterface(StreamAdapter):
         return "{0}".format(self._device.idn)
 
     def get_unit(self):
-
         return "{0}".format(self._device.unit)
 
     def set_unit(self, unit):
