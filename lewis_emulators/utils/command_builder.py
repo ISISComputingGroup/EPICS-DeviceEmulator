@@ -139,6 +139,14 @@ class CmdBuilder(object):
         """
         return self.add_ascii_character(3)
 
+    def eot(self):
+        """
+        Add the EOT character (0x4) to the string.
+
+        :return: builder
+        """
+        return self.add_ascii_character(4)
+
     def enq(self):
         """
         Add the ENQ character (0x5) to the string.
