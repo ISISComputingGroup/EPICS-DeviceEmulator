@@ -10,6 +10,15 @@ class EurothermStreamInterface(StreamAdapter):
     commands = {
         CmdBuilder("get_current_temperature").eot().escape("0011PV").enq().build(),
         CmdBuilder("get_ramp_setpoint").eot().escape("0011SP").enq().build(),
+        CmdBuilder("get_output").eot().escape("0011OP").enq().build(),
+        CmdBuilder("get_max_output").eot().escape("0011HO").enq().build(),
+        CmdBuilder("get_autotune").eot().escape("0011AT").enq().build(),
+        CmdBuilder("get_proportional").eot().escape("0011XP").enq().build(),
+        CmdBuilder("get_derivative").eot().escape("0011TD").enq().build(),
+        CmdBuilder("get_integral").eot().escape("0011TI").enq().build(),
+        CmdBuilder("get_highlim").eot().escape("0011HS").enq().build(),
+        CmdBuilder("get_lowlim").eot().escape("0011LS").enq().build(),
+
         CmdBuilder("set_ramp_setpoint", arg_sep="").eot().escape("0011").stx().escape("SL").float().etx().any().build(),
     }
 
@@ -17,7 +26,7 @@ class EurothermStreamInterface(StreamAdapter):
     # with the emulator we manually added terminators via asyn commands to the device. Lewis will be able to handle this
     # natively in future versions. See: https://github.com/DMSC-Instrument-Data/lewis/pull/262
     in_terminator = "\r\n"
-    out_terminator = "\r\n"
+    out_terminator = chr(3)
 
     def handle_error(self, request, error):
         """
@@ -29,6 +38,54 @@ class EurothermStreamInterface(StreamAdapter):
 
         """
         self.log.error("An error occurred at request " + repr(request) + ": " + repr(error))
+
+    def get_proportional(self):
+        """
+        TODO: Get the proportional of the device's PID values
+        """
+        return "\x02XP0"
+
+    def get_integral(self):
+        """
+        TODO: Get the integral of the device's PID values
+        """
+        return "\x02TI0"
+
+    def get_derivative(self):
+        """
+        TODO: Get the derivative of the device's PID values
+        """
+        return "\x02TD0"
+
+    def get_output(self):
+        """
+        TODO: Get the output of the device
+        """
+        return "\x02OP0"
+
+    def get_highlim(self):
+        """
+        TODO: Get the high limit of the device
+        """
+        return "\x02HS0"
+
+    def get_lowlim(self):
+        """
+        TODO: Get the low limit of the device
+        """
+        return "\x02LS0"
+
+    def get_max_output(self):
+        """
+        TODO: Get the max output of the device
+        """
+        return "\x02HO0"
+
+    def get_autotune(self):
+        """
+        TODO: Get the max output of the device
+        """
+        return "\x02AT0"
 
     def get_current_temperature(self):
         """
