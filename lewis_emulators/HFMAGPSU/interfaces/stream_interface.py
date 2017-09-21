@@ -5,7 +5,6 @@ from datetime import datetime
 
 class HFMAGPSUStreamInterface(StreamAdapter):
 
-
     # terminators set to ascii ETX
     in_terminator = "\r\n"
     out_terminator = "\r\n"
@@ -22,6 +21,7 @@ class HFMAGPSUStreamInterface(StreamAdapter):
         CmdBuilder("read_limit").escape("H V").build(),
         CmdBuilder("read_pause").escape("P").build(),
         CmdBuilder("read_heater_value").escape("GET H").build(),
+        CmdBuilder("read_constant").escape("GET TPA").build(),
 
         CmdBuilder("write_direction").escape("D ").arg("-|0|\+").build(),
         CmdBuilder("write_output_mode").escape("T ").arg("AMPS|TESLA").build(),
@@ -32,13 +32,13 @@ class HFMAGPSUStreamInterface(StreamAdapter):
         CmdBuilder("write_max_target").escape("SET MAX ").float().build(),
         CmdBuilder("write_mid_target").escape("SET MID ").float().build(),
         CmdBuilder("write_ramp_rate").escape("SET RAMP ").float().build(),
-        CmdBuilder("write_limit").escape("S L ").float().build()
+        CmdBuilder("write_limit").escape("S L ").float().build(),
+        CmdBuilder("write_constant").escape("SET TPA ").float().build()
     }
 
     def _create_log_message(self, pv, value):
         current_time = datetime.now().strftime('%H:%M:%S')
         self._device.log_message = "{} {}: {}".format(current_time, pv, value)
-
 
     def handle_error(self, request, error):
         self.log.error("Error occurred at " + repr(request) + ": " + repr(error))
@@ -76,14 +76,7 @@ class HFMAGPSUStreamInterface(StreamAdapter):
     def read_output(self):
         # If target is + or - the current output, we are ramping up or down
         # new output = current output +/- ramp rate
-        if not self._device.is_paused:
-            target = self._get_ramp_target_value()
-            if target >= self._device.output:
-                self._device.output += self._device.ramp_rate
-            elif target < :
-                self._device.output -= self._device.ramp_rate
         mode = self._get_output_mode_string()
-
         return "HH.MM.SS OUTPUT: {} {} AT {} VOLTS".format(self._device.output, mode, self._device.heater_value)
 
     def write_output_mode(self, output_mode):
@@ -166,7 +159,6 @@ class HFMAGPSUStreamInterface(StreamAdapter):
         mode = self._get_output_mode_string()
         return "HH:MM:SS MAX SETTING: {} {}".format(self._device.max_target, mode)
 
-
     def write_max_target(self, max_target):
         self._device.max_target = max_target
         self._create_log_message("MAX SETTING", max_target)
@@ -187,4 +179,12 @@ class HFMAGPSUStreamInterface(StreamAdapter):
     def write_limit(self, limit):
         self._device.limit = limit
         self._create_log_message("VOLTAGE LIMIT", limit)
+        return self._device.log_message
+
+    def read_constant(self):
+        return "HH:MM:SS FIELD CONSTANT: {} T/A".format(self._device.constant)
+
+    def write_constant(self, constant):
+        self._device.constant = constant
+        self._create_log_message("FIELD CONSTANT", constant)
         return self._device.log_message
