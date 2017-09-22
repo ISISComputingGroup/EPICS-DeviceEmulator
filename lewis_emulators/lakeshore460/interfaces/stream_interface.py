@@ -30,7 +30,7 @@ class Lakeshore460StreamInterface(StreamAdapter):
         CmdBuilder("get_source").escape("VSRC?").build(),
         CmdBuilder("set_source").escape("VSRC ").digit().build(),
         CmdBuilder("get_channel").escape("CHNL?").build(),
-        CmdBuilder("set_channel").escape("CHNL ").digit().build(),
+        CmdBuilder("set_channel").escape("CHNL ").arg("X|Y|Z|V").build(),
         CmdBuilder("get_display_filter_window").escape("FWIN?").build(),
         CmdBuilder("set_display_filter_window").escape("FWIN ").int().build(),
         CmdBuilder("set_filter_points").escape("FNUM ").int().build(),
@@ -49,8 +49,8 @@ class Lakeshore460StreamInterface(StreamAdapter):
     }
 
     def handle_error(self,request, error):
-        self.log.error("An error occurred at request {0} : {1} ").format(request, error)
-        print("An error occurred at request {0} : {1} ").format(request, error)
+            self.log.error("An error occurred at request" + repr(request) + ": " + repr(error))
+            print("An error occurred at request" + repr(request) + ": " + repr(error))
 
     def get_IDN(self):
         return "{0}".format(self._device.idn)
@@ -149,7 +149,7 @@ class Lakeshore460StreamInterface(StreamAdapter):
         return "{0}".format( self._device.max_reading)
 
     def read_max_reading_multiplier(self):
-        return "{0}".format( self._device.reading_multiplier)
+        return "{0}".format( self._device.max_reading_multiplier)
 
     def get_relative_mode_reading(self):
         return "{0}".format(self._device.rel_mode_reading)
