@@ -1,8 +1,8 @@
-from lewis.adapters.stream import StreamAdapter, Cmd
+from lewis.adapters.stream import StreamInterface, Cmd
 from ..control_modes import OutputMode
 
 
-class Keithley2400StreamInterface(StreamAdapter):
+class Keithley2400StreamInterface(StreamInterface):
 
     # Commands that we expect via serial during normal operation
     serial_commands = {

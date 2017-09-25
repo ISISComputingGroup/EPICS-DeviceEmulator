@@ -1,9 +1,9 @@
-from lewis.adapters.stream import StreamAdapter, Cmd
+from lewis.adapters.stream import StreamInterface, Cmd
 from lewis.core.logging import has_log
 
 
 @has_log
-class RknpsStreamInterface(StreamAdapter):
+class RknpsStreamInterface(StreamInterface):
     """
     Stream interface for the serial port
     """

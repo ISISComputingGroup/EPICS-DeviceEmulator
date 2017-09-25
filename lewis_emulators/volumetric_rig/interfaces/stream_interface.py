@@ -1,10 +1,10 @@
-from lewis.adapters.stream import StreamAdapter, Cmd
+from lewis.adapters.stream import StreamInterface, Cmd
 from ..sensor_status import SensorStatus
 from ..utilities import format_int, convert_raw_to_int, convert_raw_to_float, convert_raw_to_bool
 from ..valve_status import ValveStatus
 
 
-class VolumetricRigStreamInterface(StreamAdapter):
+class VolumetricRigStreamInterface(StreamInterface):
 
     # The rig typically splits a command by whitespace and then uses the arguments it needs and then ignores the rest
     # so "IDN" will respond as "IDN BLAH BLAH BLAH" and "BCS 01" would be the same as "BCS 01 02 03".

@@ -1,8 +1,8 @@
-from lewis.adapters.stream import StreamAdapter
+from lewis.adapters.stream import StreamInterface
 from lewis_emulators.utils.command_builder import CmdBuilder
 
 
-class Tpg26xStreamInterface(StreamAdapter):
+class Tpg26xStreamInterface(StreamInterface):
     """
     Stream interface for the serial port
     """

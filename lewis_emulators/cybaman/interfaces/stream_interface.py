@@ -1,10 +1,9 @@
-from lewis.adapters.stream import StreamAdapter, Cmd
-from time import sleep
+from lewis.adapters.stream import StreamInterface, Cmd
 
 from lewis.core.logging import has_log
 
 
-class CybamanStreamInterface(StreamAdapter):
+class CybamanStreamInterface(StreamInterface):
     """
     Stream interface for the serial port
     """

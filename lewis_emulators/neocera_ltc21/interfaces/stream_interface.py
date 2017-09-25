@@ -1,6 +1,6 @@
 import re
 
-from lewis.adapters.stream import StreamAdapter
+from lewis.adapters.stream import StreamInterface
 
 from lewis_emulators.neocera_ltc21.constants import HEATER_INDEX, CONTROL_TYPE_MAX, CONTROL_TYPE_MIN, ANALOG_INDEX
 from lewis_emulators.neocera_ltc21.device_errors import NeoceraDeviceErrors
@@ -8,7 +8,7 @@ from lewis_emulators.neocera_ltc21.states import MonitorState, ControlState
 from lewis_emulators.utils.command_builder import CmdBuilder
 
 
-class NeoceraStreamInterface(StreamAdapter):
+class NeoceraStreamInterface(StreamInterface):
     """
     Stream interface for the serial port.
     """

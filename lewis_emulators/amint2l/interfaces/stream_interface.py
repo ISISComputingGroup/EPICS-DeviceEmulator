@@ -1,10 +1,10 @@
-from lewis.adapters.stream import StreamAdapter
+from lewis.adapters.stream import StreamInterface
 from lewis.core.logging import has_log
 
 from lewis_emulators.utils.command_builder import CmdBuilder
 
 @has_log
-class Amint2lStreamInterface(StreamAdapter):
+class Amint2lStreamInterface(StreamInterface):
     """
     Stream interface for the serial port
     """

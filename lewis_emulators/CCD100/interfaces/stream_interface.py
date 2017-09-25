@@ -1,4 +1,4 @@
-from lewis.adapters.stream import StreamAdapter, Cmd
+from lewis.adapters.stream import StreamInterface, Cmd
 import random
 
 SP_COMM = "spv"
@@ -6,7 +6,7 @@ UNITS_COMM = "uiu"
 READING_COMM = "r"
 
 
-class CCD100StreamInterface(StreamAdapter):
+class CCD100StreamInterface(StreamInterface):
 
     commands = {
         Cmd("get_sp", "^[a-h]" + SP_COMM + "\?$"),

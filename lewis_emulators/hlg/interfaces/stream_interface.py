@@ -1,4 +1,4 @@
-from lewis.adapters.stream import StreamAdapter
+from lewis.adapters.stream import StreamInterface
 from lewis.core.logging import has_log
 
 from lewis_emulators.utils.command_builder import CmdBuilder
@@ -14,7 +14,7 @@ PREFIXES = [
 
 
 @has_log
-class HlgStreamInterface(StreamAdapter):
+class HlgStreamInterface(StreamInterface):
     """
     Stream interface for the serial port
     """

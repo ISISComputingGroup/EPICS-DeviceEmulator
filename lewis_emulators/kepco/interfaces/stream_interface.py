@@ -1,9 +1,9 @@
-from lewis.adapters.stream import StreamAdapter
+from lewis.adapters.stream import StreamInterface
 from lewis_emulators.utils.command_builder import CmdBuilder
 from lewis.core.logging import has_log
 
 @has_log
-class KepcoStreamInterface(StreamAdapter):
+class KepcoStreamInterface(StreamInterface):
 
     in_terminator="\r\n"
     out_terminator="\r\n"
