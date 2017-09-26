@@ -18,7 +18,9 @@ class SimulatedHFMAGPSU(StateMachineDevice):
         self._ramp_rate = 0.5
         self._limit = 5
         self._log_message = "this is the initial log message"
+        self._error_message = "this is the initial error message"
         self._constant = 0.00029
+        self._zero_target = 0
 
         self.ready = True
 
@@ -89,8 +91,16 @@ class SimulatedHFMAGPSU(StateMachineDevice):
         return self._log_message
 
     @property
+    def error_message(self):
+        return self._error_message
+
+    @property
     def constant(self):
         return self._constant
+
+    @property
+    def zero_value(self):
+        return self._zero_value
 
     @direction.setter
     def direction(self, d):
@@ -136,6 +146,10 @@ class SimulatedHFMAGPSU(StateMachineDevice):
     def log_message(self, lm):
         self._log_message = lm
 
+    @error_message.setter
+    def error_message(self, em):
+        self._error_message = em
+
     @output.setter
     def output(self, op):
         self._output = op
@@ -143,3 +157,7 @@ class SimulatedHFMAGPSU(StateMachineDevice):
     @constant.setter
     def constant(self, cons):
         self._constant = cons
+
+    @zero_value.setter
+    def zero_value(self, zv):
+        self._zero_value = zv

@@ -56,7 +56,6 @@ class HFMAGPSUStreamInterface(StreamAdapter):
             target = self._device.mid_target
         elif self._device.ramp_target == "MAX":
             target = self._device.max_target
-
         return target
 
     def read_direction(self):
