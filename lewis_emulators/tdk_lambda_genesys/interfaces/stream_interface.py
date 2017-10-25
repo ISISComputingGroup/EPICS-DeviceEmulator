@@ -1,9 +1,8 @@
-from lewis.adapters.stream import StreamAdapter, Cmd
-from lewis.core.logging import has_log
+from lewis.adapters.stream import StreamInterface, Cmd
 from lewis_emulators.utils.command_builder import CmdBuilder
 
 
-class TDKLambdaGenesysStreamInterface(StreamAdapter):
+class TDKLambdaGenesysStreamInterface(StreamInterface):
     commands = {
         CmdBuilder("write_voltage").escape("PV ").float().build(),
         CmdBuilder("read_setpoint_voltage").escape("PV?").build(),

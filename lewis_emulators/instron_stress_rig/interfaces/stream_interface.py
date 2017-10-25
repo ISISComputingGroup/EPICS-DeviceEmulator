@@ -1,7 +1,7 @@
-from lewis.adapters.stream import StreamAdapter, Cmd
+from lewis.adapters.stream import StreamInterface, Cmd
 
 
-class InstronStreamInterface(StreamAdapter):
+class InstronStreamInterface(StreamInterface):
 
     # Commands that we expect via serial during normal operation
     commands = {

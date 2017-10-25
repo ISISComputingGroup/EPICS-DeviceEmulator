@@ -1,8 +1,8 @@
-from lewis.adapters.stream import StreamAdapter, Cmd
+from lewis.adapters.stream import StreamInterface, Cmd
 from lewis.core.logging import has_log
 
 
-class IegStreamInterface(StreamAdapter):
+class IegStreamInterface(StreamInterface):
 
     # Commands that we expect via serial during normal operation
     commands = {
