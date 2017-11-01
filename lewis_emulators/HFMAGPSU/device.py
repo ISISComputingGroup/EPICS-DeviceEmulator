@@ -9,18 +9,19 @@ class SimulatedHFMAGPSU(StateMachineDevice):
         self._is_output_mode_tesla = False
         self._is_heater_on = True
         self._is_paused = True
-        self._output = 0
-        self._direction = '0'
+        self._output = 0.0
+        self._direction = '+'
         self._ramp_target = 'MID'
-        self._heater_value = 0
+        self._heater_value = 0.0
         self._max_target = 34.92
-        self._mid_target = 10.0
+        self._mid_target = 0.0
         self._ramp_rate = 0.5
-        self._limit = 5
+        self._limit = 5.0
         self._log_message = "this is the initial log message"
         self._error_message = "this is the initial error message"
         self._constant = 0.00029
-        self._zero_target = 0
+        self._zero_target = 0.0
+        self._mid_final_target = 0
 
         self.ready = True
 
@@ -68,11 +69,11 @@ class SimulatedHFMAGPSU(StateMachineDevice):
 
     @property
     def max_target(self):
-        return self._max_target
+        return float(self._max_target)
 
     @property
     def mid_target(self):
-        return self._mid_target
+        return float(self._mid_target)
 
     @property
     def ramp_rate(self):
@@ -96,11 +97,15 @@ class SimulatedHFMAGPSU(StateMachineDevice):
 
     @property
     def constant(self):
-        return self._constant
+        return float(self._constant)
 
     @property
     def zero_value(self):
         return self._zero_value
+
+    @property
+    def mid_final_target(self):
+        return self._mid_final_target
 
     @direction.setter
     def direction(self, d):
@@ -161,3 +166,7 @@ class SimulatedHFMAGPSU(StateMachineDevice):
     @zero_value.setter
     def zero_value(self, zv):
         self._zero_value = zv
+
+    @mid_final_target.setter
+    def mid_final_target(self, mft):
+        self._mid_final_target = mft

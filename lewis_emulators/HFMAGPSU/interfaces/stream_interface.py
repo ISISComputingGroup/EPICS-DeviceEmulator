@@ -79,12 +79,28 @@ class HFMAGPSUStreamInterface(StreamAdapter):
         return "HH.MM.SS OUTPUT: {} {} AT {} VOLTS".format(self._device.output, mode, self._device.heater_value)
 
     def write_output_mode(self, output_mode):
+        constant = self._device.constant
+        output = self._device.output
+        max_target = self._device.max_target
+        mid_target = self._device.max_target
+        in_tesla = self._device.is_output_mode_tesla
         if output_mode == "TESLA":
-            self._device.is_output_mode_tesla = True
-            self._create_log_message("OUTPUT MODE", output_mode)
+            if not self._device.is_output_mode_tesla:
+                self._device.output *= constant
+                self._device.max_target *= constant
+                self._device.mid_target *= constant
+                self._device.is_output_mode_tesla = True
+                self._create_log_message("OUTPUT MODE", output_mode)
         elif output_mode == "AMPS":
-            self._device.is_output_mode_tesla = False
-            self._create_log_message("OUTPUT MODE", output_mode)
+            if constant == 0:
+                self._device.error_message = "------> No field constant has been entered"
+            else:
+                if self._device.is_output_mode_tesla:
+                    self._device.output /= constant
+                    self._device.max_target /= constant
+                    self._device.mid_target /= constant
+                    self._device.is_output_mode_tesla = False
+                    self._create_log_message("OUTPUT MODE", output_mode)
         else:
             raise AssertionError("Invalid arguments sent")
         return self._device.log_message
@@ -98,7 +114,7 @@ class HFMAGPSUStreamInterface(StreamAdapter):
         return self._device.log_message
 
     def read_ramp_rate(self):
-        return "HH:MM:SS RAMP RATE {} A/SEC".format(self._device.ramp_rate)
+        return "HH:MM:SS RAMP RATE {:.4} A/SEC".format(self._device.ramp_rate)
 
     def write_ramp_rate(self, ramp_rate):
         self._device.ramp_rate = ramp_rate
@@ -131,16 +147,20 @@ class HFMAGPSUStreamInterface(StreamAdapter):
     def write_pause(self, paused):
         mode = self._get_output_mode_string()
         target = self._get_ramp_target_value()
+        rate = self._device.ramp_rate
+        output = "HOLDING ON PAUSE AT {} {}".format(self._device.output, mode)
         if paused == "ON":
             self._device.is_paused = True
-            output = "HOLDING ON PAUSE AT {} {}".format(self._device.output, mode)
             self._create_log_message("RAMP STATUS", output)
         elif paused == "OFF":
             self._device.is_paused = False
-            output = "RAMPING FROM {} TO {} {} AT A/SEC".format(self._device.output,
-                                                                target, mode,
-                                                                self._device.ramp_rate)
-            self._create_log_message("RAMP STATUS", output)
+            ramp_complete = abs(float(self._device.output) - float(target)) < 0.00001
+            if ramp_complete:
+                self._create_log_message("RAMP STATUS", output)
+            else:
+                output = "RAMPING FROM {:.6} TO {:.6} {} AT {:.6} A/SEC".format(self._device.output,
+                                                                    target, mode, rate)
+                self._create_log_message("RAMP STATUS", output)
         else:
             raise AssertionError("Invalid arguments sent")
 
@@ -156,7 +176,7 @@ class HFMAGPSUStreamInterface(StreamAdapter):
 
     def read_max_target(self):
         mode = self._get_output_mode_string()
-        return "HH:MM:SS MAX SETTING: {} {}".format(self._device.max_target, mode)
+        return "HH:MM:SS MAX SETTING: {:.4} {}".format(self._device.max_target, mode)
 
     def write_max_target(self, max_target):
         self._device.max_target = max_target
@@ -165,7 +185,7 @@ class HFMAGPSUStreamInterface(StreamAdapter):
 
     def read_mid_target(self):
         mode = self._get_output_mode_string()
-        return "HH:MM:SS MID SETTING: {} {}".format(self._device.mid_target, mode)
+        return "HH:MM:SS MID SETTING: {:.4} {}".format(self._device.mid_target, mode)
 
     def write_mid_target(self, mid_target):
         self._device.mid_target = mid_target
@@ -181,7 +201,7 @@ class HFMAGPSUStreamInterface(StreamAdapter):
         return self._device.log_message
 
     def read_constant(self):
-        return "HH:MM:SS FIELD CONSTANT: {} T/A".format(self._device.constant)
+        return "HH:MM:SS FIELD CONSTANT: {:.7} T/A".format(self._device.constant)
 
     def write_constant(self, constant):
         self._device.constant = constant

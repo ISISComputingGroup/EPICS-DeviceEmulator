@@ -26,24 +26,19 @@ class DefaultStoppedState(State):
 class DefaultStartedState(State):
     def in_state(self, dt):
         device = self._context
-        SMALL = 0.00001
-        '''
-        target = get_target_value(device._ramp_target,
-                                  device._zero
-                                  device._mid_target,
-                                  device._max_target)
-        
-        # This is now set by SNL file? SNL file finds target and sets MID value
-        # to that, so the device is ramping towards an adapted MID target.
-        '''
-        target = device._mid_target
-        rate = device._ramp_rate
-        # Starting ramping towards target value
+
+        rate = float(device._ramp_rate)
+        target = float(device._mid_target)
+        constant = float(device._constant)
+
+        # conversion logic
+
+        if device._is_output_mode_tesla:
+            rate *= constant
+
         device._output = approaches.linear(float(device._output), float(target), float(rate), dt)
-        # If the output equals the target, trigger not_ramping state with _is_paused variable
-        ramp_complete = abs(float(device._output) - float(target)) < SMALL
-        if ramp_complete:
-            device._is_paused = True
+
+
 
 
 
