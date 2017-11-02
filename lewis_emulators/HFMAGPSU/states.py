@@ -34,7 +34,7 @@ class DefaultStartedState(State):
         # conversion logic
 
         if device._is_output_mode_tesla:
-            rate *= constant
+            rate = rate * constant
 
         device._output = approaches.linear(float(device._output), float(target), float(rate), dt)
 
