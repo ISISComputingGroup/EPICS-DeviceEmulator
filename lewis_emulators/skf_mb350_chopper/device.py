@@ -15,6 +15,7 @@ class SimulatedSkfMb350Chopper(StateMachineDevice):
 
         self._started = False
         self.phase = 0
+        self.frequency = 0
 
     def _get_state_handlers(self):
         return {
@@ -33,8 +34,13 @@ class SimulatedSkfMb350Chopper(StateMachineDevice):
         if address != self.ADDRESS:
             raise NotImplementedError("Only address 1 is implemented")
 
-    def set_nominal_frequency(self, address, frequency):
-        pass
+    def set_frequency(self, address, frequency):
+        self.check_address(address)
+        self.frequency = frequency
+
+    def get_frequency(self, address):
+        self.check_address(address)
+        return self.frequency
 
     def set_nominal_phase(self, address, phase):
         self.check_address(address)

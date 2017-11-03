@@ -5,7 +5,6 @@ from .crc16 import crc16_matches
 
 BYTE = 2**8
 
-
 @has_log
 def int_to_raw_bytes(integer, length):
     """
@@ -52,6 +51,7 @@ class SkfMb350ChopperStreamInterface(StreamInterface):
             0x20: self.start,
             0x30: self.stop,
             0x60: self.set_rotational_speed,
+            0x90: self.set_nominal_phase,
             0xC0: self.get_phase_info,
         }
 
@@ -84,8 +84,8 @@ class SkfMb350ChopperStreamInterface(StreamInterface):
         self._device.stop(address)
 
     @has_log
-    def set_rotational_speed(self, address, data):
-        self.log.info("Setting rotational speed")
+    def set_nominal_phase(self, address, data):
+        self.log.info("Setting phase")
         self.log.info("Address = {}".format(address))
         self.log.info("Data = {}".format(data))
         nominal_phase = raw_bytes_to_int(data)
@@ -93,17 +93,42 @@ class SkfMb350ChopperStreamInterface(StreamInterface):
         self._device.set_nominal_phase(address, nominal_phase)
 
     @has_log
+    def set_rotational_speed(self, address, data):
+        self.log.info("Setting frequency")
+        self.log.info("Address = {}".format(address))
+        self.log.info("Data = {}".format(data))
+        freq = raw_bytes_to_int(data)
+        self.log.info("Setting frequency to {}".format(freq))
+        self._device.set_frequency(address, freq)
+
+    @has_log
     def get_phase_info(self, address, data):
         self.log.info("Getting phase info")
         self.log.info("Address = {}".format(address))
+        return Responses.phase_information_response_packet(address, self._device)
 
-        phase = self._device.get_phase(address)
-        self.log.info("Returning phase as {}".format(phase))
 
-        return ResponseBuilder().add_int(address, 1).add_int(0xC0, 1).add_int(0x00, 1).add_int(phase, 4).build()
+class Responses(object):
+    """
+    Utility class containing common responses (which are shared between many commands).
+    """
+
+    @staticmethod
+    def phase_information_response_packet(address, device):
+        return ResponseBuilder()\
+            .add_int(address, 1)\
+            .add_int(0xC0, 1)\
+            .add_int(0x00, 1)\
+            .add_int(device.get_phase(address), 4)\
+            .add_int(device.get_frequency(address), 4) \
+            .build()
 
 
 class ResponseBuilder(object):
+    """
+    Response builder which formats the responses as bytes.
+    """
+
     def __init__(self):
         self.response = ""
 
