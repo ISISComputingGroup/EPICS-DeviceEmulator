@@ -20,7 +20,7 @@ class SimulatedSkfMb350Chopper(StateMachineDevice):
         self.phase_repeatability = 100.
 
         self.interlocks = OrderedDict([
-            ("DSP_WD_FAIL", True),
+            ("DSP_WD_FAIL", False),
             ("OSCILLATOR_FAIL", False),
             ("POSITION_SHUTDOWN", False),
             ("EMERGENCY_STOP", False),

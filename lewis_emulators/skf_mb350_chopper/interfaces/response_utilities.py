@@ -4,12 +4,11 @@ from byte_conversions import int_to_raw_bytes, float_to_raw_bytes
 def build_interlock_status(device):
     interlocks = device.get_interlocks()
 
-    multiplier = 1
+    bit = 1
     result = 0
-
-    for key in interlocks.keys():
-        result += multiplier if interlocks[key] else 0
-        multiplier *= 2
+    for key in reversed(interlocks.keys()):
+        result += bit if interlocks[key] else 0
+        bit *= 2
 
     return result
 
