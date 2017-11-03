@@ -19,6 +19,31 @@ class SimulatedSkfMb350Chopper(StateMachineDevice):
         self.phase_percent_ok = 100.
         self.phase_repeatability = 100.
 
+        self.interlocks = OrderedDict([
+            ("DSP_WD_FAIL", True),
+            ("OSCILLATOR_FAIL", False),
+            ("POSITION_SHUTDOWN", False),
+            ("EMERGENCY_STOP", False),
+            ("UPS_FAIL", False),
+            ("EXTERNAL_FAULT ", False),
+            ("CC_WD_FAIL", False),
+            ("OVERSPEED_TRIP", False),
+            ("VACUUM_FAIL", False),
+            ("MOTOR_OVER_TEMP", False),
+            ("REFERENCE_SIGNAL_LOSS ", False),
+            ("SPEED_SENSOR_LOSS", False),
+            ("COOLING_LOSS", False),
+            ("DSP_SUMMARY_SHUTDOWN", False),
+            ("CC_SHUTDOWN_REQ", False),
+            ("TEST_MODE", False),
+        ])
+
+    def set_interlock_state(self, item, value):
+        self.interlocks[item] = value
+
+    def get_interlocks(self):
+        return self.interlocks
+
     def _get_state_handlers(self):
         return {
             'init': State(),

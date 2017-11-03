@@ -1,7 +1,8 @@
 from lewis.adapters.stream import StreamInterface, Cmd
 from lewis.core.logging import has_log
 
-from byte_conversions import raw_bytes_to_int, int_to_raw_bytes, float_to_raw_bytes
+from byte_conversions import raw_bytes_to_int
+from response_utilities import Responses
 from .crc16 import crc16_matches
 
 
@@ -83,41 +84,3 @@ class SkfMb350ChopperStreamInterface(StreamInterface):
         response = Responses.phase_information_response_packet(address, self._device)
         self.log.info("Response is: {}".format(response))
         return response
-
-
-class Responses(object):
-    """
-    Utility class containing common responses (which are shared between many commands).
-    """
-
-    @staticmethod
-    def phase_information_response_packet(address, device):
-        return ResponseBuilder()\
-            .add_int(address, 1)\
-            .add_int(0xC0, 1)\
-            .add_int(0x00, 1)\
-            .add_int(device.get_frequency(address), 2) \
-            .add_float(device.get_phase(address)) \
-            .add_float(device.get_phase_repeatability(address)) \
-            .add_float(device.get_phase_percent_ok(address)) \
-            .build()
-
-
-class ResponseBuilder(object):
-    """
-    Response builder which formats the responses as bytes.
-    """
-
-    def __init__(self):
-        self.response = ""
-
-    def add_int(self, value, length):
-        self.response += int_to_raw_bytes(value, length)
-        return self
-
-    def add_float(self, value):
-        self.response += float_to_raw_bytes(value)
-        return self
-
-    def build(self):
-        return self.response
