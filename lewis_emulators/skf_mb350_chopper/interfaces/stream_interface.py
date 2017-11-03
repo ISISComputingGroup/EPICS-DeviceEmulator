@@ -1,33 +1,8 @@
 from lewis.adapters.stream import StreamInterface, Cmd
 from lewis.core.logging import has_log
 
+from byte_conversions import raw_bytes_to_int, int_to_raw_bytes, float_to_raw_bytes
 from .crc16 import crc16_matches
-
-BYTE = 2**8
-
-@has_log
-def int_to_raw_bytes(integer, length):
-    """
-    Converts an integer to an unsigned, big-endian set of bytes with the specified length
-    """
-    result = r""
-    for index in range(length):
-        result += chr((integer // (BYTE**index)) % BYTE)
-
-    return result[::-1]
-
-
-@has_log
-def raw_bytes_to_int(raw_bytes):
-    """
-    Converts an unsigned, big-endian set of bytes to an integer.
-    """
-    multiplier = 1
-    result = 0
-    for b in reversed(raw_bytes):
-        result += ord(b) * multiplier
-        multiplier *= BYTE
-    return result
 
 
 class SkfMb350ChopperStreamInterface(StreamInterface):
@@ -37,7 +12,7 @@ class SkfMb350ChopperStreamInterface(StreamInterface):
         Cmd("any_command", "^([\s\S]*)$"),
     }
 
-    in_terminator = str(chr(0x0)) * 16
+    in_terminator = "[terminator]" + str(chr(0x0)) * 16
     out_terminator = in_terminator
 
     def handle_error(self, request, error):
@@ -88,7 +63,7 @@ class SkfMb350ChopperStreamInterface(StreamInterface):
         self.log.info("Setting phase")
         self.log.info("Address = {}".format(address))
         self.log.info("Data = {}".format(data))
-        nominal_phase = raw_bytes_to_int(data)
+        nominal_phase = raw_bytes_to_int(data) / 1000.
         self.log.info("Setting nominal phase to {}".format(nominal_phase))
         self._device.set_nominal_phase(address, nominal_phase)
 
@@ -105,7 +80,9 @@ class SkfMb350ChopperStreamInterface(StreamInterface):
     def get_phase_info(self, address, data):
         self.log.info("Getting phase info")
         self.log.info("Address = {}".format(address))
-        return Responses.phase_information_response_packet(address, self._device)
+        response = Responses.phase_information_response_packet(address, self._device)
+        self.log.info("Response is: {}".format(response))
+        return response
 
 
 class Responses(object):
@@ -119,8 +96,10 @@ class Responses(object):
             .add_int(address, 1)\
             .add_int(0xC0, 1)\
             .add_int(0x00, 1)\
-            .add_int(device.get_phase(address), 4)\
-            .add_int(device.get_frequency(address), 4) \
+            .add_int(device.get_frequency(address), 2) \
+            .add_float(device.get_phase(address)) \
+            .add_float(device.get_phase_repeatability(address)) \
+            .add_float(device.get_phase_percent_ok(address)) \
             .build()
 
 
@@ -134,6 +113,10 @@ class ResponseBuilder(object):
 
     def add_int(self, value, length):
         self.response += int_to_raw_bytes(value, length)
+        return self
+
+    def add_float(self, value):
+        self.response += float_to_raw_bytes(value)
         return self
 
     def build(self):

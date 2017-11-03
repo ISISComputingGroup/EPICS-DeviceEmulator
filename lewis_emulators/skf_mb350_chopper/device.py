@@ -16,6 +16,8 @@ class SimulatedSkfMb350Chopper(StateMachineDevice):
         self._started = False
         self.phase = 0
         self.frequency = 0
+        self.phase_percent_ok = 100.
+        self.phase_repeatability = 100.
 
     def _get_state_handlers(self):
         return {
@@ -60,3 +62,11 @@ class SimulatedSkfMb350Chopper(StateMachineDevice):
     def get_phase(self, address):
         self.check_address(address)
         return self.phase
+
+    def get_phase_percent_ok(self, address):
+        self.check_address(address)
+        return self.phase_percent_ok
+
+    def get_phase_repeatability(self, address):
+        self.check_address(address)
+        return self.phase_repeatability
