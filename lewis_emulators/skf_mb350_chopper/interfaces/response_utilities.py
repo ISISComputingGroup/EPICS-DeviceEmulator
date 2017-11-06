@@ -6,8 +6,8 @@ def build_interlock_status(device):
 
     bit = 1
     result = 0
-    for key in reversed(interlocks.keys()):
-        result += bit if interlocks[key] else 0
+    for ilk in interlocks.values():
+        result += bit if ilk else 0
         bit *= 2
 
     return result
@@ -23,7 +23,7 @@ class Responses(object):
             .add_int(address, 1)\
             .add_int(0xC0, 1)\
             .add_int(0x00, 1)\
-            .add_int(build_interlock_status(device), 2) \
+            .add_int(build_interlock_status(device), 2, low_byte_first=False) \
             .add_int(device.get_frequency(address), 2) \
             .add_float(device.get_phase(address)) \
             .add_float(device.get_phase_repeatability(address)) \
@@ -39,8 +39,8 @@ class ResponseBuilder(object):
     def __init__(self):
         self.response = ""
 
-    def add_int(self, value, length):
-        self.response += int_to_raw_bytes(value, length)
+    def add_int(self, value, length, low_byte_first=True):
+        self.response += int_to_raw_bytes(value, length, low_byte_first)
         return self
 
     def add_float(self, value):
