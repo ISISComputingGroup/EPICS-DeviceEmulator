@@ -13,22 +13,38 @@ def build_interlock_status(device):
     return result
 
 
-class Responses(object):
-    """
-    Utility class containing common responses (which may be shared between several commands).
-    """
-    @staticmethod
-    def phase_information_response_packet(address, device):
-        return ResponseBuilder()\
-            .add_int(address, 1)\
-            .add_int(0xC0, 1)\
-            .add_int(0x00, 1)\
-            .add_int(build_interlock_status(device), 2, low_byte_first=False) \
-            .add_int(device.get_frequency(), 2) \
-            .add_float(device.get_phase()) \
-            .add_float(device.get_phase_repeatability()) \
-            .add_float(device.get_phase_percent_ok()) \
-            .build()
+def build_device_status(device):
+    status_bits = [
+        device.is_controller_ok(),
+        device.is_up_to_speed(),
+        device.is_able_to_run(),
+        device.is_shutting_down(),
+        device.is_levitation_complete(),
+        device.is_phase_locked(),
+        device.get_motor_direction() > 0,
+        device.is_avc_on()
+    ]
+
+    bit = 1
+    result = 0
+    for stat in status_bits:
+        result += bit if stat else 0
+        bit *= 2
+    return result
+
+
+def phase_information_response_packet(address, device):
+    return ResponseBuilder() \
+        .add_int(address, 1) \
+        .add_int(0xC0, 1) \
+        .add_int(0x00, 1) \
+        .add_int(build_device_status(device), 1) \
+        .add_int(build_interlock_status(device), 2, low_byte_first=False) \
+        .add_int(device.get_frequency(), 2) \
+        .add_float(device.get_phase()) \
+        .add_float(device.get_phase_repeatability()) \
+        .add_float(device.get_phase_percent_ok()) \
+        .build()
 
 
 class ResponseBuilder(object):

@@ -72,6 +72,30 @@ class SimulatedSkfMb350Chopper(StateMachineDevice):
     def stop(self):
         self._started = False
 
+    def is_controller_ok(self):
+        return True  # TODO
+
+    def is_up_to_speed(self):
+        return self.frequency > 10  # TODO
+
+    def is_able_to_run(self):
+        return True  # TODO
+
+    def is_shutting_down(self):
+        return False  # TODO
+
+    def is_levitation_complete(self):
+        return True  # TODO
+
+    def is_phase_locked(self):
+        return True  # TODO
+
+    def get_motor_direction(self):
+        return 1  # TODO
+
+    def is_avc_on(self):
+        return True  # TODO
+
     def get_phase(self):
         return self.phase
 

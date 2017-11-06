@@ -8,6 +8,11 @@ def int_to_raw_bytes(integer, length, low_byte_first):
     Converts an integer to an unsigned set of bytes with the specified length (represented as a string).
 
     If low byte first is True, the least significant byte comes first, otherwise the most significant byte comes first.
+
+    :param integer: (int) The integer to convert
+    :param length: (int) The length of the result
+    :param low_byte_first: (bool) Whether to put the least significant byte first
+    :return (str) A string representation of the bytes.
     """
     result = r""
 
@@ -20,6 +25,9 @@ def int_to_raw_bytes(integer, length, low_byte_first):
 def raw_bytes_to_int(raw_bytes):
     """
     Converts an unsigned set of bytes to an integer.
+
+    :param raw_bytes: (str) A string representation of the raw bytes.
+    :return (int): The integer represented by the raw bytes passed in.
     """
     multiplier = 1
     result = 0

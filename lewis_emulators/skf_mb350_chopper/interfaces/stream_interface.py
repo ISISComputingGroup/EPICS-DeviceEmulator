@@ -2,7 +2,7 @@ from lewis.adapters.stream import StreamInterface, Cmd
 from lewis.core.logging import has_log
 
 from byte_conversions import raw_bytes_to_int
-from response_utilities import Responses
+from response_utilities import phase_information_response_packet
 from .crc16 import crc16_matches
 
 
@@ -77,6 +77,6 @@ class SkfMb350ChopperStreamInterface(StreamInterface):
     @has_log
     def get_phase_info(self, address, data):
         self.log.info("Getting phase info")
-        response = Responses.phase_information_response_packet(address, self._device)
+        response = phase_information_response_packet(address, self._device)
         self.log.info("Response is: {}".format(response))
         return response
