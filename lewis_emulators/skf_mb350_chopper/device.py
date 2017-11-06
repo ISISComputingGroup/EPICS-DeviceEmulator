@@ -76,7 +76,7 @@ class SimulatedSkfMb350Chopper(StateMachineDevice):
         return True  # TODO
 
     def is_up_to_speed(self):
-        return self.frequency > 10  # TODO
+        return self._started  # TODO
 
     def is_able_to_run(self):
         return True  # TODO
