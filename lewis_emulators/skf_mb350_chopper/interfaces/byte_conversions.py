@@ -6,6 +6,8 @@ BYTE = 2**8
 def int_to_raw_bytes(integer, length, low_byte_first):
     """
     Converts an integer to an unsigned set of bytes with the specified length (represented as a string).
+
+    If low byte first is True, the least significant byte comes first, otherwise the most significant byte comes first.
     """
     result = r""
 

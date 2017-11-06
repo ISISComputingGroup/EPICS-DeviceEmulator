@@ -24,10 +24,10 @@ class Responses(object):
             .add_int(0xC0, 1)\
             .add_int(0x00, 1)\
             .add_int(build_interlock_status(device), 2, low_byte_first=False) \
-            .add_int(device.get_frequency(address), 2) \
-            .add_float(device.get_phase(address)) \
-            .add_float(device.get_phase_repeatability(address)) \
-            .add_float(device.get_phase_percent_ok(address)) \
+            .add_int(device.get_frequency(), 2) \
+            .add_float(device.get_phase()) \
+            .add_float(device.get_phase_repeatability()) \
+            .add_float(device.get_phase_percent_ok()) \
             .build()
 
 

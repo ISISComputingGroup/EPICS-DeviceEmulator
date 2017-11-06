@@ -36,8 +36,7 @@ class SkfMb350ChopperStreamInterface(StreamInterface):
             raise ValueError("Address should be in range 0-15")
 
         # Constant function code. Should always be 0x80
-        function_code = ord(command[1])
-        if function_code != 0x80:
+        if ord(command[1]) != 0x80:
             raise ValueError("Function code should always be 0x80")
 
         command_number = ord(command[2])
@@ -54,33 +53,30 @@ class SkfMb350ChopperStreamInterface(StreamInterface):
         return command_mapping[command_number](address, command_data)
 
     def start(self, address, data):
-        self._device.start(address)
+        self._device.start()
 
     def stop(self, address, data):
-        self._device.stop(address)
+        self._device.stop()
 
     @has_log
     def set_nominal_phase(self, address, data):
         self.log.info("Setting phase")
-        self.log.info("Address = {}".format(address))
         self.log.info("Data = {}".format(data))
         nominal_phase = raw_bytes_to_int(data) / 1000.
         self.log.info("Setting nominal phase to {}".format(nominal_phase))
-        self._device.set_nominal_phase(address, nominal_phase)
+        self._device.set_nominal_phase(nominal_phase)
 
     @has_log
     def set_rotational_speed(self, address, data):
         self.log.info("Setting frequency")
-        self.log.info("Address = {}".format(address))
         self.log.info("Data = {}".format(data))
         freq = raw_bytes_to_int(data)
         self.log.info("Setting frequency to {}".format(freq))
-        self._device.set_frequency(address, freq)
+        self._device.set_frequency(freq)
 
     @has_log
     def get_phase_info(self, address, data):
         self.log.info("Getting phase info")
-        self.log.info("Address = {}".format(address))
         response = Responses.phase_information_response_packet(address, self._device)
         self.log.info("Response is: {}".format(response))
         return response

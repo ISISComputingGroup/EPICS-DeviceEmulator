@@ -10,9 +10,6 @@ class SimulatedSkfMb350Chopper(StateMachineDevice):
         Initialize all of the device's attributes.
         """
 
-        # Chopper is only simulated for this one address.
-        self.ADDRESS = 1
-
         self._started = False
         self.phase = 0
         self.frequency = 0
@@ -25,12 +22,12 @@ class SimulatedSkfMb350Chopper(StateMachineDevice):
             ("POSITION_SHUTDOWN", False),
             ("EMERGENCY_STOP", False),
             ("UPS_FAIL", False),
-            ("EXTERNAL_FAULT ", False),
+            ("EXTERNAL_FAULT", False),
             ("CC_WD_FAIL", False),
             ("OVERSPEED_TRIP", False),
             ("VACUUM_FAIL", False),
             ("MOTOR_OVER_TEMP", False),
-            ("REFERENCE_SIGNAL_LOSS ", False),
+            ("REFERENCE_SIGNAL_LOSS", False),
             ("SPEED_SENSOR_LOSS", False),
             ("COOLING_LOSS", False),
             ("DSP_SUMMARY_SHUTDOWN", False),
@@ -57,41 +54,29 @@ class SimulatedSkfMb350Chopper(StateMachineDevice):
             (('init', 'stopped'), lambda: False),
         ])
 
-    def check_address(self, address):
-        if address != self.ADDRESS:
-            raise NotImplementedError("Only address 1 is implemented")
-
-    def set_frequency(self, address, frequency):
-        self.check_address(address)
+    def set_frequency(self, frequency):
         self.frequency = frequency
 
-    def get_frequency(self, address):
-        self.check_address(address)
+    def get_frequency(self):
         return self.frequency
 
-    def set_nominal_phase(self, address, phase):
-        self.check_address(address)
+    def set_nominal_phase(self, phase):
         self.phase = phase
 
     def set_nominal_phase_window(self, address, phase_window):
         pass
 
-    def start(self, address):
-        self.check_address(address)
+    def start(self):
         self._started = True
 
-    def stop(self, address):
-        self.check_address(address)
+    def stop(self):
         self._started = False
 
-    def get_phase(self, address):
-        self.check_address(address)
+    def get_phase(self):
         return self.phase
 
-    def get_phase_percent_ok(self, address):
-        self.check_address(address)
+    def get_phase_percent_ok(self):
         return self.phase_percent_ok
 
-    def get_phase_repeatability(self, address):
-        self.check_address(address)
+    def get_phase_repeatability(self):
         return self.phase_repeatability
