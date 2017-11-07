@@ -96,8 +96,8 @@ def phase_time_response_packet(address, device):
     :return: The response
     """
     return ResponseBuilder() \
-        .add_common_header(address, 0x81, device) \
-        .add_int(int(device.get_phase()/100), 4) \
+        .add_common_header(address, 0x85, device) \
+        .add_int(int(device.get_phase()*10), 4) \
         .build()
 
 
@@ -153,7 +153,7 @@ class ResponseBuilder(object):
                 .add_int(0x00, 1) \
                 .add_int(build_device_status(device), 1) \
                 .add_int(build_interlock_status(device), 2, low_byte_first=False) \
-                .add_int(device.get_frequency(), 2)
+                .add_int(int(device.get_frequency()), 2)
 
     def build(self):
         """

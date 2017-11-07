@@ -1,7 +1,8 @@
 from collections import OrderedDict
 
-from lewis.core.statemachine import State
 from lewis.devices import StateMachineDevice
+
+from states import DefaultState, StoppingState, GoingState
 
 
 class SimulatedSkfMb350Chopper(StateMachineDevice):
@@ -13,6 +14,7 @@ class SimulatedSkfMb350Chopper(StateMachineDevice):
         self._started = False
         self.phase = 0
         self.frequency = 0
+        self.frequency_setpoint = 0
         self.phase_percent_ok = 100.
         self.phase_repeatability = 100.
 
@@ -45,19 +47,23 @@ class SimulatedSkfMb350Chopper(StateMachineDevice):
 
     def _get_state_handlers(self):
         return {
-            'init': State(),
+            'default': DefaultState(),
+            'going': GoingState(),
+            'stopping': StoppingState(),
         }
 
     def _get_initial_state(self):
-        return 'init'
+        return 'default'
 
     def _get_transition_handlers(self):
         return OrderedDict([
-            (('init', 'stopped'), lambda: False),
+            (('default', 'going'), lambda: self.frequency_setpoint != self.frequency and self._started),
+            (('going', 'stopping'), lambda: not self._started),
+            (('stopping', 'default'), lambda: self.frequency == 0 and not self._started),
         ])
 
     def set_frequency(self, frequency):
-        self.frequency = frequency
+        self.frequency_setpoint = frequency
 
     def get_frequency(self):
         return self.frequency
@@ -75,7 +81,7 @@ class SimulatedSkfMb350Chopper(StateMachineDevice):
         return True  # TODO
 
     def is_up_to_speed(self):
-        return self._started  # TODO
+        return self.frequency == self.frequency_setpoint and self._started
 
     def is_able_to_run(self):
         return True  # TODO
@@ -84,16 +90,16 @@ class SimulatedSkfMb350Chopper(StateMachineDevice):
         return False  # TODO
 
     def is_levitation_complete(self):
-        return True  # TODO
+        return self.is_up_to_speed()  # Not really the correct condition but close enough
 
     def is_phase_locked(self):
-        return True  # TODO
+        return self.is_up_to_speed()  # Not really the correct condition but close enough
 
     def get_motor_direction(self):
-        return 1  # TODO
+        return 1  # Not clear if this can be set externally or only from front panel of physical device.
 
     def is_avc_on(self):
-        return True  # TODO
+        return True  # Don't know what this is/represents. Manual doesn't help.
 
     def get_phase(self):
         return self.phase
