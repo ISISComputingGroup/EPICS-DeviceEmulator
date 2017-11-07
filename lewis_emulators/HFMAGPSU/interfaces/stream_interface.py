@@ -5,9 +5,8 @@ from datetime import datetime
 
 class HFMAGPSUStreamInterface(StreamAdapter):
 
-    # terminators set to ascii ETX
     in_terminator = "\r\n"
-    out_terminator = "\r\n"
+    out_terminator = chr(19)
 
     commands = {
         CmdBuilder("read_direction").escape("GET SIGN").build(),
@@ -24,7 +23,7 @@ class HFMAGPSUStreamInterface(StreamAdapter):
         CmdBuilder("read_constant").escape("GET TPA").build(),
 
         CmdBuilder("write_direction").escape("D ").arg("-|0|\+").build(),
-        CmdBuilder("write_output_mode").escape("T ").arg("AMPS|TESLA").build(),
+        CmdBuilder("write_output_mode").escape("T ").arg("OFF|ON").build(),
         CmdBuilder("write_ramp_target").escape("RAMP ").arg("ZERO|MID|MAX").build(),
         CmdBuilder("write_heater_status").escape("H ").arg("OFF|ON").build(),
         CmdBuilder("write_pause").escape("P ").arg("OFF|ON").build(),
@@ -84,14 +83,14 @@ class HFMAGPSUStreamInterface(StreamAdapter):
         max_target = self._device.max_target
         mid_target = self._device.max_target
         in_tesla = self._device.is_output_mode_tesla
-        if output_mode == "TESLA":
+        if output_mode == "ON":
             if not self._device.is_output_mode_tesla:
                 self._device.output *= constant
                 self._device.max_target *= constant
                 self._device.mid_target *= constant
                 self._device.is_output_mode_tesla = True
                 self._create_log_message("OUTPUT MODE", output_mode)
-        elif output_mode == "AMPS":
+        elif output_mode == "OFF":
             if constant == 0:
                 self._device.error_message = "------> No field constant has been entered"
             else:

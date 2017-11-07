@@ -101,7 +101,7 @@ class SimulatedHFMAGPSU(StateMachineDevice):
 
     @property
     def zero_value(self):
-        return self._zero_value
+        return self._zero_target
 
     @property
     def mid_final_target(self):
