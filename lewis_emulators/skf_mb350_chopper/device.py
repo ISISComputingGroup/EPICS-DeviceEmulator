@@ -35,6 +35,8 @@ class SimulatedSkfMb350Chopper(StateMachineDevice):
             ("TEST_MODE", False),
         ])
 
+        self.rotator_angle = 90
+
     def set_interlock_state(self, item, value):
         self.interlocks[item] = value
 
@@ -104,3 +106,6 @@ class SimulatedSkfMb350Chopper(StateMachineDevice):
 
     def get_phase_repeatability(self):
         return self.phase_repeatability
+
+    def get_rotator_angle(self):
+        return self.rotator_angle

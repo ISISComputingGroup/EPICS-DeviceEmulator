@@ -2,7 +2,7 @@ from lewis.adapters.stream import StreamInterface, Cmd
 from lewis.core.logging import has_log
 
 from byte_conversions import raw_bytes_to_int
-from response_utilities import phase_information_response_packet
+from response_utilities import phase_information_response_packet, rotator_angle_response_packet
 from .crc16 import crc16_matches
 
 
@@ -27,6 +27,7 @@ class SkfMb350ChopperStreamInterface(StreamInterface):
             0x20: self.start,
             0x30: self.stop,
             0x60: self.set_rotational_speed,
+            0x81: self.get_rotator_angle,
             0x90: self.set_nominal_phase,
             0xC0: self.get_phase_info,
         }
@@ -78,5 +79,12 @@ class SkfMb350ChopperStreamInterface(StreamInterface):
     def get_phase_info(self, address, data):
         self.log.info("Getting phase info")
         response = phase_information_response_packet(address, self._device)
+        self.log.info("Response is: {}".format(response))
+        return response
+
+    @has_log
+    def get_rotator_angle(self, address, data):
+        self.log.info("Getting rotator angle")
+        response = rotator_angle_response_packet(address, self._device)
         self.log.info("Response is: {}".format(response))
         return response
