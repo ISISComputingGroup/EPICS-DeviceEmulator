@@ -71,7 +71,7 @@ def rotator_angle_response_packet(address, device):
 
     Response structure is:
         8 bytes common header (see ResponseBuilder.add_common_header)
-        4 bytes (IEEE single-precision float): The current rotator angle
+        4 bytes (unsigned int): The current rotator angle
 
     :param address: The address of this device
     :param device: The lewis device
@@ -79,7 +79,25 @@ def rotator_angle_response_packet(address, device):
     """
     return ResponseBuilder() \
         .add_common_header(address, 0x81, device) \
-        .add_float(device.get_rotator_angle()) \
+        .add_int(int(device.get_rotator_angle()), 4) \
+        .build()
+
+
+def phase_time_response_packet(address, device):
+    """
+    Returns the response to the "get_phase_information" command.
+
+    Response structure is:
+        8 bytes common header (see ResponseBuilder.add_common_header)
+        4 bytes (unsigned int): The current rotator angle
+
+    :param address: The address of this device
+    :param device: The lewis device
+    :return: The response
+    """
+    return ResponseBuilder() \
+        .add_common_header(address, 0x81, device) \
+        .add_int(int(device.get_phase()/100), 4) \
         .build()
 
 

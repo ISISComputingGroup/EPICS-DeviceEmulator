@@ -65,9 +65,6 @@ class SimulatedSkfMb350Chopper(StateMachineDevice):
     def set_nominal_phase(self, phase):
         self.phase = phase
 
-    def set_nominal_phase_window(self, address, phase_window):
-        pass
-
     def start(self):
         self._started = True
 
@@ -106,6 +103,9 @@ class SimulatedSkfMb350Chopper(StateMachineDevice):
 
     def get_phase_repeatability(self):
         return self.phase_repeatability
+
+    def set_phase_repeatability(self, value):
+        self.phase_repeatability = value
 
     def get_rotator_angle(self):
         return self.rotator_angle

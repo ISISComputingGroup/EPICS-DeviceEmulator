@@ -2,7 +2,8 @@ from lewis.adapters.stream import StreamInterface, Cmd
 from lewis.core.logging import has_log
 
 from byte_conversions import raw_bytes_to_int
-from response_utilities import phase_information_response_packet, rotator_angle_response_packet
+from response_utilities import phase_information_response_packet, rotator_angle_response_packet, \
+    phase_time_response_packet
 from .crc16 import crc16_matches
 
 
@@ -28,6 +29,8 @@ class SkfMb350ChopperStreamInterface(StreamInterface):
             0x30: self.stop,
             0x60: self.set_rotational_speed,
             0x81: self.get_rotator_angle,
+            0x85: self.get_phase_delay,
+            0x8E: self.set_gate_width,
             0x90: self.set_nominal_phase,
             0xC0: self.get_phase_info,
         }
@@ -53,9 +56,11 @@ class SkfMb350ChopperStreamInterface(StreamInterface):
 
         return command_mapping[command_number](address, command_data)
 
+    @has_log
     def start(self, address, data):
         self._device.start()
 
+    @has_log
     def stop(self, address, data):
         self._device.stop()
 
@@ -66,6 +71,14 @@ class SkfMb350ChopperStreamInterface(StreamInterface):
         nominal_phase = raw_bytes_to_int(data) / 1000.
         self.log.info("Setting nominal phase to {}".format(nominal_phase))
         self._device.set_nominal_phase(nominal_phase)
+
+    @has_log
+    def set_gate_width(self, address, data):
+        self.log.info("Setting gate width")
+        self.log.info("Data = {}".format(data))
+        width = raw_bytes_to_int(data)
+        self.log.info("Setting gate width to {}".format(width))
+        self._device.set_phase_repeatability(width / 10.)
 
     @has_log
     def set_rotational_speed(self, address, data):
@@ -86,5 +99,12 @@ class SkfMb350ChopperStreamInterface(StreamInterface):
     def get_rotator_angle(self, address, data):
         self.log.info("Getting rotator angle")
         response = rotator_angle_response_packet(address, self._device)
+        self.log.info("Response is: {}".format(response))
+        return response
+
+    @has_log
+    def get_phase_delay(self, address, data):
+        self.log.info("Getting phase time")
+        response = phase_time_response_packet(address, self._device)
         self.log.info("Response is: {}".format(response))
         return response
