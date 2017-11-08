@@ -115,3 +115,6 @@ class SimulatedSkfMb350Chopper(StateMachineDevice):
 
     def get_rotator_angle(self):
         return self.rotator_angle
+
+    def set_rotator_angle(self, angle):
+        self.rotator_angle = angle

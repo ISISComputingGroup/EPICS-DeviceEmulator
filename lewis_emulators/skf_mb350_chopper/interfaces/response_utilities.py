@@ -43,6 +43,23 @@ def build_device_status(device):
     return result
 
 
+def general_status_response_packet(address, device, command):
+    """
+    Returns the general response packet, the default response to any command that doesn't have a more specific response.
+
+    Response structure is:
+        8 bytes common header (see ResponseBuilder.add_common_header)
+
+    :param address: The address of this device
+    :param device: The lewis device
+    :param command: The command number that this is a reply to
+    :return: The response
+    """
+    return ResponseBuilder() \
+        .add_common_header(address, command, device) \
+        .build()
+
+
 def phase_information_response_packet(address, device):
     """
     Returns the response to the "get_phase_information" command.
@@ -79,7 +96,7 @@ def rotator_angle_response_packet(address, device):
     """
     return ResponseBuilder() \
         .add_common_header(address, 0x81, device) \
-        .add_int(int(device.get_rotator_angle()), 4) \
+        .add_int(int(device.get_rotator_angle()*10), 4) \
         .build()
 
 

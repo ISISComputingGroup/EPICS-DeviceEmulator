@@ -3,7 +3,7 @@ from lewis.core.logging import has_log
 
 from byte_conversions import raw_bytes_to_int
 from response_utilities import phase_information_response_packet, rotator_angle_response_packet, \
-    phase_time_response_packet
+    phase_time_response_packet, general_status_response_packet
 from .crc16 import crc16_matches
 
 
@@ -29,6 +29,7 @@ class SkfMb350ChopperStreamInterface(StreamInterface):
             0x30: self.stop,
             0x60: self.set_rotational_speed,
             0x81: self.get_rotator_angle,
+            0x82: self.set_rotator_angle,
             0x85: self.get_phase_delay,
             0x8E: self.set_gate_width,
             0x90: self.set_nominal_phase,
@@ -51,6 +52,8 @@ class SkfMb350ChopperStreamInterface(StreamInterface):
 
         crc = [ord(c) for c in command[-2:]]
 
+        self.log.info("Checksum bytes are: {}".format(crc))
+
         if not crc16_matches(command[:-2], crc):
             raise ValueError("CRC Checksum didn't match")
 
@@ -59,10 +62,12 @@ class SkfMb350ChopperStreamInterface(StreamInterface):
     @has_log
     def start(self, address, data):
         self._device.start()
+        return general_status_response_packet(address, self.device, 0x20)
 
     @has_log
     def stop(self, address, data):
         self._device.stop()
+        return general_status_response_packet(address, self.device, 0x30)
 
     @has_log
     def set_nominal_phase(self, address, data):
@@ -71,6 +76,7 @@ class SkfMb350ChopperStreamInterface(StreamInterface):
         nominal_phase = raw_bytes_to_int(data) / 1000.
         self.log.info("Setting nominal phase to {}".format(nominal_phase))
         self._device.set_nominal_phase(nominal_phase)
+        return general_status_response_packet(address, self.device, 0x90)
 
     @has_log
     def set_gate_width(self, address, data):
@@ -79,6 +85,7 @@ class SkfMb350ChopperStreamInterface(StreamInterface):
         width = raw_bytes_to_int(data)
         self.log.info("Setting gate width to {}".format(width))
         self._device.set_phase_repeatability(width / 10.)
+        return general_status_response_packet(address, self.device, 0x8E)
 
     @has_log
     def set_rotational_speed(self, address, data):
@@ -87,24 +94,28 @@ class SkfMb350ChopperStreamInterface(StreamInterface):
         freq = raw_bytes_to_int(data)
         self.log.info("Setting frequency to {}".format(freq))
         self._device.set_frequency(freq)
+        return general_status_response_packet(address, self.device, 0x60)
+
+    @has_log
+    def set_rotator_angle(self, address, data):
+        self.log.info("Setting rotator angle")
+        self.log.info("Data = {}".format(data))
+        angle_times_ten = raw_bytes_to_int(data)
+        self.log.info("Setting rotator angle to {}".format(angle_times_ten / 10.))
+        self._device.set_rotator_angle(angle_times_ten / 10.)
+        return general_status_response_packet(address, self.device, 0x82)
 
     @has_log
     def get_phase_info(self, address, data):
         self.log.info("Getting phase info")
-        response = phase_information_response_packet(address, self._device)
-        self.log.info("Response is: {}".format(response))
-        return response
+        return phase_information_response_packet(address, self._device)
 
     @has_log
     def get_rotator_angle(self, address, data):
         self.log.info("Getting rotator angle")
-        response = rotator_angle_response_packet(address, self._device)
-        self.log.info("Response is: {}".format(response))
-        return response
+        return rotator_angle_response_packet(address, self._device)
 
     @has_log
     def get_phase_delay(self, address, data):
         self.log.info("Getting phase time")
-        response = phase_time_response_packet(address, self._device)
-        self.log.info("Response is: {}".format(response))
-        return response
+        return phase_time_response_packet(address, self._device)
