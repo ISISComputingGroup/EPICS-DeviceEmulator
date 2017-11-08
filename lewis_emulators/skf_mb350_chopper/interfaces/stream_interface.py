@@ -4,7 +4,7 @@ from lewis.core.logging import has_log
 from byte_conversions import raw_bytes_to_int
 from response_utilities import phase_information_response_packet, rotator_angle_response_packet, \
     phase_time_response_packet, general_status_response_packet
-from .crc16 import crc16_matches
+from .crc16 import crc16_matches, crc16
 
 
 class SkfMb350ChopperStreamInterface(StreamInterface):
@@ -50,12 +50,9 @@ class SkfMb350ChopperStreamInterface(StreamInterface):
 
         command_data = [c for c in command[3:-2]]
 
-        crc = [ord(c) for c in command[-2:]]
-
-        self.log.info("Checksum bytes are: {}".format(crc))
-
-        if not crc16_matches(command[:-2], crc):
-            raise ValueError("CRC Checksum didn't match")
+        if not crc16_matches(command[:-2], command[-2:]):
+            raise ValueError("CRC Checksum didn't match. Expected {} but got {}"
+                             .format(crc16(command[:-2]), command[-2:]))
 
         return command_mapping[command_number](address, command_data)
 

@@ -1,4 +1,5 @@
 from byte_conversions import int_to_raw_bytes, float_to_raw_bytes
+from crc16 import crc16
 
 
 def build_interlock_status(device):
@@ -177,4 +178,5 @@ class ResponseBuilder(object):
         Gets the response from the builder
         :return: the response
         """
+        self.response += crc16(self.response)
         return self.response
