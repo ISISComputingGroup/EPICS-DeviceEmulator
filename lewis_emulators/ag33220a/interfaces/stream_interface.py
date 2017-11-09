@@ -1,10 +1,10 @@
-from lewis.adapters.stream import StreamAdapter, Cmd
+from lewis.adapters.stream import StreamInterface, Cmd
 import traceback
 
 NUM_MIN_MAX = "([\-0-9.]+|MAX|MIN)"
 
 
-class AG33220AStreamInterface(StreamAdapter):
+class AG33220AStreamInterface(StreamInterface):
 
     commands = {
         Cmd("get_amplitude", "^VOLT\?$"),

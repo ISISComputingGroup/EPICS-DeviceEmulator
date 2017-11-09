@@ -1,8 +1,8 @@
-from lewis.adapters.stream import Cmd, StreamAdapter
+from lewis.adapters.stream import Cmd, StreamInterface
 from ..states import Errors
 
 
-class POLARISSampleChangerStreamInterface(StreamAdapter):
+class POLARISSampleChangerStreamInterface(StreamInterface):
     protocol = "POLARIS"
 
     commands = {

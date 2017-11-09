@@ -1,4 +1,4 @@
-from lewis.adapters.stream import StreamAdapter, Cmd
+from lewis.adapters.stream import StreamInterface, Cmd
 
 import math
 
@@ -43,7 +43,7 @@ class JulichChecksum(object):
         return data + JulichChecksum._calculate(data)
 
 
-class FermichopperStreamInterface(StreamAdapter):
+class FermichopperStreamInterface(StreamInterface):
 
     # Commands that we expect via serial during normal operation
     commands = {
@@ -116,7 +116,8 @@ class FermichopperStreamInterface(StreamAdapter):
             + JulichChecksum.append("#E{:04X}".format(int(round((self._device.autozero_2_lower + 22.86647) / 0.04486)))) \
             + JulichChecksum.append("#F{:04X}".format(int(round(self._device.get_voltage() / 0.4274)))) \
             + JulichChecksum.append("#G{:04X}".format(int(round((self._device.get_electronics_temp() + 25.0) / 0.14663)))) \
-            + JulichChecksum.append("#H{:04X}".format(int(round((self._device.get_motor_temp() + 12.124) / 0.1263))))
+            + JulichChecksum.append("#H{:04X}".format(int(round((self._device.get_motor_temp() + 12.124) / 0.1263))))\
+            + "$"
 
     def execute_command(self, command, checksum):
         JulichChecksum.verify('#1', command, checksum)

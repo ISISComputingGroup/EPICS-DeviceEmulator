@@ -1,14 +1,13 @@
-from lewis.adapters.stream import StreamAdapter, Cmd
+from lewis.adapters.stream import StreamInterface, Cmd
 
 
-class InstronStreamInterface(StreamAdapter):
+class InstronStreamInterface(StreamInterface):
 
     # Commands that we expect via serial during normal operation
     commands = {
         Cmd("get_control_channel", "^Q300$"),
         Cmd("set_control_channel", "^C300,([1-3])$"),
-        Cmd("get_watchdog_status", "^Q904$"),
-        Cmd("set_watchdog_status", "^C904,([0-2]),([0-3])$"),
+        Cmd("disable_watchdog", "^C904,0$"),
         Cmd("get_control_mode", "^Q909$"),
         Cmd("set_control_mode", "^P909,([0-1])$"),
         Cmd("get_status", "^Q22$"),
@@ -68,12 +67,8 @@ class InstronStreamInterface(StreamAdapter):
     def set_control_channel(self, channel):
         self._device.set_control_channel(int(channel))
 
-    def get_watchdog_status(self):
-        enabled, status = self._device.get_watchdog_status()
-        return "{},{}".format(enabled, status)
-
-    def set_watchdog_status(self, cv1, cv2):
-        self._device.set_watchdog_status(int(cv1), int(cv2))
+    def disable_watchdog(self):
+        self._device.disable_watchdog()
 
     def get_control_mode(self):
         return self._device.get_control_mode()
