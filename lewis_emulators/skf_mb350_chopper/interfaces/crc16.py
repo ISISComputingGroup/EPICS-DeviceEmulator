@@ -29,4 +29,4 @@ def crc16(data):
 
             crc %= BYTE**2
 
-    return int_to_raw_bytes(crc, 2, low_byte_first=False)
+    return int_to_raw_bytes(crc, 2, low_byte_first=True)
