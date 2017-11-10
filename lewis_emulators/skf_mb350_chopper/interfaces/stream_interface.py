@@ -14,7 +14,7 @@ class SkfMb350ChopperStreamInterface(StreamInterface):
         Cmd("any_command", "^([\s\S]*)$"),
     }
 
-    in_terminator = "[terminator]" + str(chr(0x0)) * 16
+    in_terminator = str(chr(0x0)) * 16
     out_terminator = in_terminator
 
     def handle_error(self, request, error):
