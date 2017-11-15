@@ -10,7 +10,8 @@ class FZJDDFCHStreamInterface(StreamInterface):
     """
 
     commands = {
-        CmdBuilder("get_magnetic_bearing_state").escape("MBON?").build()
+        CmdBuilder("get_magnetic_bearing_status").escape("MBON?").build(),
+        CmdBuilder("get_all_status").escape("ASTA?").build()
     }
 
     in_terminator = "\r\n"
@@ -27,13 +28,25 @@ class FZJDDFCHStreamInterface(StreamInterface):
         """
         self.log.error("An error occurred at request " + repr(request) + ": " + repr(error))
 
-    def get_magnetic_bearing_state(self):
+    def get_magnetic_bearing_status(self):
 
         """
-        Gets the 
+        Gets the magnetic bearing status for the FZJ Digital Drive Fermi Chopper Controller
 
-        :param address: address of request
-        Returns: pressure in correct format if pressure has a value; if None returns None as if it is disconnected
+        :param 
+        Returns:
 
         """
-        return self._device.magnetic_bearing_state
+        return self._device.magnetic_bearing_status
+
+    def get_all_status(self):
+
+        """
+        Gets the all status for the FZJ Digital Drive Fermi Chopper Controller
+
+        :param 
+        Returns:
+
+        """
+        return "{ref_freq:.2f};{freq_setp:.2f}".format(ref_freq=self._device.reference_frequency,
+                                                       freq_setp=self._device.frequency_setpoint)

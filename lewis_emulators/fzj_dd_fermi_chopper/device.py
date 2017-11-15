@@ -6,14 +6,16 @@ from .states import DefaultState
 
 class SimulatedFZJDDFCH(StateMachineDevice):
     """
-    Simulated .
+    Simulated FZJ Digital Drive Fermi Chopper Controller.
     """
 
     def _initialize_data(self):
         """
         Sets the initial state of the device.
         """
-        self.magnetic_bearing_state = "OFF"
+        self.magnetic_bearing_status = "OFF"
+        self.reference_frequency = 0
+        self.frequency_setpoint = 0
 
     def _get_state_handlers(self):
         """
