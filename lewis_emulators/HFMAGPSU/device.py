@@ -6,11 +6,11 @@ from states import DefaultInitState, DefaultStartedState, DefaultStoppedState
 class SimulatedHFMAGPSU(StateMachineDevice):
 
     def _initialize_data(self):
-        self._is_output_mode_tesla = False
+        self._is_output_mode_tesla = True
         self._is_heater_on = True
         self._is_paused = True
         self._output = 0.0
-        self._direction = '+'
+        self._direction = 'POSITIVE'
         self._ramp_target = 'MID'
         self._heater_value = 0.0
         self._max_target = 34.92
