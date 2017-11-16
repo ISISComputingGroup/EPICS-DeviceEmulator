@@ -16,6 +16,7 @@ class SimulatedFZJDDFCH(StateMachineDevice):
         self.magnetic_bearing_status = "OFF"
         self.reference_frequency = 0
         self.frequency_setpoint = 0
+        self.frequency = 0
 
     def _get_state_handlers(self):
         """

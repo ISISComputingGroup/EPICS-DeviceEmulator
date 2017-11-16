@@ -3,6 +3,7 @@ from lewis.core.logging import has_log
 
 from lewis_emulators.utils.command_builder import CmdBuilder
 
+
 @has_log
 class FZJDDFCHStreamInterface(StreamInterface):
     """
@@ -48,5 +49,6 @@ class FZJDDFCHStreamInterface(StreamInterface):
         Returns:
 
         """
-        return "{ref_freq:.2f};{freq_setp:.2f}".format(ref_freq=self._device.reference_frequency,
-                                                       freq_setp=self._device.frequency_setpoint)
+        return "{freq_ref:.2f};{freq_setp:.2f};{freq:.2f}".format(freq_ref=self._device.reference_frequency,
+                                                                  freq_setp=self._device.frequency_setpoint,
+                                                                  freq=self._device.frequency)
