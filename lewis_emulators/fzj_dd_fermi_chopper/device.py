@@ -17,6 +17,9 @@ class SimulatedFZJDDFCH(StateMachineDevice):
         self.reference_frequency = 0
         self.frequency_setpoint = 0
         self.frequency = 0
+        self.phase_setpoint = 0
+        self.phase = 0
+        self.phase_status = "NOK"
 
     def _get_state_handlers(self):
         """

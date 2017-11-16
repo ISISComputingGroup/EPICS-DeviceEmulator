@@ -49,6 +49,7 @@ class FZJDDFCHStreamInterface(StreamInterface):
         Returns:
 
         """
-        return "{freq_ref:.2f};{freq_setp:.2f};{freq:.2f}".format(freq_ref=self._device.reference_frequency,
-                                                                  freq_setp=self._device.frequency_setpoint,
-                                                                  freq=self._device.frequency)
+        return "{freq_ref:.2f};{freq_setp:.2f};{freq:.2f};{phas_setp:.2f};{phas:.2f};{phas_stat:s}"\
+            .format(freq_ref=self._device.reference_frequency, freq_setp=self._device.frequency_setpoint,
+            freq=self._device.frequency, phas_setp=self._device.phase_setpoint, phas=self._device.phase,
+            phas_stat=self._device.phase_status)
