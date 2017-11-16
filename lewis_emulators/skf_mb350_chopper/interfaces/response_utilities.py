@@ -115,7 +115,7 @@ def phase_time_response_packet(address, device):
     """
     return ResponseBuilder() \
         .add_common_header(address, 0x85, device) \
-        .add_int(int(device.get_phase()*10), 4) \
+        .add_float(device.get_phase()/1000.) \
         .build()
 
 

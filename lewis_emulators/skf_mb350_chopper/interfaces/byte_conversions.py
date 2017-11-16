@@ -38,8 +38,8 @@ def raw_bytes_to_int(raw_bytes):
 
 
 def float_to_raw_bytes(fl):
-    return "".join(chr(c) for c in bytearray(struct.pack(">f", fl)))
+    return "".join(chr(c) for c in bytearray(struct.pack(">f", fl)))[::-1]
 
 
 def raw_bytes_to_float(raw_bytes):
-    return struct.unpack('f', raw_bytes)[0]
+    return struct.unpack('f', raw_bytes[::-1])[0]
