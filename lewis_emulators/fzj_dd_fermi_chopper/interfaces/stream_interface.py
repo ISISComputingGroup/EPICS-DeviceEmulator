@@ -34,11 +34,14 @@ class FZJDDFCHStreamInterface(StreamInterface):
         """
         Gets the magnetic bearing status for the FZJ Digital Drive Fermi Chopper Controller
 
-        :param 
+        :param
         Returns:
 
         """
-        return self._device.magnetic_bearing_status
+        pass
+
+        # return self._device.magnetic_bearing_status
+        return
 
     def get_all_status(self):
 
@@ -49,7 +52,18 @@ class FZJDDFCHStreamInterface(StreamInterface):
         Returns:
 
         """
-        return "{freq_ref:.2f};{freq_setp:.2f};{freq:.2f};{phas_setp:.2f};{phas:.2f};{phas_stat:s}"\
-            .format(freq_ref=self._device.reference_frequency, freq_setp=self._device.frequency_setpoint,
-            freq=self._device.frequency, phas_setp=self._device.phase_setpoint, phas=self._device.phase,
-            phas_stat=self._device.phase_status)
+        device = self._device
+        values = [
+            "{0:.2f}".format(device.frequency_reference),
+            "{0:.2f}".format(device.frequency_setpoint),
+            "{0:.2f}".format(device.frequency),
+            "{0:.2f}".format(device.phase_setpoint),
+            "{0:.2f}".format(device.phase),
+            "{0:s}".format(device.phase_status),
+            "{0:s}".format(device.magnetic_bearing),
+            "{0:s}".format(device.magnetic_bearing_status)
+        ]
+
+        return_string = ";".join(values)
+        self.log.error(return_string)
+        return return_string
