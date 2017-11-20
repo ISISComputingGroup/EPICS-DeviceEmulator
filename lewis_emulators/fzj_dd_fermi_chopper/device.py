@@ -40,3 +40,11 @@ class SimulatedFZJDDFCH(StateMachineDevice):
         Returns: the state transitions
         """
         return OrderedDict()
+
+    def reset(self):
+        """
+        Reset device to defaults
+        :return: 
+        """
+
+        self._initialize_data()
