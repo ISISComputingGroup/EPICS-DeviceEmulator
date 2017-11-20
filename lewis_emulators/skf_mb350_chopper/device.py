@@ -78,16 +78,16 @@ class SimulatedSkfMb350Chopper(StateMachineDevice):
         self._started = False
 
     def is_controller_ok(self):
-        return True  # TODO
+        return True
 
     def is_up_to_speed(self):
         return self.frequency == self.frequency_setpoint and self._started
 
     def is_able_to_run(self):
-        return True  # TODO
+        return True
 
     def is_shutting_down(self):
-        return False  # TODO
+        return False
 
     def is_levitation_complete(self):
         return self.is_up_to_speed()  # Not really the correct condition but close enough
