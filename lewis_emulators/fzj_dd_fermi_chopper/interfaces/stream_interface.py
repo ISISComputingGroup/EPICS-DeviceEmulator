@@ -62,7 +62,16 @@ class FZJDDFCHStreamInterface(StreamInterface):
             "{0:s}".format(device.phase_status),
             "{0:s}".format(device.magnetic_bearing),
             "{0:s}".format(device.magnetic_bearing_status),
-            "{0:.1f}".format(device.magnetic_bearing_integrator)
+            "{0:.1f}".format(device.magnetic_bearing_integrator),
+            "{0:s}".format(device.drive),
+            "{0:s}".format(device.drive_status),
+            "{0:.2f}".format(device.drive_l1_current),
+            "{0:.2f}".format(device.drive_l2_current),
+            "{0:.2f}".format(device.drive_l3_current),
+            "{0:s}".format(device.drive_direction),
+            "{0:s}".format(device.parked_open_status),
+            "{0:.2f}".format(device.drive_temperature),
+            "{0:.2f}".format(device.input_clock)
         ]
 
         return_string = ";".join(values)

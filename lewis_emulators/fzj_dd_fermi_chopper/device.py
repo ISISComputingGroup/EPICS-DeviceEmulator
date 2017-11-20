@@ -22,6 +22,15 @@ class SimulatedFZJDDFCH(StateMachineDevice):
         self.magnetic_bearing = "OFF"
         self.magnetic_bearing_status = "NOK"
         self.magnetic_bearing_integrator = 0
+        self.drive = "OFF"
+        self.drive_status = "START"
+        self.drive_l1_current = 0
+        self.drive_l2_current = 0
+        self.drive_l3_current = 0
+        self.drive_direction = "CW"
+        self.parked_open_status = "OK"
+        self.drive_temperature = 0
+        self.input_clock = 0
 
     def _get_state_handlers(self):
         """
