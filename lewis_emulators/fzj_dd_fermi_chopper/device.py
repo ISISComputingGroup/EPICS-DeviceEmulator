@@ -31,6 +31,12 @@ class SimulatedFZJDDFCH(StateMachineDevice):
         self.parked_open_status = "OK"
         self.drive_temperature = 0
         self.input_clock = 0
+        self.phase_outage = 0
+        self.master_chopper = "C01"
+        self.logging = "ON"
+        self.lmsr_status = "OK"
+        self.dsp_status = "OK"
+        self.interlock_er_status = "OK"
 
     def _get_state_handlers(self):
         """

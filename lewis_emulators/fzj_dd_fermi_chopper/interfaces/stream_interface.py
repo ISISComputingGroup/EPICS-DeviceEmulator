@@ -71,7 +71,13 @@ class FZJDDFCHStreamInterface(StreamInterface):
             "{0:s}".format(device.drive_direction),
             "{0:s}".format(device.parked_open_status),
             "{0:.2f}".format(device.drive_temperature),
-            "{0:.2f}".format(device.input_clock)
+            "{0:.2f}".format(device.input_clock),
+            "{0:.2f}".format(device.phase_outage),
+            "{0:s}".format(device.master_chopper),
+            "{0:s}".format(device.logging),
+            "{0:s}".format(device.lmsr_status),
+            "{0:s}".format(device.dsp_status),
+            "{0:s}".format(device.interlock_er_status)
         ]
 
         return_string = ";".join(values)
