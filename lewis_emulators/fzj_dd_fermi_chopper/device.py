@@ -21,6 +21,7 @@ class SimulatedFZJDDFCH(StateMachineDevice):
         self.phase_status = "NOK"
         self.magnetic_bearing = "OFF"
         self.magnetic_bearing_status = "NOK"
+        self.magnetic_bearing_integrator = 0
 
     def _get_state_handlers(self):
         """

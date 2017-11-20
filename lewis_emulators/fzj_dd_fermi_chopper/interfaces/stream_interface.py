@@ -61,7 +61,8 @@ class FZJDDFCHStreamInterface(StreamInterface):
             "{0:.2f}".format(device.phase),
             "{0:s}".format(device.phase_status),
             "{0:s}".format(device.magnetic_bearing),
-            "{0:s}".format(device.magnetic_bearing_status)
+            "{0:s}".format(device.magnetic_bearing_status),
+            "{0:.1f}".format(device.magnetic_bearing_integrator)
         ]
 
         return_string = ";".join(values)
