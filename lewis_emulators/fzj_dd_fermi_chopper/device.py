@@ -37,6 +37,13 @@ class SimulatedFZJDDFCH(StateMachineDevice):
         self.lmsr_status = "OK"
         self.dsp_status = "OK"
         self.interlock_er_status = "OK"
+        self.interlock_vacuum_status = "OK"
+        self.interlock_frequency_monitoring_status = "OK"
+        self.interlock_magnetic_bearing_amplifier_temperature_status = "OK"
+        self.interlock_magnetic_bearing_amplifier_current_status = "OK"
+        self.interlock_drive_amplifier_temperature_status = "OK"
+        self.interlock_drive_amplifier_current_status = "OK"
+        self.interlock_ups_status = "OK"
 
     def _get_state_handlers(self):
         """

@@ -77,7 +77,14 @@ class FZJDDFCHStreamInterface(StreamInterface):
             "{0:s}".format(device.logging),
             "{0:s}".format(device.lmsr_status),
             "{0:s}".format(device.dsp_status),
-            "{0:s}".format(device.interlock_er_status)
+            "{0:s}".format(device.interlock_er_status),
+            "{0:s}".format(device.interlock_vacuum_status),
+            "{0:s}".format(device.interlock_frequency_monitoring_status),
+            "{0:s}".format(device.interlock_magnetic_bearing_amplifier_temperature_status),
+            "{0:s}".format(device.interlock_magnetic_bearing_amplifier_current_status),
+            "{0:s}".format(device.interlock_drive_amplifier_temperature_status),
+            "{0:s}".format(device.interlock_drive_amplifier_current_status),
+            "{0:s}".format(device.interlock_ups_status)
         ]
 
         return_string = ";".join(values)
