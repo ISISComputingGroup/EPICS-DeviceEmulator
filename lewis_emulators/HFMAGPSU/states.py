@@ -28,7 +28,8 @@ class DefaultStartedState(State):
         device = self._context
 
         rate = float(device._ramp_rate)
-        target = float(device._mid_target)
+        target = float(get_target_value(device._ramp_target, device._mid_target, device._max_target))
+
         constant = float(device._constant)
 
         # conversion logic

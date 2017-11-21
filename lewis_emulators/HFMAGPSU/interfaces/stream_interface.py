@@ -21,7 +21,7 @@ class HFMAGPSUStreamInterface(StreamInterface):
         CmdBuilder("read_heater_value").escape("GET H").build(),
         CmdBuilder("read_constant").escape("GET TPA").build(),
 
-        CmdBuilder("write_direction").escape("D ").arg("ZERO|NEGATIVE|POSITIVE").build(),
+        CmdBuilder("write_direction").escape("D ").arg("0|-|\+").build(),
         CmdBuilder("write_output_mode").escape("T ").arg("OFF|ON").build(),
         CmdBuilder("write_ramp_target").escape("RAMP ").arg("ZERO|MID|MAX").build(),
         CmdBuilder("write_heater_status").escape("H ").arg("OFF|ON").build(),
@@ -57,7 +57,14 @@ class HFMAGPSUStreamInterface(StreamInterface):
         return target
 
     def read_direction(self):
-        return "CURRENT DIRECTION: {}".format(self._device.direction)
+        dir = self._device.direction
+        if dir == "+":
+            dir_string = "POSITIVE"
+        elif dir == "-":
+            dir_string = "NEGATIVE"
+        elif dir == "0":
+            dir_string = "ZERO";
+        return "CURRENT DIRECTION: {}".format(dir_string)
 
     def write_direction(self, direction):
         self._device.direction = direction

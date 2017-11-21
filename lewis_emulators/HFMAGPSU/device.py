@@ -10,7 +10,7 @@ class SimulatedHFMAGPSU(StateMachineDevice):
         self._is_heater_on = True
         self._is_paused = True
         self._output = 0.0
-        self._direction = 'POSITIVE'
+        self._direction = '+'
         self._ramp_target = 'MID'
         self._heater_value = 0.0
         self._max_target = 34.92
