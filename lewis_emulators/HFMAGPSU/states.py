@@ -37,6 +37,9 @@ class DefaultStartedState(State):
         if device._is_output_mode_tesla:
             rate = rate * constant
 
+        if device._direction == '-':
+            target *= -1
+
         device._output = approaches.linear(float(device._output), float(target), float(rate), dt)
 
 
