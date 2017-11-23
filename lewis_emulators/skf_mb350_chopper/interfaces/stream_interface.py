@@ -7,6 +7,7 @@ from response_utilities import phase_information_response_packet, rotator_angle_
 from .crc16 import crc16_matches, crc16
 
 
+@has_log
 class SkfMb350ChopperStreamInterface(StreamInterface):
 
     # Commands that we expect via serial during normal operation. Match anything!
@@ -21,7 +22,6 @@ class SkfMb350ChopperStreamInterface(StreamInterface):
         print("An error occurred at request " + repr(request) + ": " + repr(error))
         return str(error)
 
-    @has_log
     def any_command(self, command):
 
         command_mapping = {
@@ -56,17 +56,14 @@ class SkfMb350ChopperStreamInterface(StreamInterface):
 
         return command_mapping[command_number](address, command_data)
 
-    @has_log
     def start(self, address, data):
         self._device.start()
         return general_status_response_packet(address, self.device, 0x20)
 
-    @has_log
     def stop(self, address, data):
         self._device.stop()
         return general_status_response_packet(address, self.device, 0x30)
 
-    @has_log
     def set_nominal_phase(self, address, data):
         self.log.info("Setting phase")
         self.log.info("Data = {}".format(data))
@@ -75,7 +72,6 @@ class SkfMb350ChopperStreamInterface(StreamInterface):
         self._device.set_nominal_phase(nominal_phase)
         return general_status_response_packet(address, self.device, 0x90)
 
-    @has_log
     def set_gate_width(self, address, data):
         self.log.info("Setting gate width")
         self.log.info("Data = {}".format(data))
@@ -84,7 +80,6 @@ class SkfMb350ChopperStreamInterface(StreamInterface):
         self._device.set_phase_repeatability(width / 10.)
         return general_status_response_packet(address, self.device, 0x8E)
 
-    @has_log
     def set_rotational_speed(self, address, data):
         self.log.info("Setting frequency")
         self.log.info("Data = {}".format(data))
@@ -93,7 +88,6 @@ class SkfMb350ChopperStreamInterface(StreamInterface):
         self._device.set_frequency(freq)
         return general_status_response_packet(address, self.device, 0x60)
 
-    @has_log
     def set_rotator_angle(self, address, data):
         self.log.info("Setting rotator angle")
         self.log.info("Data = {}".format(data))
@@ -102,17 +96,14 @@ class SkfMb350ChopperStreamInterface(StreamInterface):
         self._device.set_rotator_angle(angle_times_ten / 10.)
         return general_status_response_packet(address, self.device, 0x82)
 
-    @has_log
     def get_phase_info(self, address, data):
         self.log.info("Getting phase info")
         return phase_information_response_packet(address, self._device)
 
-    @has_log
     def get_rotator_angle(self, address, data):
         self.log.info("Getting rotator angle")
         return rotator_angle_response_packet(address, self._device)
 
-    @has_log
     def get_phase_delay(self, address, data):
         self.log.info("Getting phase time")
         return phase_time_response_packet(address, self._device)
