@@ -53,6 +53,7 @@ class FZJDDFCHStreamInterface(StreamInterface):
 
         """
         device = self._device
+        drive_direction = "CLOCK" if device.is_drive_direction_clockwise else "ANTICLOCK"
         values = [
             "{0:.2f}".format(device.frequency_reference),
             "{0:.2f}".format(device.frequency_setpoint),
@@ -68,7 +69,7 @@ class FZJDDFCHStreamInterface(StreamInterface):
             "{0:.2f}".format(device.drive_l1_current),
             "{0:.2f}".format(device.drive_l2_current),
             "{0:.2f}".format(device.drive_l3_current),
-            "{0:s}".format(device.drive_direction),
+            "{0:s}".format(drive_direction),
             "{0:s}".format(device.parked_open_status),
             "{0:.2f}".format(device.drive_temperature),
             "{0:.2f}".format(device.input_clock),

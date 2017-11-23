@@ -27,7 +27,7 @@ class SimulatedFZJDDFCH(StateMachineDevice):
         self.drive_l1_current = 0
         self.drive_l2_current = 0
         self.drive_l3_current = 0
-        self.drive_direction = "CLOCK"
+        self.is_drive_direction_clockwise = True
         self.parked_open_status = "OK"
         self.drive_temperature = 0
         self.input_clock = 0
