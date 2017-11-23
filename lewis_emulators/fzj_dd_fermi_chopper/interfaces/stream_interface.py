@@ -88,5 +88,8 @@ class FZJDDFCHStreamInterface(StreamInterface):
         ]
 
         return_string = ";".join(values)
-        self.log.error(return_string)
+
+        # print reply string in log
+        # self.log.info(return_string)
+
         return return_string
