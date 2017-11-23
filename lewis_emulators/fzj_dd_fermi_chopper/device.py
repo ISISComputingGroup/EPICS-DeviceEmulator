@@ -13,6 +13,7 @@ class SimulatedFZJDDFCH(StateMachineDevice):
         """
         Sets the initial state of the device.
         """
+        self.chopper_name = "C01"
         self.frequency_reference = 0
         self.frequency_setpoint = 0
         self.frequency = 0

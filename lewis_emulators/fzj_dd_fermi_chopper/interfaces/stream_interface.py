@@ -12,7 +12,7 @@ class FZJDDFCHStreamInterface(StreamInterface):
 
     commands = {
         CmdBuilder("get_magnetic_bearing_status").escape("MBON?").build(),
-        CmdBuilder("get_all_status").escape("ASTA?").build()
+        CmdBuilder("get_all_status").arg(".{3}").escape(";ASTA?").build()
     }
 
     in_terminator = "\r\n"
@@ -43,7 +43,7 @@ class FZJDDFCHStreamInterface(StreamInterface):
         # return self._device.magnetic_bearing_status
         return
 
-    def get_all_status(self):
+    def get_all_status(self, chopper_name):
 
         """
         Gets the all status for the FZJ Digital Drive Fermi Chopper Controller
@@ -53,8 +53,11 @@ class FZJDDFCHStreamInterface(StreamInterface):
 
         """
         device = self._device
+        if chopper_name != device.chopper_name:
+            return None
         drive_direction = "CLOCK" if device.is_drive_direction_clockwise else "ANTICLOCK"
         values = [
+            "{0:3s}".format(device.chopper_name),
             "{0:.2f}".format(device.frequency_reference),
             "{0:.2f}".format(device.frequency_setpoint),
             "{0:.2f}".format(device.frequency),
