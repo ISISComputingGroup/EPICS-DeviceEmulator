@@ -14,7 +14,8 @@ class SimulatedFZJDDFCH(StateMachineDevice):
         Sets the initial state of the device.
         """
         self.chopper_name = "C01"
-        self.frequency_reference = 0
+        # reference frequency set to 50Hz to match actual device
+        self.frequency_reference = 50
         self.frequency_setpoint = 0
         self.frequency = 0
         self.phase_setpoint = 0
@@ -45,6 +46,8 @@ class SimulatedFZJDDFCH(StateMachineDevice):
         self.interlock_drive_amplifier_temperature_status = "OK"
         self.interlock_drive_amplifier_current_status = "OK"
         self.interlock_ups_status = "OK"
+
+        self.error_on_set_frequency = None
 
     def _get_state_handlers(self):
         """

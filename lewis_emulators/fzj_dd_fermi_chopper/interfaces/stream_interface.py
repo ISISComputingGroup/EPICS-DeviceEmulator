@@ -12,7 +12,8 @@ class FZJDDFCHStreamInterface(StreamInterface):
 
     commands = {
         CmdBuilder("get_magnetic_bearing_status").escape("MBON?").build(),
-        CmdBuilder("get_all_status").arg(".{3}").escape(";ASTA?").build()
+        CmdBuilder("get_all_status").arg(".{3}").escape(";ASTA?").build(),
+        CmdBuilder("set_frequency", arg_sep="").arg(".{3}").escape("!;FACT!;").int().build()
     }
 
     in_terminator = "\r\n"
@@ -28,6 +29,17 @@ class FZJDDFCHStreamInterface(StreamInterface):
 
         """
         self.log.error("An error occurred at request " + repr(request) + ": " + repr(error))
+
+    def set_frequency(self, chopper_name, frequency):
+
+        if self._device.error_on_set_frequency is None:
+            self._device.frequency_setpoint = int(frequency) * self._device.frequency_reference
+            reply = "{chopper_name}OK".format(chopper_name=chopper_name)
+        else:
+            reply = self._device.error_on_set_frequency
+
+        self.log.info(reply)
+        return reply
 
     def get_magnetic_bearing_status(self):
 
