@@ -51,6 +51,16 @@ class CmdBuilder(object):
         self._reg_ex += re.escape(text) + self._ignore
         return self
 
+    def regex(self, regex):
+        """
+        Add a regex to match but not as an argument.
+
+        :param regex: regex to add
+        :return: builder
+        """
+        self._reg_ex += regex + self._ignore
+        return self
+
     def arg(self, arg_regex):
         """
         Add an argument to the command.
