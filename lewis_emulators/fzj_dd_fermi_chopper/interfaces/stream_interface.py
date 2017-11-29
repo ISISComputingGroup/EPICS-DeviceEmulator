@@ -13,7 +13,10 @@ class FZJDDFCHStreamInterface(StreamInterface):
     commands = {
         CmdBuilder("get_magnetic_bearing_status").escape("MBON?").build(),
         CmdBuilder("get_all_status").arg(".{3}").escape(";ASTA?").build(),
-        CmdBuilder("set_frequency", arg_sep="").arg(".{3}").escape("!;FACT!;").int().build()
+        CmdBuilder("set_frequency", arg_sep="").arg(".{3}").escape("!;FACT!;").int().build(),
+        CmdBuilder("set_phase", arg_sep="").arg(".{3}").escape("!;PHAS!;").float().build(),
+        CmdBuilder("set_magnetic_bearing", arg_sep="").arg(".{3}").escape("!;MAGB!;").any().build(),
+        CmdBuilder("set_drive_mode", arg_sep="").arg(".{3}").escape("!;DRIV!;").any().build()
     }
 
     in_terminator = "\r\n"
@@ -37,6 +40,39 @@ class FZJDDFCHStreamInterface(StreamInterface):
             reply = "{chopper_name}OK".format(chopper_name=chopper_name)
         else:
             reply = self._device.error_on_set_frequency
+
+        self.log.info(reply)
+        return reply
+
+    def set_phase(self, chopper_name, phase):
+
+        if self._device.error_on_set_phase is None:
+            self._device.phase_setpoint = float(phase)
+            reply = "{chopper_name}OK".format(chopper_name=chopper_name)
+        else:
+            reply = self._device.error_on_set_phase
+
+        self.log.info(reply)
+        return reply
+
+    def set_magnetic_bearing(self, chopper_name, magnetic_bearing):
+
+        if self._device.error_on_set_magnetic_bearing is None:
+            self._device.magnetic_bearing = magnetic_bearing
+            reply = "{chopper_name}OK".format(chopper_name=chopper_name)
+        else:
+            reply = self._device.error_on_set_magnetic_bearing
+
+        self.log.info(reply)
+        return reply
+
+    def set_drive_mode(self, chopper_name, drive_mode):
+
+        if self._device.error_on_set_drive_mode is None:
+            self._device.drive_mode = drive_mode
+            reply = "{chopper_name}OK".format(chopper_name=chopper_name)
+        else:
+            reply = self._device.error_on_set_drive_mode
 
         self.log.info(reply)
         return reply
@@ -80,7 +116,7 @@ class FZJDDFCHStreamInterface(StreamInterface):
             "{0:s}".format(device.magnetic_bearing_status),
             "{0:.1f}".format(device.magnetic_bearing_integrator),
             "{0:s}".format(device.drive),
-            "{0:s}".format(device.drive_status),
+            "{0:s}".format(device.drive_mode),
             "{0:.2f}".format(device.drive_l1_current),
             "{0:.2f}".format(device.drive_l2_current),
             "{0:.2f}".format(device.drive_l3_current),

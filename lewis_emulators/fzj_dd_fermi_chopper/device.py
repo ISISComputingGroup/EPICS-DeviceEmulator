@@ -25,7 +25,7 @@ class SimulatedFZJDDFCH(StateMachineDevice):
         self.magnetic_bearing_status = "OK"
         self.magnetic_bearing_integrator = 0
         self.drive = "OFF"
-        self.drive_status = "START"
+        self.drive_mode = "START"
         self.drive_l1_current = 0
         self.drive_l2_current = 0
         self.drive_l3_current = 0
@@ -48,6 +48,9 @@ class SimulatedFZJDDFCH(StateMachineDevice):
         self.interlock_ups_status = "OK"
 
         self.error_on_set_frequency = None
+        self.error_on_set_phase = None
+        self.error_on_set_magnetic_bearing = None
+        self.error_on_set_drive_mode = None
 
     def _get_state_handlers(self):
         """
