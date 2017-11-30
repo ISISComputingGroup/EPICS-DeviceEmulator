@@ -24,12 +24,12 @@ class SimulatedGemorc(StateMachineDevice):
         self.complete_cycles = 0
 
         # Device settings
-        self.window_width = 1.0
-        self.acceleration = 1.0
-        self.target_speed = 1.0
-        self.speed = 0.0
-        self.offset = 0.0
-        self.backlash = 1.0
+        self.window_width = 100
+        self.acceleration = 500
+        self.target_speed = 20
+        self.speed = 0
+        self.offset = 0
+        self.backlash = 10
 
     def _get_state_handlers(self):
         return {
