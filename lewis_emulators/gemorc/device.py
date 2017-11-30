@@ -47,7 +47,8 @@ class SimulatedGemorc(StateMachineDevice):
         return OrderedDict([
             (('idle', 'initialising'), lambda: self.initialisation_requested),
 
-            (('initialising', 'initialised'), lambda: self.time_spent_initialising >= self.time_to_initialise),
+            (('initialising', 'initialised'), lambda: self.stop_initialisation or
+                                                      self.time_spent_initialising >= self.time_to_initialise),
 
             (('initialised', 'oscillating'), lambda: self.start_requested),
             (('initialised', 'initialising'), lambda: self.initialisation_requested),
