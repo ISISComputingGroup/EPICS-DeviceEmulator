@@ -82,3 +82,4 @@ class InitialisingState(State):
 
     def on_exit(self, dt):
         self._context.stop_initialisation = False
+        self._context.time_spent_initialising = 0.0

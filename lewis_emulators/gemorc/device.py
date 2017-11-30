@@ -19,8 +19,8 @@ class SimulatedGemorc(StateMachineDevice):
         self.state = None  # Controlled by state handler
         self.stop_initialisation = False
 
-        self.initialisation_cycle = 20000
-        self.optional_initialisation_cycle = 10000
+        self.initialisation_cycle = 100
+        self.optional_initialisation_cycle = 50
         self.complete_cycles = 0
 
         # Device settings
@@ -53,11 +53,11 @@ class SimulatedGemorc(StateMachineDevice):
             (('initialised', 'initialising'), lambda: self.initialisation_requested),
 
             (('oscillating', 'stopped'), lambda: not self.start_requested),
-            # (('oscillating', 'initialising'), lambda: self.complete_cycles > 0 and
-            #                                           self.complete_cycles % self.initialisation_cycle == 0),
-            #
-            # (('stopped', 'initialising'), lambda: self.initialisation_requested),
-            # (('stopped', 'oscillating'), lambda: self.start_requested),
+            (('oscillating', 'initialising'), lambda: self.complete_cycles > 0 and
+                                                      self.complete_cycles % self.initialisation_cycle == 0),
+
+            (('stopped', 'initialising'), lambda: self.initialisation_requested),
+            (('stopped', 'oscillating'), lambda: self.start_requested),
         ])
 
     def initialise(self):
