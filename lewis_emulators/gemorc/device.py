@@ -2,6 +2,7 @@ from collections import OrderedDict
 from states import StoppedState, OscillatingState, InitialisingState, IdleState
 from lewis.devices import StateMachineDevice
 
+SMALL = 1.0e-10
 
 class SimulatedGemorc(StateMachineDevice):
 
@@ -25,7 +26,7 @@ class SimulatedGemorc(StateMachineDevice):
         # Device settings
         self.window_width = 1.0
         self.acceleration = 1.0
-        self.max_speed = 1.0
+        self.target_speed = 1.0
         self.speed = 0.0
         self.offset = 0.0
         self.backlash = 1.0
@@ -51,7 +52,7 @@ class SimulatedGemorc(StateMachineDevice):
             (('initialised', 'oscillating'), lambda: self.start_requested),
             (('initialised', 'initialising'), lambda: self.initialisation_requested),
 
-            (('oscillating', 'stopped'), lambda: not self.start_requested),
+            (('oscillating', 'stopped'), lambda: not self.speed < SMALL),
             (('oscillating', 'initialising'), lambda: self.complete_cycles % self.initialisation_cycle == 0),
 
             (('stopped', 'initialising'), lambda: self.initialisation_requested),
@@ -95,7 +96,7 @@ class SimulatedGemorc(StateMachineDevice):
         return self.speed
 
     def set_speed(self, speed):
-        self.max_speed = speed
+        self.target_speed = speed
 
     def is_oscillating(self):
         return self.state == OscillatingState.__name__
