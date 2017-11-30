@@ -52,7 +52,6 @@ class GemorcStreamInterface(StreamInterface):
         """
         Re-zero position from datum marker
         """
-        self.device.initialise()
         return "daok"
 
     def start(self):
