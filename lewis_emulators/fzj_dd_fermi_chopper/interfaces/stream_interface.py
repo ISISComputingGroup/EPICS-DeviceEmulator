@@ -39,7 +39,7 @@ class FZJDDFCHStreamInterface(StreamInterface):
             self._device.frequency_setpoint = int(frequency) * self._device.frequency_reference
             reply = "{chopper_name}OK".format(chopper_name=chopper_name)
         else:
-            reply = self._device.error_on_set_frequency
+            reply = "ERROR;{}".format(self._device.error_on_set_frequency)
 
         self.log.info(reply)
         return reply
@@ -50,7 +50,7 @@ class FZJDDFCHStreamInterface(StreamInterface):
             self._device.phase_setpoint = float(phase)
             reply = "{chopper_name}OK".format(chopper_name=chopper_name)
         else:
-            reply = self._device.error_on_set_phase
+            reply = "ERROR;{}".format(self._device.error_on_set_phase)
 
         self.log.info(reply)
         return reply
@@ -61,7 +61,7 @@ class FZJDDFCHStreamInterface(StreamInterface):
             self._device.magnetic_bearing = magnetic_bearing
             reply = "{chopper_name}OK".format(chopper_name=chopper_name)
         else:
-            reply = self._device.error_on_set_magnetic_bearing
+            reply = "ERROR;{}".format(self._device.error_on_set_magnetic_bearing)
 
         self.log.info(reply)
         return reply
@@ -72,7 +72,7 @@ class FZJDDFCHStreamInterface(StreamInterface):
             self._device.drive_mode = drive_mode
             reply = "{chopper_name}OK".format(chopper_name=chopper_name)
         else:
-            reply = self._device.error_on_set_drive_mode
+            reply = "ERROR;{}".format(self._device.error_on_set_drive_mode)
 
         self.log.info(reply)
         return reply
