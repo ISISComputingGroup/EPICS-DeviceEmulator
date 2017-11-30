@@ -1,5 +1,5 @@
 from collections import OrderedDict
-from states import StoppedState, OscillatingState, InitialisingState, IdleState
+from states import StoppedState, OscillatingState, InitialisingState, IdleState, InitialisedState
 from lewis.devices import StateMachineDevice
 
 SMALL = 1.0e-10
@@ -12,10 +12,10 @@ class SimulatedGemorc(StateMachineDevice):
         """
 
         # State control variables
-        self.time_to_initialise = 10.0
+        self.time_to_initialise = 2.0
         self.time_spent_initialising = 0.0
         self.initialisation_requested = False
-        self.start_requested = True
+        self.start_requested = False
         self.state = None  # Controlled by state handler
         self.stop_initialisation = False
 
@@ -34,6 +34,7 @@ class SimulatedGemorc(StateMachineDevice):
     def _get_state_handlers(self):
         return {
             'initialising': InitialisingState(),
+            'initialised': InitialisedState(),
             'oscillating': OscillatingState(),
             'stopped': StoppedState(),
             'idle': IdleState(),
@@ -46,17 +47,17 @@ class SimulatedGemorc(StateMachineDevice):
         return OrderedDict([
             (('idle', 'initialising'), lambda: self.initialisation_requested),
 
-            (('initialising', 'initialised'), lambda: self.stop_initialisation_requested or
-                                                      self.time_spent_initialising >= self.time_to_initialise),
+            (('initialising', 'initialised'), lambda: self.time_spent_initialising >= self.time_to_initialise),
 
             (('initialised', 'oscillating'), lambda: self.start_requested),
             (('initialised', 'initialising'), lambda: self.initialisation_requested),
 
-            (('oscillating', 'stopped'), lambda: not self.speed < SMALL),
-            (('oscillating', 'initialising'), lambda: self.complete_cycles % self.initialisation_cycle == 0),
-
-            (('stopped', 'initialising'), lambda: self.initialisation_requested),
-            (('stopped', 'oscillating'), lambda: self.start_requested),
+            (('oscillating', 'stopped'), lambda: not self.start_requested),
+            # (('oscillating', 'initialising'), lambda: self.complete_cycles > 0 and
+            #                                           self.complete_cycles % self.initialisation_cycle == 0),
+            #
+            # (('stopped', 'initialising'), lambda: self.initialisation_requested),
+            # (('stopped', 'oscillating'), lambda: self.start_requested),
         ])
 
     def initialise(self):
@@ -105,7 +106,7 @@ class SimulatedGemorc(StateMachineDevice):
         return self.state == InitialisingState.__name__
 
     def has_been_initialised(self):
-        return self.state != IdleState.__name__
+        return self.state not in (IdleState.__name__, InitialisingState.__name__)
 
     def get_complete_cycles(self):
         return self.complete_cycles

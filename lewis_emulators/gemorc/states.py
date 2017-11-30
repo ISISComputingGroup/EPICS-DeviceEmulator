@@ -7,54 +7,68 @@ class StoppedState(State):
         self._context.state = StoppedState.__name__
 
 
+class IdleState(State):
+
+    def on_entry(self, dt):
+        self._context.state = IdleState.__name__
+
+
+class InitialisedState(State):
+
+    def on_entry(self, dt):
+        self._context.state = InitialisedState.__name__
+
+
 class OscillatingState(State):
 
     def on_entry(self, dt):
-        device = self._context
-        device.state = OscillatingState.__name__
+        dev = self._context
+        dev.state = OscillatingState.__name__
         self.time = 0.0
+        self.target_reached = False
+
+    @staticmethod
+    def calculate_speed(time, window_width, target_speed, acceleration):
+        transition_time = target_speed/acceleration
+        total_cycle_time = 2*transition_time + window_width
+        cycle_time = time % total_cycle_time
+
+        spinning_up = cycle_time < transition_time
+        spinning_down = cycle_time > window_width + transition_time
+
+        if spinning_up:
+            current_speed = target_speed * cycle_time / transition_time
+        elif spinning_down:
+            current_speed = target_speed * (total_cycle_time - cycle_time) / transition_time
+        else:
+            current_speed = target_speed
+        return current_speed
 
     def in_state(self, dt):
         self.time += dt
         dev = self._context
 
-        def calculate_speed(time, window_width, target_speed, acceleration):
-            transition_time = target_speed/acceleration
-            total_cycle_time = 2*transition_time + window_width
-            cycle_time = time % total_cycle_time
+        dev.speed = OscillatingState.calculate_speed(self.time, dev.window_width, dev.target_speed, dev.acceleration)
 
-            spinning_up = cycle_time < transition_time
-            spinning_down = cycle_time > window_width + transition_time
-
-            if spinning_up:
-                current_speed = target_speed*cycle_time/transition_time
-            elif spinning_down:
-                current_speed = target_speed*(total_cycle_time - cycle_time)/transition_time
-            else:
-                current_speed = target_speed
-
-            return current_speed
-
-        dev.speed = calculate_speed(self.time, dev.window_width, dev.target_speed, dev.acceleration)
-
-        def cycle_counter(speed, acceleration, dt):
-            was_in_motion = False
-            while True:
-                tolerance = 2*dt*acceleration/speed # 2 normalised speed steps
-                in_motion = speed > tolerance
-                if not in_motion and was_in_motion:
-                    was_in_motion = False
-                    yield 1
-                else:
-                    yield 0
-
-        dev.complete_cycles += cycle_counter(dev.target_speed, dev.acceleration, dt)
+        # Increment the cycle counter if needed. Important to only do this once per cycle
+        # Has the cycle hit its target speed this cycle
+        self.target_reached = self.target_reached or dev.speed == dev.target_speed
+        in_motion = dev.speed/(dev.acceleration*dt) > 2  # 2 dimensionless speed increments
+        if not in_motion and self.target_reached:
+            dev.complete_cycles += 1
+            self.target_reached = False
 
 
 class IdleState(State):
 
     def on_entry(self, dt):
-        self._context.state = OscillatingState.__name__
+        self._context.state = IdleState.__name__
+
+
+class InitialisedState(State):
+
+    def on_entry(self, dt):
+        self._context.state = InitialisedState.__name__
 
 
 class InitialisingState(State):

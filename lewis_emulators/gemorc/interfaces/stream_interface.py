@@ -17,8 +17,11 @@ class GemorcStreamInterface(StreamInterface):
         CmdBuilder("set_offset").escape("of").int().build(),
         CmdBuilder("set_speed").escape("ds").int().build(),
         CmdBuilder("set_acceleration").escape("ac").int().build(),
-        CmdBuilder("get_status").escape("rq"),
+        CmdBuilder("get_status").escape("rq").build(),
     }
+
+    in_terminator = "\r\n"
+    out_terminator = "\r\n"
 
     def handle_error(self, request, error):
         """
@@ -80,7 +83,7 @@ class GemorcStreamInterface(StreamInterface):
         Args:
             width: Width in centi-degrees
         """
-        self.device.set_window_width(int(width)/100.0)
+        self.device.set_window_width(int(width))
         return "wnok"
 
     def set_offset(self, offset):
@@ -90,7 +93,7 @@ class GemorcStreamInterface(StreamInterface):
         Args:
             offset: Datum offset in centi-degrees
         """
-        self.device.set_offset(int(offset)/100.0)
+        self.device.set_offset(int(offset))
         return "ofok"
 
     def set_acceleration(self, acceleration):
@@ -100,7 +103,7 @@ class GemorcStreamInterface(StreamInterface):
         Args:
             acceleration: Rate of acceleration in centi-degrees per second^2
         """
-        self.device.set_acceleration(int(acceleration)/100.0)
+        self.device.set_acceleration(int(acceleration))
         return "acok"
 
     def set_speed(self, speed):
@@ -110,7 +113,7 @@ class GemorcStreamInterface(StreamInterface):
         Args:
             speed: Speed in centi-degrees per second
         """
-        self.device.set_speed(int(speed)/100.0)
+        self.device.set_speed(int(speed))
         return "dsok"
 
     def get_status(self):
@@ -118,16 +121,16 @@ class GemorcStreamInterface(StreamInterface):
         Get the current state of the collimator. This is backwards engineered from the VI. I haven't actually seen
         what the real thing returns as the VI code doesn't match the spec
         """
-        request_format = "{oscillating:1d}....{initialising:1d}....{initialised:1d}.....{width:3d}......{offset:4d}" \
-                         "......{speed:2d}.....{acceleration:3d}..{cycles:5d}..........{backlash:3d}"
+        request_format = "{oscillating:01d}....{initialising:01d}....{initialised:01d}.....{width:03d}......" \
+                         "{offset:04d}......{speed:02d}.....{acceleration:03d}..{cycles:05d}..........{backlash:03d}"
         return request_format.format(
             oscillating=int(self.device.is_oscillating()),
             initialising=int(self.device.is_initialising()),
             initialised=int(self.device.has_been_initialised()),
-            width=self.device.get_window_width(),
-            offset=self.device.get_offset(),
-            speed=self.device.get_speed(),
-            acceleration=self.device.get_acceleration(),
-            cycles=self.device.get_complete_cycles(),
-            backlash=self.device.get_backlash()
+            width=int(self.device.get_window_width()),
+            offset=int(self.device.get_offset()),
+            speed=int(self.device.get_speed()),
+            acceleration=int(self.device.get_acceleration()),
+            cycles=int(self.device.get_complete_cycles()),
+            backlash=int(self.device.get_backlash())
         )
