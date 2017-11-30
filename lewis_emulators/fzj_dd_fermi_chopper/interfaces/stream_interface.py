@@ -34,7 +34,8 @@ class FZJDDFCHStreamInterface(StreamInterface):
         self.log.error("An error occurred at request " + repr(request) + ": " + repr(error))
 
     def set_frequency(self, chopper_name, frequency):
-
+        if self._device.disconnected:
+            return None
         if self._device.error_on_set_frequency is None:
             self._device.frequency_setpoint = int(frequency) * self._device.frequency_reference
             reply = "{chopper_name}OK".format(chopper_name=chopper_name)
@@ -45,7 +46,8 @@ class FZJDDFCHStreamInterface(StreamInterface):
         return reply
 
     def set_phase(self, chopper_name, phase):
-
+        if self._device.disconnected:
+            return None
         if self._device.error_on_set_phase is None:
             self._device.phase_setpoint = float(phase)
             reply = "{chopper_name}OK".format(chopper_name=chopper_name)
@@ -56,7 +58,8 @@ class FZJDDFCHStreamInterface(StreamInterface):
         return reply
 
     def set_magnetic_bearing(self, chopper_name, magnetic_bearing):
-
+        if self._device.disconnected:
+            return None
         if self._device.error_on_set_magnetic_bearing is None:
             self._device.magnetic_bearing = magnetic_bearing
             reply = "{chopper_name}OK".format(chopper_name=chopper_name)
@@ -67,7 +70,8 @@ class FZJDDFCHStreamInterface(StreamInterface):
         return reply
 
     def set_drive_mode(self, chopper_name, drive_mode):
-
+        if self._device.disconnected:
+            return None
         if self._device.error_on_set_drive_mode is None:
             self._device.drive_mode = drive_mode
             reply = "{chopper_name}OK".format(chopper_name=chopper_name)
@@ -86,10 +90,8 @@ class FZJDDFCHStreamInterface(StreamInterface):
         Returns:
 
         """
-        pass
 
-        # return self._device.magnetic_bearing_status
-        return
+        return self._device.magnetic_bearing_status
 
     def get_all_status(self, chopper_name):
 
@@ -101,7 +103,7 @@ class FZJDDFCHStreamInterface(StreamInterface):
 
         """
         device = self._device
-        if chopper_name != device.chopper_name:
+        if self._device.disconnected or chopper_name != device.chopper_name:
             return None
         drive_direction = "CLOCK" if device.is_drive_direction_clockwise else "ANTICLOCK"
         values = [
