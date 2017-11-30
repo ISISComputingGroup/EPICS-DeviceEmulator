@@ -14,7 +14,7 @@ class GemorcStreamInterface(StreamInterface):
         CmdBuilder("stop").escape("sp").build(),
         CmdBuilder("stop_next_initialisation").escape("si").build(),
         CmdBuilder("set_window_width").escape("ww").int().build(),
-        CmdBuilder("set_offset_from_datum").escape("of").int().build(),
+        CmdBuilder("set_offset").escape("of").int().build(),
         CmdBuilder("set_speed").escape("ds").int().build(),
         CmdBuilder("set_acceleration").escape("ac").int().build(),
         CmdBuilder("get_status").escape("rq"),
@@ -83,14 +83,14 @@ class GemorcStreamInterface(StreamInterface):
         self.device.set_window_width(int(width)/100.0)
         return "wnok"
 
-    def set_offset_from_datum(self, offset):
+    def set_offset(self, offset):
         """
         Sets the offset position from datum to match axis (signed)
 
         Args:
             offset: Datum offset in centi-degrees
         """
-        self.device.set_offset_from_datum(int(offset)/100.0)
+        self.device.set_offset(int(offset)/100.0)
         return "ofok"
 
     def set_acceleration(self, acceleration):
