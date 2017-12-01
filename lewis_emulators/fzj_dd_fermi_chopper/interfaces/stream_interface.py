@@ -11,8 +11,8 @@ class FZJDDFCHStreamInterface(StreamInterface):
     """
 
     commands = {
-        CmdBuilder("get_magnetic_bearing_status").escape("MBON?").build(),
-        CmdBuilder("get_all_status").arg(".{3}").escape(";ASTA?").build(),
+        CmdBuilder("get_magnetic_bearing_status").arg(".{3}").escape("?;MBON?").build(),
+        CmdBuilder("get_all_status").arg(".{3}").escape("?;ASTA?").build(),
         CmdBuilder("set_frequency", arg_sep="").arg(".{3}").escape("!;FACT!;").int().build(),
         CmdBuilder("set_phase", arg_sep="").arg(".{3}").escape("!;PHAS!;").float().build(),
         CmdBuilder("set_magnetic_bearing", arg_sep="").arg(".{3}").escape("!;MAGB!;").any().build(),
@@ -81,7 +81,7 @@ class FZJDDFCHStreamInterface(StreamInterface):
         self.log.info(reply)
         return reply
 
-    def get_magnetic_bearing_status(self):
+    def get_magnetic_bearing_status(self, chopper_name):
 
         """
         Gets the magnetic bearing status for the FZJ Digital Drive Fermi Chopper Controller
@@ -90,8 +90,10 @@ class FZJDDFCHStreamInterface(StreamInterface):
         Returns:
 
         """
-
-        return self._device.magnetic_bearing_status
+        if self._device.disconnected:
+            return None
+        device = self._device
+        return "{0:3s};MBON?;{}".format(device.chopper_name, self._device.magnetic_bearing_status)
 
     def get_all_status(self, chopper_name):
 
