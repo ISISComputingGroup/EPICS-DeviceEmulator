@@ -39,8 +39,8 @@ class HFMAGPSUStreamInterface(StreamInterface):
         self._device.log_message = "{} {}: {}".format(current_time, pv, value)
 
     def handle_error(self, request, error):
-        self.log.error("Error occurred at " + repr(request) + ": " + repr(error))
-        print("Error occurred at " + repr(request) + ": " + repr(error))
+        self.log.error("Error occurred at " + request) + ": " + error
+        print("Error occurred at " + request) + ": " + error
 
     def _get_output_mode_string(self):
         if self._device.is_output_mode_tesla:
@@ -64,7 +64,7 @@ class HFMAGPSUStreamInterface(StreamInterface):
             dir_string = "NEGATIVE"
         elif dir == "0":
             dir_string = "ZERO";
-        return "CURRENT DIRECTION: {}".format(dir_string)
+        return "CURRENT DIRECTION: {}  ".format(dir_string)
 
     def write_direction(self, direction):
         self._device.direction = direction
@@ -75,13 +75,13 @@ class HFMAGPSUStreamInterface(StreamInterface):
         mode = "AMPS"
         if self._device.is_output_mode_tesla:
             mode = "TESLA"
-        return "........ UNITS: {}".format(mode)
+        return "........ UNITS: {}  ".format(mode)
 
     def read_output(self):
         # If target is + or - the current output, we are ramping up or down
         # new output = current output +/- ramp rate
         mode = self._get_output_mode_string()
-        return "OUTPUT: {} {} AT {} VOLTS".format(self._device.output, mode, self._device.heater_value)
+        return "OUTPUT: {} {} AT {} VOLTS  ".format(self._device.output, mode, self._device.heater_value)
 
     def write_output_mode(self, output_mode):
         # Convert values if output mode is changing between amps(OFF) / tesla(ON)
@@ -108,7 +108,7 @@ class HFMAGPSUStreamInterface(StreamInterface):
         return self._device.log_message
 
     def read_ramp_target(self):
-        return "........ RAMP TARGET: {}".format(self._device.ramp_target)
+        return "........ RAMP TARGET: {}  ".format(self._device.ramp_target)
 
     def write_ramp_target(self, ramp_target):
         self._device.ramp_target = ramp_target
@@ -116,7 +116,7 @@ class HFMAGPSUStreamInterface(StreamInterface):
         return self._device.log_message
 
     def read_ramp_rate(self):
-        return "........ RAMP RATE: {:.4} A/SEC".format(self._device.ramp_rate)
+        return "........ RAMP RATE: {:.4} A/SEC  ".format(self._device.ramp_rate)
 
     def write_ramp_rate(self, ramp_rate):
         self._device.ramp_rate = ramp_rate
@@ -127,14 +127,14 @@ class HFMAGPSUStreamInterface(StreamInterface):
         heater_value = "OFF"
         if self._device.is_heater_on:
             heater_value = "ON"
-            return "........ HEATER STATUS: {}".format(heater_value)
+            return "........ HEATER STATUS: {}  ".format(heater_value)
         else:
             if self._device.is_output_mode_tesla:
                 mode = "TESLA"
             else:
                 mode = "AMPS"
             #return "........ HEATER STATUS: {} AT {} {}".format(heater_value, self._device.output, mode)
-            return "........ HEATER STATUS: {}".format(heater_value)
+            return "........ HEATER STATUS: {}  ".format(heater_value)
 
     def write_heater_status(self, heater_status):
         if heater_status == "ON":
@@ -151,7 +151,7 @@ class HFMAGPSUStreamInterface(StreamInterface):
         paused = "OFF"
         if self._device.is_paused:
             paused = "ON"
-        return "........ PAUSE STATUS: {}".format(paused)
+        return "........ PAUSE STATUS: {}  ".format(paused)
 
     def write_pause(self, paused):
         mode = self._get_output_mode_string()
@@ -176,7 +176,7 @@ class HFMAGPSUStreamInterface(StreamInterface):
         return self._device.log_message
 
     def read_heater_value(self):
-        return "........ HEATER OUTPUT: {} VOLTS".format(self._device.heater_value)
+        return "........ HEATER OUTPUT: {} VOLTS  ".format(self._device.heater_value)
 
     def write_heater_value(self, heater_value):
         self._device.heater_value = heater_value
@@ -185,7 +185,7 @@ class HFMAGPSUStreamInterface(StreamInterface):
 
     def read_max_target(self):
         mode = self._get_output_mode_string()
-        return "........ MAX SETTING: {:.4} {}".format(self._device.max_target, mode)
+        return "........ MAX SETTING: {:.4} {}  ".format(self._device.max_target, mode)
 
     def write_max_target(self, max_target):
         self._device.max_target = max_target
@@ -194,7 +194,7 @@ class HFMAGPSUStreamInterface(StreamInterface):
 
     def read_mid_target(self):
         mode = self._get_output_mode_string()
-        return "........ MID SETTING: {:.4} {}".format(self._device.mid_target, mode)
+        return "........ MID SETTING: {:.4} {}  ".format(self._device.mid_target, mode)
 
     def write_mid_target(self, mid_target):
         self._device.mid_target = mid_target
@@ -202,7 +202,7 @@ class HFMAGPSUStreamInterface(StreamInterface):
         return self._device.log_message
 
     def read_limit(self):
-        return "........ VOLTAGE LIMIT: {} VOLTS".format(self._device.limit)
+        return "........ VOLTAGE LIMIT: {} VOLTS  ".format(self._device.limit)
 
     def write_limit(self, limit):
         self._device.limit = limit
@@ -210,7 +210,7 @@ class HFMAGPSUStreamInterface(StreamInterface):
         return self._device.log_message
 
     def read_constant(self):
-        return "........ FIELD CONSTANT: {:.7} T/A".format(self._device.constant)
+        return "........ FIELD CONSTANT: {:.7} T/A  ".format(self._device.constant)
 
     def write_constant(self, constant):
         self._device.constant = constant
