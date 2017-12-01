@@ -83,7 +83,7 @@ class GemorcStreamInterface(StreamInterface):
             width: Width in centi-degrees
         """
         self.device.set_window_width(int(width))
-        return "wnok"
+        return "wwok"
 
     def set_offset(self, offset):
         """

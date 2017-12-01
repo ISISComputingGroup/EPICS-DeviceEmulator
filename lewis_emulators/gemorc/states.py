@@ -30,11 +30,12 @@ class OscillatingState(State):
     @staticmethod
     def calculate_speed(time, window_width, target_speed, acceleration):
         transition_time = target_speed/acceleration
-        total_cycle_time = 2*transition_time + window_width
+        window_time = window_width/target_speed
+        total_cycle_time = 2*transition_time + window_time
         cycle_time = time % total_cycle_time
 
         spinning_up = cycle_time < transition_time
-        spinning_down = cycle_time > window_width + transition_time
+        spinning_down = cycle_time > window_time + transition_time
 
         if spinning_up:
             current_speed = target_speed * cycle_time / transition_time
