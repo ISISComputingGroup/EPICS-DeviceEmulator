@@ -29,64 +29,10 @@ class OscillatingState(State):
         self.new_cycle = False
 
     @staticmethod
-    def transition_time(speed, acceleration):
-        return speed/acceleration
-
-    @staticmethod
-    def window_time(width, speed):
-        return width/speed
-
-    @staticmethod
     def total_cycle_time(width, speed, acceleration):
-        transition_time = OscillatingState.transition_time(speed, acceleration)
-        window_time = OscillatingState.window_time(width, speed)
+        transition_time = speed/acceleration
+        window_time = width/speed
         return 2*transition_time + window_time
-
-    @staticmethod
-    def cycle_time(actual_time, width, speed, acceleration):
-        return actual_time % OscillatingState.total_cycle_time(width, speed, acceleration)
-
-    @staticmethod
-    def spinning_up(actual_time, width, speed, acceleration):
-        cycle_time = OscillatingState.cycle_time(actual_time, width, speed, acceleration)
-        transition_time = OscillatingState.transition_time(speed, acceleration)
-        return cycle_time < transition_time
-
-    # TODO: The following methods static methods are only needed if the ORC reports its instantaneous speed/acceleration
-    # At the moment we don't know if it reports only the requested speed/acceleration rather than the instantaneous
-    # values.
-
-    @staticmethod
-    def spinning_down(actual_time, width, speed, acceleration):
-        cycle_time = OscillatingState.cycle_time(actual_time, width, speed, acceleration)
-        window_time = OscillatingState.window_time(width, speed)
-        transition_time = OscillatingState.transition_time(speed, acceleration)
-        return cycle_time > window_time + transition_time
-
-    @staticmethod
-    def calculate_speed(time, window_width, speed, acceleration):
-        cycle_time = OscillatingState.cycle_time(time, window_width, speed, acceleration)
-        transition_time = OscillatingState.transition_time(speed, acceleration)
-        total_cycle_time = OscillatingState.total_cycle_time(window_width, speed, acceleration)
-
-        if OscillatingState.spinning_up(time, window_width, speed, acceleration):
-            current_speed = speed*cycle_time/transition_time
-        elif OscillatingState.spinning_down(time, window_width, speed, acceleration):
-            current_speed = speed*(total_cycle_time-cycle_time)/transition_time
-        else:
-            current_speed = speed
-
-        return current_speed
-
-    @staticmethod
-    def calculate_acceleration(time, window_width, speed, acceleration):
-        if OscillatingState.spinning_up(time, window_width, speed, acceleration):
-            current_acceleration = acceleration
-        elif OscillatingState.spinning_down(time, window_width, speed, acceleration):
-            current_acceleration = 0
-        else:
-            current_acceleration = -acceleration
-        return current_acceleration
 
     def in_state(self, dt):
         self.time += dt
