@@ -25,39 +25,84 @@ class OscillatingState(State):
         dev = self._context
         dev.state = OscillatingState.__name__
         self.time = 0.0
-        self.target_reached = False
+        self.new_cycle = False
 
     @staticmethod
-    def calculate_speed(time, window_width, target_speed, acceleration):
-        transition_time = target_speed/acceleration
-        window_time = window_width/target_speed
-        total_cycle_time = 2*transition_time + window_time
-        cycle_time = time % total_cycle_time
+    def transition_time(speed, acceleration):
+        return speed/acceleration
 
-        spinning_up = cycle_time < transition_time
-        spinning_down = cycle_time > window_time + transition_time
+    @staticmethod
+    def window_time(width, speed):
+        return width/speed
 
-        if spinning_up:
-            current_speed = target_speed * cycle_time / transition_time
-        elif spinning_down:
-            current_speed = target_speed * (total_cycle_time - cycle_time) / transition_time
+    @staticmethod
+    def total_cycle_time(width, speed, acceleration):
+        transition_time = OscillatingState.transition_time(speed, acceleration)
+        window_time = OscillatingState.window_time(width, speed)
+        return 2*transition_time + window_time
+
+    @staticmethod
+    def cycle_time(actual_time, width, speed, acceleration):
+        return actual_time % OscillatingState.total_cycle_time(width, speed, acceleration)
+
+    @staticmethod
+    def spinning_up(actual_time, width, speed, acceleration):
+        cycle_time = OscillatingState.cycle_time(actual_time, width, speed, acceleration)
+        transition_time = OscillatingState.transition_time(speed, acceleration)
+        return cycle_time < transition_time
+
+    # TODO: The following methods static methods are only needed if the ORC reports its instantaneous speed/acceleration
+    # At the moment we don't know if it reports only the requested speed/acceleration rather than the instantaneous
+    # values.
+
+    @staticmethod
+    def spinning_down(actual_time, width, speed, acceleration):
+        cycle_time = OscillatingState.cycle_time(actual_time, width, speed, acceleration)
+        window_time = OscillatingState.window_time(width, speed)
+        transition_time = OscillatingState.transition_time(speed, acceleration)
+        return cycle_time > window_time + transition_time
+
+    @staticmethod
+    def calculate_speed(time, window_width, speed, acceleration):
+        cycle_time = OscillatingState.cycle_time(time, window_width, speed, acceleration)
+        transition_time = OscillatingState.transition_time(speed, acceleration)
+        total_cycle_time = OscillatingState.total_cycle_time(window_width, speed, acceleration)
+
+        if OscillatingState.spinning_up(time, window_width, speed, acceleration):
+            current_speed = speed*cycle_time/transition_time
+        elif OscillatingState.spinning_down(time, window_width, speed, acceleration):
+            current_speed = speed*(total_cycle_time-cycle_time)/transition_time
         else:
-            current_speed = target_speed
+            current_speed = speed
+
         return current_speed
+
+    @staticmethod
+    def calculate_acceleration(time, window_width, speed, acceleration):
+        if OscillatingState.spinning_up(time, window_width, speed, acceleration):
+            current_acceleration = acceleration
+        elif OscillatingState.spinning_down(time, window_width, speed, acceleration):
+            current_acceleration = 0
+        else:
+            current_acceleration = -acceleration
+        return current_acceleration
 
     def in_state(self, dt):
         self.time += dt
         dev = self._context
+        spinning_up = OscillatingState.spinning_up(self.time, dev.window_width, dev.speed, dev.acceleration)
 
-        dev.speed = OscillatingState.calculate_speed(self.time, dev.window_width, dev.target_speed, dev.acceleration)
-
-        # Increment the cycle counter if needed. Important to only do this once per cycle
-        # Has the cycle hit its target speed this cycle
-        self.target_reached = self.target_reached or dev.speed == dev.target_speed
-        in_motion = dev.speed/(dev.acceleration*dt) > 2  # 2 dimensionless speed increments
-        if not in_motion and self.target_reached:
-            dev.complete_cycles += 1
-            self.target_reached = False
+        if spinning_up and self.new_cycle:
+            dev.complete_cycles += 1  # Increment the complete cycles during spin up once per cycle
+            self.new_cycle = False
+        elif spinning_up and not self.new_cycle:
+            pass  # We've already incremented the cycles
+        elif not spinning_up and self.new_cycle:
+            pass  # We've already set the new cycle flag ready for the next cycle
+        elif not spinning_up and not self.new_cycle:
+            self.new_cycle = True
+        else:
+            raise AssertionError("Should not logically be reached")
 
 
 class IdleState(State):
@@ -84,3 +129,12 @@ class InitialisingState(State):
     def on_exit(self, dt):
         self._context.stop_initialisation = False
         self._context.time_spent_initialising = 0.0
+
+class ResetState(State):
+
+    def on_entry(self, dt):
+        dev = self._context
+        dev.window_width = 100
+        dev.acceleration = 500
+        dev.speed = 20
+        dev.offset = 0

@@ -1,5 +1,5 @@
 from collections import OrderedDict
-from states import StoppedState, OscillatingState, InitialisingState, IdleState, InitialisedState
+from states import StoppedState, OscillatingState, InitialisingState, IdleState, InitialisedState, ResetState
 from lewis.devices import StateMachineDevice
 
 SMALL = 1.0e-10
@@ -19,17 +19,22 @@ class SimulatedGemorc(StateMachineDevice):
         self.state = None  # Controlled by state handler
         self.stop_initialisation = False
 
-        self.initialisation_cycle = 100
-        self.optional_initialisation_cycle = 50
-        self.complete_cycles = 0
-
-        # Device settings
-        self.window_width = 100
-        self.acceleration = 500
-        self.target_speed = 20
+        # Device settings, set by the reset state
+        self.window_width = 0
+        self.acceleration = 0
         self.speed = 0
         self.offset = 0
+
+        # Instantaneous properties
         self.backlash = 10
+        self.complete_cycles = 0
+
+        # Emulator control
+        self.reset = False
+
+        # TODO: These are not part of the hardware. Their logic should be removed before the code is accepted
+        self.initialisation_cycle = 100
+        self.optional_initialisation_cycle = 50
 
     def _get_state_handlers(self):
         return {
@@ -38,10 +43,11 @@ class SimulatedGemorc(StateMachineDevice):
             'oscillating': OscillatingState(),
             'stopped': StoppedState(),
             'idle': IdleState(),
+            'reset': ResetState(),
         }
 
     def _get_initial_state(self):
-        return 'idle'
+        return 'reset'
 
     def _get_transition_handlers(self):
         return OrderedDict([
@@ -59,6 +65,13 @@ class SimulatedGemorc(StateMachineDevice):
 
             (('stopped', 'initialising'), lambda: self.initialisation_requested),
             (('stopped', 'oscillating'), lambda: self.start_requested),
+
+            (('idle', 'reset'), lambda: self.reset),
+            (('initialising', 'reset'), lambda: self.reset),
+            (('initialised', 'reset'), lambda: self.reset),
+            (('oscillating', 'reset'), lambda: self.reset),
+            (('stopped', 'reset'), lambda: self.reset),
+            (('reset', 'idle'), lambda: not self.reset),
         ])
 
     def initialise(self):
@@ -98,7 +111,7 @@ class SimulatedGemorc(StateMachineDevice):
         return self.speed
 
     def set_speed(self, speed):
-        self.target_speed = speed
+        self.speed = speed
 
     def is_oscillating(self):
         return self.state == OscillatingState.__name__
