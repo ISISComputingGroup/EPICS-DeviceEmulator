@@ -1,4 +1,5 @@
 from lewis.core.statemachine import State
+from math import floor
 
 
 class StoppedState(State):
@@ -90,19 +91,7 @@ class OscillatingState(State):
     def in_state(self, dt):
         self.time += dt
         dev = self._context
-        spinning_up = OscillatingState.spinning_up(self.time, dev.window_width, dev.speed, dev.acceleration)
-
-        if spinning_up and self.new_cycle:
-            dev.complete_cycles += 1  # Increment the complete cycles during spin up once per cycle
-            self.new_cycle = False
-        elif spinning_up and not self.new_cycle:
-            pass  # We've already incremented the cycles
-        elif not spinning_up and self.new_cycle:
-            pass  # We've already set the new cycle flag ready for the next cycle
-        elif not spinning_up and not self.new_cycle:
-            self.new_cycle = True
-        else:
-            raise AssertionError("Should not logically be reached")
+        dev.complete_cycles = floor(self.time/self.total_cycle_time(dev.window_width, dev.speed, dev.acceleration))
 
 
 class IdleState(State):

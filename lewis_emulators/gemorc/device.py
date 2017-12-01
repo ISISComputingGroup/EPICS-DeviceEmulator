@@ -32,10 +32,6 @@ class SimulatedGemorc(StateMachineDevice):
         # Emulator control
         self.reset = False
 
-        # TODO: These are not part of the hardware. Their logic should be removed before the code is accepted
-        self.initialisation_cycle = 100
-        self.optional_initialisation_cycle = 50
-
     def _get_state_handlers(self):
         return {
             'initialising': InitialisingState(),
@@ -60,8 +56,7 @@ class SimulatedGemorc(StateMachineDevice):
             (('initialised', 'initialising'), lambda: self.initialisation_requested),
 
             (('oscillating', 'stopped'), lambda: not self.start_requested),
-            (('oscillating', 'initialising'), lambda: self.complete_cycles > 0 and
-                                                      self.complete_cycles % self.initialisation_cycle == 0),
+            (('oscillating', 'initialising'), lambda: self.initialisation_requested),
 
             (('stopped', 'initialising'), lambda: self.initialisation_requested),
             (('stopped', 'oscillating'), lambda: self.start_requested),
