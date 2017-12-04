@@ -65,6 +65,7 @@ class InitialisingState(State):
         self._context.stop_initialisation = False
         self._context.time_spent_initialising = 0.0
 
+
 class ResetState(State):
 
     def on_entry(self, dt):
@@ -73,3 +74,7 @@ class ResetState(State):
         dev.acceleration = 500
         dev.speed = 20
         dev.offset = 0
+        dev.initialisation_requested = False
+        dev.start_requested = False
+        dev.stop_initialisation = False
+        dev.reset = False

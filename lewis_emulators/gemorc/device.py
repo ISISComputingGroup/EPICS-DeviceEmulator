@@ -12,18 +12,18 @@ class SimulatedGemorc(StateMachineDevice):
         """
 
         # State control variables
-        self.time_to_initialise = 2.0
+        self.time_to_initialise = 300.0  # 3s in real time with speed up factor of 100
         self.time_spent_initialising = 0.0
-        self.initialisation_requested = False
-        self.start_requested = False
         self.state = None  # Controlled by state handler
-        self.stop_initialisation = False
 
         # Device settings, set by the reset state
         self.window_width = 0
         self.acceleration = 0
         self.speed = 0
         self.offset = 0
+        self.initialisation_requested = False
+        self.start_requested = False
+        self.stop_initialisation = False
 
         # Instantaneous properties
         self.backlash = 10
@@ -115,7 +115,7 @@ class SimulatedGemorc(StateMachineDevice):
         return self.state == InitialisingState.__name__
 
     def has_been_initialised(self):
-        return self.state not in (IdleState.__name__, InitialisingState.__name__)
+        return self.state in (s.__name__ for s in (InitialisedState, OscillatingState, StoppedState))
 
     def get_complete_cycles(self):
         return self.complete_cycles
