@@ -77,4 +77,5 @@ class ResetState(State):
         dev.initialisation_requested = False
         dev.start_requested = False
         dev.stop_initialisation = False
+        dev.complete_cycles = 0
         dev.reset = False
