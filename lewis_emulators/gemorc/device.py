@@ -72,6 +72,7 @@ class SimulatedGemorc(StateMachineDevice):
         self.initialisation_requested = True
 
     def re_zero_to_datum(self):
+        # Not clear whether this is what the real device does
         self.offset = 0.0
 
     def start(self):
