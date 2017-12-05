@@ -26,7 +26,6 @@ class SimulatedGemorc(StateMachineDevice):
         self.stop_initialisation = False
 
         # Instantaneous properties
-        self.backlash = 10
         self.complete_cycles = 0
 
         # Emulator control
@@ -121,4 +120,4 @@ class SimulatedGemorc(StateMachineDevice):
         return self.complete_cycles
 
     def get_backlash(self):
-        return self.backlash
+        return 0.5*float(self.speed**2)/float(max(self.acceleration,1))
