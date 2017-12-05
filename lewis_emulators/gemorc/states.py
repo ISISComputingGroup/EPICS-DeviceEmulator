@@ -57,6 +57,7 @@ class InitialisingState(State):
     def on_entry(self, dt):
         self._context.state = InitialisingState.__name__
         self._context.initialisation_requested = False
+        self._context.complete_cycles = 0
 
     def in_state(self, dt):
         self._context.time_spent_initialising += dt
