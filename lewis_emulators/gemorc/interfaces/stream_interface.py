@@ -20,8 +20,8 @@ class GemorcStreamInterface(StreamInterface):
         CmdBuilder("get_status").escape("rq").build(),
     }
 
-    in_terminator = "\r\n"
-    out_terminator = "\r\n"
+    in_terminator = "\n"
+    out_terminator = "\n"
 
     def handle_error(self, request, error):
         """
