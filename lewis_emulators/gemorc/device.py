@@ -2,7 +2,6 @@ from collections import OrderedDict
 from states import StoppedState, OscillatingState, InitialisingState, IdleState, InitialisedState, ResetState
 from lewis.devices import StateMachineDevice
 
-SMALL = 1.0e-10
 
 class SimulatedGemorc(StateMachineDevice):
 
