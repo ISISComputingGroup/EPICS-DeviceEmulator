@@ -8,6 +8,7 @@ from lewis_emulators.utils.constants import ACK, STX, EOT, COMMAND_CHARS
 @has_log
 class Sm300StreamInterface(StreamInterface):
 
+    in_terminator = EOT
     out_terminator = EOT
 
     def __init__(self):
@@ -18,7 +19,7 @@ class Sm300StreamInterface(StreamInterface):
         self.commands = {
             CmdBuilder(self.get_position).escape("LQ").build(),  # Catch-all command for debugging
             CmdBuilder(self.home_axis).escape("BR").char().build(),  # Catch-all command for debugging
-            CmdBuilder(self.get_status).escape("LM").char().build(),  # Catch-all command for debugging
+            CmdBuilder(self.get_status).escape("LM").build(),  # Catch-all command for debugging
         }
 
         self.device = self._device
@@ -35,7 +36,10 @@ class Sm300StreamInterface(StreamInterface):
         self.log.error("An error occurred at request " + repr(request) + ": " + repr(error))
 
     def get_position(self):
-        return "{ACK}{STX}X{0:d.0},Y{1:d.0}".format(self.device.x_axis.rbv, self.device.y_axis.rbv, **COMMAND_CHARS)
+        self.device.x_axis.rbv += 0.1
+        self.device.x_axis.sp += 0.1
+        self.log.info("Send position {} {}".format(self.device.x_axis.rbv, self.device.y_axis.rbv))
+        return "{ACK}{STX}X{0:.0f},Y{1:.0f}".format(self.device.x_axis.rbv, self.device.y_axis.rbv, **COMMAND_CHARS)
 
     def home_axis(self, axis):
         if axis == "X":

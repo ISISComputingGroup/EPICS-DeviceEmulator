@@ -6,13 +6,13 @@ from lewis.core import approaches
 
 class Axis():
     def __init__(self):
-        self.rbv = 0
-        self.sp = 0
+        self.rbv = 10.0
+        self.sp = self.rbv
         self.moving = False
         self.speed = 0.1
 
     def home(self):
-        self.sp = 0
+        self.sp = 0.0
         self.moving = True
 
     def simulate(self, dt):
@@ -59,3 +59,11 @@ class SimulatedSm300(StateMachineDevice):
     @y_axis_rbv.setter
     def y_axis_rbv(self, position):
         self.y_axis.rbv = position
+
+    @property
+    def x_axis_sp(self):
+        return self.x_axis.rbv
+
+    @x_axis_sp.setter
+    def x_axis_sp(self, position):
+        self.x_axis.sp = position
