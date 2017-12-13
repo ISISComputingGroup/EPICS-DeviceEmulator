@@ -122,8 +122,8 @@ class GemorcStreamInterface(StreamInterface):
         what the real thing returns as the VI code doesn't match the spec
         """
         request_format = "{oscillating:01d}....{initialising:01d}....{initialised:01d}.....{width:03d}....." \
-                         "{offset:+03d}......{speed:02d}.....{acceleration:03d}..{cycles:05d}..........{backlash:03d}"
-        return request_format.format(
+                         "{offset:+04d}......{speed:02d}.....{acceleration:03d}..{cycles:05d}..........{backlash:03d}"
+        status_string = request_format.format(
             oscillating=int(self.device.is_oscillating()),
             initialising=int(self.device.is_initialising()),
             initialised=int(self.device.has_been_initialised()),
@@ -134,3 +134,4 @@ class GemorcStreamInterface(StreamInterface):
             cycles=int(self.device.get_complete_cycles()),
             backlash=int(self.device.get_backlash())
         )
+        return status_string
