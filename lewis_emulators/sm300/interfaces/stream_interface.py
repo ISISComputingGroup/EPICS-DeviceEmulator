@@ -36,10 +36,16 @@ class Sm300StreamInterface(StreamInterface):
         self.log.error("An error occurred at request " + repr(request) + ": " + repr(error))
 
     def get_position(self):
-        self.device.x_axis.rbv += 0.1
-        self.device.x_axis.sp += 0.1
-        self.log.info("Send position {} {}".format(self.device.x_axis.rbv, self.device.y_axis.rbv))
-        return "{ACK}{STX}X{0:.0f},Y{1:.0f}".format(self.device.x_axis.rbv, self.device.y_axis.rbv, **COMMAND_CHARS)
+        """
+        Get position of the motor axes
+        Returns: string indicating postion of motors
+
+        """
+
+        x_axis_return = self.device.x_axis.get_label_and_position()
+        y_axis_return = self.device.y_axis.get_label_and_position()
+        self.log.info("Send position {} {}".format(x_axis_return, y_axis_return))
+        return "{ACK}{STX}{0},{1}".format(x_axis_return, y_axis_return, **COMMAND_CHARS)
 
     def home_axis(self, axis):
         if axis == "X":
@@ -49,8 +55,21 @@ class Sm300StreamInterface(StreamInterface):
         return "{ACK}"
 
     def get_status(self):
-        if self.device.x_axis.moving or self.device.y_axis.moving:
-            status = "N"
+        """
+
+        Returns: the moving status of the motor, N not at position, P at position, E error
+
+        """
+        if self.device.is_moving_error:
+            status = "E"
         else:
-            status = "P"
+            is_moving = self.device.x_axis.moving or self.device.y_axis.moving
+            if self.device.is_moving is not None:
+                is_moving = self.device.is_moving
+
+            if is_moving:
+                status = "N"
+            else:
+                status = "P"
+        self.log.info("Send motor status {}".format(status))
         return "{ACK}{STX}{status}".format(status=status, **COMMAND_CHARS)
