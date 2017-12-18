@@ -1,4 +1,4 @@
-from lewis.adapters.stream import StreamAdapter, Cmd
+from lewis.adapters.stream import StreamInterface, Cmd
 from ..chopper_type import ChopperType
 
 
@@ -18,7 +18,7 @@ def filled_int(val, length):
     return str(converted_val).zfill(length)
 
 
-class Mk2ChopperStreamInterface(StreamAdapter):
+class Mk2ChopperStreamInterface(StreamInterface):
 
     # Commands that we expect via serial during normal operation
     commands = {

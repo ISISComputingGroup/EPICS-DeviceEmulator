@@ -1,7 +1,7 @@
-from lewis.adapters.stream import StreamAdapter, Cmd
+from lewis.adapters.stream import StreamInterface, Cmd
 
 
-class IrisCryoValveStreamInterface(StreamAdapter):
+class IrisCryoValveStreamInterface(StreamInterface):
 
     commands = {
         Cmd("get_status", "^\?$"),

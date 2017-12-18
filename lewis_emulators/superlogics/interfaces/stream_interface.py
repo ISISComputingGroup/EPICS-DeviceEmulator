@@ -1,8 +1,8 @@
-from lewis.adapters.stream import StreamAdapter
+from lewis.adapters.stream import StreamInterface
 from lewis_emulators.utils.command_builder import CmdBuilder
 
 
-class SuperlogicsStreamInterface(StreamAdapter):
+class SuperlogicsStreamInterface(StreamInterface):
     """
     Stream interface for the serial port
     """

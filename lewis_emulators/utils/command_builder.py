@@ -6,6 +6,22 @@ from lewis.adapters.stream import Cmd
 class CmdBuilder(object):
     """
     Build a command for the stream adapter.
+
+    Do this by creating this object, adding the values and then building it (this uses a fluent interface).
+
+    For example to read a pressure the ioc might send "pres?" and when that happens this should call get_pres
+    command would be:
+    >>> CmdBuilder("get_pres").escape("pres?").build()
+    This will generate the regex needed by Lewis. The escape is just making sure none of the characters are special
+    reg ex characters.
+    If you wanted to set a pressure the ioc might send "pres <pressure>" where <pressure> is a floating point number,
+    the interface should call set_pres with that number. Now use:
+    >>> CmdBuilder("set_pres").escape("pres ").float().build()
+    this add float as a regularly expression capture group for your argument. It is equivalent to:
+    >>> Cmd("set_pres", r"pres ([+-]?\d+\.?\d*)")
+    There are various arguments like int and digit. Finally some special characters are included so if your protocol uses
+    enquirey character ascii 5 you can match is using
+    >>> CmdBuilder("set_pres").escape("pres?").enq().build()
     """
 
     def __init__(self, target_method, arg_sep=",", ignore=""):
@@ -62,13 +78,29 @@ class CmdBuilder(object):
         """
         return self.arg(r"\d")
 
+    def char(self):
+        """
+        Add a single character argument.
+
+        :return: builder
+        """
+        return self.arg(r".")
+
     def int(self):
         """
         Add an integer argument.
 
         :return: builder
         """
-        return self.arg(r"\d+")
+        return self.arg(r"[+-]?\d+")
+
+    def any(self):
+        """
+        Add an argument that matches anything.
+
+        :return: builder
+        """
+        return self.arg(r".*")
 
     def build(self, *args, **kwargs):
         """
@@ -106,6 +138,14 @@ class CmdBuilder(object):
         :return: builder
         """
         return self.add_ascii_character(3)
+
+    def eot(self):
+        """
+        Add the EOT character (0x4) to the string.
+
+        :return: builder
+        """
+        return self.add_ascii_character(4)
 
     def enq(self):
         """

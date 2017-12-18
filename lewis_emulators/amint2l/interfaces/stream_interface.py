@@ -1,8 +1,10 @@
-from lewis.adapters.stream import StreamAdapter
+from lewis.adapters.stream import StreamInterface
+from lewis.core.logging import has_log
+
 from lewis_emulators.utils.command_builder import CmdBuilder
 
-
-class Amint2lStreamInterface(StreamAdapter):
+@has_log
+class Amint2lStreamInterface(StreamInterface):
     """
     Stream interface for the serial port
     """
@@ -23,7 +25,7 @@ class Amint2lStreamInterface(StreamAdapter):
             error: problem
 
         """
-        print "An error occurred at request " + repr(request) + ": " + repr(error)
+        self.log.error("An error occurred at request " + repr(request) + ": " + repr(error))
 
     def get_pressure(self, address):
 
@@ -35,9 +37,9 @@ class Amint2lStreamInterface(StreamAdapter):
 
         """
         if address.upper() != self._device.address.upper():
-            print "unknown address {0}".format(address)
+            self.log.error("unknown address {0}".format(address))
             return None
-        print str(self._device.pressure)
+        self.log.info("Pressure: {0}".format(self._device.pressure))
         if self._device.pressure is None:
             return None
         else:
