@@ -14,6 +14,9 @@ class SimulatedTriton(StateMachineDevice):
         """
         Initialize all of the device's attributes.
         """
+        self.temperature_setpoint = 0
+        self.heater_range = 0
+
         self.p = 0
         self.i = 0
         self.d = 0
@@ -47,3 +50,15 @@ class SimulatedTriton(StateMachineDevice):
 
     def get_d(self):
         return self.d
+
+    def get_temperature_setpoint(self):
+        return self.temperature_setpoint
+
+    def set_temperature_setpoint(self, value):
+        self.temperature_setpoint = value
+
+    def get_heater_range(self):
+        return self.heater_range
+
+    def set_heater_range(self, value):
+        self.heater_range = value
