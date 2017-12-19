@@ -61,6 +61,19 @@ class CmdBuilder(object):
         self._reg_ex += regex + self._ignore
         return self
 
+    def spaces(self, at_least_one=False):
+        """
+        Add a regex for any number of spaces
+        Args:
+            at_least_one: true there must be at least one space; false there can be any nnumber including zero
+
+        Returns: builder
+
+        """
+        wildchard = "*" if at_least_one else "+"
+
+        self._reg_ex += "\w" + wildchard + self._ignore
+
     def arg(self, arg_regex):
         """
         Add an argument to the command.

@@ -20,6 +20,7 @@ class Sm300StreamInterface(StreamInterface):
             CmdBuilder(self.get_position).escape("LQ").build(),  # Catch-all command for debugging
             CmdBuilder(self.home_axis).escape("BR").char().build(),  # Catch-all command for debugging
             CmdBuilder(self.get_status).escape("LM").build(),  # Catch-all command for debugging
+            CmdBuilder(self.set_position).escape("B/").spaces().escape("X").int().spaces().escape("Y").int()
         }
 
         self.device = self._device
@@ -73,3 +74,8 @@ class Sm300StreamInterface(StreamInterface):
                 status = "P"
         self.log.info("Send motor status {}".format(status))
         return "{ACK}{STX}{status}".format(status=status, **COMMAND_CHARS)
+
+    def set_position(self, x_position, y_position):
+        self.device.x_axis.sp = x_position
+        self.device.y_axis.sp = y_position
+        return "{ACK}".format(**COMMAND_CHARS)
