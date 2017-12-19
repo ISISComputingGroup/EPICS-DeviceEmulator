@@ -25,6 +25,8 @@ class SimulatedTriton(StateMachineDevice):
         self.i = 0
         self.d = 0
 
+        self.closed_loop = False
+
     def _get_state_handlers(self):
         return {
             'default': DefaultState(),

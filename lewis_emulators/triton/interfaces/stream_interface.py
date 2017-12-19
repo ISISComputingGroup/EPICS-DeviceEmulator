@@ -47,6 +47,10 @@ class TritonStreamInterface(StreamInterface):
         # Get heater power
         CmdBuilder("get_heater_power")
             .escape("READ:DEV:{}:HTR:SIG:POWR".format(SUBSYSTEM_NAMES["heater"])).build(),
+
+        # Loop mode
+        CmdBuilder("get_closed_loop_mode")
+            .escape("READ:DEV:{}:TEMP:LOOP:MODE".format(SUBSYSTEM_NAMES["mixing chamber"])).build(),
     }
 
     in_terminator = "\r\n"
@@ -87,6 +91,7 @@ class TritonStreamInterface(StreamInterface):
 
     def set_temperature_setpoint(self, value):
         self.device.set_temperature_setpoint(value)
+        return "ok"
 
     def get_temperature_setpoint(self):
         return "STAT:DEV:{}:TEMP:LOOP:TSET:{}K" \
@@ -94,6 +99,7 @@ class TritonStreamInterface(StreamInterface):
 
     def set_heater_range(self, value):
         self.device.set_heater_range(value)
+        return "ok"
 
     def get_heater_range(self):
         return "STAT:DEV:{}:TEMP:LOOP:RANGE:{}" \
@@ -106,3 +112,7 @@ class TritonStreamInterface(StreamInterface):
     def get_heater_power(self):
         return "STAT:DEV:{}:HTR:SIG:POWR:{}{}"\
             .format(SUBSYSTEM_NAMES["heater"], self.device.heater_power, self.device.heater_power_units)
+
+    def get_closed_loop_mode(self):
+        return "STAT:DEV:{}:TEMP:LOOP:MODE:{}"\
+            .format(SUBSYSTEM_NAMES["mixing chamber"], "ON" if self.device.closed_loop else "OFF")
