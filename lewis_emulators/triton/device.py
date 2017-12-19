@@ -4,8 +4,9 @@ from lewis.devices import StateMachineDevice
 
 
 SUBSYSTEM_NAMES = {
-        "mixing chamber": "mix_chamber_name",
-    }
+    "mixing chamber": "mix_chamber_name",
+    "heater": "H5"
+}
 
 
 class SimulatedTriton(StateMachineDevice):
@@ -16,6 +17,9 @@ class SimulatedTriton(StateMachineDevice):
         """
         self.temperature_setpoint = 0
         self.heater_range = 0
+
+        self.heater_power = 1
+        self.heater_power_units = "mA"
 
         self.p = 0
         self.i = 0
