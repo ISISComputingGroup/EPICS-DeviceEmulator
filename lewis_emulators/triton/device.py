@@ -5,6 +5,7 @@ from lewis.devices import StateMachineDevice
 
 SUBSYSTEM_NAMES = {
     "mixing chamber": "mix_chamber_name",
+    "stil": "T1",
     "heater": "H5"
 }
 
@@ -42,6 +43,9 @@ class SimulatedTriton(StateMachineDevice):
 
         self.status = "This is a device status message."
         self.automation = "This is the automation status"
+
+        self.stil_temp = 0
+        self.mc_temp = 0
 
     def set_valve_state_backdoor(self, valve, newstate):
         self.valves[int(valve) - 1] = int(newstate)
@@ -102,3 +106,9 @@ class SimulatedTriton(StateMachineDevice):
 
     def get_automation(self):
         return self.automation
+
+    def get_stil_temp(self):
+        return self.stil_temp
+
+    def get_mc_temp(self):
+        return self.mc_temp

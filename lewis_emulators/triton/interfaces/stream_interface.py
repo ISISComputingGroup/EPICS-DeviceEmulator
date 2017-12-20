@@ -10,8 +10,11 @@ class TritonStreamInterface(StreamInterface):
 
     # Commands that we expect via serial during normal operation
     commands = {
+        # UIDs
         CmdBuilder("get_mc_uid")
             .escape("READ:SYS:DR:CHAN:MC").build(),
+        CmdBuilder("get_stil_uid")
+            .escape("READ:SYS:DR:CHAN:STIL").build(),
 
         # PID setpoints
         CmdBuilder("set_p")
@@ -34,6 +37,12 @@ class TritonStreamInterface(StreamInterface):
             .escape("SET:DEV:{}:TEMP:LOOP:TSET:".format(SUBSYSTEM_NAMES["mixing chamber"])).float().build(),
         CmdBuilder("get_temperature_setpoint")
             .escape("READ:DEV:{}:TEMP:LOOP:TSET".format(SUBSYSTEM_NAMES["mixing chamber"])).build(),
+
+        # Temperature
+        CmdBuilder("get_stil_temp")
+            .escape("READ:DEV:{}:TEMP:SIG:TEMP".format(SUBSYSTEM_NAMES["stil"])).build(),
+        CmdBuilder("get_mc_temp")
+            .escape("READ:DEV:{}:TEMP:SIG:TEMP".format(SUBSYSTEM_NAMES["mixing chamber"])).build(),
 
         # Heater range
         CmdBuilder("set_heater_range")
@@ -84,6 +93,10 @@ class TritonStreamInterface(StreamInterface):
     def get_mc_uid(self):
         return "STAT:SYS:DR:CHAN:MC:{}" \
             .format(SUBSYSTEM_NAMES["mixing chamber"])
+
+    def get_stil_uid(self):
+        return "STAT:SYS:DR:CHAN:STIL:{}" \
+            .format(SUBSYSTEM_NAMES["stil"])
 
     def set_p(self, value):
         self.device.set_p(float(value))
@@ -167,3 +180,9 @@ class TritonStreamInterface(StreamInterface):
 
     def get_automation(self):
         return "STAT:SYS:DR:ACTN:{}".format(self.device.get_automation())
+
+    def get_stil_temp(self):
+        return "STAT:DEV:{}:TEMP:SIG:TEMP:{}K".format(SUBSYSTEM_NAMES["stil"], self.device.get_stil_temp())
+
+    def get_mc_temp(self):
+        return "STAT:DEV:{}:TEMP:SIG:TEMP:{}K".format(SUBSYSTEM_NAMES["mixing chamber"], self.device.get_mc_temp())
