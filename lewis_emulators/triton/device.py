@@ -38,6 +38,8 @@ class SimulatedTriton(StateMachineDevice):
 
         self.valves = [ValveStates.CLOSED] * 10
 
+        self.channels_enabled = [True] * 6
+
     def set_valve_state_backdoor(self, valve, newstate):
         self.valves[int(valve) - 1] = int(newstate)
 
@@ -85,3 +87,9 @@ class SimulatedTriton(StateMachineDevice):
 
     def get_valve_state(self, valve):
         return self.valves[valve-1]
+
+    def is_channel_enabled(self, chan):
+        return self.channels_enabled[chan-1]
+
+    def set_channel_enabled(self, chan, newstate):
+        self.channels_enabled[chan-1] = newstate

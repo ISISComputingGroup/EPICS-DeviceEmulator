@@ -56,13 +56,21 @@ class TritonStreamInterface(StreamInterface):
         # Valve state
         CmdBuilder("get_valve_state")
             .escape("READ:DEV:V").int().escape(":VALV:SIG:STATE").build(),
+
+        # Channel enablement
+        CmdBuilder("get_channel_enabled")
+            .escape("READ:DEV:T").int().escape(":TEMP:MEAS:ENAB").build(),
+        CmdBuilder("set_channel_enabled")
+            .escape("SET:DEV:T").int().escape(":TEMP:MEAS:ENAB:").any().build(),
     }
 
     in_terminator = "\r\n"
     out_terminator = "\r\n"
 
     def handle_error(self, request, error):
-        err = "Request: {}, error: {}".format(request, error)
+        err = "Request: {}, error: {}. \n\nAvailable commands: {}"\
+            .format(request, error, [c.pattern for c in self.commands])
+
         print(err)
         self.log.error(err)
         return err
@@ -131,7 +139,19 @@ class TritonStreamInterface(StreamInterface):
             response = "CLOSE"
         elif state == ValveStates.OPEN:
             response = "OPEN"
-        else:
+        elif state == ValveStates.NOT_FOUND:
             response = "NOT_FOUND"
+        else:
+            raise ValueError("Invalid valve state: {}".format(state))
 
         return "STAT:DEV:V{}:VALV:SIG:STATE:{}".format(valve, response)
+
+    def get_channel_enabled(self, channel):
+        return "STAT:DEV:T{}:TEMP:MEAS:ENAB:{}"\
+            .format(channel, "ON" if self.device.is_channel_enabled(int(channel)) else "OFF")
+
+    def set_channel_enabled(self, channel, newstate):
+        if newstate not in ["ON", "OFF"]:
+            raise ValueError("New state '{}' not valid.".format(newstate))
+        self.device.set_channel_enabled(int(channel), str(newstate) == "ON")
+        return "ok"

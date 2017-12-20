@@ -24,7 +24,7 @@ class CmdBuilder(object):
     >>> CmdBuilder("set_pres").escape("pres?").enq().build()
     """
 
-    def __init__(self, target_method, arg_sep=",", ignore=""):
+    def __init__(self, target_method, arg_sep="", ignore=""):
         """
         Create a builder. Use build to create the final object
 
