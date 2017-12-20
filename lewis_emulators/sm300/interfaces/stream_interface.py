@@ -9,7 +9,7 @@ from lewis_emulators.utils.constants import ACK, STX, EOT, COMMAND_CHARS
 class Sm300StreamInterface(StreamInterface):
 
     in_terminator = EOT
-    out_terminator = EOT
+    out_terminator = ""
 
     def __init__(self):
 
@@ -17,10 +17,12 @@ class Sm300StreamInterface(StreamInterface):
 
         # Commands that we expect via serial during normal operation
         self.commands = {
-            CmdBuilder(self.get_position).escape("LQ").build(),  # Catch-all command for debugging
-            CmdBuilder(self.home_axis).escape("BR").char().build(),  # Catch-all command for debugging
-            CmdBuilder(self.get_status).escape("LM").build(),  # Catch-all command for debugging
-            CmdBuilder(self.set_position).escape("B/").spaces().escape("X").int().spaces().escape("Y").int()
+            CmdBuilder(self.get_position).escape("LQ").build(),
+            CmdBuilder(self.get_position_as_steps).escape("LI").char().build(),
+            CmdBuilder(self.home_axis).escape("BR").char().build(),
+            CmdBuilder(self.get_status).escape("LM").build(),
+            CmdBuilder(self.set_position).escape("B/").spaces().escape("X").int().spaces().escape("Y").int().build(),
+            CmdBuilder(self.set_position_as_steps).escape("B").char().int().build()
         }
 
         self.device = self._device
@@ -46,13 +48,11 @@ class Sm300StreamInterface(StreamInterface):
         x_axis_return = self.device.x_axis.get_label_and_position()
         y_axis_return = self.device.y_axis.get_label_and_position()
         self.log.info("Send position {} {}".format(x_axis_return, y_axis_return))
-        return "{ACK}{STX}{0},{1}".format(x_axis_return, y_axis_return, **COMMAND_CHARS)
+        return "{ACK}{STX}{0},{1}{EOT}".format(x_axis_return, y_axis_return, **COMMAND_CHARS)
 
     def home_axis(self, axis):
-        if axis == "X":
-            self.device.x_axis.home()
-        elif axis == "Y":
-            self.device.y_axis.home()
+        axis = self.device.axes[axis]
+        axis.home()
         return "{ACK}"
 
     def get_status(self):
@@ -73,9 +73,33 @@ class Sm300StreamInterface(StreamInterface):
             else:
                 status = "P"
         self.log.info("Send motor status {}".format(status))
-        return "{ACK}{STX}{status}".format(status=status, **COMMAND_CHARS)
+        return "{ACK}{STX}{status}{EOT}".format(status=status, **COMMAND_CHARS)
 
     def set_position(self, x_position, y_position):
         self.device.x_axis.sp = x_position
         self.device.y_axis.sp = y_position
         return "{ACK}".format(**COMMAND_CHARS)
+
+    def set_position_as_steps(self, axis, steps):
+        """
+        Set the position at using increments (steps)
+        Args:
+            axis: the axis to set
+            steps: the number of steps to set it at
+
+        Returns: acknowledgement
+
+        """
+        axis = self.device.axes[axis]
+        axis.sp = int(steps)
+        self.log.info("Setting: Position {}, sp {}".format(axis.rbv, axis.sp))
+        return "{ACK}".format(**COMMAND_CHARS)
+
+    def get_position_as_steps(self, axis):
+
+        axis = self.device.axes[axis]
+        self.log.info("Position {}, sp {}".format(axis.rbv, axis.sp))
+        if axis.rbv_error is not None:
+            return "{ACK}{STX}{0}{EOT}".format(self.rbv_error, **COMMAND_CHARS)
+        else:
+            return "{ACK}{STX}{steps:.0f}{EOT}".format(steps=axis.rbv, **COMMAND_CHARS)

@@ -1,9 +1,12 @@
 from collections import OrderedDict
+
+from lewis.core.logging import has_log
+
 from states import DefaultState
 from lewis.devices import StateMachineDevice
 from lewis.core import approaches
 
-
+@has_log
 class Axis():
     def __init__(self, axis_label):
         self.rbv_error = None
@@ -18,8 +21,9 @@ class Axis():
         self.moving = True
 
     def simulate(self, dt):
+
         self.rbv = approaches.linear(self.rbv, self.sp, self.speed, dt)
-        self.moving = self.rbv == self.sp
+        self.moving = self.rbv != self.sp
 
     def get_label_and_position(self):
         if self.rbv_error is not None:
@@ -36,9 +40,12 @@ class SimulatedSm300(StateMachineDevice):
         """
         # Is the device initialised, if not it won't talk to me
         self.initialised = False
-
-        self.x_axis = Axis("X")
-        self.y_axis = Axis("Y")
+        self.axes = {
+            "X": Axis("X"),
+            "Y": Axis("Y")
+        }
+        self.x_axis = self.axes["X"]
+        self.y_axis = self.axes["Y"]
         self.is_moving = None  # let the axis report its motion
         self.is_moving_error = False
 
