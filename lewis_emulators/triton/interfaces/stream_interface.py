@@ -62,15 +62,17 @@ class TritonStreamInterface(StreamInterface):
             .escape("READ:DEV:T").int().escape(":TEMP:MEAS:ENAB").build(),
         CmdBuilder("set_channel_enabled")
             .escape("SET:DEV:T").int().escape(":TEMP:MEAS:ENAB:").any().build(),
+
+        # Status
+        CmdBuilder("get_status")
+            .escape("READ:SYS:DR:STATUS").build(),
     }
 
     in_terminator = "\r\n"
     out_terminator = "\r\n"
 
     def handle_error(self, request, error):
-        err = "Request: {}, error: {}. \n\nAvailable commands: {}"\
-            .format(request, error, [c.pattern for c in self.commands])
-
+        err = "Request: {}, error: {}."
         print(err)
         self.log.error(err)
         return err
@@ -155,3 +157,6 @@ class TritonStreamInterface(StreamInterface):
             raise ValueError("New state '{}' not valid.".format(newstate))
         self.device.set_channel_enabled(int(channel), str(newstate) == "ON")
         return "ok"
+
+    def get_status(self):
+        return "STAT:SYS:DR:STATUS:{}".format(self.device.get_status())

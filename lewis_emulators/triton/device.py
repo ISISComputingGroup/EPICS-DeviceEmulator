@@ -40,6 +40,8 @@ class SimulatedTriton(StateMachineDevice):
 
         self.channels_enabled = [True] * 6
 
+        self.status = "This is a device status message."
+
     def set_valve_state_backdoor(self, valve, newstate):
         self.valves[int(valve) - 1] = int(newstate)
 
@@ -93,3 +95,6 @@ class SimulatedTriton(StateMachineDevice):
 
     def set_channel_enabled(self, chan, newstate):
         self.channels_enabled[chan-1] = newstate
+
+    def get_status(self):
+        return self.status
