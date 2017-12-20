@@ -53,8 +53,13 @@ class SimulatedTriton(StateMachineDevice):
         self.fkhx_temp = 0
         self.jthx_temp = 0
 
+        self.pressures = [0] * 5
+
     def set_valve_state_backdoor(self, valve, newstate):
         self.valves[int(valve) - 1] = int(newstate)
+
+    def set_pressure_backdoor(self, valve, newpressure):
+        self.pressures[int(valve) - 1] = float(newpressure)
 
     def _get_state_handlers(self):
         return {
@@ -127,3 +132,6 @@ class SimulatedTriton(StateMachineDevice):
 
     def get_jthx_temp(self):
         return self.jthx_temp
+
+    def get_pressure(self, sensor):
+        return self.pressures[sensor]

@@ -87,6 +87,10 @@ class TritonStreamInterface(StreamInterface):
         # Automation
         CmdBuilder("get_automation")
             .escape("READ:SYS:DR:ACTN").build(),
+
+        # Pressures
+        CmdBuilder("get_pressure")
+            .escape("READ:DEV:P").int().escape(":PRES:SIG:PRES").build(),
     }
 
     in_terminator = "\r\n"
@@ -207,3 +211,6 @@ class TritonStreamInterface(StreamInterface):
 
     def get_jthx_temp(self):
         return "STAT:DEV:{}:TEMP:SIG:TEMP:{}K".format(SUBSYSTEM_NAMES["jthx"], self.device.get_jthx_temp())
+
+    def get_pressure(self, sensor):
+        return "STAT:DEV:P{}:PRES:SIG:PRES:{}mB".format(sensor, self.device.get_pressure(int(sensor)-1))
