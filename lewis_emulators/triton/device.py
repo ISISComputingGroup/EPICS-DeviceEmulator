@@ -4,10 +4,10 @@ from lewis.devices import StateMachineDevice
 
 
 SUBSYSTEM_NAMES = {
-    "mixing chamber": "T0",
+    "mixing chamber": "T5",
     "stil": "T1",
     "sorb": "T9",
-    "heater": "T5",
+    "heater": "H5",
     "4khx": "T3",
     "jthx": "T2"
 }
