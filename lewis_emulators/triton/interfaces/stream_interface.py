@@ -2,6 +2,7 @@ from lewis.adapters.stream import StreamInterface, Cmd
 from lewis.core.logging import has_log
 from lewis_emulators.utils.command_builder import CmdBuilder
 from lewis_emulators.triton.device import SUBSYSTEM_NAMES
+from lewis_emulators.triton.device import ValveStates
 
 
 @has_log
@@ -51,6 +52,10 @@ class TritonStreamInterface(StreamInterface):
         # Loop mode
         CmdBuilder("get_closed_loop_mode")
             .escape("READ:DEV:{}:TEMP:LOOP:MODE".format(SUBSYSTEM_NAMES["mixing chamber"])).build(),
+
+        # Valve state
+        CmdBuilder("get_valve_state")
+            .escape("READ:DEV:V").int().escape(":VALV:SIG:STATE").build(),
     }
 
     in_terminator = "\r\n"
@@ -59,6 +64,7 @@ class TritonStreamInterface(StreamInterface):
     def handle_error(self, request, error):
         err = "Request: {}, error: {}".format(request, error)
         print(err)
+        self.log.error(err)
         return err
 
     def get_mc_uid(self):
@@ -66,15 +72,15 @@ class TritonStreamInterface(StreamInterface):
             .format(SUBSYSTEM_NAMES["mixing chamber"])
 
     def set_p(self, value):
-        self.device.set_p(value)
+        self.device.set_p(float(value))
         return "ok"
 
     def set_i(self, value):
-        self.device.set_i(value)
+        self.device.set_i(float(value))
         return "ok"
 
     def set_d(self, value):
-        self.device.set_d(value)
+        self.device.set_d(float(value))
         return "ok"
 
     def get_p(self):
@@ -90,7 +96,7 @@ class TritonStreamInterface(StreamInterface):
             .format(SUBSYSTEM_NAMES["mixing chamber"], self.device.get_d())
 
     def set_temperature_setpoint(self, value):
-        self.device.set_temperature_setpoint(value)
+        self.device.set_temperature_setpoint(float(value))
         return "ok"
 
     def get_temperature_setpoint(self):
@@ -98,7 +104,7 @@ class TritonStreamInterface(StreamInterface):
             .format(SUBSYSTEM_NAMES["mixing chamber"], self.device.get_temperature_setpoint())
 
     def set_heater_range(self, value):
-        self.device.set_heater_range(value)
+        self.device.set_heater_range(float(value))
         return "ok"
 
     def get_heater_range(self):
@@ -116,3 +122,16 @@ class TritonStreamInterface(StreamInterface):
     def get_closed_loop_mode(self):
         return "STAT:DEV:{}:TEMP:LOOP:MODE:{}"\
             .format(SUBSYSTEM_NAMES["mixing chamber"], "ON" if self.device.closed_loop else "OFF")
+
+    def get_valve_state(self, valve):
+
+        state = self.device.get_valve_state(int(valve))
+
+        if state == ValveStates.CLOSED:
+            response = "CLOSE"
+        elif state == ValveStates.OPEN:
+            response = "OPEN"
+        else:
+            response = "NOT_FOUND"
+
+        return "STAT:DEV:V{}:VALV:SIG:STATE:{}".format(valve, response)
