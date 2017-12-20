@@ -4,9 +4,12 @@ from lewis.devices import StateMachineDevice
 
 
 SUBSYSTEM_NAMES = {
-    "mixing chamber": "mix_chamber_name",
+    "mixing chamber": "T0",
     "stil": "T1",
-    "heater": "H5"
+    "sorb": "T9",
+    "heater": "H5",
+    "4khx": "T3",
+    "jthx": "T2"
 }
 
 
@@ -46,6 +49,9 @@ class SimulatedTriton(StateMachineDevice):
 
         self.stil_temp = 0
         self.mc_temp = 0
+        self.sorb_temp = 0
+        self.fkhx_temp = 0
+        self.jthx_temp = 0
 
     def set_valve_state_backdoor(self, valve, newstate):
         self.valves[int(valve) - 1] = int(newstate)
@@ -112,3 +118,12 @@ class SimulatedTriton(StateMachineDevice):
 
     def get_mc_temp(self):
         return self.mc_temp
+
+    def get_sorb_temp(self):
+        return self.sorb_temp
+
+    def get_4khx_temp(self):
+        return self.fkhx_temp
+
+    def get_jthx_temp(self):
+        return self.jthx_temp

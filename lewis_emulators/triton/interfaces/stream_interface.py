@@ -15,6 +15,8 @@ class TritonStreamInterface(StreamInterface):
             .escape("READ:SYS:DR:CHAN:MC").build(),
         CmdBuilder("get_stil_uid")
             .escape("READ:SYS:DR:CHAN:STIL").build(),
+        CmdBuilder("get_sorb_uid")
+            .escape("READ:SYS:DR:CHAN:SORB").build(),
 
         # PID setpoints
         CmdBuilder("set_p")
@@ -43,6 +45,12 @@ class TritonStreamInterface(StreamInterface):
             .escape("READ:DEV:{}:TEMP:SIG:TEMP".format(SUBSYSTEM_NAMES["stil"])).build(),
         CmdBuilder("get_mc_temp")
             .escape("READ:DEV:{}:TEMP:SIG:TEMP".format(SUBSYSTEM_NAMES["mixing chamber"])).build(),
+        CmdBuilder("get_sorb_temp")
+            .escape("READ:DEV:{}:TEMP:SIG:TEMP".format(SUBSYSTEM_NAMES["sorb"])).build(),
+        CmdBuilder("get_4khx_temp")
+            .escape("READ:DEV:{}:TEMP:SIG:TEMP".format(SUBSYSTEM_NAMES["4khx"])).build(),
+        CmdBuilder("get_jthx_temp")
+            .escape("READ:DEV:{}:TEMP:SIG:TEMP".format(SUBSYSTEM_NAMES["jthx"])).build(),
 
         # Heater range
         CmdBuilder("set_heater_range")
@@ -85,7 +93,7 @@ class TritonStreamInterface(StreamInterface):
     out_terminator = "\r\n"
 
     def handle_error(self, request, error):
-        err = "Request: {}, error: {}."
+        err = "Request: {}, error: {}.".format(request, error)
         print(err)
         self.log.error(err)
         return err
@@ -97,6 +105,10 @@ class TritonStreamInterface(StreamInterface):
     def get_stil_uid(self):
         return "STAT:SYS:DR:CHAN:STIL:{}" \
             .format(SUBSYSTEM_NAMES["stil"])
+
+    def get_sorb_uid(self):
+        return "STAT:SYS:DR:CHAN:SORB:{}" \
+            .format(SUBSYSTEM_NAMES["sorb"])
 
     def set_p(self, value):
         self.device.set_p(float(value))
@@ -186,3 +198,12 @@ class TritonStreamInterface(StreamInterface):
 
     def get_mc_temp(self):
         return "STAT:DEV:{}:TEMP:SIG:TEMP:{}K".format(SUBSYSTEM_NAMES["mixing chamber"], self.device.get_mc_temp())
+
+    def get_sorb_temp(self):
+        return "STAT:DEV:{}:TEMP:SIG:TEMP:{}K".format(SUBSYSTEM_NAMES["sorb"], self.device.get_sorb_temp())
+
+    def get_4khx_temp(self):
+        return "STAT:DEV:{}:TEMP:SIG:TEMP:{}K".format(SUBSYSTEM_NAMES["4khx"], self.device.get_4khx_temp())
+
+    def get_jthx_temp(self):
+        return "STAT:DEV:{}:TEMP:SIG:TEMP:{}K".format(SUBSYSTEM_NAMES["jthx"], self.device.get_jthx_temp())
