@@ -66,6 +66,10 @@ class TritonStreamInterface(StreamInterface):
         # Status
         CmdBuilder("get_status")
             .escape("READ:SYS:DR:STATUS").build(),
+
+        # Automation
+        CmdBuilder("get_automation")
+            .escape("READ:SYS:DR:ACTN").build(),
     }
 
     in_terminator = "\r\n"
@@ -160,3 +164,6 @@ class TritonStreamInterface(StreamInterface):
 
     def get_status(self):
         return "STAT:SYS:DR:STATUS:{}".format(self.device.get_status())
+
+    def get_automation(self):
+        return "STAT:SYS:DR:ACTN:{}".format(self.device.get_automation())
