@@ -94,13 +94,13 @@ class TritonStreamInterface(StreamInterface):
     }
 
     in_terminator = "\r\n"
-    out_terminator = "\r\n"
+    out_terminator = "\n"
 
     def handle_error(self, request, error):
-        err = "Request: {}, error: {}.".format(request, error)
-        print(err)
-        self.log.error(err)
-        return err
+        err_string = "command was: {}, error was: {}\n".format(request, error)
+        print(err_string)
+        # self.log.error(err)
+        return err_string
 
     def get_mc_uid(self):
         return "STAT:SYS:DR:CHAN:MC:{}" \

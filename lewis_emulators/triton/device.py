@@ -7,7 +7,7 @@ SUBSYSTEM_NAMES = {
     "mixing chamber": "T0",
     "stil": "T1",
     "sorb": "T9",
-    "heater": "H5",
+    "heater": "T5",
     "4khx": "T3",
     "jthx": "T2"
 }
