@@ -1,3 +1,7 @@
+"""
+Device classes for the SM 300 motor emulator
+"""
+
 from collections import OrderedDict
 
 from lewis.core.logging import has_log
@@ -6,9 +10,19 @@ from states import DefaultState
 from lewis.devices import StateMachineDevice
 from lewis.core import approaches
 
+
 @has_log
 class Axis():
+    """
+    An axis within the SM300 device
+    """
+
     def __init__(self, axis_label):
+        """
+        Constructor.
+        Args:
+            axis_label: the label for the axis
+        """
         self.rbv_error = None
         self.rbv = 10.0
         self.sp = self.rbv
@@ -17,15 +31,25 @@ class Axis():
         self.axis_label = axis_label
 
     def home(self):
+        """
+        Perform a homing operation.
+        """
         self.sp = 0.0
         self.moving = True
 
     def simulate(self, dt):
-
+        """
+        Simulate movement of the axis.
+        Args:
+            dt: time since last simulation
+        """
         self.rbv = approaches.linear(self.rbv, self.sp, self.speed, dt)
         self.moving = self.rbv != self.sp
 
     def get_label_and_position(self):
+        """
+        Returns: axis label and current position in steps
+        """
         if self.rbv_error is not None:
             return self.rbv_error
         else:
@@ -33,7 +57,9 @@ class Axis():
 
 
 class SimulatedSm300(StateMachineDevice):
-
+    """
+    Simulated SM300 Device
+    """
     def _initialize_data(self):
         """
         Initialize all of the device's attributes.
@@ -62,10 +88,16 @@ class SimulatedSm300(StateMachineDevice):
         ])
 
     def reset(self):
+        """
+        Reset device to start up state
+        """
         self._initialize_data()
 
     @property
     def x_axis_rbv(self):
+        """
+        Returns: Read back value for the x axis (useful usage through the back door
+        """
         return self.x_axis.rbv
 
     @x_axis_rbv.setter
@@ -74,6 +106,9 @@ class SimulatedSm300(StateMachineDevice):
 
     @property
     def y_axis_rbv(self):
+        """
+        Returns: Read back value for the y axis (useful usage through the back door
+        """
         return self.y_axis.rbv
 
     @y_axis_rbv.setter
@@ -82,6 +117,9 @@ class SimulatedSm300(StateMachineDevice):
 
     @property
     def x_axis_sp(self):
+        """
+        Returns: Set point value for the x axis (useful usage through the back door
+        """
         return self.x_axis.rbv
 
     @x_axis_sp.setter
@@ -90,6 +128,9 @@ class SimulatedSm300(StateMachineDevice):
 
     @property
     def y_axis_sp(self):
+        """
+        Returns: Set point value for the y axis (useful usage through the back door
+        """
         return self.y_axis.rbv
 
     @y_axis_sp.setter
@@ -98,6 +139,9 @@ class SimulatedSm300(StateMachineDevice):
 
     @property
     def x_axis_rbv_error(self):
+        """
+        Returns: The error to give instead of the read back value
+        """
         return self.x_axis.rbv_error
 
     @x_axis_rbv_error.setter
