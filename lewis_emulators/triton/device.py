@@ -73,6 +73,12 @@ class SimulatedTriton(StateMachineDevice):
         return OrderedDict([
         ])
 
+    def get_closed_loop_mode(self):
+        return self.closed_loop
+
+    def set_closed_loop_mode(self, mode):
+        self.closed_loop = mode
+
     def set_p(self, value):
         self.p = value
 

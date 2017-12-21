@@ -69,6 +69,8 @@ class TritonStreamInterface(StreamInterface):
         # Loop mode
         CmdBuilder("get_closed_loop_mode")
             .escape("READ:DEV:{}:TEMP:LOOP:MODE".format(SUBSYSTEM_NAMES["mixing chamber"])).build(),
+        CmdBuilder("set_closed_loop_mode")
+            .escape("SET:DEV:{}:TEMP:LOOP:MODE:".format(SUBSYSTEM_NAMES["mixing chamber"])).any().build(),
 
         # Valve state
         CmdBuilder("get_valve_state")
@@ -164,7 +166,14 @@ class TritonStreamInterface(StreamInterface):
 
     def get_closed_loop_mode(self):
         return "STAT:DEV:{}:TEMP:LOOP:MODE:{}"\
-            .format(SUBSYSTEM_NAMES["mixing chamber"], "ON" if self.device.closed_loop else "OFF")
+            .format(SUBSYSTEM_NAMES["mixing chamber"], "ON" if self.device.get_closed_loop_mode() else "OFF")
+
+    def set_closed_loop_mode(self, mode):
+        if mode not in ["ON", "OFF"]:
+            raise ValueError("Invalid mode")
+
+        self.device.set_closed_loop_mode(mode == "ON")
+        return "ok"
 
     def get_valve_state(self, valve):
 
