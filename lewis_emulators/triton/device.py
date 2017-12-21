@@ -8,8 +8,8 @@ SUBSYSTEM_NAMES = {
     "stil": "T1",
     "sorb": "T9",
     "heater": "H5",
-    "4khx": "T3",
-    "jthx": "T2"
+    "fkhx": "T3",
+    "jthx": "T2",
 }
 
 
@@ -20,6 +20,22 @@ class ValveStates(object):
     OPEN = 0
     CLOSED = 1
     NOT_FOUND = 2
+
+
+class TemperatureStage(object):
+    def __init__(self, name):
+        self.name = name
+        self.temperature = 0
+        self.enabled = True
+
+        self.p = 0
+        self.i = 0
+        self.d = 0
+
+
+class PressureSensor(object):
+    def __init__(self):
+        self.pressure = 0
 
 
 class SimulatedTriton(StateMachineDevice):
@@ -34,10 +50,6 @@ class SimulatedTriton(StateMachineDevice):
         self.heater_power = 1
         self.heater_power_units = "mA"
 
-        self.p = 0
-        self.i = 0
-        self.d = 0
-
         self.closed_loop = False
 
         self.valves = [ValveStates.CLOSED] * 10
@@ -47,19 +59,31 @@ class SimulatedTriton(StateMachineDevice):
         self.status = "This is a device status message."
         self.automation = "This is the automation status"
 
-        self.stil_temp = 0
-        self.mc_temp = 0
-        self.sorb_temp = 0
-        self.fkhx_temp = 0
-        self.jthx_temp = 0
+        self.pressure_sensors = {"P{}".format(idx): PressureSensor() for idx in range(1, 6)}
 
-        self.pressures = [0] * 5
+        self.temperature_stages = {
+            "T1": TemperatureStage("stil"),
+            "T2": TemperatureStage("jthx"),
+            "T3": TemperatureStage("4khx"),
+            "T4": TemperatureStage("sorb"),
+            "T5": TemperatureStage("mc"),
+        }
+
+    def find_temperature_channel(self, name):
+        for k, v in self.temperature_stages.items():
+            if v.name == name:
+                return k
+        else:
+            raise ValueError("{} not found".format(name))
+
+    def set_temperature_backdoor(self, stage_name, new_temp):
+        self.temperature_stages[self.find_temperature_channel(stage_name)].temperature = new_temp
 
     def set_valve_state_backdoor(self, valve, newstate):
         self.valves[int(valve) - 1] = int(newstate)
 
-    def set_pressure_backdoor(self, valve, newpressure):
-        self.pressures[int(valve) - 1] = float(newpressure)
+    def set_pressure_backdoor(self, sensor, newpressure):
+        self.pressure_sensors["P{}".format(sensor)].pressure = float(newpressure)
 
     def _get_state_handlers(self):
         return {
@@ -79,23 +103,23 @@ class SimulatedTriton(StateMachineDevice):
     def set_closed_loop_mode(self, mode):
         self.closed_loop = mode
 
-    def set_p(self, value):
-        self.p = value
+    def set_p(self, stage, value):
+        self.temperature_stages[stage].p = value
 
-    def set_i(self, value):
-        self.i = value
+    def set_i(self, stage, value):
+        self.temperature_stages[stage].i = value
 
-    def set_d(self, value):
-        self.d = value
+    def set_d(self, stage, value):
+        self.temperature_stages[stage].d = value
 
-    def get_p(self):
-        return self.p
+    def get_p(self, stage):
+        return self.temperature_stages[stage].p
 
-    def get_i(self):
-        return self.i
+    def get_i(self, stage):
+        return self.temperature_stages[stage].i
 
-    def get_d(self):
-        return self.d
+    def get_d(self, stage):
+        return self.temperature_stages[stage].d
 
     def get_temperature_setpoint(self):
         return self.temperature_setpoint
@@ -124,20 +148,8 @@ class SimulatedTriton(StateMachineDevice):
     def get_automation(self):
         return self.automation
 
-    def get_stil_temp(self):
-        return self.stil_temp
-
-    def get_mc_temp(self):
-        return self.mc_temp
-
-    def get_sorb_temp(self):
-        return self.sorb_temp
-
-    def get_4khx_temp(self):
-        return self.fkhx_temp
-
-    def get_jthx_temp(self):
-        return self.jthx_temp
-
     def get_pressure(self, sensor):
-        return self.pressures[sensor]
+        return self.pressure_sensors[sensor].pressure
+
+    def get_temp(self, stage):
+        return self.temperature_stages[stage].temperature

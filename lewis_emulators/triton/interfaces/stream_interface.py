@@ -20,19 +20,19 @@ class TritonStreamInterface(StreamInterface):
 
         # PID setpoints
         CmdBuilder("set_p")
-            .escape("SET:DEV:{}:TEMP:LOOP:P:".format(SUBSYSTEM_NAMES["mixing chamber"])).float().build(),
+            .escape("SET:DEV:").arg("T[0-9]").escape(":TEMP:LOOP:P:").float().build(),
         CmdBuilder("set_i")
-            .escape("SET:DEV:{}:TEMP:LOOP:I:".format(SUBSYSTEM_NAMES["mixing chamber"])).float().build(),
+            .escape("SET:DEV:").arg("T[0-9]").escape(":TEMP:LOOP:I:").float().build(),
         CmdBuilder("set_d")
-            .escape("SET:DEV:{}:TEMP:LOOP:D:".format(SUBSYSTEM_NAMES["mixing chamber"])).float().build(),
+            .escape("SET:DEV:").arg("T[0-9]").escape(":TEMP:LOOP:D:").float().build(),
 
         # PID readbacks
         CmdBuilder("get_p")
-            .escape("READ:DEV:{}:TEMP:LOOP:P".format(SUBSYSTEM_NAMES["mixing chamber"])).build(),
+            .escape("READ:DEV:").arg("T[0-9]").escape(":TEMP:LOOP:P").build(),
         CmdBuilder("get_i")
-            .escape("READ:DEV:{}:TEMP:LOOP:I".format(SUBSYSTEM_NAMES["mixing chamber"])).build(),
+            .escape("READ:DEV:").arg("T[0-9]").escape(":TEMP:LOOP:I").build(),
         CmdBuilder("get_d")
-            .escape("READ:DEV:{}:TEMP:LOOP:D".format(SUBSYSTEM_NAMES["mixing chamber"])).build(),
+            .escape("READ:DEV:").arg("T[0-9]").escape(":TEMP:LOOP:D").build(),
 
         # Setpoint temperature
         CmdBuilder("set_temperature_setpoint")
@@ -41,16 +41,8 @@ class TritonStreamInterface(StreamInterface):
             .escape("READ:DEV:{}:TEMP:LOOP:TSET".format(SUBSYSTEM_NAMES["mixing chamber"])).build(),
 
         # Temperature
-        CmdBuilder("get_stil_temp")
-            .escape("READ:DEV:{}:TEMP:SIG:TEMP".format(SUBSYSTEM_NAMES["stil"])).build(),
-        CmdBuilder("get_mc_temp")
-            .escape("READ:DEV:{}:TEMP:SIG:TEMP".format(SUBSYSTEM_NAMES["mixing chamber"])).build(),
-        CmdBuilder("get_sorb_temp")
-            .escape("READ:DEV:{}:TEMP:SIG:TEMP".format(SUBSYSTEM_NAMES["sorb"])).build(),
-        CmdBuilder("get_4khx_temp")
-            .escape("READ:DEV:{}:TEMP:SIG:TEMP".format(SUBSYSTEM_NAMES["4khx"])).build(),
-        CmdBuilder("get_jthx_temp")
-            .escape("READ:DEV:{}:TEMP:SIG:TEMP".format(SUBSYSTEM_NAMES["jthx"])).build(),
+        CmdBuilder("get_temp")
+            .escape("READ:DEV:").arg("T[0-9]").escape(":TEMP:SIG:TEMP").build(),
 
         # Heater range
         CmdBuilder("set_heater_range")
@@ -92,7 +84,7 @@ class TritonStreamInterface(StreamInterface):
 
         # Pressures
         CmdBuilder("get_pressure")
-            .escape("READ:DEV:P").int().escape(":PRES:SIG:PRES").build(),
+            .escape("READ:DEV:").arg("P[0-9]").escape(":PRES:SIG:PRES").build(),
     }
 
     in_terminator = "\r\n"
@@ -105,40 +97,37 @@ class TritonStreamInterface(StreamInterface):
         return err_string
 
     def get_mc_uid(self):
-        return "STAT:SYS:DR:CHAN:MC:{}" \
-            .format(SUBSYSTEM_NAMES["mixing chamber"])
+        return "STAT:SYS:DR:CHAN:MC:{}".format(self.device.find_temperature_channel("mc"))
 
     def get_stil_uid(self):
-        return "STAT:SYS:DR:CHAN:STIL:{}" \
-            .format(SUBSYSTEM_NAMES["stil"])
+        return "STAT:SYS:DR:CHAN:STIL:{}".format(self.device.find_temperature_channel("stil"))
 
     def get_sorb_uid(self):
-        return "STAT:SYS:DR:CHAN:SORB:{}" \
-            .format(SUBSYSTEM_NAMES["sorb"])
+        return "STAT:SYS:DR:CHAN:SORB:{}".format(self.device.find_temperature_channel("sorb"))
 
-    def set_p(self, value):
-        self.device.set_p(float(value))
+    def set_p(self, stage, value):
+        self.device.set_p(stage, float(value))
         return "ok"
 
-    def set_i(self, value):
-        self.device.set_i(float(value))
+    def set_i(self, stage, value):
+        self.device.set_i(stage, float(value))
         return "ok"
 
-    def set_d(self, value):
-        self.device.set_d(float(value))
+    def set_d(self, stage, value):
+        self.device.set_d(stage, float(value))
         return "ok"
 
-    def get_p(self):
+    def get_p(self, stage):
         return "STAT:DEV:{}:TEMP:LOOP:P:{}" \
-            .format(SUBSYSTEM_NAMES["mixing chamber"], self.device.get_p())
+            .format(stage, self.device.get_p(stage))
 
-    def get_i(self):
+    def get_i(self, stage):
         return "STAT:DEV:{}:TEMP:LOOP:I:{}" \
-            .format(SUBSYSTEM_NAMES["mixing chamber"], self.device.get_i())
+            .format(stage, self.device.get_i(stage))
 
-    def get_d(self):
+    def get_d(self, stage):
         return "STAT:DEV:{}:TEMP:LOOP:D:{}" \
-            .format(SUBSYSTEM_NAMES["mixing chamber"], self.device.get_d())
+            .format(stage, self.device.get_d(stage))
 
     def set_temperature_setpoint(self, value):
         self.device.set_temperature_setpoint(float(value))
@@ -146,7 +135,7 @@ class TritonStreamInterface(StreamInterface):
 
     def get_temperature_setpoint(self):
         return "STAT:DEV:{}:TEMP:LOOP:TSET:{}K" \
-            .format(SUBSYSTEM_NAMES["mixing chamber"], self.device.get_temperature_setpoint())
+            .format(self.device.find_temperature_channel("mc"), self.device.get_temperature_setpoint())
 
     def set_heater_range(self, value):
         self.device.set_heater_range(float(value))
@@ -154,11 +143,11 @@ class TritonStreamInterface(StreamInterface):
 
     def get_heater_range(self):
         return "STAT:DEV:{}:TEMP:LOOP:RANGE:{}" \
-            .format(SUBSYSTEM_NAMES["mixing chamber"], self.device.get_heater_range())
+            .format(self.device.find_temperature_channel("mc"), self.device.get_heater_range())
 
     def get_heater_type(self):
         return "STAT:DEV:{}:TEMP:LOOP:HTR:{}" \
-            .format(SUBSYSTEM_NAMES["mixing chamber"], SUBSYSTEM_NAMES["heater"])
+            .format(self.device.find_temperature_channel("mc"), SUBSYSTEM_NAMES["heater"])
 
     def get_heater_power(self):
         return "STAT:DEV:{}:HTR:SIG:POWR:{}{}"\
@@ -166,7 +155,7 @@ class TritonStreamInterface(StreamInterface):
 
     def get_closed_loop_mode(self):
         return "STAT:DEV:{}:TEMP:LOOP:MODE:{}"\
-            .format(SUBSYSTEM_NAMES["mixing chamber"], "ON" if self.device.get_closed_loop_mode() else "OFF")
+            .format(self.device.find_temperature_channel("mc"), "ON" if self.device.get_closed_loop_mode() else "OFF")
 
     def set_closed_loop_mode(self, mode):
         if mode not in ["ON", "OFF"]:
@@ -206,20 +195,8 @@ class TritonStreamInterface(StreamInterface):
     def get_automation(self):
         return "STAT:SYS:DR:ACTN:{}".format(self.device.get_automation())
 
-    def get_stil_temp(self):
-        return "STAT:DEV:{}:TEMP:SIG:TEMP:{}K".format(SUBSYSTEM_NAMES["stil"], self.device.get_stil_temp())
-
-    def get_mc_temp(self):
-        return "STAT:DEV:{}:TEMP:SIG:TEMP:{}K".format(SUBSYSTEM_NAMES["mixing chamber"], self.device.get_mc_temp())
-
-    def get_sorb_temp(self):
-        return "STAT:DEV:{}:TEMP:SIG:TEMP:{}K".format(SUBSYSTEM_NAMES["sorb"], self.device.get_sorb_temp())
-
-    def get_4khx_temp(self):
-        return "STAT:DEV:{}:TEMP:SIG:TEMP:{}K".format(SUBSYSTEM_NAMES["4khx"], self.device.get_4khx_temp())
-
-    def get_jthx_temp(self):
-        return "STAT:DEV:{}:TEMP:SIG:TEMP:{}K".format(SUBSYSTEM_NAMES["jthx"], self.device.get_jthx_temp())
+    def get_temp(self, stage):
+        return "STAT:DEV:{}:TEMP:SIG:TEMP:{}K".format(stage, self.device.get_temp(str(stage)))
 
     def get_pressure(self, sensor):
-        return "STAT:DEV:P{}:PRES:SIG:PRES:{}mB".format(sensor, self.device.get_pressure(int(sensor)-1))
+        return "STAT:DEV:{}:PRES:SIG:PRES:{}mB".format(sensor, self.device.get_pressure(sensor))
