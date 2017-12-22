@@ -12,7 +12,7 @@ from lewis.core import approaches
 
 
 @has_log
-class Axis():
+class Axis(object):
     """
     An axis within the SM300 device
     """
@@ -74,6 +74,7 @@ class SimulatedSm300(StateMachineDevice):
         self.y_axis = self.axes["Y"]
         self.is_moving = None  # let the axis report its motion
         self.is_moving_error = False
+        self.reset_codes = []
 
     def _get_state_handlers(self):
         return {

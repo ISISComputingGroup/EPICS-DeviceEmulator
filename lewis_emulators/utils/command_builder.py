@@ -77,7 +77,7 @@ class CmdBuilder(object):
         """
         wildchard = "*" if at_least_one else "+"
 
-        self._add_to_regex("\w" + wildchard, False)
+        self._add_to_regex(" " + wildchard, False)
         return self
 
     def arg(self, arg_regex):
@@ -107,13 +107,19 @@ class CmdBuilder(object):
         """
         return self.arg(r"\d")
 
-    def char(self):
+    def char(self, not_chars=None):
         """
         Add a single character argument.
 
-        :return: builder
+        Args:
+            not_chars: characters that the character can not be; None for can be anything
+
+        Returns: builder
+
         """
-        return self.arg(r".")
+        if not_chars is None:
+            return self.arg(r".")
+        return self.arg("[^{}]".format("".join(not_chars)))
 
     def int(self):
         """

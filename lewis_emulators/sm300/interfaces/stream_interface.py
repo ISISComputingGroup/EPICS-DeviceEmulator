@@ -22,12 +22,17 @@ class Sm300StreamInterface(StreamInterface):
 
         # Commands that we expect via serial during normal operation
         self.commands = {
-            CmdBuilder(self.get_position).escape("LQ").build(),
-            CmdBuilder(self.get_position_as_steps).escape("LI").char().build(),
-            CmdBuilder(self.home_axis).escape("BR").char().build(),
-            CmdBuilder(self.get_status).escape("LM").build(),
-            CmdBuilder(self.set_position).escape("B/").spaces().escape("X").int().spaces().escape("Y").int().build(),
-            CmdBuilder(self.set_position_as_steps).escape("B").char().int().build()
+            CmdBuilder(self.get_position).ack().stx().escape("LQ").build(),
+            CmdBuilder(self.get_position_as_steps).ack().stx().escape("LI").char().build(),
+            CmdBuilder(self.home_axis).ack().stx().escape("BR").char().build(),
+            CmdBuilder(self.get_status).ack().stx().escape("LM").build(),
+            CmdBuilder(self.set_position).ack().stx().escape("B/").spaces().escape("X").int().spaces().escape("Y").
+            int().build(),
+            CmdBuilder(self.setting).ack().stx().escape("B/").spaces().escape("G").any().build(),
+            CmdBuilder(self.feed_code).ack().stx().escape("BF").int().build(),
+            CmdBuilder(self.set_position_as_steps).ack().stx().escape("B").char(not_chars=["F"]).int().build(),
+            # This is cheating the PEL1 command comes after PEL0 which is sent with a cr characters so add it in here
+            CmdBuilder(self.reset_code).regex(r"\r?").ack().stx().escape("P").any().build()
         }
 
         self.device = self._device
@@ -114,7 +119,6 @@ class Sm300StreamInterface(StreamInterface):
         """
         axis = self.device.axes[axis]
         axis.sp = int(steps)
-        self.log.info("Setting: Position {}, sp {}".format(axis.rbv, axis.sp))
         return "{ACK}".format(**COMMAND_CHARS)
 
     def get_position_as_steps(self, axis):
@@ -132,3 +136,42 @@ class Sm300StreamInterface(StreamInterface):
             return "{ACK}{STX}{0}{EOT}".format(self.rbv_error, **COMMAND_CHARS)
         else:
             return "{ACK}{STX}{steps:.0f}{EOT}".format(steps=axis.rbv, **COMMAND_CHARS)
+
+    def reset_code(self, code):
+        """
+        Record reset codes sent from P commands
+        Args:
+            code: code from P command
+
+        Returns: acknowledge
+
+        """
+        self.device.reset_codes.append("P{}".format(code))
+        self.log.info("Reset codes: {}".format(self.device.reset_codes))
+        return "{ACK}".format(**COMMAND_CHARS)
+
+    def setting(self, code):
+        """
+        Record reset codes sent from B/ G commands
+        Args:
+            code: code from P command
+
+        Returns: acknowledge
+
+        """
+        self.device.reset_codes.append("B/ G{}".format(code))
+        self.log.info("Reset codes: {}".format(self.device.reset_codes))
+        return "{ACK}".format(**COMMAND_CHARS)
+
+    def feed_code(self, code):
+        """
+        Record reset codes sent from BF commands
+        Args:
+            code: code from P command
+
+        Returns: acknowledge
+
+        """
+        self.device.reset_codes.append("BF{}".format(code))
+        self.log.info("Reset codes: {}".format(self.device.reset_codes))
+        return "{ACK}".format(**COMMAND_CHARS)
