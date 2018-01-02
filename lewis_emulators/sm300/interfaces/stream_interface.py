@@ -1,6 +1,7 @@
 """
 Stream interface for the SM 300 motor emulator
 """
+
 from lewis.adapters.stream import StreamInterface
 from lewis.core.logging import has_log
 

@@ -1,3 +1,7 @@
+"""
+A fluent command builder for lewis.
+"""
+
 import re
 
 from lewis.adapters.stream import Cmd
@@ -127,7 +131,7 @@ class CmdBuilder(object):
 
         :return: builder
         """
-        return self.arg(r"\d+")
+        return self.arg(r"[-+]?\d+")
 
     def any(self):
         """
