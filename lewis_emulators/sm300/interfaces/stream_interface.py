@@ -25,6 +25,7 @@ class Sm300StreamInterface(StreamInterface):
             CmdBuilder(self.get_position).ack().stx().escape("LQ").build(),
             CmdBuilder(self.get_position_as_steps).ack().stx().escape("LI").char().build(),
             CmdBuilder(self.home_axis).ack().stx().escape("BR").char().build(),
+            CmdBuilder(self.stop).ack().stx().escape("BSS").build(),
             CmdBuilder(self.get_status).ack().stx().escape("LM").build(),
             CmdBuilder(self.set_position).ack().stx().escape("B/").spaces().escape("X").int().spaces().escape("Y").
             int().build(),
@@ -133,7 +134,7 @@ class Sm300StreamInterface(StreamInterface):
         axis = self.device.axes[axis]
         self.log.info("Position {}, sp {}".format(axis.rbv, axis.sp))
         if axis.rbv_error is not None:
-            return "{ACK}{STX}{0}{EOT}".format(self.rbv_error, **COMMAND_CHARS)
+            return "{ACK}{STX}{0}{EOT}".format(axis.rbv_error, **COMMAND_CHARS)
         else:
             return "{ACK}{STX}{steps:.0f}{EOT}".format(steps=axis.rbv, **COMMAND_CHARS)
 
@@ -175,3 +176,14 @@ class Sm300StreamInterface(StreamInterface):
         self.device.reset_codes.append("BF{}".format(code))
         self.log.info("Reset codes: {}".format(self.device.reset_codes))
         return "{ACK}".format(**COMMAND_CHARS)
+
+    def stop(self):
+        """
+        Stops all axes movement
+        Returns: acknowledge
+
+        """
+        for axis in self.device.axes.values():
+            axis.stop()
+
+        return "{ACK}{STX}P{EOT}".format(**COMMAND_CHARS)

@@ -25,10 +25,30 @@ class Axis(object):
         """
         self.rbv_error = None
         self.rbv = 10.0
-        self.sp = self.rbv
+        self._sp = self.rbv
         self.moving = False
         self.speed = 0.1
         self.axis_label = axis_label
+        self.stopped = False
+
+    @property
+    def sp(self):
+        """
+        Returns: the set point of the motor (i.e. where it is moving to)
+
+        """
+        return self._sp
+
+    @sp.setter
+    def sp(self, position):
+        """
+        Set the set point position of the motor. Also clears stopped condition.
+        Args:
+            position: the position to move to
+
+        """
+        self._sp = position
+        self.stopped = False
 
     def home(self):
         """
@@ -36,6 +56,7 @@ class Axis(object):
         """
         self.sp = 0.0
         self.moving = True
+        self.stopped = False
 
     def simulate(self, dt):
         """
@@ -43,6 +64,9 @@ class Axis(object):
         Args:
             dt: time since last simulation
         """
+        if self.stopped:
+            self.moving = False
+            return
         self.rbv = approaches.linear(self.rbv, self.sp, self.speed, dt)
         self.moving = self.rbv != self.sp
 
@@ -54,6 +78,13 @@ class Axis(object):
             return self.rbv_error
         else:
             return "{label}{0:.0f}".format(self.rbv, label=self.axis_label)
+
+    def stop(self):
+        """
+        Stop the motor moving.
+
+        """
+        self.stopped = True
 
 
 class SimulatedSm300(StateMachineDevice):
