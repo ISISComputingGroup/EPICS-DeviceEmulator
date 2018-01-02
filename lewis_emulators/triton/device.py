@@ -3,14 +3,7 @@ from states import DefaultState
 from lewis.devices import StateMachineDevice
 
 
-SUBSYSTEM_NAMES = {
-    "mixing chamber": "T5",
-    "stil": "T1",
-    "sorb": "T9",
-    "heater": "H5",
-    "fkhx": "T3",
-    "jthx": "T2",
-}
+HEATER_NAME = "H5"
 
 
 class ValveStates(object):
@@ -23,19 +16,40 @@ class ValveStates(object):
 
 
 class TemperatureStage(object):
+    """
+    Class representing a temperature stage.
+    """
     def __init__(self, name):
         self.name = name
-        self.temperature = 0
+        self.temperature = 1
         self.enabled = True
-
-        self.p = 0
-        self.i = 0
-        self.d = 0
 
 
 class PressureSensor(object):
+    """
+    Class to represent a pressure sensor.
+
+    Having this as a class makes it more extensible in future, as the triton driver is still in flux.
+    """
     def __init__(self):
         self.pressure = 0
+
+
+class Valve(object):
+    """
+    Class to represent a valve.
+
+    Having this as a class makes it more extensible in future, as the triton driver is still in flux.
+    """
+    def __init__(self):
+        self.open = False
+
+
+class Heater(object):
+    def __init__(self):
+        self.range = 0
+        self.power = 0
+        self.power_units = 0
 
 
 class SimulatedTriton(StateMachineDevice):
@@ -44,22 +58,21 @@ class SimulatedTriton(StateMachineDevice):
         """
         Initialize all of the device's attributes.
         """
-        self.temperature_setpoint = 0
         self.heater_range = 0
-
         self.heater_power = 1
         self.heater_power_units = "mA"
 
+        self.temperature_setpoint = 0
+        self.p = 0
+        self.i = 0
+        self.d = 0
         self.closed_loop = False
-
-        self.valves = [ValveStates.CLOSED] * 10
-
-        self.channels_enabled = [True] * 6
 
         self.status = "This is a device status message."
         self.automation = "This is the automation status"
 
-        self.pressure_sensors = {"P{}".format(idx): PressureSensor() for idx in range(1, 6)}
+        self.valves = {"V{}".format(i): Valve() for i in range(1, 11)}
+        self.pressure_sensors = {"P{}".format(i): PressureSensor() for i in range(1, 6)}
 
         self.temperature_stages = {
             "T1": TemperatureStage("stil"),
@@ -67,6 +80,7 @@ class SimulatedTriton(StateMachineDevice):
             "T3": TemperatureStage("4khx"),
             "T4": TemperatureStage("sorb"),
             "T5": TemperatureStage("mc"),
+            "T6": TemperatureStage("unknown"),
         }
 
     def find_temperature_channel(self, name):
@@ -74,13 +88,13 @@ class SimulatedTriton(StateMachineDevice):
             if v.name == name:
                 return k
         else:
-            raise ValueError("{} not found".format(name))
+            raise KeyError("{} not found".format(name))
 
     def set_temperature_backdoor(self, stage_name, new_temp):
         self.temperature_stages[self.find_temperature_channel(stage_name)].temperature = new_temp
 
     def set_valve_state_backdoor(self, valve, newstate):
-        self.valves[int(valve) - 1] = int(newstate)
+        self.valves["V{}".format(valve)].open = bool(newstate)
 
     def set_pressure_backdoor(self, sensor, newpressure):
         self.pressure_sensors["P{}".format(sensor)].pressure = float(newpressure)
@@ -103,23 +117,23 @@ class SimulatedTriton(StateMachineDevice):
     def set_closed_loop_mode(self, mode):
         self.closed_loop = mode
 
-    def set_p(self, stage, value):
-        self.temperature_stages[stage].p = value
+    def set_p(self, value):
+        self.p = value
 
-    def set_i(self, stage, value):
-        self.temperature_stages[stage].i = value
+    def set_i(self, value):
+        self.i = value
 
-    def set_d(self, stage, value):
-        self.temperature_stages[stage].d = value
+    def set_d(self, value):
+        self.d = value
 
-    def get_p(self, stage):
-        return self.temperature_stages[stage].p
+    def get_p(self):
+        return self.p
 
-    def get_i(self, stage):
-        return self.temperature_stages[stage].i
+    def get_i(self):
+        return self.i
 
-    def get_d(self, stage):
-        return self.temperature_stages[stage].d
+    def get_d(self):
+        return self.d
 
     def get_temperature_setpoint(self):
         return self.temperature_setpoint
@@ -134,13 +148,16 @@ class SimulatedTriton(StateMachineDevice):
         self.heater_range = value
 
     def get_valve_state(self, valve):
-        return self.valves[valve-1]
+        try:
+            return ValveStates.OPEN if self.valves[valve].open else ValveStates.CLOSED
+        except KeyError:
+            return ValveStates.NOT_FOUND
 
     def is_channel_enabled(self, chan):
-        return self.channels_enabled[chan-1]
+        return self.temperature_stages[chan].enabled
 
     def set_channel_enabled(self, chan, newstate):
-        self.channels_enabled[chan-1] = newstate
+        self.temperature_stages[chan].enabled = newstate
 
     def get_status(self):
         return self.status
