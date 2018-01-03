@@ -56,11 +56,95 @@ class Lakeshore460StreamInterface(StreamInterface):
         CmdBuilder("set_manual_range").escape("RANGE ").int().build(),
     }
 
-    def get_multiplier_value(self, string_val):
-        if string_val == "u": return 0
-        elif string_val == "m" : return 1
-        elif string_val == " " : return 2
-        else: return 3
+    def update_reading(self, reading, multiplier):
+        """
+        :param reading: A reading from the device
+        :param multiplier: The current multiplier for the reading
+        :return:    new_reading: updated reading value, based on more appropriate multiplier
+                    new_multiplier: updated multiplier for the value
+        """
+        stripped_reading = self.strip_multiplier(reading, multiplier)
+        new_multiplier = self.calculate_multiplier(stripped_reading)
+        new_reading = self.apply_multiplier(stripped_reading, new_multiplier)
+        return new_reading, new_multiplier
+
+    def strip_multiplier(self, reading, multiplier):
+        """
+        :param reading:  A reading from the device with multiplier applied
+        :param multiplier: The current multiplier for the reading
+        :return: The raw reading
+        """
+        if multiplier == "u":
+            return reading * 0.000001
+        if multiplier == "m":
+            return reading * 0.001
+        if multiplier == "k":
+            return reading * 1000
+        else:
+            return reading
+
+    def apply_multiplier(self, reading, multiplier):
+        """
+        :param reading: A raw reading from the device
+        :param multiplier: The multiplier to be applied
+        :return: The reading with the multiplier applied
+        """
+        if multiplier == "u":
+            return reading / 0.000001
+        if multiplier == "m":
+            return reading / 0.001
+        if multiplier == "k":
+            return reading / 1000
+        else:
+            return reading
+
+    def convert_units(self, convert_value):
+        """
+        Converts between Tesla and Gauss (applies conversion of *10000 or *0.0001)
+        Then updates reading values according to more appropriate multiplier
+        :param convert_value: 10000 or 0.0001
+        """
+        channels = ['X', 'Y', 'Z', 'V']
+        for c in channels:
+            self.set_channel(c)
+            self._device.channels[c].field_reading *= convert_value
+            self._device.channels[c].field_reading, \
+            self._device.channels[c].field_multiplier = self.update_reading(self._device.channels[c].field_reading,
+                                                                            self._device.channels[c].field_multiplier)
+            self._device.channels[c].max_hold_reading *= convert_value
+            self._device.channels[c].max_hold_reading, \
+            self._device.channels[c].max_hold_multiplier = self.update_reading(self._device.channels[c].max_hold_reading,
+                                                                                self._device.channels[c].max_hold_multiplier)
+            self._device.channels[c].rel_mode_reading *= convert_value
+            self._device.channels[c].rel_mode_reading, \
+            self._device.channels[c].rel_mode_multiplier = self.update_reading(self._device.channels[c].rel_mode_reading,
+                                                                                self._device.channels[c].rel_mode_multiplier)
+            self._device.channels[c].relative_setpoint *= convert_value
+            self._device.channels[c].relative_setpoint, \
+            self._device.channels[c].relative_setpoint_multiplier = self.update_reading(self._device.channels[c].relative_setpoint,
+                                                                                self._device.channels[c].relative_setpoint_multiplier)
+
+
+    def calculate_multiplier(self, reading):
+        """
+        Calculates the most appropriate multiplier for a given value.
+        :param reading: A raw reading from the device
+        :return: The most appropriate multiplier value for the given raw reading
+        """
+        if reading < 0.001:
+            return "u"
+        if reading >= 0.001 and reading < 0:
+            return "m"
+        if reading > 0 and reading < 1000:
+            return " "
+        else:
+            return "k"
+
+    def update_reading(self, reading, multiplier):
+        stripped_reading = self.strip_multiplier(reading, multiplier)
+        new_multiplier = self.calculate_multiplier(stripped_reading)
+        new_reading = self.apply_multiplier(stripped_reading, new_multiplier)
+        return new_reading, new_multiplier
 
     def handle_error(self, request, error):
         self.log.error("An error occurred at request" + repr(request) + ": " + repr(error))
@@ -82,6 +166,14 @@ class Lakeshore460StreamInterface(StreamInterface):
         return self._device.channel
 
     def get_magnetic_field_reading(self):
+        field_reading = self._device.channels[self.get_channel()].field_reading
+        multiplier = self._device.channels[self.get_channel()].field_multiplier
+
+        # Update max_hold_reading if field_reading is larger
+        if field_reading > self._device.channels[self.get_channel()].max_hold_reading:
+            self._device.channels[self.get_channel()].max_hold_reading = field_reading
+            self._device.channels[self.get_channel()].max_hold_reading_multiplier = multiplier
+
         return "{0}".format(self._device.channels[self.get_channel()].field_reading)
 
     def get_magnetic_field_reading_multiplier(self):
@@ -103,6 +195,13 @@ class Lakeshore460StreamInterface(StreamInterface):
         return "{0}".format(self._device.unit)
 
     def set_unit(self, unit):
+        # Convert values if required
+        if self._device.unit == "T":
+            if unit == "G":
+                self.convert_units(10000)
+        if self._device.unit == "G":
+            if unit == "T":
+                self.convert_units(0.0001)
         self._device.unit = unit
 
     def get_ac_dc_mode(self):

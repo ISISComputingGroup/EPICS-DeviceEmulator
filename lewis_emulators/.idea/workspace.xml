@@ -2,49 +2,49 @@
 <project version="4">
   <component name="ChangeListManager">
     <list default="true" id="353d531c-53e1-4416-b7fe-d8cb5beac892" name="Default" comment="">
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/../../../../misc/upgrade/master" afterPath="$PROJECT_DIR$/../../../../misc/upgrade/master" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/../../../ReadASCII/master" afterPath="$PROJECT_DIR$/../../../ReadASCII/master" />
       <change type="MODIFICATION" beforePath="$PROJECT_DIR$/../../../FZJ_fermichopper/master" afterPath="$PROJECT_DIR$/../../../FZJ_fermichopper/master" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/../../../danfysikMps8000/master" afterPath="$PROJECT_DIR$/../../../danfysikMps8000/master" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/../../../mk2chopper/master" afterPath="$PROJECT_DIR$/../../../mk2chopper/master" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/../../../../base/master" afterPath="$PROJECT_DIR$/../../../../base/master" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/../../../../misc/upgrade/master" afterPath="$PROJECT_DIR$/../../../../misc/upgrade/master" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/../../../motor/master" afterPath="$PROJECT_DIR$/../../../motor/master" />
       <change type="MODIFICATION" beforePath="$PROJECT_DIR$/../../../../ISIS/ScriptServer/nicos-core/master" afterPath="$PROJECT_DIR$/../../../../ISIS/ScriptServer/nicos-core/master" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/../../../MCAG_Base_Project/master" afterPath="$PROJECT_DIR$/../../../MCAG_Base_Project/master" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/../../../eurotherm2k/master" afterPath="$PROJECT_DIR$/../../../eurotherm2k/master" />
       <change type="MODIFICATION" beforePath="$PROJECT_DIR$/../../../NetShrVar/master" afterPath="$PROJECT_DIR$/../../../NetShrVar/master" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/../../../agilent33220A/master" afterPath="$PROJECT_DIR$/../../../agilent33220A/master" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/../../../areaDetector/master" afterPath="$PROJECT_DIR$/../../../areaDetector/master" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/../../../../utils_win32/master" afterPath="$PROJECT_DIR$/../../../../utils_win32/master" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/lakeshore460/interfaces/stream_interface.py" afterPath="$PROJECT_DIR$/lakeshore460/interfaces/stream_interface.py" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/../../../../CSS/master" afterPath="$PROJECT_DIR$/../../../../CSS/master" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/.idea/lewis_emulators.iml" afterPath="$PROJECT_DIR$/.idea/lewis_emulators.iml" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/../../../../ISIS/DbUnitChecker/master" afterPath="$PROJECT_DIR$/../../../../ISIS/DbUnitChecker/master" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/../../../asubFunctions/master" afterPath="$PROJECT_DIR$/../../../asubFunctions/master" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/../../../VISAdrv/master" afterPath="$PROJECT_DIR$/../../../VISAdrv/master" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/../../../instron/master" afterPath="$PROJECT_DIR$/../../../instron/master" />
       <change type="MODIFICATION" beforePath="$PROJECT_DIR$/../../../motorExtensions/master" afterPath="$PROJECT_DIR$/../../../motorExtensions/master" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/../../../lakeshore460/master" afterPath="$PROJECT_DIR$/../../../lakeshore460/master" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/../../../sscan/master" afterPath="$PROJECT_DIR$/../../../sscan/master" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/../../../modbus/master" afterPath="$PROJECT_DIR$/../../../modbus/master" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/../../../../ISIS/JournalParser/master" afterPath="$PROJECT_DIR$/../../../../ISIS/JournalParser/master" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/../../../isisdae/master" afterPath="$PROJECT_DIR$/../../../isisdae/master" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/../../../IocTestFramework/master" afterPath="$PROJECT_DIR$/../../../IocTestFramework/master" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/../../../HVCAENx527/master" afterPath="$PROJECT_DIR$/../../../HVCAENx527/master" />
       <change type="MODIFICATION" beforePath="$PROJECT_DIR$/../../../../ISIS/ActiveMQ/master" afterPath="$PROJECT_DIR$/../../../../ISIS/ActiveMQ/master" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/../../../../ioc/master" afterPath="$PROJECT_DIR$/../../../../ioc/master" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/../../../../ISIS/inst_servers/master" afterPath="$PROJECT_DIR$/../../../../ISIS/inst_servers/master" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/../../../asubFunctions/master" afterPath="$PROJECT_DIR$/../../../asubFunctions/master" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/../../../RunControl/master" afterPath="$PROJECT_DIR$/../../../RunControl/master" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/../../../isisdae/master" afterPath="$PROJECT_DIR$/../../../isisdae/master" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/../../../lakeshore460/master" afterPath="$PROJECT_DIR$/../../../lakeshore460/master" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/../../../../ISIS/JournalParser/master" afterPath="$PROJECT_DIR$/../../../../ISIS/JournalParser/master" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/../../../../extensions/master" afterPath="$PROJECT_DIR$/../../../../extensions/master" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/../../../danfysikMps8000/master" afterPath="$PROJECT_DIR$/../../../danfysikMps8000/master" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/../../../../ISIS/DbUnitChecker/master" afterPath="$PROJECT_DIR$/../../../../ISIS/DbUnitChecker/master" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/../../../galil/master" afterPath="$PROJECT_DIR$/../../../galil/master" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/../../../../CSS/master" afterPath="$PROJECT_DIR$/../../../../CSS/master" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/../../../IocTestFramework/master" afterPath="$PROJECT_DIR$/../../../IocTestFramework/master" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/../../../VISAdrv/master" afterPath="$PROJECT_DIR$/../../../VISAdrv/master" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/../../../modbus/master" afterPath="$PROJECT_DIR$/../../../modbus/master" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/../../../pixelman/master" afterPath="$PROJECT_DIR$/../../../pixelman/master" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/lakeshore460/device.py" afterPath="$PROJECT_DIR$/lakeshore460/device.py" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/../../../sscan/master" afterPath="$PROJECT_DIR$/../../../sscan/master" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/../../../ReadASCII/master" afterPath="$PROJECT_DIR$/../../../ReadASCII/master" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/../../../MCAG_Base_Project/master" afterPath="$PROJECT_DIR$/../../../MCAG_Base_Project/master" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/../../../instron/master" afterPath="$PROJECT_DIR$/../../../instron/master" />
       <change type="MODIFICATION" beforePath="$PROJECT_DIR$/.." afterPath="$PROJECT_DIR$/.." />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/../../../../tools/master" afterPath="$PROJECT_DIR$/../../../../tools/master" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/.idea/workspace.xml" afterPath="$PROJECT_DIR$/.idea/workspace.xml" />
       <change type="MODIFICATION" beforePath="$PROJECT_DIR$/../../../GP2Camera/master" afterPath="$PROJECT_DIR$/../../../GP2Camera/master" />
       <change type="MODIFICATION" beforePath="$PROJECT_DIR$/../../../../ISIS/SimpleIoc/master" afterPath="$PROJECT_DIR$/../../../../ISIS/SimpleIoc/master" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/../../../pixelman/master" afterPath="$PROJECT_DIR$/../../../pixelman/master" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/../../../../extensions/master" afterPath="$PROJECT_DIR$/../../../../extensions/master" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/../../../galil/master" afterPath="$PROJECT_DIR$/../../../galil/master" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/../../../RunControl/master" afterPath="$PROJECT_DIR$/../../../RunControl/master" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/../../../HVCAENx527/master" afterPath="$PROJECT_DIR$/../../../HVCAENx527/master" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/lakeshore460/device.py" afterPath="$PROJECT_DIR$/lakeshore460/device.py" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/../../../../base/master" afterPath="$PROJECT_DIR$/../../../../base/master" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/../../../eurotherm2k/master" afterPath="$PROJECT_DIR$/../../../eurotherm2k/master" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/../../../../ISIS/inst_servers/master" afterPath="$PROJECT_DIR$/../../../../ISIS/inst_servers/master" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/../../../../utils_win32/master" afterPath="$PROJECT_DIR$/../../../../utils_win32/master" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/../../../agilent33220A/master" afterPath="$PROJECT_DIR$/../../../agilent33220A/master" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/../../../../tools/master" afterPath="$PROJECT_DIR$/../../../../tools/master" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/.idea/workspace.xml" afterPath="$PROJECT_DIR$/.idea/workspace.xml" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/.idea/lewis_emulators.iml" afterPath="$PROJECT_DIR$/.idea/lewis_emulators.iml" />
       <change type="MODIFICATION" beforePath="$PROJECT_DIR$/../../../linkam95/master" afterPath="$PROJECT_DIR$/../../../linkam95/master" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/../../../../ioc/master" afterPath="$PROJECT_DIR$/../../../../ioc/master" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/../../../motor/master" afterPath="$PROJECT_DIR$/../../../motor/master" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/../../../areaDetector/master" afterPath="$PROJECT_DIR$/../../../areaDetector/master" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/lakeshore460/interfaces/stream_interface.py" afterPath="$PROJECT_DIR$/lakeshore460/interfaces/stream_interface.py" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/../../../mk2chopper/master" afterPath="$PROJECT_DIR$/../../../mk2chopper/master" />
     </list>
     <option name="EXCLUDED_CONVERTED_TO_IGNORED" value="true" />
     <option name="TRACKING_ENABLED" value="true" />
@@ -56,21 +56,21 @@
   <component name="ExecutionTargetManager" SELECTED_TARGET="default_target" />
   <component name="FileEditorManager">
     <leaf SIDE_TABS_SIZE_LIMIT_KEY="300">
-      <file leaf-file-name="device.py" pinned="false" current-in-tab="false">
+      <file leaf-file-name="device.py" pinned="false" current-in-tab="true">
         <entry file="file://$PROJECT_DIR$/lakeshore460/device.py">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="432">
-              <caret line="21" column="31" lean-forward="false" selection-start-line="21" selection-start-column="31" selection-end-line="21" selection-end-column="31" />
+            <state relative-caret-position="-480">
+              <caret line="22" column="31" lean-forward="true" selection-start-line="22" selection-start-column="31" selection-end-line="22" selection-end-column="31" />
               <folding />
             </state>
           </provider>
         </entry>
       </file>
-      <file leaf-file-name="stream_interface.py" pinned="false" current-in-tab="true">
+      <file leaf-file-name="stream_interface.py" pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/lakeshore460/interfaces/stream_interface.py">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="350">
-              <caret line="138" column="65" lean-forward="false" selection-start-line="138" selection-start-column="65" selection-end-line="138" selection-end-column="65" />
+            <state relative-caret-position="1882">
+              <caret line="171" column="60" lean-forward="false" selection-start-line="171" selection-start-column="60" selection-end-line="171" selection-end-column="60" />
               <folding>
                 <element signature="e#0#9#0" expanded="true" />
               </folding>
@@ -91,8 +91,8 @@
       <file leaf-file-name="command_builder.py" pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/utils/command_builder.py">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="2520">
-              <caret line="105" column="26" lean-forward="true" selection-start-line="105" selection-start-column="25" selection-end-line="105" selection-end-column="26" />
+            <state relative-caret-position="820">
+              <caret line="105" column="26" lean-forward="false" selection-start-line="105" selection-start-column="25" selection-end-line="105" selection-end-column="26" />
               <folding>
                 <element signature="e#0#9#0" expanded="true" />
               </folding>
@@ -103,7 +103,7 @@
       <file leaf-file-name="stream.py" pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/../../../../../Python/Lib/site-packages/lewis/adapters/stream.py">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="882">
+            <state relative-caret-position="820">
               <caret line="320" column="23" lean-forward="false" selection-start-line="320" selection-start-column="8" selection-end-line="320" selection-end-column="23" />
               <folding />
             </state>
@@ -121,9 +121,6 @@
   </component>
   <component name="FindInProjectRecents">
     <findStrings>
-      <find>max_hold_mul</find>
-      <find>hold_mul</find>
-      <find>window</find>
       <find>read</find>
       <find>ac_d</find>
       <find>filter_window</find>
@@ -151,6 +148,9 @@
       <find>MODE</find>
       <find>relative_mode</find>
       <find>max_hold</find>
+      <find>UNIT</find>
+      <find>get_mag</find>
+      <find>field_reading</find>
     </findStrings>
   </component>
   <component name="Git.Settings">
@@ -209,7 +209,6 @@
       <foldersAlwaysOnTop value="true" />
     </navigator>
     <panes>
-      <pane id="Scope" />
       <pane id="ProjectPane">
         <subPane>
           <PATH>
@@ -300,136 +299,9 @@
               <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
             </PATH_ELEMENT>
           </PATH>
-          <PATH>
-            <PATH_ELEMENT>
-              <option name="myItemId" value="lewis_emulators" />
-              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.ProjectViewProjectNode" />
-            </PATH_ELEMENT>
-            <PATH_ELEMENT>
-              <option name="myItemId" value="lewis_emulators" />
-              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
-            </PATH_ELEMENT>
-            <PATH_ELEMENT>
-              <option name="myItemId" value="kepco" />
-              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
-            </PATH_ELEMENT>
-          </PATH>
-          <PATH>
-            <PATH_ELEMENT>
-              <option name="myItemId" value="lewis_emulators" />
-              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.ProjectViewProjectNode" />
-            </PATH_ELEMENT>
-            <PATH_ELEMENT>
-              <option name="myItemId" value="lewis_emulators" />
-              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
-            </PATH_ELEMENT>
-            <PATH_ELEMENT>
-              <option name="myItemId" value="kepco" />
-              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
-            </PATH_ELEMENT>
-            <PATH_ELEMENT>
-              <option name="myItemId" value="interfaces" />
-              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
-            </PATH_ELEMENT>
-          </PATH>
-          <PATH>
-            <PATH_ELEMENT>
-              <option name="myItemId" value="lewis_emulators" />
-              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.ProjectViewProjectNode" />
-            </PATH_ELEMENT>
-            <PATH_ELEMENT>
-              <option name="myItemId" value="lewis_emulators" />
-              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
-            </PATH_ELEMENT>
-            <PATH_ELEMENT>
-              <option name="myItemId" value="iris_cryo_valve" />
-              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
-            </PATH_ELEMENT>
-          </PATH>
-          <PATH>
-            <PATH_ELEMENT>
-              <option name="myItemId" value="lewis_emulators" />
-              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.ProjectViewProjectNode" />
-            </PATH_ELEMENT>
-            <PATH_ELEMENT>
-              <option name="myItemId" value="lewis_emulators" />
-              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
-            </PATH_ELEMENT>
-            <PATH_ELEMENT>
-              <option name="myItemId" value="iris_cryo_valve" />
-              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
-            </PATH_ELEMENT>
-            <PATH_ELEMENT>
-              <option name="myItemId" value="interfaces" />
-              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
-            </PATH_ELEMENT>
-          </PATH>
-          <PATH>
-            <PATH_ELEMENT>
-              <option name="myItemId" value="lewis_emulators" />
-              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.ProjectViewProjectNode" />
-            </PATH_ELEMENT>
-            <PATH_ELEMENT>
-              <option name="myItemId" value="lewis_emulators" />
-              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
-            </PATH_ELEMENT>
-            <PATH_ELEMENT>
-              <option name="myItemId" value="instron_stress_rig" />
-              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
-            </PATH_ELEMENT>
-          </PATH>
-          <PATH>
-            <PATH_ELEMENT>
-              <option name="myItemId" value="lewis_emulators" />
-              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.ProjectViewProjectNode" />
-            </PATH_ELEMENT>
-            <PATH_ELEMENT>
-              <option name="myItemId" value="lewis_emulators" />
-              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
-            </PATH_ELEMENT>
-            <PATH_ELEMENT>
-              <option name="myItemId" value="instron_stress_rig" />
-              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
-            </PATH_ELEMENT>
-            <PATH_ELEMENT>
-              <option name="myItemId" value="interfaces" />
-              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
-            </PATH_ELEMENT>
-          </PATH>
-          <PATH>
-            <PATH_ELEMENT>
-              <option name="myItemId" value="lewis_emulators" />
-              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.ProjectViewProjectNode" />
-            </PATH_ELEMENT>
-            <PATH_ELEMENT>
-              <option name="myItemId" value="lewis_emulators" />
-              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
-            </PATH_ELEMENT>
-            <PATH_ELEMENT>
-              <option name="myItemId" value="fermichopper" />
-              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
-            </PATH_ELEMENT>
-          </PATH>
-          <PATH>
-            <PATH_ELEMENT>
-              <option name="myItemId" value="lewis_emulators" />
-              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.ProjectViewProjectNode" />
-            </PATH_ELEMENT>
-            <PATH_ELEMENT>
-              <option name="myItemId" value="lewis_emulators" />
-              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
-            </PATH_ELEMENT>
-            <PATH_ELEMENT>
-              <option name="myItemId" value="fermichopper" />
-              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
-            </PATH_ELEMENT>
-            <PATH_ELEMENT>
-              <option name="myItemId" value="interfaces" />
-              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
-            </PATH_ELEMENT>
-          </PATH>
         </subPane>
       </pane>
+      <pane id="Scope" />
       <pane id="Scratches" />
     </panes>
   </component>
@@ -563,19 +435,19 @@
     <servers />
   </component>
   <component name="ToolWindowManager">
-    <frame x="-1928" y="2" width="1936" height="1056" extended-state="7" />
+    <frame x="-1928" y="2" width="1936" height="1056" extended-state="1" />
     <editor active="true" />
     <layout>
-      <window_info id="Project" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" show_stripe_button="true" weight="0.1881663" sideWeight="0.5" order="0" side_tool="false" content_ui="combo" />
+      <window_info id="Project" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" show_stripe_button="true" weight="0.19029851" sideWeight="0.5" order="0" side_tool="false" content_ui="combo" />
       <window_info id="TODO" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="6" side_tool="false" content_ui="tabs" />
       <window_info id="Event Log" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="7" side_tool="true" content_ui="tabs" />
-      <window_info id="Version Control" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="false" weight="0.33" sideWeight="0.5" order="7" side_tool="false" content_ui="tabs" />
-      <window_info id="Python Console" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="7" side_tool="false" content_ui="tabs" />
       <window_info id="Run" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.12242687" sideWeight="0.5" order="2" side_tool="false" content_ui="tabs" />
+      <window_info id="Version Control" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="false" weight="0.33" sideWeight="0.5" order="10" side_tool="false" content_ui="tabs" />
+      <window_info id="Python Console" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="8" side_tool="false" content_ui="tabs" />
       <window_info id="Structure" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.2497332" sideWeight="0.5" order="1" side_tool="false" content_ui="tabs" />
-      <window_info id="Terminal" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="7" side_tool="false" content_ui="tabs" />
-      <window_info id="Favorites" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="2" side_tool="true" content_ui="tabs" />
+      <window_info id="Terminal" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="9" side_tool="false" content_ui="tabs" />
       <window_info id="Debug" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.4" sideWeight="0.5" order="3" side_tool="false" content_ui="tabs" />
+      <window_info id="Favorites" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="2" side_tool="true" content_ui="tabs" />
       <window_info id="Data View" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.32995737" sideWeight="0.5" order="3" side_tool="false" content_ui="tabs" />
       <window_info id="Cvs" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.25" sideWeight="0.5" order="4" side_tool="false" content_ui="tabs" />
       <window_info id="Message" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="0" side_tool="false" content_ui="tabs" />
@@ -585,26 +457,6 @@
       <window_info id="Find" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" show_stripe_button="true" weight="0.0809628" sideWeight="0.5" order="1" side_tool="false" content_ui="tabs" />
       <window_info id="Ant Build" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.25" sideWeight="0.5" order="1" side_tool="false" content_ui="tabs" />
     </layout>
-    <layout-to-restore>
-      <window_info id="TODO" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="6" side_tool="false" content_ui="tabs" />
-      <window_info id="Cvs" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.25" sideWeight="0.5" order="4" side_tool="false" content_ui="tabs" />
-      <window_info id="Message" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="0" side_tool="false" content_ui="tabs" />
-      <window_info id="Commander" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.4" sideWeight="0.5" order="0" side_tool="false" content_ui="tabs" />
-      <window_info id="Event Log" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="7" side_tool="true" content_ui="tabs" />
-      <window_info id="Inspection" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.4" sideWeight="0.5" order="5" side_tool="false" content_ui="tabs" />
-      <window_info id="Run" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="2" side_tool="false" content_ui="tabs" />
-      <window_info id="Version Control" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="false" weight="0.33" sideWeight="0.5" order="8" side_tool="false" content_ui="tabs" />
-      <window_info id="Python Console" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="9" side_tool="false" content_ui="tabs" />
-      <window_info id="Terminal" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="10" side_tool="false" content_ui="tabs" />
-      <window_info id="Project" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" show_stripe_button="true" weight="0.18496802" sideWeight="0.5" order="0" side_tool="false" content_ui="combo" />
-      <window_info id="Hierarchy" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.25" sideWeight="0.5" order="2" side_tool="false" content_ui="combo" />
-      <window_info id="Find" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.32936078" sideWeight="0.5" order="1" side_tool="false" content_ui="tabs" />
-      <window_info id="Structure" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.25" sideWeight="0.5" order="1" side_tool="false" content_ui="tabs" />
-      <window_info id="Ant Build" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.25" sideWeight="0.5" order="1" side_tool="false" content_ui="tabs" />
-      <window_info id="Debug" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.4" sideWeight="0.5" order="3" side_tool="false" content_ui="tabs" />
-      <window_info id="Favorites" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="2" side_tool="true" content_ui="tabs" />
-      <window_info id="Data View" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.32995737" sideWeight="0.5" order="3" side_tool="false" content_ui="tabs" />
-    </layout-to-restore>
   </component>
   <component name="VcsContentAnnotationSettings">
     <option name="myLimit" value="2678400000" />
@@ -612,9 +464,6 @@
   <component name="XDebuggerManager">
     <breakpoint-manager>
       <breakpoints>
-        <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
-          <url>file://$PROJECT_DIR$/../../../IocTestFramework/master/tests/hfmagpsu.py</url>
-        </line-breakpoint>
         <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
           <url>file://$PROJECT_DIR$/utils/command_builder.py</url>
           <option name="timeStamp" value="2" />
@@ -633,13 +482,6 @@
     <watches-manager />
   </component>
   <component name="editorHistoryManager">
-    <entry file="file://$PROJECT_DIR$/neocera_ltc21/device.py">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="1900">
-          <caret line="91" column="20" lean-forward="true" selection-start-line="91" selection-start-column="20" selection-end-line="91" selection-end-column="20" />
-        </state>
-      </provider>
-    </entry>
     <entry file="file://$PROJECT_DIR$/mk2_chopper/__init__.py">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="0">
@@ -776,7 +618,6 @@
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="120">
           <caret line="5" column="29" lean-forward="false" selection-start-line="5" selection-start-column="29" selection-end-line="5" selection-end-column="29" />
-          <folding />
         </state>
       </provider>
     </entry>
@@ -819,9 +660,6 @@
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="-2659">
           <caret line="0" column="0" lean-forward="false" selection-start-line="0" selection-start-column="0" selection-end-line="0" selection-end-column="0" />
-          <folding>
-            <element signature="e#0#54#0" expanded="false" />
-          </folding>
         </state>
       </provider>
     </entry>
@@ -829,25 +667,42 @@
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="552">
           <caret line="23" column="36" lean-forward="true" selection-start-line="23" selection-start-column="36" selection-end-line="23" selection-end-column="36" />
-          <folding />
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/../../../../../Python/Lib/site-packages/lewis/adapters/stream.py">
+    <entry file="file://$PROJECT_DIR$/instron_stress_rig/interfaces/stream_interface.py">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="882">
-          <caret line="320" column="23" lean-forward="false" selection-start-line="320" selection-start-column="8" selection-end-line="320" selection-end-column="23" />
-          <folding />
+        <state relative-caret-position="96">
+          <caret line="7" column="26" lean-forward="false" selection-start-line="7" selection-start-column="26" selection-end-line="7" selection-end-column="26" />
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/utils/command_builder.py">
+    <entry file="file://$PROJECT_DIR$/kepco/device.py">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="2520">
-          <caret line="105" column="26" lean-forward="true" selection-start-line="105" selection-start-column="25" selection-end-line="105" selection-end-column="26" />
-          <folding>
-            <element signature="e#0#9#0" expanded="true" />
-          </folding>
+        <state relative-caret-position="-1220">
+          <caret line="1" column="1" lean-forward="false" selection-start-line="1" selection-start-column="0" selection-end-line="1" selection-end-column="1" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/kepco/interfaces/stream_interface.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="456">
+          <caret line="19" column="36" lean-forward="true" selection-start-line="19" selection-start-column="36" selection-end-line="19" selection-end-column="36" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/tdk_lambda_genesys/interfaces/stream_interface.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="0">
+          <caret line="0" column="0" lean-forward="false" selection-start-line="0" selection-start-column="0" selection-end-line="0" selection-end-column="0" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/../../../IocTestFramework/master/tests/lakeshore460.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="96">
+          <caret line="8" column="15" lean-forward="true" selection-start-line="8" selection-start-column="15" selection-end-line="8" selection-end-column="15" />
+          <folding />
         </state>
       </provider>
     </entry>
@@ -859,57 +714,39 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/instron_stress_rig/interfaces/stream_interface.py">
+    <entry file="file://$PROJECT_DIR$/utils/command_builder.py">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="96">
-          <caret line="7" column="26" lean-forward="false" selection-start-line="7" selection-start-column="26" selection-end-line="7" selection-end-column="26" />
-          <folding />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/kepco/device.py">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="-1220">
-          <caret line="1" column="1" lean-forward="false" selection-start-line="1" selection-start-column="0" selection-end-line="1" selection-end-column="1" />
-          <folding />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/kepco/interfaces/stream_interface.py">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="456">
-          <caret line="19" column="36" lean-forward="true" selection-start-line="19" selection-start-column="36" selection-end-line="19" selection-end-column="36" />
+        <state relative-caret-position="820">
+          <caret line="105" column="26" lean-forward="false" selection-start-line="105" selection-start-column="25" selection-end-line="105" selection-end-column="26" />
           <folding>
-            <element signature="e#0#49#0" expanded="false" />
+            <element signature="e#0#9#0" expanded="true" />
           </folding>
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/tdk_lambda_genesys/interfaces/stream_interface.py">
+    <entry file="file://$PROJECT_DIR$/../../../../../Python/Lib/site-packages/lewis/adapters/stream.py">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="0">
-          <caret line="0" column="0" lean-forward="false" selection-start-line="0" selection-start-column="0" selection-end-line="0" selection-end-column="0" />
-          <folding>
-            <element signature="e#0#54#0" expanded="false" />
-          </folding>
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/lakeshore460/device.py">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="432">
-          <caret line="21" column="31" lean-forward="false" selection-start-line="21" selection-start-column="31" selection-end-line="21" selection-end-column="31" />
+        <state relative-caret-position="820">
+          <caret line="320" column="23" lean-forward="false" selection-start-line="320" selection-start-column="8" selection-end-line="320" selection-end-column="23" />
           <folding />
         </state>
       </provider>
     </entry>
     <entry file="file://$PROJECT_DIR$/lakeshore460/interfaces/stream_interface.py">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="350">
-          <caret line="138" column="65" lean-forward="false" selection-start-line="138" selection-start-column="65" selection-end-line="138" selection-end-column="65" />
+        <state relative-caret-position="1882">
+          <caret line="171" column="60" lean-forward="false" selection-start-line="171" selection-start-column="60" selection-end-line="171" selection-end-column="60" />
           <folding>
             <element signature="e#0#9#0" expanded="true" />
           </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/lakeshore460/device.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="-480">
+          <caret line="22" column="31" lean-forward="true" selection-start-line="22" selection-start-column="31" selection-end-line="22" selection-end-column="31" />
+          <folding />
         </state>
       </provider>
     </entry>

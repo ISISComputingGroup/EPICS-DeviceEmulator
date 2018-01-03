@@ -7,12 +7,12 @@ from .states import DefaultState
 class Channel(object):
 
     def __init__(self):
-        self.field_reading = 0.8884
-        self.field_multiplier = "u"
-        self.max_hold_reading = 0.1234
-        self.max_hold_multiplier = "m"
+        self.field_reading = 1.234
+        self.field_multiplier = " "
+        self.max_hold_reading = 0
+        self.max_hold_multiplier = " "
         self.rel_mode_reading = 0.5645
-        self.rel_mode_multiplier = "m"
+        self.rel_mode_multiplier = " "
         self.mode = 0
         self.prms = 0
         self.filter_status = 0
@@ -38,7 +38,7 @@ class SimulatedLakeshore460(StateMachineDevice):
         """
         self.idn = "LSCI,MODEL460,0,22323"
         self.source = 1
-        self.channels = {"X": Channel(), "Y":Channel(), "Z": Channel(), "V": Channel()}
+        self.channels = {"X": Channel(), "Y": Channel(), "Z": Channel(), "V": Channel()}
         self.channel = "X"
         self.unit = "T"
 
