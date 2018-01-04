@@ -26,7 +26,6 @@ class Channel(object):
         self.relative_setpoint = 1.123
         self.relative_setpoint_multiplier = "u"
 
-
 class SimulatedLakeshore460(StateMachineDevice):
     """
     Simulated Lakeshore 460
@@ -59,6 +58,14 @@ class SimulatedLakeshore460(StateMachineDevice):
         Returns: the state transitions
         """
         return OrderedDict()
+
+    # This is a workaround for https://github.com/DMSC-Instrument-Data/lewis/issues/248
+    def set_channel_param(self, channel, param, value):
+        setattr(self.channels[str(channel)], str(param), value)
+
+    # This is a workaround for https://github.com/DMSC-Instrument-Data/lewis/issues/248
+    def get_channel_param(self, channel, param):
+        return getattr(self.channels[str(channel)], str(param))
 
     @property
     def idn(self):

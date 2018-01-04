@@ -14,15 +14,13 @@ class Lakeshore460StreamInterface(StreamInterface):
     out_terminator = "\r\n"
 
     commands = {
-        # Split commands by ';' if multiple command strings are received
+        # get_multicmds splits commands by ';' if multiple command strings are received
         CmdBuilder("get_multicmds", arg_sep="").arg("[^;]+").escape(";").arg(".*").build(),
-
         CmdBuilder("get_IDN").escape("*IDN?").build(),
         CmdBuilder("get_source").escape("VSRC?").build(),
         CmdBuilder("set_source").escape("VSRC ").digit().build(),
         CmdBuilder("get_channel").escape("CHNL?").build(),
         CmdBuilder("set_channel").escape("CHNL ").arg("X|Y|Z|V").endOfString().build(),
-
         CmdBuilder("get_magnetic_field_reading").escape("FIELD?").build(),
         CmdBuilder("get_magnetic_field_reading_multiplier").escape("FIELDM?").build(),
         CmdBuilder("get_max_hold_reading").escape("MAXR?").build(),
@@ -56,24 +54,32 @@ class Lakeshore460StreamInterface(StreamInterface):
         CmdBuilder("set_manual_range").escape("RANGE ").int().build(),
     }
 
-    def update_reading(self, reading, multiplier):
+    def update_reading_and_multiplier(self, reading, multiplier):
         """
-        :param reading: A reading from the device
-        :param multiplier: The current multiplier for the reading
-        :return:    new_reading: updated reading value, based on more appropriate multiplier
-                    new_multiplier: updated multiplier for the value
+        Args:
+            reading: A reading from the device.
+            multiplier: The current multiplier for the reading.
+
+        Returns:
+            new_reading: Updated reading value, based on more appropriate multiplier
+            new_multiplier: updated multiplier for the value
         """
+
         stripped_reading = self.strip_multiplier(reading, multiplier)
         new_multiplier = self.calculate_multiplier(stripped_reading)
-        new_reading = self.apply_multiplier(stripped_reading, new_multiplier)
+        new_reading = self.calculate_multiplier(stripped_reading, new_multiplier)
         return new_reading, new_multiplier
 
     def strip_multiplier(self, reading, multiplier):
         """
-        :param reading:  A reading from the device with multiplier applied
-        :param multiplier: The current multiplier for the reading
-        :return: The raw reading
+        Args:
+            reading: A reading from the device with multiplier applied.
+            multiplier: The current multiplier for the reading.
+
+        Returns:
+                The raw reading.
         """
+
         if multiplier == "u":
             return reading * 0.000001
         if multiplier == "m":
@@ -83,12 +89,16 @@ class Lakeshore460StreamInterface(StreamInterface):
         else:
             return reading
 
-    def apply_multiplier(self, reading, multiplier):
+    def calculate_multiplier(self, reading, multiplier):
         """
-        :param reading: A raw reading from the device
-        :param multiplier: The multiplier to be applied
-        :return: The reading with the multiplier applied
+        Args:
+            reading:  A raw reading from the device.
+            multiplier: The multiplier to be applied.
+
+        Returns:
+            The reading with the multiplier applied.
         """
+
         if multiplier == "u":
             return reading / 0.000001
         if multiplier == "m":
@@ -100,37 +110,54 @@ class Lakeshore460StreamInterface(StreamInterface):
 
     def convert_units(self, convert_value):
         """
+
         Converts between Tesla and Gauss (applies conversion of *10000 or *0.0001)
-        Then updates reading values according to more appropriate multiplier
-        :param convert_value: 10000 or 0.0001
+        Then updates reading values according to the more appropriate multiplier
+
+        Args:
+            convert_value: 10000 (converting to gauss) or 0.0001 (to Tesla).
+
+        Returns:
+            None.
         """
+
         channels = ['X', 'Y', 'Z', 'V']
         for c in channels:
             self.set_channel(c)
             self._device.channels[c].field_reading *= convert_value
             self._device.channels[c].field_reading, \
-            self._device.channels[c].field_multiplier = self.update_reading(self._device.channels[c].field_reading,
-                                                                            self._device.channels[c].field_multiplier)
+                self._device.channels[c].field_multiplier = \
+                self.update_reading_and_multiplier(self._device.channels[c].field_reading,
+                                                    self._device.channels[c].field_multiplier)
             self._device.channels[c].max_hold_reading *= convert_value
             self._device.channels[c].max_hold_reading, \
-            self._device.channels[c].max_hold_multiplier = self.update_reading(self._device.channels[c].max_hold_reading,
-                                                                                self._device.channels[c].max_hold_multiplier)
+                self._device.channels[c].max_hold_multiplier = \
+                self.update_reading_and_multiplier(self._device.channels[c].max_hold_reading,
+                                                    self._device.channels[c].max_hold_multiplier)
             self._device.channels[c].rel_mode_reading *= convert_value
             self._device.channels[c].rel_mode_reading, \
-            self._device.channels[c].rel_mode_multiplier = self.update_reading(self._device.channels[c].rel_mode_reading,
-                                                                                self._device.channels[c].rel_mode_multiplier)
+                self._device.channels[c].rel_mode_multiplier = \
+                self.update_reading_and_multiplier(self._device.channels[c].rel_mode_reading,
+                                                    self._device.channels[c].rel_mode_multiplier)
             self._device.channels[c].relative_setpoint *= convert_value
             self._device.channels[c].relative_setpoint, \
-            self._device.channels[c].relative_setpoint_multiplier = self.update_reading(self._device.channels[c].relative_setpoint,
-                                                                                self._device.channels[c].relative_setpoint_multiplier)
+                self._device.channels[c].relative_setpoint_multiplier = \
+                self.update_reading_and_multiplier(self._device.channels[c].relative_setpoint,
+                                                    self._device.channels[c].relative_setpoint_multiplier)
 
 
     def calculate_multiplier(self, reading):
         """
         Calculates the most appropriate multiplier for a given value.
-        :param reading: A raw reading from the device
-        :return: The most appropriate multiplier value for the given raw reading
+
+        Args:
+            reading: A raw reading from the device.
+
+        Returns:
+            The most appropriate multiplier value for the given raw reading.
+
         """
+
         if reading < 0.001:
             return "u"
         if reading >= 0.001 and reading < 0:
@@ -139,12 +166,6 @@ class Lakeshore460StreamInterface(StreamInterface):
             return " "
         else:
             return "k"
-
-    def update_reading(self, reading, multiplier):
-        stripped_reading = self.strip_multiplier(reading, multiplier)
-        new_multiplier = self.calculate_multiplier(stripped_reading)
-        new_reading = self.apply_multiplier(stripped_reading, new_multiplier)
-        return new_reading, new_multiplier
 
     def handle_error(self, request, error):
         self.log.error("An error occurred at request" + repr(request) + ": " + repr(error))
@@ -273,10 +294,11 @@ class Lakeshore460StreamInterface(StreamInterface):
     def get_relative_setpoint_multiplier(self):
         return self._device.channels[self.get_channel()].relative_setpoint_multiplier
 
-    # As the protocol file sends multiple commands (set Channel; request channel PV),
-    # these methods split up the commands and process both.
-
     def get_multicmds(self, command, other_commands):
+        """
+             As the protocol file sends multiple commands (set Channel; request channel PV),
+             these methods split up the commands and process both.
+        """
         replies = []
         for cmd_to_find in [command, other_commands]:
             self.log.info("cmd {}".format(cmd_to_find))
