@@ -114,10 +114,7 @@ class Sm300StreamInterface(StreamInterface):
         if self.device.is_moving_error:
             status = "E"
         else:
-            is_moving = self.device.x_axis.moving or self.device.y_axis.moving
-            if self.device.is_moving is not None:
-                is_moving = self.device.is_moving
-
+            is_moving = self.device.is_motor_moving()
             if is_moving:
                 status = "N"
             else:
@@ -163,7 +160,7 @@ class Sm300StreamInterface(StreamInterface):
 
         """
         axis = self.device.axes[axis]
-        self.log.info("Position {}, sp {}".format(axis.rbv, axis.sp))
+        self.log.info("Position {}, sp {}, moving_to_sp {}".format(axis.rbv, axis.sp, axis._move_to_sp))
         if axis.rbv_error is not None:
             return self.generate_reply(axis.rbv_error)
         else:
@@ -176,8 +173,7 @@ class Sm300StreamInterface(StreamInterface):
         Returns: acknowledge
 
         """
-        for axis in self.device.axes.values():
-            axis.move_to_sp()
+        self.device.move_to_sp()
         return self.generate_reply()
 
     def reset_code(self, code):

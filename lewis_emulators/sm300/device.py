@@ -26,8 +26,9 @@ class Axis(object):
         self.rbv_error = None
         self.rbv = 10.0
         self.sp = self.rbv
+        self._move_to_sp = 0
         self.moving = False
-        self.speed = 100
+        self.speed = 1
         self.axis_label = axis_label
 
     def home(self):
@@ -44,8 +45,9 @@ class Axis(object):
             dt: time since last simulation
         """
         if self.moving:
-            self.rbv = approaches.linear(self.rbv, self.sp, self.speed, dt)
-            self.moving = self.rbv != self.sp
+            self.rbv = approaches.linear(self.rbv, self._move_to_sp, self.speed, dt)
+            self.moving = self.rbv != self._move_to_sp
+            self.log.info("moving {}".format(self.moving))
         return
 
     def get_label_and_position(self):
@@ -66,9 +68,16 @@ class Axis(object):
 
     def move_to_sp(self):
         """
-        Start a movement of the axis to its set point
+        Start a movement of the axis to the current set point
+
+        Returns: True if can start moving, False otherwise
         """
+        if self.moving:
+            self.log.error("Called move to sp while moving")
+            return False
+        self._move_to_sp = self.sp
         self.moving = True
+        return True
 
 
 class SimulatedSm300(StateMachineDevice):
@@ -91,6 +100,34 @@ class SimulatedSm300(StateMachineDevice):
         self.is_moving_error = False
         self.reset_codes = []
         self.has_bcc_at_end_of_message = True
+
+    def move_to_sp(self):
+        """
+        Move to the setpoint if the motor is not already moving
+        Returns: True if new points set; False otherwise
+        """
+        if self.is_motor_moving():
+            self.log.error("Called move to sp while moving")
+            return False
+
+        for axis in self.axes.values():
+            axis.move_to_sp()
+        return True
+
+    def is_motor_moving(self):
+        """
+
+        Returns: whether the motor is moving
+
+        """
+        if self.is_moving is not None:
+            return self.is_moving
+
+        for axis in self.axes.values():
+            if axis.moving:
+                return True
+
+        return False
 
     def _get_state_handlers(self):
         return {
