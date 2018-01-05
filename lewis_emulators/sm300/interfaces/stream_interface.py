@@ -6,7 +6,7 @@ from lewis.adapters.stream import StreamInterface
 from lewis.core.logging import has_log
 
 from lewis_emulators.utils.command_builder import CmdBuilder
-from lewis_emulators.utils.constants import EOT, COMMAND_CHARS
+from lewis_emulators.utils.constants import EOT, ASCII_CHARS
 
 
 @has_log
@@ -27,12 +27,13 @@ class Sm300StreamInterface(StreamInterface):
             CmdBuilder(self.get_position_as_steps).ack().stx().escape("LI").char().build(),
             CmdBuilder(self.home_axis).ack().stx().escape("BR").char().build(),
             CmdBuilder(self.stop).ack().stx().escape("BSS").build(),
+            CmdBuilder(self.start_movement_to_sp).ack().stx().escape("BSL").build(),
             CmdBuilder(self.get_status).ack().stx().escape("LM").build(),
             CmdBuilder(self.set_position).ack().stx().escape("B/").spaces().escape("X").int().spaces().escape("Y").
             int().build(),
             CmdBuilder(self.setting).ack().stx().escape("B/").spaces().escape("G").any().build(),
             CmdBuilder(self.feed_code).ack().stx().escape("BF").int().build(),
-            CmdBuilder(self.set_position_as_steps).ack().stx().escape("B").char(not_chars=["F"]).int().build(),
+            CmdBuilder(self.set_position_as_steps).ack().stx().escape("B").char(not_chars=["FS"]).int().build(),
             # This is cheating the PEL1 command comes after PEL0 which is sent with a cr characters so add it in here
             CmdBuilder(self.reset_code).regex(r"\r?").ack().stx().escape("P").any().build()
         }
@@ -50,6 +51,35 @@ class Sm300StreamInterface(StreamInterface):
         """
         self.log.error("An error occurred at request " + repr(request) + ": " + repr(error))
 
+    def generate_reply(self, message=None, override_form_to_eot=False):
+        """
+        Generate a reply as the device depending on the encoding. There are two choice BCC and EOT form
+        EOT is ACK STX <message> EOT and BCC is ACK STX <messsage> ETX <2 digit checksum>
+        Args:
+            message: message to send
+            override_form_to_eot: If True use the EOT form otherwise use the default form
+
+        Returns: message to reply with.
+
+        """
+
+        if message is None:
+            return "{ACK}".format(**ASCII_CHARS)
+
+        if self.device.has_bcc_at_end_of_message and not override_form_to_eot:
+            sum_chars = 0
+            xor_chars = 0
+            for character in message:
+                as_int = ord(character)
+                sum_chars += as_int
+                xor_chars ^= as_int
+            sum_chars = chr(sum_chars % 256)
+            xor_chars = chr(xor_chars)
+
+            return "{ACK}{STX}{0}{ETX}{sum}{xor}".format(message, sum=sum_chars, xor=xor_chars, **ASCII_CHARS)
+        else:
+            return "{ACK}{STX}{0}{EOT}".format(message, **ASCII_CHARS)
+
     def get_position(self):
         """
         Get position of the motor axes
@@ -60,7 +90,7 @@ class Sm300StreamInterface(StreamInterface):
         x_axis_return = self.device.x_axis.get_label_and_position()
         y_axis_return = self.device.y_axis.get_label_and_position()
         self.log.info("Send position {} {}".format(x_axis_return, y_axis_return))
-        return "{ACK}{STX}{0},{1}{EOT}".format(x_axis_return, y_axis_return, **COMMAND_CHARS)
+        return self.generate_reply("{0},{1}".format(x_axis_return, y_axis_return))
 
     def home_axis(self, axis):
         """
@@ -73,7 +103,7 @@ class Sm300StreamInterface(StreamInterface):
         """
         axis = self.device.axes[axis]
         axis.home()
-        return "{ACK}"
+        return self.generate_reply()
 
     def get_status(self):
         """
@@ -93,7 +123,7 @@ class Sm300StreamInterface(StreamInterface):
             else:
                 status = "P"
         self.log.info("Send motor status {}".format(status))
-        return "{ACK}{STX}{status}{EOT}".format(status=status, **COMMAND_CHARS)
+        return self.generate_reply(status, override_form_to_eot=True)
 
     def set_position(self, x_position, y_position):
         """
@@ -107,7 +137,7 @@ class Sm300StreamInterface(StreamInterface):
         """
         self.device.x_axis.sp = x_position
         self.device.y_axis.sp = y_position
-        return "{ACK}".format(**COMMAND_CHARS)
+        return self.generate_reply()
 
     def set_position_as_steps(self, axis, steps):
         """
@@ -121,7 +151,7 @@ class Sm300StreamInterface(StreamInterface):
         """
         axis = self.device.axes[axis]
         axis.sp = int(steps)
-        return "{ACK}".format(**COMMAND_CHARS)
+        return self.generate_reply()
 
     def get_position_as_steps(self, axis):
         """
@@ -135,9 +165,20 @@ class Sm300StreamInterface(StreamInterface):
         axis = self.device.axes[axis]
         self.log.info("Position {}, sp {}".format(axis.rbv, axis.sp))
         if axis.rbv_error is not None:
-            return "{ACK}{STX}{0}{EOT}".format(axis.rbv_error, **COMMAND_CHARS)
+            return self.generate_reply(axis.rbv_error)
         else:
-            return "{ACK}{STX}{steps:.0f}{EOT}".format(steps=axis.rbv, **COMMAND_CHARS)
+            return self.generate_reply("{steps:.0f}".format(steps=axis.rbv))
+
+    def start_movement_to_sp(self):
+        """
+        Start a movement of all axises to final set points
+
+        Returns: acknowledge
+
+        """
+        for axis in self.device.axes.values():
+            axis.move_to_sp()
+        return self.generate_reply()
 
     def reset_code(self, code):
         """
@@ -149,8 +190,13 @@ class Sm300StreamInterface(StreamInterface):
 
         """
         self.device.reset_codes.append("P{}".format(code))
+        if code == "EK1":
+            self.device.has_bcc_at_end_of_message = False
+        elif code == "EK0":
+            self.device.has_bcc_at_end_of_message = True
         self.log.info("Reset codes: {}".format(self.device.reset_codes))
-        return "{ACK}".format(**COMMAND_CHARS)
+
+        return self.generate_reply()
 
     def setting(self, code):
         """
@@ -163,7 +209,7 @@ class Sm300StreamInterface(StreamInterface):
         """
         self.device.reset_codes.append("B/ G{}".format(code))
         self.log.info("Reset codes: {}".format(self.device.reset_codes))
-        return "{ACK}".format(**COMMAND_CHARS)
+        return self.generate_reply()
 
     def feed_code(self, code):
         """
@@ -176,7 +222,7 @@ class Sm300StreamInterface(StreamInterface):
         """
         self.device.reset_codes.append("BF{}".format(code))
         self.log.info("Reset codes: {}".format(self.device.reset_codes))
-        return "{ACK}".format(**COMMAND_CHARS)
+        return self.generate_reply()
 
     def stop(self):
         """
@@ -187,4 +233,4 @@ class Sm300StreamInterface(StreamInterface):
         for axis in self.device.axes.values():
             axis.stop()
 
-        return "{ACK}{STX}P{EOT}".format(**COMMAND_CHARS)
+        return self.generate_reply("P")

@@ -3,8 +3,9 @@ A fluent command builder for lewis.
 """
 
 import re
-
 from lewis.adapters.stream import Cmd
+
+from lewis_emulators.utils.constants import STX, ACK, EOT, ETX, ENQ
 
 
 class CmdBuilder(object):
@@ -167,7 +168,7 @@ class CmdBuilder(object):
 
         :return: builder
         """
-        return self.add_ascii_character(2)
+        return self.escape(STX)
 
     def etx(self):
         """
@@ -175,7 +176,7 @@ class CmdBuilder(object):
 
         :return: builder
         """
-        return self.add_ascii_character(3)
+        return self.escape(ETX)
 
     def eot(self):
         """
@@ -183,7 +184,7 @@ class CmdBuilder(object):
 
         :return: builder
         """
-        return self.add_ascii_character(4)
+        return self.escape(EOT)
 
     def enq(self):
         """
@@ -191,7 +192,7 @@ class CmdBuilder(object):
 
         :return: builder
         """
-        return self.add_ascii_character(5)
+        return self.escape(ENQ)
 
     def ack(self):
         """
@@ -199,4 +200,4 @@ class CmdBuilder(object):
 
         :return: builder
         """
-        return self.add_ascii_character(6)
+        return self.escape(ACK)
