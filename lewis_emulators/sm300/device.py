@@ -28,7 +28,7 @@ class Axis(object):
         self.sp = self.rbv
         self._move_to_sp = 0
         self.moving = False
-        self.speed = 1
+        self.speed = 10
         self.axis_label = axis_label
 
     def home(self):
