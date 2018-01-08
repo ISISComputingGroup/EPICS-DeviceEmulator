@@ -100,6 +100,7 @@ class SimulatedSm300(StateMachineDevice):
         self.is_moving_error = False
         self.reset_codes = []
         self.has_bcc_at_end_of_message = True
+        self.disconnect = ""
 
     def move_to_sp(self):
         """

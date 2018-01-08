@@ -34,6 +34,7 @@ class Sm300StreamInterface(StreamInterface):
             CmdBuilder(self.setting).ack().stx().escape("B/").spaces().escape("G").any().build(),
             CmdBuilder(self.feed_code).ack().stx().escape("BF").int().build(),
             CmdBuilder(self.set_position_as_steps).ack().stx().escape("B").char(not_chars=["FS"]).int().build(),
+            CmdBuilder(self.disconnect).ack().stx().escape("M").any().build(),
             # This is cheating the PEL1 command comes after PEL0 which is sent with a cr characters so add it in here
             CmdBuilder(self.reset_code).regex(r"\r?").ack().stx().escape("P").any().build()
         }
@@ -160,7 +161,6 @@ class Sm300StreamInterface(StreamInterface):
 
         """
         axis = self.device.axes[axis]
-        self.log.info("Position {}, sp {}, moving_to_sp {}".format(axis.rbv, axis.sp, axis._move_to_sp))
         if axis.rbv_error is not None:
             return self.generate_reply(axis.rbv_error)
         else:
@@ -230,3 +230,15 @@ class Sm300StreamInterface(StreamInterface):
             axis.stop()
 
         return self.generate_reply("P")
+
+    def disconnect(self, code):
+        """
+        Command to disconnect from the device
+        Args:
+            code: code called with
+
+        Returns: No response
+
+        """
+        self.device.disconnect = code
+        return None
