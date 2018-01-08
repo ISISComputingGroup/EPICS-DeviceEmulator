@@ -23,18 +23,24 @@ class Sm300StreamInterface(StreamInterface):
 
         # Commands that we expect via serial during normal operation
         self.commands = {
-            CmdBuilder(self.get_position).ack().stx().escape("LQ").build(),
-            CmdBuilder(self.get_position_as_steps).ack().stx().escape("LI").char().build(),
+
             CmdBuilder(self.home_axis).ack().stx().escape("BR").char().build(),
-            CmdBuilder(self.stop).ack().stx().escape("BSS").build(),
             CmdBuilder(self.start_movement_to_sp).ack().stx().escape("BSL").build(),
-            CmdBuilder(self.get_status).ack().stx().escape("LM").build(),
-            CmdBuilder(self.set_position).ack().stx().escape("B/").spaces().escape("X").int().spaces().escape("Y").
-            int().build(),
+            CmdBuilder(self.stop).ack().stx().escape("BSS").build(),
             CmdBuilder(self.setting).ack().stx().escape("B/").spaces().escape("G").any().build(),
-            CmdBuilder(self.feed_code).ack().stx().escape("BF").int().build(),
+            CmdBuilder(self.set_position).ack().stx().escape("B/").spaces().escape("X").int().spaces().escape("Y").int()
+                                         .build(),
             CmdBuilder(self.set_position_as_steps).ack().stx().escape("B").char(not_chars=["FS"]).int().build(),
+            CmdBuilder(self.feed_code).ack().stx().escape("BF").int().build(),
+
+
+            CmdBuilder(self.get_position_as_steps).ack().stx().escape("LI").char().build(),
+            CmdBuilder(self.get_status).ack().stx().escape("LM").build(),
+            CmdBuilder(self.get_position).ack().stx().escape("LQ").build(),
+            CmdBuilder(self.error_status).ack().stx().escape("LS10").build(),
+
             CmdBuilder(self.disconnect).ack().stx().escape("M").any().build(),
+
             # This is cheating the PEL1 command comes after PEL0 which is sent with a cr characters so add it in here
             CmdBuilder(self.reset_code).regex(r"\r?").ack().stx().escape("P").any().build()
         }
@@ -70,7 +76,7 @@ class Sm300StreamInterface(StreamInterface):
         if self.device.has_bcc_at_end_of_message and not override_form_to_eot:
             sum_chars = 0
             xor_chars = 0
-            for character in message:
+            for character in str(message):
                 as_int = ord(character)
                 sum_chars += as_int
                 xor_chars ^= as_int
@@ -242,3 +248,11 @@ class Sm300StreamInterface(StreamInterface):
         """
         self.device.disconnect = code
         return None
+
+    def error_status(self):
+        """
+        Returns: the current error code
+        """
+        error_code = "{:02x}".format(self.device.error_code)
+        self.log.error("error code {}".format(error_code))
+        return self.generate_reply(error_code)
