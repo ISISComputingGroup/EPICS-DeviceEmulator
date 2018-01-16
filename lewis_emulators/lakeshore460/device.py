@@ -67,6 +67,118 @@ class SimulatedLakeshore460(StateMachineDevice):
     def get_channel_param(self, channel, param):
         return getattr(self.channels[str(channel)], str(param))
 
+    def update_reading_and_multiplier(self, reading, multiplier):
+        """
+        Args:
+            reading: A reading from the device.
+            multiplier: The current multiplier for the reading.
+
+        Returns:
+            new_reading: Updated reading value, based on more appropriate multiplier
+            new_multiplier: updated multiplier for the value
+        """
+
+        stripped_reading = self.strip_multiplier(reading, multiplier)
+        new_multiplier = self.calculate_multiplier(stripped_reading)
+        new_reading = self.calculate_multiplier(stripped_reading, new_multiplier)
+        return new_reading, new_multiplier
+
+    def strip_multiplier(self, reading, multiplier):
+        """
+        Args:
+            reading: A reading from the device with multiplier applied.
+            multiplier: The current multiplier for the reading.
+
+        Returns:
+                The raw reading.
+        """
+
+        if multiplier == "u":
+            return reading * 0.000001
+        if multiplier == "m":
+            return reading * 0.001
+        if multiplier == "k":
+            return reading * 1000
+        else:
+            return reading
+
+    def apply_multiplier(self, reading, multiplier):
+        """
+        Args:
+            reading:  A raw reading from the device.
+            multiplier: The multiplier to be applied.
+
+        Returns:
+            The reading with the multiplier applied.
+        """
+
+        if multiplier == "u":
+            return reading / 0.000001
+        if multiplier == "m":
+            return reading / 0.001
+        if multiplier == "k":
+            return reading / 1000
+        else:
+            return reading
+
+    def convert_units(self, convert_value):
+        """
+
+        Converts between Tesla and Gauss (applies conversion of *10000 or *0.0001)
+        Then updates reading values according to the more appropriate multiplier
+
+        Args:
+            convert_value: 10000 (converting to gauss) or 0.0001 (to Tesla).
+
+        Returns:
+            None.
+        """
+
+        channels = ['X', 'Y', 'Z', 'V']
+        for c in channels:
+            self.set_channel(c)
+            self.channels[c].field_reading *= convert_value
+            self.channels[c].field_reading, \
+                self.channels[c].field_multiplier = \
+                self.update_reading_and_multiplier(self.channels[c].field_reading,
+                                                    self.channels[c].field_multiplier)
+            self.channels[c].max_hold_reading *= convert_value
+            self.channels[c].max_hold_reading, \
+                self.channels[c].max_hold_multiplier = \
+                self.update_reading_and_multiplier(self.channels[c].max_hold_reading,
+                                                    self.channels[c].max_hold_multiplier)
+            self.channels[c].rel_mode_reading *= convert_value
+            self.channels[c].rel_mode_reading, \
+                self.channels[c].rel_mode_multiplier = \
+                self.update_reading_and_multiplier(self.channels[c].rel_mode_reading,
+                                                    self.channels[c].rel_mode_multiplier)
+            self.channels[c].relative_setpoint *= convert_value
+            self.channels[c].relative_setpoint, \
+                self.channels[c].relative_setpoint_multiplier = \
+                self.update_reading_and_multiplier(self.channels[c].relative_setpoint,
+                                                    self.channels[c].relative_setpoint_multiplier)
+
+    def calculate_multiplier(self, reading):
+        """
+        Calculates the most appropriate multiplier for a given value.
+
+        Args:
+            reading: A raw reading from the device.
+
+        Returns:
+            The most appropriate multiplier value for the given raw reading.
+
+        """
+
+        if reading <= 0.001:
+            return "u"
+        if 0.001 < reading <= 0:
+            return "m"
+        if 0 < reading < 1000:
+            return " "
+        else:
+            return "k"
+
     @property
     def idn(self):
         """
@@ -259,7 +371,7 @@ class SimulatedLakeshore460(StateMachineDevice):
     @filter_status.setter
     def filter_status(self, state):
         """
-        :param filter_status:  sets filter state (binary)
+        :param state:  sets filter state (binary)
         """
         self.channels[self._channel].filter_status = state
 
@@ -273,7 +385,7 @@ class SimulatedLakeshore460(StateMachineDevice):
     @rel_mode_status.setter
     def rel_mode_status(self, rel_mode):
         """
-        :param rel_mode_status:  Sets the relative mode status
+        :param rel_mode:  Sets the relative mode status
         """
         self.channels[self._channel].rel_mode_status = rel_mode
 
@@ -287,7 +399,7 @@ class SimulatedLakeshore460(StateMachineDevice):
     @auto_mode_status.setter
     def auto_mode_status(self, auto_mode):
         """
-        :param auto_mode_status:  Sets the auto mode status
+        :param auto_mode:  Sets the auto mode status
         """
         self.channels[self._channel].auto_mode_status = auto_mode
 
@@ -301,7 +413,7 @@ class SimulatedLakeshore460(StateMachineDevice):
     @max_hold_status.setter
     def max_hold_status(self, max_hold):
         """
-        :param max_hold_status:  Sets max hold status
+        :param max_hold:  Sets max hold status
         """
         self.channels[self._channel].max_hold_status = max_hold
 
@@ -310,7 +422,7 @@ class SimulatedLakeshore460(StateMachineDevice):
         """
         :return: status of device. If its on/off
         """
-        return self.channels[self._channel].channel_
+        return self.channels[self._channel].channel
 
     @channel_status.setter
     def channel_status(self, status):

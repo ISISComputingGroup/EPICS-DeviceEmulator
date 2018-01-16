@@ -1,8 +1,7 @@
-import re
-
 from lewis.adapters.stream import StreamInterface
 from lewis.core.logging import has_log
 from lewis_emulators.utils.command_builder import CmdBuilder
+
 
 @has_log
 class Lakeshore460StreamInterface(StreamInterface):
@@ -53,119 +52,6 @@ class Lakeshore460StreamInterface(StreamInterface):
         CmdBuilder("get_manual_range").escape("RANGE?").build(),
         CmdBuilder("set_manual_range").escape("RANGE ").int().build(),
     }
-
-    def update_reading_and_multiplier(self, reading, multiplier):
-        """
-        Args:
-            reading: A reading from the device.
-            multiplier: The current multiplier for the reading.
-
-        Returns:
-            new_reading: Updated reading value, based on more appropriate multiplier
-            new_multiplier: updated multiplier for the value
-        """
-
-        stripped_reading = self.strip_multiplier(reading, multiplier)
-        new_multiplier = self.calculate_multiplier(stripped_reading)
-        new_reading = self.calculate_multiplier(stripped_reading, new_multiplier)
-        return new_reading, new_multiplier
-
-    def strip_multiplier(self, reading, multiplier):
-        """
-        Args:
-            reading: A reading from the device with multiplier applied.
-            multiplier: The current multiplier for the reading.
-
-        Returns:
-                The raw reading.
-        """
-
-        if multiplier == "u":
-            return reading * 0.000001
-        if multiplier == "m":
-            return reading * 0.001
-        if multiplier == "k":
-            return reading * 1000
-        else:
-            return reading
-
-    def calculate_multiplier(self, reading, multiplier):
-        """
-        Args:
-            reading:  A raw reading from the device.
-            multiplier: The multiplier to be applied.
-
-        Returns:
-            The reading with the multiplier applied.
-        """
-
-        if multiplier == "u":
-            return reading / 0.000001
-        if multiplier == "m":
-            return reading / 0.001
-        if multiplier == "k":
-            return reading / 1000
-        else:
-            return reading
-
-    def convert_units(self, convert_value):
-        """
-
-        Converts between Tesla and Gauss (applies conversion of *10000 or *0.0001)
-        Then updates reading values according to the more appropriate multiplier
-
-        Args:
-            convert_value: 10000 (converting to gauss) or 0.0001 (to Tesla).
-
-        Returns:
-            None.
-        """
-
-        channels = ['X', 'Y', 'Z', 'V']
-        for c in channels:
-            self.set_channel(c)
-            self._device.channels[c].field_reading *= convert_value
-            self._device.channels[c].field_reading, \
-                self._device.channels[c].field_multiplier = \
-                self.update_reading_and_multiplier(self._device.channels[c].field_reading,
-                                                    self._device.channels[c].field_multiplier)
-            self._device.channels[c].max_hold_reading *= convert_value
-            self._device.channels[c].max_hold_reading, \
-                self._device.channels[c].max_hold_multiplier = \
-                self.update_reading_and_multiplier(self._device.channels[c].max_hold_reading,
-                                                    self._device.channels[c].max_hold_multiplier)
-            self._device.channels[c].rel_mode_reading *= convert_value
-            self._device.channels[c].rel_mode_reading, \
-                self._device.channels[c].rel_mode_multiplier = \
-                self.update_reading_and_multiplier(self._device.channels[c].rel_mode_reading,
-                                                    self._device.channels[c].rel_mode_multiplier)
-            self._device.channels[c].relative_setpoint *= convert_value
-            self._device.channels[c].relative_setpoint, \
-                self._device.channels[c].relative_setpoint_multiplier = \
-                self.update_reading_and_multiplier(self._device.channels[c].relative_setpoint,
-                                                    self._device.channels[c].relative_setpoint_multiplier)
-
-
-    def calculate_multiplier(self, reading):
-        """
-        Calculates the most appropriate multiplier for a given value.
-
-        Args:
-            reading: A raw reading from the device.
-
-        Returns:
-            The most appropriate multiplier value for the given raw reading.
-
-        """
-
-        if reading < 0.001:
-            return "u"
-        if reading >= 0.001 and reading < 0:
-            return "m"
-        if reading > 0 and reading < 1000:
-            return " "
-        else:
-            return "k"
 
     def handle_error(self, request, error):
         self.log.error("An error occurred at request" + repr(request) + ": " + repr(error))
@@ -219,10 +105,10 @@ class Lakeshore460StreamInterface(StreamInterface):
         # Convert values if required
         if self._device.unit == "T":
             if unit == "G":
-                self.convert_units(10000)
+                self._device.convert_units(10000)
         if self._device.unit == "G":
             if unit == "T":
-                self.convert_units(0.0001)
+                self._device.convert_units(0.0001)
         self._device.unit = unit
 
     def get_ac_dc_mode(self):
