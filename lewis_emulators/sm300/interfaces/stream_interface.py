@@ -118,7 +118,7 @@ class Sm300StreamInterface(StreamInterface):
         Returns: the moving status of the motor, N not at position, P at position, E error
 
         """
-        if self.device.is_moving_error:
+        if self.device.is_moving_error or self.device.error_code is not 0:
             status = "E"
         else:
             is_moving = self.device.is_motor_moving()

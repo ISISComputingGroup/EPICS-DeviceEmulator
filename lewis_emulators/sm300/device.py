@@ -36,7 +36,7 @@ class Axis(object):
         Perform a homing operation.
         """
         self.sp = 0.0
-        self.moving = True
+        self.move_to_sp()
 
     def simulate(self, dt):
         """
@@ -46,9 +46,15 @@ class Axis(object):
         """
         if self.moving:
             self.rbv = approaches.linear(self.rbv, self._move_to_sp, self.speed, dt)
-            self.moving = self.rbv != self._move_to_sp
+            self.moving = not self._at_position()
             self.log.info("moving {}".format(self.moving))
         return
+
+    def _at_position(self):
+        """
+        Returns: True if at position (within tolerance); False otherwise.
+        """
+        return abs(self.rbv - self._move_to_sp) < 0.01
 
     def get_label_and_position(self):
         """
@@ -70,12 +76,11 @@ class Axis(object):
         """
         Start a movement of the axis to the current set point
 
-        Returns: True if can start moving, False otherwise
+        Returns: True if can start moving (or is already at position), False otherwise
         """
-        if self.moving:
-            self.log.error("Called move to sp while moving")
-            return False
         self._move_to_sp = self.sp
+        if self._at_position():
+            return True
         self.moving = True
         return True
 
@@ -123,7 +128,7 @@ class SimulatedSm300(StateMachineDevice):
 
         """
         if self.is_moving is not None:
-            return self.is_moving
+                return self.is_moving
 
         for axis in self.axes.values():
             if axis.moving:
