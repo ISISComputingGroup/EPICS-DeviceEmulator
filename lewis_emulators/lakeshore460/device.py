@@ -80,7 +80,7 @@ class SimulatedLakeshore460(StateMachineDevice):
 
         stripped_reading = self.strip_multiplier(reading, multiplier)
         new_multiplier = self.calculate_multiplier(stripped_reading)
-        new_reading = self.calculate_multiplier(stripped_reading, new_multiplier)
+        new_reading = self.apply_multiplier(stripped_reading, new_multiplier)
         return new_reading, new_multiplier
 
     def strip_multiplier(self, reading, multiplier):
@@ -136,7 +136,7 @@ class SimulatedLakeshore460(StateMachineDevice):
 
         channels = ['X', 'Y', 'Z', 'V']
         for c in channels:
-            self.set_channel(c)
+            self.channel = c
             self.channels[c].field_reading *= convert_value
             self.channels[c].field_reading, \
                 self.channels[c].field_multiplier = \
