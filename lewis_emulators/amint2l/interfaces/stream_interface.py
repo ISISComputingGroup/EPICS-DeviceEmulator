@@ -9,12 +9,16 @@ class Amint2lStreamInterface(StreamInterface):
     Stream interface for the serial port
     """
 
-    commands = {
-        CmdBuilder("get_pressure").stx().arg("[A-Fa-f0-9]+").escape("r").build()
-    }
-
     in_terminator = chr(3)
     out_terminator = chr(3)
+
+    def __init__(self):
+
+        super(Amint2lStreamInterface, self).__init__()
+        self.commands = {
+            CmdBuilder(self.get_pressure).stx().arg("[A-Fa-f0-9]+").escape("r").build()
+        }
+        self.device = self._device
 
     def handle_error(self, request, error):
         """
@@ -36,15 +40,15 @@ class Amint2lStreamInterface(StreamInterface):
         Returns: pressure in correct format if pressure has a value; if None returns None as if it is disconnected
 
         """
-        if address.upper() != self._device.address.upper():
+        if address.upper() != self.device.address.upper():
             self.log.error("unknown address {0}".format(address))
             return None
-        self.log.info("Pressure: {0}".format(self._device.pressure))
-        if self._device.pressure is None:
+        self.log.info("Pressure: {0}".format(self.device.pressure))
+        if self.device.pressure is None:
             return None
         else:
             try:
-                return "{stx}{pressure:+8.3f}".format(stx=chr(2), pressure=self._device.pressure)
+                return "{stx}{pressure:+8.3f}".format(stx=chr(2), pressure=self.device.pressure)
             except ValueError:
                 # pressure contains string probably OR (over range) or UR (under range)
-                return "{stx}{pressure:8s}".format(stx=chr(2), pressure=self._device.pressure)
+                return "{stx}{pressure:8s}".format(stx=chr(2), pressure=self.device.pressure)
