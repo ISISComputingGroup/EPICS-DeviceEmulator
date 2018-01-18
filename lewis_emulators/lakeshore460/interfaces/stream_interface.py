@@ -15,7 +15,7 @@ class Lakeshore460StreamInterface(StreamInterface):
     commands = {
         # get_multicmds splits commands by ';' if multiple command strings are received
         CmdBuilder("get_multicmds", arg_sep="").arg("[^;]+").escape(";").arg(".*").build(),
-        CmdBuilder("get_IDN").escape("*IDN?").build(),
+        CmdBuilder("get_idn").escape("*IDN?").build(),
         CmdBuilder("get_source").escape("VSRC?").build(),
         CmdBuilder("set_source").escape("VSRC ").digit().build(),
         CmdBuilder("get_channel").escape("CHNL?").build(),
@@ -70,7 +70,7 @@ class Lakeshore460StreamInterface(StreamInterface):
         self._device.channel = channel
 
     def get_channel(self):
-        return self._device.channel
+        return "{0}".format(self._device.channel)
 
     def get_magnetic_field_reading(self):
         field_reading = self._device.channels[self.get_channel()].field_reading
