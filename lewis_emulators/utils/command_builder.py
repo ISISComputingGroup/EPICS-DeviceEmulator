@@ -132,7 +132,7 @@ class CmdBuilder(object):
 
         :return: builder
         """
-        return self.arg(r"[-+]?\d+")
+        return self.arg(r"[+-]?\d+")
 
     def any(self):
         """
