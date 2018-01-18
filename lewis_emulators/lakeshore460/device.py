@@ -1,5 +1,4 @@
 from collections import OrderedDict
-
 from lewis.devices import StateMachineDevice
 from .states import DefaultState
 
@@ -25,6 +24,7 @@ class Channel(object):
         self.manual_range = 1
         self.relative_setpoint = 1.123
         self.relative_setpoint_multiplier = "u"
+
 
 class SimulatedLakeshore460(StateMachineDevice):
     """
