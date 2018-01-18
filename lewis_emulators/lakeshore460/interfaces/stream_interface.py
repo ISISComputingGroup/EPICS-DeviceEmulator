@@ -57,7 +57,7 @@ class Lakeshore460StreamInterface(StreamInterface):
         self.log.error("An error occurred at request" + repr(request) + ": " + repr(error))
         print("An error occurred at request" + repr(request) + ": " + repr(error))
 
-    def get_IDN(self):
+    def get_idn(self):
         return "{0}".format(self._device.idn)
 
     def set_source(self, source):
