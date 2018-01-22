@@ -197,3 +197,5 @@ class Lakeshore460StreamInterface(StreamInterface):
         for cmd in self.bound_commands:
             if cmd.can_process(cmd_to_find):
                 return cmd.process_request(cmd_to_find)
+            else:
+                self.log.info("Error, unable to process command: {}".format(cmd))
