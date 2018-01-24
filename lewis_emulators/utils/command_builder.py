@@ -102,6 +102,10 @@ class CmdBuilder(object):
         """
         return self.arg(r".*")
 
+    def endOfString(self):
+        self._reg_ex += "$"
+        return self
+
     def build(self, *args, **kwargs):
         """
         Builds the CMd object based on the target and regular expression.
