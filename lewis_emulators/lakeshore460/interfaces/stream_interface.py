@@ -187,7 +187,7 @@ class Lakeshore460StreamInterface(StreamInterface):
         """
         replies = []
         for cmd_to_find in [command, other_commands]:
-            self.log.info("cmd {}".format(cmd_to_find))
+            self.log.info("Processing {} from combined command".format(cmd_to_find))
             reply = self._process_part_command(cmd_to_find)
             if reply is not None:
                 replies.append(self._process_part_command(cmd_to_find))
@@ -197,5 +197,4 @@ class Lakeshore460StreamInterface(StreamInterface):
         for cmd in self.bound_commands:
             if cmd.can_process(cmd_to_find):
                 return cmd.process_request(cmd_to_find)
-            else:
-                self.log.info("Error, unable to process command: {}".format(cmd))
+        self.log.info("Error, unable to find command: {}".format(cmd_to_find))
