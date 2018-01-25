@@ -1,3 +1,5 @@
+from datetime import datetime
+
 from lewis.adapters.stream import StreamInterface, Cmd
 from lewis.core.logging import has_log
 from lewis_emulators.utils.command_builder import CmdBuilder
@@ -10,10 +12,11 @@ class TritonStreamInterface(StreamInterface):
 
     # Commands that we expect via serial during normal operation
     commands = {
+        # ID
+        CmdBuilder("get_idn").escape("*IDN?").build(),
+
         # UIDs
-        CmdBuilder("get_mc_uid").escape("READ:SYS:DR:CHAN:MC").build(),
-        CmdBuilder("get_stil_uid").escape("READ:SYS:DR:CHAN:STIL").build(),
-        CmdBuilder("get_sorb_uid").escape("READ:SYS:DR:CHAN:SORB").build(),
+        CmdBuilder("get_uid").escape("READ:SYS:DR:CHAN:").arg("[A-Z0-9]+").build(),
 
         # PID setpoints
         CmdBuilder("set_p").escape("SET:DEV:").arg("T[0-9]+").escape(":TEMP:LOOP:P:").float().build(),
@@ -43,6 +46,9 @@ class TritonStreamInterface(StreamInterface):
         # Get heater power
         CmdBuilder("get_heater_power").escape("READ:DEV:{}:HTR:SIG:POWR".format(HEATER_NAME)).build(),
 
+        # Heater control sensor
+        CmdBuilder("get_heater_control_sensor").escape("READ:DEV:{}:HTR:LOOP".format(HEATER_NAME)).build(),
+
         # Loop mode
         CmdBuilder("get_closed_loop_mode").escape("READ:DEV:").arg("T[0-9]+").escape(":TEMP:LOOP:MODE").build(),
         CmdBuilder("set_closed_loop_mode").escape("SET:DEV:").arg("T[0-9]+").escape(":TEMP:LOOP:MODE:").any().build(),
@@ -60,6 +66,9 @@ class TritonStreamInterface(StreamInterface):
 
         # Pressures
         CmdBuilder("get_pressure").escape("READ:DEV:").arg("P[0-9]+").escape(":PRES:SIG:PRES").build(),
+
+        # System
+        CmdBuilder("get_time").escape("READ:SYS:TIME").build(),
     }
 
     in_terminator = "\r\n"
@@ -71,67 +80,63 @@ class TritonStreamInterface(StreamInterface):
         self.log.error(err_string)
         return err_string
 
-    def raise_if_channel_is_not_mc_channel(self, chan):
-        if str(chan) != self.device.find_temperature_channel("mc"):
-            raise ValueError("Channel should have been MC channel")
+    def raise_if_channel_is_not_sample_channel(self, chan):
+        if str(chan) != self.device.sample_channel:
+            raise ValueError("Channel should have been sample channel")
 
-    def get_mc_uid(self):
-        return "STAT:SYS:DR:CHAN:MC:{}".format(self.device.find_temperature_channel("mc"))
+    def get_idn(self):
+        return "This is the IDN of this device"
 
-    def get_stil_uid(self):
-        return "STAT:SYS:DR:CHAN:STIL:{}".format(self.device.find_temperature_channel("stil"))
-
-    def get_sorb_uid(self):
-        return "STAT:SYS:DR:CHAN:SORB:{}".format(self.device.find_temperature_channel("sorb"))
+    def get_uid(self, chan):
+        return "STAT:SYS:DR:CHAN:{}:{}".format(chan, self.device.find_temperature_channel(chan))
 
     def set_p(self, stage, value):
-        self.raise_if_channel_is_not_mc_channel(stage)
+        self.raise_if_channel_is_not_sample_channel(stage)
         self.device.set_p(float(value))
         return "ok"
 
     def set_i(self, stage, value):
-        self.raise_if_channel_is_not_mc_channel(stage)
+        self.raise_if_channel_is_not_sample_channel(stage)
         self.device.set_i(float(value))
         return "ok"
 
     def set_d(self, stage, value):
-        self.raise_if_channel_is_not_mc_channel(stage)
+        self.raise_if_channel_is_not_sample_channel(stage)
         self.device.set_d(float(value))
         return "ok"
 
     def get_p(self, stage):
-        self.raise_if_channel_is_not_mc_channel(stage)
+        self.raise_if_channel_is_not_sample_channel(stage)
         return "STAT:DEV:{}:TEMP:LOOP:P:{}".format(stage, self.device.get_p())
 
     def get_i(self, stage):
-        self.raise_if_channel_is_not_mc_channel(stage)
+        self.raise_if_channel_is_not_sample_channel(stage)
         return "STAT:DEV:{}:TEMP:LOOP:I:{}".format(stage, self.device.get_i())
 
     def get_d(self, stage):
-        self.raise_if_channel_is_not_mc_channel(stage)
+        self.raise_if_channel_is_not_sample_channel(stage)
         return "STAT:DEV:{}:TEMP:LOOP:D:{}".format(stage, self.device.get_d())
 
     def set_temperature_setpoint(self, chan, value):
-        self.raise_if_channel_is_not_mc_channel(chan)
+        self.raise_if_channel_is_not_sample_channel(chan)
         self.device.set_temperature_setpoint(float(value))
         return "ok"
 
     def get_temperature_setpoint(self, chan):
-        self.raise_if_channel_is_not_mc_channel(chan)
-        return "STAT:DEV:{}:TEMP:LOOP:TSET:{}K" \
-            .format(self.device.find_temperature_channel("mc"), self.device.get_temperature_setpoint())
+        self.raise_if_channel_is_not_sample_channel(chan)
+        return "STAT:DEV:{}:TEMP:LOOP:TSET:{}K" .format(chan, self.device.get_temperature_setpoint())
 
     def set_heater_range(self, chan, value):
-        self.raise_if_channel_is_not_mc_channel(chan)
+        self.raise_if_channel_is_not_sample_channel(chan)
         self.device.set_heater_range(float(value))
         return "ok"
 
     def get_heater_range(self, chan):
-        self.raise_if_channel_is_not_mc_channel(chan)
-        return "STAT:DEV:{}:TEMP:LOOP:RANGE:{}".format(chan, self.device.get_heater_range())
+        self.raise_if_channel_is_not_sample_channel(chan)
+        return "STAT:DEV:{}:TEMP:LOOP:RANGE:{}mA".format(chan, self.device.get_heater_range())
 
     def get_heater_type(self, chan):
-        self.raise_if_channel_is_not_mc_channel(chan)
+        self.raise_if_channel_is_not_sample_channel(chan)
         return "STAT:DEV:{}:TEMP:LOOP:HTR:{}".format(chan, HEATER_NAME)
 
     def get_heater_power(self):
@@ -139,11 +144,11 @@ class TritonStreamInterface(StreamInterface):
             .format(HEATER_NAME, self.device.heater_power, self.device.heater_power_units)
 
     def get_closed_loop_mode(self, chan):
-        self.raise_if_channel_is_not_mc_channel(chan)
+        self.raise_if_channel_is_not_sample_channel(chan)
         return "STAT:DEV:{}:TEMP:LOOP:MODE:{}".format(chan, "ON" if self.device.get_closed_loop_mode() else "OFF")
 
     def set_closed_loop_mode(self, chan, mode):
-        self.raise_if_channel_is_not_mc_channel(chan)
+        self.raise_if_channel_is_not_sample_channel(chan)
 
         if mode not in ["ON", "OFF"]:
             raise ValueError("Invalid mode")
@@ -190,3 +195,10 @@ class TritonStreamInterface(StreamInterface):
 
     def get_pressure(self, sensor):
         return "STAT:DEV:{}:PRES:SIG:PRES:{}mB".format(sensor, self.device.get_pressure(sensor))
+
+    def get_time(self):
+        return datetime.now().strftime("STAT:SYS:TIME:%H:%M:%S")
+
+    def get_heater_control_sensor(self):
+        # Always assume heater controls sample. This is true so far at ISIS
+        return "STAT:DEV:{}:HTR:LOOP:SENS:{}".format(HEATER_NAME, self.device.sample_channel)

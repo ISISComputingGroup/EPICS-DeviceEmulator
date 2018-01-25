@@ -3,7 +3,7 @@ from states import DefaultState
 from lewis.devices import StateMachineDevice
 
 
-HEATER_NAME = "H5"
+HEATER_NAME = "H1"
 
 
 class ValveStates(object):
@@ -75,13 +75,16 @@ class SimulatedTriton(StateMachineDevice):
         self.pressure_sensors = {"P{}".format(i): PressureSensor() for i in range(1, 6)}
 
         self.temperature_stages = {
-            "T1": TemperatureStage("stil"),
-            "T2": TemperatureStage("jthx"),
-            "T3": TemperatureStage("4khx"),
-            "T4": TemperatureStage("sorb"),
-            "T5": TemperatureStage("mc"),
+            "T1": TemperatureStage("STIL"),
+            "T2": TemperatureStage("PT1"),
+            "T3": TemperatureStage("PT2"),
+            "T4": TemperatureStage("SORB"),
+            "T5": TemperatureStage("MC"),
             "T6": TemperatureStage("unknown"),
         }
+
+        self.sample_channel = "T5"
+        assert self.sample_channel in self.temperature_stages
 
     def find_temperature_channel(self, name):
         for k, v in self.temperature_stages.items():

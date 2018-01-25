@@ -151,4 +151,3 @@ class RknpsStreamInterface(StreamInterface):
         Reset the device, turn it off and set all values to 0.
         """
         self._device.reset()
-
