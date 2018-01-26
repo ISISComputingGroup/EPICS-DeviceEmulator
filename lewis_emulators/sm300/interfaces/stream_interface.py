@@ -45,8 +45,6 @@ class Sm300StreamInterface(StreamInterface):
             CmdBuilder(self.reset_code).regex(r"\r?").ack().stx().escape("P").any().build()
         }
 
-        self.device = self._device
-
     def handle_error(self, request, error):
         """
         If command is not recognised print and error
@@ -61,7 +59,7 @@ class Sm300StreamInterface(StreamInterface):
     def generate_reply(self, message=None, override_form_to_eot=False):
         """
         Generate a reply as the device depending on the encoding. There are two choice BCC and EOT form
-        EOT is ACK STX <message> EOT and BCC is ACK STX <messsage> ETX <2 digit checksum>
+        EOT is ACK STX <message> EOT and BCC is ACK STX <message> ETX <2 digit checksum>
         Args:
             message: message to send
             override_form_to_eot: If True use the EOT form otherwise use the default form
@@ -69,11 +67,13 @@ class Sm300StreamInterface(StreamInterface):
         Returns: message to reply with.
 
         """
+        if self._device.is_disconnected:
+            return None
 
         if message is None:
             return "{ACK}".format(**ASCII_CHARS)
 
-        if self.device.has_bcc_at_end_of_message and not override_form_to_eot:
+        if self._device.has_bcc_at_end_of_message and not override_form_to_eot:
             sum_chars = 0
             xor_chars = 0
             for character in str(message):
@@ -83,32 +83,34 @@ class Sm300StreamInterface(StreamInterface):
             sum_chars = chr(sum_chars % 256)
             xor_chars = chr(xor_chars)
 
-            return "{ACK}{STX}{0}{ETX}{sum}{xor}".format(message, sum=sum_chars, xor=xor_chars, **ASCII_CHARS)
+            reply = "{ACK}{STX}{message}{ETX}{sum}{xor}".format(
+                message=message, sum=sum_chars, xor=xor_chars, **ASCII_CHARS)
         else:
-            return "{ACK}{STX}{0}{EOT}".format(message, **ASCII_CHARS)
+            reply = "{ACK}{STX}{message}{EOT}".format(message=message, **ASCII_CHARS)
+        return reply
 
     def get_position(self):
         """
         Get position of the motor axes
-        Returns: string indicating postion of motors
+        Returns: string indicating position of motors
 
         """
 
-        x_axis_return = self.device.x_axis.get_label_and_position()
-        y_axis_return = self.device.y_axis.get_label_and_position()
-        self.log.info("Send position {} {}".format(x_axis_return, y_axis_return))
+        x_axis_return = self._device.x_axis.get_label_and_position()
+        y_axis_return = self._device.y_axis.get_label_and_position()
+        self.log.debug("Send position {} {}".format(x_axis_return, y_axis_return))
         return self.generate_reply("{0},{1}".format(x_axis_return, y_axis_return))
 
     def home_axis(self, axis):
         """
         Home the axis.
         Args:
-            axis: acis to home
+            axis: axis to home
 
         Returns: acknowledge when sent
 
         """
-        axis = self.device.axes[axis]
+        axis = self._device.axes[axis]
         axis.home()
         return self.generate_reply()
 
@@ -118,15 +120,15 @@ class Sm300StreamInterface(StreamInterface):
         Returns: the moving status of the motor, N not at position, P at position, E error
 
         """
-        if self.device.is_moving_error or self.device.error_code is not 0:
+        if self._device.is_moving_error or self._device.error_code is not 0:
             status = "E"
         else:
-            is_moving = self.device.is_motor_moving()
+            is_moving = self._device.is_motor_moving()
             if is_moving:
                 status = "N"
             else:
                 status = "P"
-        self.log.info("Send motor status {}".format(status))
+        self.log.debug("Send motor status {}".format(status))
         return self.generate_reply(status, override_form_to_eot=True)
 
     def set_position(self, x_position, y_position):
@@ -139,8 +141,8 @@ class Sm300StreamInterface(StreamInterface):
         Returns: acknowledge when done
 
         """
-        self.device.x_axis.sp = x_position
-        self.device.y_axis.sp = y_position
+        self._device.x_axis.sp = x_position
+        self._device.y_axis.sp = y_position
         return self.generate_reply()
 
     def set_position_as_steps(self, axis, steps):
@@ -153,7 +155,7 @@ class Sm300StreamInterface(StreamInterface):
         Returns: acknowledgement
 
         """
-        axis = self.device.axes[axis]
+        axis = self._device.axes[axis]
         axis.sp = int(steps)
         return self.generate_reply()
 
@@ -166,7 +168,7 @@ class Sm300StreamInterface(StreamInterface):
         Returns: the value
 
         """
-        axis = self.device.axes[axis]
+        axis = self._device.axes[axis]
         if axis.rbv_error is not None:
             return self.generate_reply(axis.rbv_error)
         else:
@@ -179,7 +181,7 @@ class Sm300StreamInterface(StreamInterface):
         Returns: acknowledge
 
         """
-        self.device.move_to_sp()
+        self._device.move_to_sp()
         return self.generate_reply()
 
     def reset_code(self, code):
@@ -191,12 +193,12 @@ class Sm300StreamInterface(StreamInterface):
         Returns: acknowledge
 
         """
-        self.device.reset_codes.append("P{}".format(code))
+        self._device.reset_codes.append("P{}".format(code))
         if code == "EK1":
-            self.device.has_bcc_at_end_of_message = False
+            self._device.has_bcc_at_end_of_message = False
         elif code == "EK0":
-            self.device.has_bcc_at_end_of_message = True
-        self.log.info("Reset codes: {}".format(self.device.reset_codes))
+            self._device.has_bcc_at_end_of_message = True
+        self.log.info("Reset codes: {}".format(self._device.reset_codes))
 
         return self.generate_reply()
 
@@ -209,8 +211,8 @@ class Sm300StreamInterface(StreamInterface):
         Returns: acknowledge
 
         """
-        self.device.reset_codes.append("B/ G{}".format(code))
-        self.log.info("Reset codes: {}".format(self.device.reset_codes))
+        self._device.reset_codes.append("B/ G{}".format(code))
+        self.log.info("Reset codes: {}".format(self._device.reset_codes))
         return self.generate_reply()
 
     def feed_code(self, code):
@@ -222,8 +224,8 @@ class Sm300StreamInterface(StreamInterface):
         Returns: acknowledge
 
         """
-        self.device.reset_codes.append("BF{}".format(code))
-        self.log.info("Reset codes: {}".format(self.device.reset_codes))
+        self._device.reset_codes.append("BF{}".format(code))
+        self.log.info("Reset codes: {}".format(self._device.reset_codes))
         return self.generate_reply()
 
     def stop(self):
@@ -232,7 +234,7 @@ class Sm300StreamInterface(StreamInterface):
         Returns: acknowledge
 
         """
-        for axis in self.device.axes.values():
+        for axis in self._device.axes.values():
             axis.stop()
 
         return self.generate_reply("P")
@@ -246,13 +248,13 @@ class Sm300StreamInterface(StreamInterface):
         Returns: No response
 
         """
-        self.device.disconnect = code
+        self._device.disconnect = code
         return None
 
     def error_status(self):
         """
         Returns: the current error code
         """
-        error_code = "{:02x}".format(self.device.error_code)
-        self.log.error("error code {}".format(error_code))
+        error_code = "{:02x}".format(self._device.error_code)
+        self.log.debug("error code {}".format(error_code))
         return self.generate_reply(error_code)

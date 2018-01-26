@@ -47,7 +47,7 @@ class Axis(object):
         if self.moving:
             self.rbv = approaches.linear(self.rbv, self._move_to_sp, self.speed, dt)
             self.moving = not self._at_position()
-            self.log.info("moving {}".format(self.moving))
+            self.log.debug("moving {}".format(self.moving))
         return
 
     def _at_position(self):
@@ -107,6 +107,7 @@ class SimulatedSm300(StateMachineDevice):
         self.has_bcc_at_end_of_message = True
         self.disconnect = ""
         self.error_code = 0
+        self.is_disconnected = False
 
     def move_to_sp(self):
         """

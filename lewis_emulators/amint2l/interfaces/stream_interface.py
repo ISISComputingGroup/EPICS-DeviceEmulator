@@ -1,7 +1,12 @@
+"""
+Stream device for amint2l
+"""
+
 from lewis.adapters.stream import StreamInterface
 from lewis.core.logging import has_log
 
 from lewis_emulators.utils.command_builder import CmdBuilder
+
 
 @has_log
 class Amint2lStreamInterface(StreamInterface):
@@ -18,7 +23,6 @@ class Amint2lStreamInterface(StreamInterface):
         self.commands = {
             CmdBuilder(self.get_pressure).stx().arg("[A-Fa-f0-9]+").escape("r").build()
         }
-        self.device = self._device
 
     def handle_error(self, request, error):
         """
@@ -40,15 +44,15 @@ class Amint2lStreamInterface(StreamInterface):
         Returns: pressure in correct format if pressure has a value; if None returns None as if it is disconnected
 
         """
-        if address.upper() != self.device.address.upper():
+        if address.upper() != self._device.address.upper():
             self.log.error("unknown address {0}".format(address))
             return None
-        self.log.info("Pressure: {0}".format(self.device.pressure))
-        if self.device.pressure is None:
+        self.log.info("Pressure: {0}".format(self._device.pressure))
+        if self._device.pressure is None:
             return None
         else:
             try:
-                return "{stx}{pressure:+8.3f}".format(stx=chr(2), pressure=self.device.pressure)
+                return "{stx}{pressure:+8.3f}".format(stx=chr(2), pressure=self._device.pressure)
             except ValueError:
                 # pressure contains string probably OR (over range) or UR (under range)
-                return "{stx}{pressure:8s}".format(stx=chr(2), pressure=self.device.pressure)
+                return "{stx}{pressure:8s}".format(stx=chr(2), pressure=self._device.pressure)
