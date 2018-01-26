@@ -4,6 +4,9 @@ from lewis.core.logging import has_log
 from lewis_emulators.utils.command_builder import CmdBuilder
 
 
+OK_NOK = {True: "OK", False: "NOK"}
+
+
 @has_log
 class FZJDDFCHStreamInterface(StreamInterface):
     """
@@ -108,6 +111,7 @@ class FZJDDFCHStreamInterface(StreamInterface):
         if self._device.disconnected or chopper_name != device.chopper_name:
             return None
         drive_direction = "CLOCK" if device.is_drive_direction_clockwise else "ANTICLOCK"
+
         values = [
             "{0:3s}".format(device.chopper_name),
             "{0:.2f}".format(device.frequency_reference),
@@ -115,7 +119,7 @@ class FZJDDFCHStreamInterface(StreamInterface):
             "{0:.2f}".format(device.frequency),
             "{0:.2f}".format(device.phase_setpoint),
             "{0:.2f}".format(device.phase),
-            "{0:s}".format(device.phase_status),
+            "{0:s}".format(OK_NOK[device.self.phase_status_is_ok]),
             "{0:s}".format(device.magnetic_bearing),
             "{0:s}".format(device.magnetic_bearing_status),
             "{0:.1f}".format(device.magnetic_bearing_integrator),

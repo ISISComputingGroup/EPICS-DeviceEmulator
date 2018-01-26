@@ -20,7 +20,8 @@ class SimulatedFZJDDFCH(StateMachineDevice):
         self.frequency = 0
         self.phase_setpoint = 0
         self.phase = 0
-        self.phase_status = "OK"
+        self.phase_status_is_ok = True
+        # self.phase_status.isOK = True
         self.magnetic_bearing = "OFF"
         self.magnetic_bearing_status = "OK"
         self.magnetic_bearing_integrator = 0
@@ -77,5 +78,4 @@ class SimulatedFZJDDFCH(StateMachineDevice):
         Reset device to defaults
         :return: 
         """
-
         self._initialize_data()
