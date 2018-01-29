@@ -1,6 +1,11 @@
-import re
+"""
+A fluent command builder for lewis.
+"""
 
+import re
 from lewis.adapters.stream import Cmd
+
+from lewis_emulators.utils.constants import STX, ACK, EOT, ETX, ENQ
 
 
 class CmdBuilder(object):
@@ -19,17 +24,17 @@ class CmdBuilder(object):
     >>> CmdBuilder("set_pres").escape("pres ").float().build()
     this add float as a regularly expression capture group for your argument. It is equivalent to:
     >>> Cmd("set_pres", r"pres ([+-]?\d+\.?\d*)")
-    There are various arguments like int and digit. Finally some special characters are included so if your protocol uses
-    enquirey character ascii 5 you can match is using
+    There are various arguments like int and digit. Finally some special characters are included so if your protocol
+    uses enquirey character ascii 5 you can match is using
     >>> CmdBuilder("set_pres").escape("pres?").enq().build()
     """
 
-    def __init__(self, target_method, arg_sep=",", ignore=""):
+    def __init__(self, target_method, arg_sep="", ignore=""):
         """
         Create a builder. Use build to create the final object
 
         :param target_method: name of the method target to call when the reg ex matches
-        :param arg_sep: separators between the arguments
+        :param arg_sep: separators between arguments which are next to each other
         :param ignore: set of characters to ignore between text and arguments
         """
         self._target_method = target_method
@@ -41,6 +46,11 @@ class CmdBuilder(object):
             self._ignore = "[{0}]*".format(ignore)
         self._reg_ex = self._ignore
 
+    def _add_to_regex(self, regex, is_arg):
+        self._reg_ex += regex + self._ignore
+        if not is_arg:
+            self._current_sep = ""
+
     def escape(self, text):
         """
         Add some text to the regex which is escaped.
@@ -48,7 +58,31 @@ class CmdBuilder(object):
         :param text: text to add
         :return: builder
         """
-        self._reg_ex += re.escape(text) + self._ignore
+        self._add_to_regex(re.escape(text), False)
+        return self
+
+    def regex(self, regex):
+        """
+        Add a regex to match but not as an argument.
+
+        :param regex: regex to add
+        :return: builder
+        """
+        self._add_to_regex(regex, False)
+        return self
+
+    def spaces(self, at_least_one=False):
+        """
+        Add a regex for any number of spaces
+        Args:
+            at_least_one: true there must be at least one space; false there can be any nnumber including zero
+
+        Returns: builder
+
+        """
+        wildchard = "*" if at_least_one else "+"
+
+        self._add_to_regex(" " + wildchard, False)
         return self
 
     def arg(self, arg_regex):
@@ -58,7 +92,7 @@ class CmdBuilder(object):
         :param arg_regex: regex for the argument (capture group will be added)
         :return: builder
         """
-        self._reg_ex += self._current_sep + "(" + arg_regex + ")" + self._ignore
+        self._add_to_regex(self._current_sep + "(" + arg_regex + ")", True)
         self._current_sep = self._arg_sep
         return self
 
@@ -78,13 +112,19 @@ class CmdBuilder(object):
         """
         return self.arg(r"\d")
 
-    def char(self):
+    def char(self, not_chars=None):
         """
         Add a single character argument.
 
-        :return: builder
+        Args:
+            not_chars: characters that the character can not be; None for can be anything
+
+        Returns: builder
+
         """
-        return self.arg(r".")
+        if not_chars is None:
+            return self.arg(r".")
+        return self.arg("[^{}]".format("".join(not_chars)))
 
     def int(self):
         """
@@ -110,8 +150,8 @@ class CmdBuilder(object):
         """
         Builds the CMd object based on the target and regular expression.
 
-        :param *args: arguments to pass to Cmd constructor
-        :param **kwargs: key word arguments to pass to Cmd constructor
+        :param args: arguments to pass to Cmd constructor
+        :param kwargs: key word arguments to pass to Cmd constructor
         :return: Cmd object
         """
         return Cmd(self._target_method, self._reg_ex, *args, **kwargs)
@@ -123,8 +163,7 @@ class CmdBuilder(object):
         :param char_number: character number
         :return: self
         """
-        self._reg_ex += chr(char_number)
-
+        self._add_to_regex(chr(char_number), False)
         return self
 
     def stx(self):
@@ -133,7 +172,7 @@ class CmdBuilder(object):
 
         :return: builder
         """
-        return self.add_ascii_character(2)
+        return self.escape(STX)
 
     def etx(self):
         """
@@ -141,7 +180,7 @@ class CmdBuilder(object):
 
         :return: builder
         """
-        return self.add_ascii_character(3)
+        return self.escape(ETX)
 
     def eot(self):
         """
@@ -149,7 +188,7 @@ class CmdBuilder(object):
 
         :return: builder
         """
-        return self.add_ascii_character(4)
+        return self.escape(EOT)
 
     def enq(self):
         """
@@ -157,7 +196,7 @@ class CmdBuilder(object):
 
         :return: builder
         """
-        return self.add_ascii_character(5)
+        return self.escape(ENQ)
 
     def ack(self):
         """
@@ -165,4 +204,4 @@ class CmdBuilder(object):
 
         :return: builder
         """
-        return self.add_ascii_character(6)
+        return self.escape(ACK)
