@@ -3,8 +3,11 @@ from lewis.core.logging import has_log
 
 from lewis_emulators.utils.command_builder import CmdBuilder
 
-
+# Dictionaries for parameter states (strings required to build reply to "all status" command)
 OK_NOK = {True: "OK", False: "NOK"}
+ON_OFF = {True: "ON", False: "OFF"}
+START_STOP = {True: "START", False: "STOP"}
+CW_CCW = {True: "CLOCK", False: "ANTICLOCK"}
 
 
 @has_log
@@ -110,7 +113,6 @@ class FZJDDFCHStreamInterface(StreamInterface):
         device = self._device
         if self._device.disconnected or chopper_name != device.chopper_name:
             return None
-        drive_direction = "CLOCK" if device.is_drive_direction_clockwise else "ANTICLOCK"
 
         values = [
             "{0:3s}".format(device.chopper_name),
@@ -119,32 +121,32 @@ class FZJDDFCHStreamInterface(StreamInterface):
             "{0:.2f}".format(device.frequency),
             "{0:.2f}".format(device.phase_setpoint),
             "{0:.2f}".format(device.phase),
-            "{0:s}".format(OK_NOK[device.self.phase_status_is_ok]),
-            "{0:s}".format(device.magnetic_bearing),
-            "{0:s}".format(device.magnetic_bearing_status),
+            "{0:s}".format(OK_NOK[device.phase_status_is_ok]),
+            "{0:s}".format(ON_OFF[device.magnetic_bearing_is_on]),
+            "{0:s}".format(OK_NOK[device.magnetic_bearing_status_is_ok]),
             "{0:.1f}".format(device.magnetic_bearing_integrator),
-            "{0:s}".format(device.drive),
-            "{0:s}".format(device.drive_mode),
+            "{0:s}".format(ON_OFF[device.drive_is_on]),
+            "{0:s}".format(START_STOP[device.drive_mode_is_start]),
             "{0:.2f}".format(device.drive_l1_current),
             "{0:.2f}".format(device.drive_l2_current),
             "{0:.2f}".format(device.drive_l3_current),
-            "{0:s}".format(drive_direction),
-            "{0:s}".format(device.parked_open_status),
+            "{0:s}".format(CW_CCW[device.drive_direction_is_cw]),
+            "{0:s}".format(OK_NOK[device.parked_open_status_is_ok]),
             "{0:.2f}".format(device.drive_temperature),
             "{0:.2f}".format(device.input_clock),
             "{0:.2f}".format(device.phase_outage),
-            "{0:s}".format(device.master_chopper),
-            "{0:s}".format(device.logging),
-            "{0:s}".format(device.lmsr_status),
-            "{0:s}".format(device.dsp_status),
-            "{0:s}".format(device.interlock_er_status),
-            "{0:s}".format(device.interlock_vacuum_status),
-            "{0:s}".format(device.interlock_frequency_monitoring_status),
-            "{0:s}".format(device.interlock_magnetic_bearing_amplifier_temperature_status),
-            "{0:s}".format(device.interlock_magnetic_bearing_amplifier_current_status),
-            "{0:s}".format(device.interlock_drive_amplifier_temperature_status),
-            "{0:s}".format(device.interlock_drive_amplifier_current_status),
-            "{0:s}".format(device.interlock_ups_status)
+            "{0:3s}".format(device.master_chopper),
+            "{0:s}".format(ON_OFF[device.logging_is_on]),
+            "{0:s}".format(OK_NOK[device.lmsr_status_is_ok]),
+            "{0:s}".format(OK_NOK[device.dsp_status_is_ok]),
+            "{0:s}".format(OK_NOK[device.interlock_er_status_is_ok]),
+            "{0:s}".format(OK_NOK[device.interlock_vacuum_status_is_ok]),
+            "{0:s}".format(OK_NOK[device.interlock_frequency_monitoring_status_is_ok]),
+            "{0:s}".format(OK_NOK[device.interlock_magnetic_bearing_amplifier_temperature_status_is_ok]),
+            "{0:s}".format(OK_NOK[device.interlock_magnetic_bearing_amplifier_current_status_is_ok]),
+            "{0:s}".format(OK_NOK[device.interlock_drive_amplifier_temperature_status_is_ok]),
+            "{0:s}".format(OK_NOK[device.interlock_drive_amplifier_current_status_is_ok]),
+            "{0:s}".format(OK_NOK[device.interlock_ups_status_is_ok])
         ]
 
         return_string = ";".join(values)
