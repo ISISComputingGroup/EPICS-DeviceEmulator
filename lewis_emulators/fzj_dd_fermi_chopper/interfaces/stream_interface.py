@@ -67,7 +67,7 @@ class FZJDDFCHStreamInterface(StreamInterface):
         if self._device.disconnected:
             return None
         if self._device.error_on_set_magnetic_bearing is None:
-            self._device.magnetic_bearing = magnetic_bearing
+            self._device.magnetic_bearing_is_on = ON_OFF.keys()[ON_OFF.values().index(magnetic_bearing)]
             reply = "{chopper_name}OK".format(chopper_name=chopper_name)
         else:
             reply = "ERROR;{}".format(self._device.error_on_set_magnetic_bearing)
@@ -79,7 +79,7 @@ class FZJDDFCHStreamInterface(StreamInterface):
         if self._device.disconnected:
             return None
         if self._device.error_on_set_drive_mode is None:
-            self._device.drive_mode = drive_mode
+            self._device.drive_mode_is_start = START_STOP.keys()[START_STOP.values().index(drive_mode)]
             reply = "{chopper_name}OK".format(chopper_name=chopper_name)
         else:
             reply = "ERROR;{}".format(self._device.error_on_set_drive_mode)

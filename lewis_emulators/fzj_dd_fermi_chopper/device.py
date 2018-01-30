@@ -25,7 +25,7 @@ class SimulatedFZJDDFCH(StateMachineDevice):
         self.magnetic_bearing_status_is_ok = True
         self.magnetic_bearing_integrator = 0
         self.drive_is_on = False
-        self.drive_mode_is_start = True
+        self.drive_mode_is_start = False
         self.drive_l1_current = 0
         self.drive_l2_current = 0
         self.drive_l3_current = 0
