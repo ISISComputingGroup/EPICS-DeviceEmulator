@@ -24,6 +24,14 @@ class TemperatureStage(object):
         self.temperature = 1
         self.enabled = True
 
+        self.resistance = 0
+
+        self.excitation_type = "VOLT"
+        self.excitation = 10
+
+        self.pause = 10
+        self.dwell = 3
+
 
 class PressureSensor(object):
     """
@@ -87,6 +95,7 @@ class SimulatedTriton(StateMachineDevice):
         assert self.sample_channel in self.temperature_stages
 
     def find_temperature_channel(self, name):
+
         for k, v in self.temperature_stages.items():
             if v.name == name:
                 return k
@@ -102,17 +111,19 @@ class SimulatedTriton(StateMachineDevice):
     def set_pressure_backdoor(self, sensor, newpressure):
         self.pressure_sensors["P{}".format(sensor)].pressure = float(newpressure)
 
+    def set_sensor_property_backdoor(self, sensor, property, value):
+        # The sensor + 1 is due to an indexing error in the Oxford Instruments firmware.
+        # We are emulating this off-by-one error.
+        setattr(self.temperature_stages["T{}".format(sensor+1)], property, value)
+
     def _get_state_handlers(self):
-        return {
-            'default': DefaultState(),
-        }
+        return {'default': DefaultState()}
 
     def _get_initial_state(self):
         return 'default'
 
     def _get_transition_handlers(self):
-        return OrderedDict([
-        ])
+        return OrderedDict([])
 
     def get_closed_loop_mode(self):
         return self.closed_loop
@@ -157,7 +168,10 @@ class SimulatedTriton(StateMachineDevice):
             return ValveStates.NOT_FOUND
 
     def is_channel_enabled(self, chan):
-        return self.temperature_stages[chan].enabled
+        try:
+            return self.temperature_stages[chan].enabled
+        except KeyError:
+            return False
 
     def set_channel_enabled(self, chan, newstate):
         self.temperature_stages[chan].enabled = newstate

@@ -162,3 +162,12 @@ class CmdBuilder(object):
         :return: builder
         """
         return self.add_ascii_character(6)
+
+    def eos(self):
+        """
+        Adds the regex end-of-string character to a command.
+
+        :return: builder
+        """
+        self._reg_ex += "$"
+        return self

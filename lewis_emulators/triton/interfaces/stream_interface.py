@@ -13,69 +13,73 @@ class TritonStreamInterface(StreamInterface):
     # Commands that we expect via serial during normal operation
     commands = {
         # ID
-        CmdBuilder("get_idn").escape("*IDN?").build(),
+        CmdBuilder("get_idn").escape("*IDN?").eos().build(),
 
         # UIDs
-        CmdBuilder("get_uid").escape("READ:SYS:DR:CHAN:").arg("[A-Z0-9]+").build(),
+        CmdBuilder("get_uid").escape("READ:SYS:DR:CHAN:").arg("[A-Z0-9]+").eos().build(),
 
         # PID setpoints
-        CmdBuilder("set_p").escape("SET:DEV:").arg("T[0-9]+").escape(":TEMP:LOOP:P:").float().build(),
-        CmdBuilder("set_i").escape("SET:DEV:").arg("T[0-9]+").escape(":TEMP:LOOP:I:").float().build(),
-        CmdBuilder("set_d").escape("SET:DEV:").arg("T[0-9]+").escape(":TEMP:LOOP:D:").float().build(),
+        CmdBuilder("set_p").escape("SET:DEV:").arg("T[0-9]+").escape(":TEMP:LOOP:P:").float().eos().build(),
+        CmdBuilder("set_i").escape("SET:DEV:").arg("T[0-9]+").escape(":TEMP:LOOP:I:").float().eos().build(),
+        CmdBuilder("set_d").escape("SET:DEV:").arg("T[0-9]+").escape(":TEMP:LOOP:D:").float().eos().build(),
 
         # PID readbacks
-        CmdBuilder("get_p").escape("READ:DEV:").arg("T[0-9]+").escape(":TEMP:LOOP:P").build(),
-        CmdBuilder("get_i").escape("READ:DEV:").arg("T[0-9]+").escape(":TEMP:LOOP:I").build(),
-        CmdBuilder("get_d").escape("READ:DEV:").arg("T[0-9]+").escape(":TEMP:LOOP:D").build(),
+        CmdBuilder("get_p").escape("READ:DEV:").arg("T[0-9]+").escape(":TEMP:LOOP:P").eos().build(),
+        CmdBuilder("get_i").escape("READ:DEV:").arg("T[0-9]+").escape(":TEMP:LOOP:I").eos().build(),
+        CmdBuilder("get_d").escape("READ:DEV:").arg("T[0-9]+").escape(":TEMP:LOOP:D").eos().build(),
 
         # Setpoint temperature
-        CmdBuilder("set_temperature_setpoint")
-            .escape("SET:DEV:").arg("T[0-9]+").escape(":TEMP:LOOP:TSET:").float().build(),
-        CmdBuilder("get_temperature_setpoint").escape("READ:DEV:").arg("T[0-9]+").escape(":TEMP:LOOP:TSET").build(),
+        CmdBuilder("set_temperature_setpoint").escape("SET:DEV:").arg("T[0-9]+").escape(":TEMP:LOOP:TSET:").float().eos().build(),
+        CmdBuilder("get_temperature_setpoint").escape("READ:DEV:").arg("T[0-9]+").escape(":TEMP:LOOP:TSET").eos().build(),
 
         # Temperature
-        CmdBuilder("get_temp").escape("READ:DEV:").arg("T[0-9]+").escape(":TEMP:SIG:TEMP").build(),
+        CmdBuilder("get_temp").escape("READ:DEV:").arg("T[0-9]+").escape(":TEMP:SIG:TEMP").eos().build(),
 
         # Heater range
-        CmdBuilder("set_heater_range").escape("SET:DEV:").arg("T[0-9]+").escape(":TEMP:LOOP:RANGE:").float().build(),
-        CmdBuilder("get_heater_range").escape("READ:DEV:").arg("T[0-9]+").escape(":TEMP:LOOP:RANGE").build(),
+        CmdBuilder("set_heater_range").escape("SET:DEV:").arg("T[0-9]+").escape(":TEMP:LOOP:RANGE:").float().eos().build(),
+        CmdBuilder("get_heater_range").escape("READ:DEV:").arg("T[0-9]+").escape(":TEMP:LOOP:RANGE").eos().build(),
 
         # Heater type
-        CmdBuilder("get_heater_type").escape("READ:DEV:").arg("T[0-9]+").escape(":TEMP:LOOP:HTR").build(),
+        CmdBuilder("get_heater_type").escape("READ:DEV:").arg("T[0-9]+").escape(":TEMP:LOOP:HTR").eos().build(),
 
         # Get heater power
-        CmdBuilder("get_heater_power").escape("READ:DEV:{}:HTR:SIG:POWR".format(HEATER_NAME)).build(),
+        CmdBuilder("get_heater_power").escape("READ:DEV:{}:HTR:SIG:POWR".format(HEATER_NAME)).eos().build(),
 
         # Heater control sensor
-        CmdBuilder("get_heater_control_sensor").escape("READ:DEV:{}:HTR:LOOP".format(HEATER_NAME)).build(),
+        CmdBuilder("get_heater_control_sensor").escape("READ:DEV:{}:HTR:LOOP".format(HEATER_NAME)).eos().build(),
 
         # Loop mode
-        CmdBuilder("get_closed_loop_mode").escape("READ:DEV:").arg("T[0-9]+").escape(":TEMP:LOOP:MODE").build(),
-        CmdBuilder("set_closed_loop_mode").escape("SET:DEV:").arg("T[0-9]+").escape(":TEMP:LOOP:MODE:").any().build(),
+        CmdBuilder("get_closed_loop_mode").escape("READ:DEV:").arg("T[0-9]+").escape(":TEMP:LOOP:MODE").eos().build(),
+        CmdBuilder("set_closed_loop_mode").escape("SET:DEV:").arg("T[0-9]+").escape(":TEMP:LOOP:MODE:").any().eos().build(),
 
         # Valve state
-        CmdBuilder("get_valve_state").escape("READ:DEV:").arg("V[0-9]+").escape(":VALV:SIG:STATE").build(),
+        CmdBuilder("get_valve_state").escape("READ:DEV:").arg("V[0-9]+").escape(":VALV:SIG:STATE").eos().build(),
 
         # Channel enablement
-        CmdBuilder("get_channel_enabled").escape("READ:DEV:").arg("T[0-9]+").escape(":TEMP:MEAS:ENAB").build(),
-        CmdBuilder("set_channel_enabled").escape("SET:DEV:").arg("T[0-9]+").escape(":TEMP:MEAS:ENAB:").any().build(),
+        CmdBuilder("get_channel_enabled").escape("READ:DEV:").arg("T[0-9]+").escape(":TEMP:MEAS:ENAB").eos().build(),
+        CmdBuilder("set_channel_enabled").escape("SET:DEV:").arg("T[0-9]+").escape(":TEMP:MEAS:ENAB:").any().eos().build(),
 
         # Status
-        CmdBuilder("get_status").escape("READ:SYS:DR:STATUS").build(),
-        CmdBuilder("get_automation").escape("READ:SYS:DR:ACTN").build(),
+        CmdBuilder("get_status").escape("READ:SYS:DR:STATUS").eos().build(),
+        CmdBuilder("get_automation").escape("READ:SYS:DR:ACTN").eos().build(),
 
         # Pressures
-        CmdBuilder("get_pressure").escape("READ:DEV:").arg("P[0-9]+").escape(":PRES:SIG:PRES").build(),
+        CmdBuilder("get_pressure").escape("READ:DEV:").arg("P[0-9]+").escape(":PRES:SIG:PRES").eos().build(),
 
         # System
-        CmdBuilder("get_time").escape("READ:SYS:TIME").build(),
+        CmdBuilder("get_time").escape("READ:SYS:TIME").eos().build(),
+
+        # Sensor info
+        CmdBuilder("get_sig").escape("READ:DEV:").arg("T[0-9]+").escape(":TEMP:SIG").eos().build(),
+        CmdBuilder("get_excitation").escape("READ:DEV:").arg("T[0-9]+").escape(":TEMP:EXCT").eos().build(),
+        CmdBuilder("get_meas").escape("READ:DEV:").arg("T[0-9]+").escape(":TEMP:MEAS").eos().build(),
     }
 
     in_terminator = "\r\n"
     out_terminator = "\n"
 
     def handle_error(self, request, error):
-        err_string = "command was: {}, error was: {}\n".format(request, error)
+        err_string = "command was: {}, error was: {}: {}\n".format(request, error.__class__.__name__, error)
         print(err_string)
         self.log.error(err_string)
         return err_string
@@ -154,7 +158,7 @@ class TritonStreamInterface(StreamInterface):
             raise ValueError("Invalid mode")
 
         self.device.set_closed_loop_mode(mode == "ON")
-        return "ok"
+        return "STAT:SET:DEV:{}:TEMP:LOOP:MODE:{}:VALID".format(chan, mode)
 
     def get_valve_state(self, valve):
 
@@ -202,3 +206,24 @@ class TritonStreamInterface(StreamInterface):
     def get_heater_control_sensor(self):
         # Always assume heater controls sample. This is true so far at ISIS
         return "STAT:DEV:{}:HTR:LOOP:SENS:{}".format(HEATER_NAME, self.device.sample_channel)
+
+    def get_sig(self, chan):
+        return "STAT:DEV:{}:TEMP:SIG:TEMP:{}K:RES:{}Ohm".format(
+            chan,
+            self.device.temperature_stages[chan].temperature,
+            self.device.temperature_stages[chan].resistance,
+        )
+
+    def get_excitation(self, chan):
+        return "STAT:DEV:{}:TEMP:EXCT:TYPE:{}:MAG:{}V".format(
+            chan,
+            self.device.temperature_stages[chan].excitation_type,
+            self.device.temperature_stages[chan].excitation,
+        )
+
+    def get_meas(self, chan):
+        return "STAT:DEV:{}:TEMP:MEAS:PAUS:{}s:DWEL:{}s:ENAB:ON".format(
+            chan,
+            self.device.temperature_stages[chan].pause,
+            self.device.temperature_stages[chan].dwell,
+        )
