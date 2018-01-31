@@ -1,7 +1,7 @@
 from collections import OrderedDict
 
 from lewis.devices import StateMachineDevice
-from .states import DefaultState
+from .states import StartedState, StoppedState
 
 
 class SimulatedFZJDDFCH(StateMachineDevice):
@@ -13,6 +13,7 @@ class SimulatedFZJDDFCH(StateMachineDevice):
         """
         Sets the initial state of the device.
         """
+        # only one chopper in this case
         self.chopper_name = "C01"
         # reference frequency set to 50Hz to match actual device
         self.frequency_reference = 50
@@ -24,8 +25,8 @@ class SimulatedFZJDDFCH(StateMachineDevice):
         self.magnetic_bearing_is_on = True
         self.magnetic_bearing_status_is_ok = True
         self.magnetic_bearing_integrator = 0
-        self.drive_is_on = False
-        self.drive_mode_is_start = False
+        self.drive_is_on = True
+        self.drive_mode_is_start = True
         self.drive_l1_current = 0
         self.drive_l2_current = 0
         self.drive_l3_current = 0
@@ -58,19 +59,25 @@ class SimulatedFZJDDFCH(StateMachineDevice):
         """
         Returns: states and their names
         """
-        return {DefaultState.NAME: DefaultState()}
+        return {
+            StartedState.NAME: StartedState(),
+            StoppedState.NAME: StoppedState()
+        }
 
     def _get_initial_state(self):
         """
         Returns: the name of the initial state
         """
-        return DefaultState.NAME
+        return StoppedState.NAME
 
     def _get_transition_handlers(self):
         """
         Returns: the state transitions
         """
-        return OrderedDict()
+        return OrderedDict([
+            ((StoppedState.NAME, StartedState.NAME), lambda: self.drive_mode_is_start),
+            ((StartedState.NAME, StoppedState.NAME), lambda: not self.drive_mode_is_start),
+        ])
 
     def reset(self):
         """

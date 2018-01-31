@@ -12,6 +12,7 @@ CW_CCW = {True: "CLOCK", False: "ANTICLOCK"}
 
 @has_log
 class FZJDDFCHStreamInterface(StreamInterface):
+
     """
     Stream interface for the Ethernet port
     """
@@ -29,17 +30,29 @@ class FZJDDFCHStreamInterface(StreamInterface):
     out_terminator = "\r\n"
 
     def handle_error(self, request, error):
+
         """
-        If command is not recognised print and error
+        If command is not recognised, print and error
 
         Args:
             request: requested string
             error: problem
-
         """
+
         self.log.error("An error occurred at request " + repr(request) + ": " + repr(error))
 
     def set_frequency(self, chopper_name, frequency):
+
+        """
+        Sets the frequency setpoint by multiplying input value by reference frequency
+
+        Args:
+            chopper_name: Chopper name (C01, C02, C2B, C03)
+            frequency: Frequency setpoint multiple (1, 2, 3, ... 12)
+
+        Returns: OK or error
+        """
+
         if self._device.disconnected:
             return None
         if self._device.error_on_set_frequency is None:
@@ -52,6 +65,17 @@ class FZJDDFCHStreamInterface(StreamInterface):
         return reply
 
     def set_phase(self, chopper_name, phase):
+
+        """
+        Sets the phase setpoint
+
+        Args:
+            chopper_name:  Chopper name (C01, C02, C2B, C03)
+            phase: Phase setpoint (0.01 ... 359.99)
+
+        Returns: OK or error
+        """
+
         if self._device.disconnected:
             return None
         if self._device.error_on_set_phase is None:
@@ -64,6 +88,17 @@ class FZJDDFCHStreamInterface(StreamInterface):
         return reply
 
     def set_magnetic_bearing(self, chopper_name, magnetic_bearing):
+
+        """
+        Sets the state of the magnetic bearings
+
+        Args:
+            chopper_name:  Chopper name (C01, C02, C2B, C03)
+            magnetic_bearing: boolean value to set magnetic bearings on or off ("ON", "OFF")
+
+        Returns: OK or error
+        """
+
         if self._device.disconnected:
             return None
         if self._device.error_on_set_magnetic_bearing is None:
@@ -76,6 +111,17 @@ class FZJDDFCHStreamInterface(StreamInterface):
         return reply
 
     def set_drive_mode(self, chopper_name, drive_mode):
+
+        """
+        Sets the drive mode
+
+        Args:
+            chopper_name:   Chopper name (C01, C02, C2B, C03)
+            drive_mode: boolean value to set drive ("START", "STOP")
+
+        Returns: OK or error
+        """
+
         if self._device.disconnected:
             return None
         if self._device.error_on_set_drive_mode is None:
@@ -90,12 +136,14 @@ class FZJDDFCHStreamInterface(StreamInterface):
     def get_magnetic_bearing_status(self, chopper_name):
 
         """
-        Gets the magnetic bearing status for the FZJ Digital Drive Fermi Chopper Controller
+        Gets the magnetic bearing status
 
-        :param
-        Returns:
+        Args:
+            chopper_name:  Chopper name (e.g. C01, C02, C2B, C03)
 
+        Returns: magnetic bearing status
         """
+
         if self._device.disconnected:
             return None
         device = self._device
@@ -104,12 +152,14 @@ class FZJDDFCHStreamInterface(StreamInterface):
     def get_all_status(self, chopper_name):
 
         """
-        Gets the all status for the FZJ Digital Drive Fermi Chopper Controller
+        Gets the status as a single string
 
-        :param 
-        Returns:
+        Args:
+            chopper_name:  Chopper name (e.g. C01, C02, C2B, C03)
 
+        Returns: string containing values for all parameters
         """
+
         device = self._device
         if self._device.disconnected or chopper_name != device.chopper_name:
             return None
@@ -149,9 +199,9 @@ class FZJDDFCHStreamInterface(StreamInterface):
             "{0:s}".format(OK_NOK[device.interlock_ups_status_is_ok])
         ]
 
-        return_string = ";".join(values)
+        status_string = ";".join(values)
 
         # print reply string in log
-        # self.log.info(return_string)
+        # self.log.info(status_string)
 
-        return return_string
+        return status_string
