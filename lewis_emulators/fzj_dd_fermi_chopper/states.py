@@ -13,6 +13,7 @@ class StartedState(State):
     def in_state(self, dt):
         device = self._context
         device.frequency = approaches.linear(device.frequency, device.frequency_setpoint, 1, dt)
+        device.phase = approaches.linear(device.phase, device.phase_setpoint, 1, dt)
 
 
 class StoppedState(State):
@@ -24,3 +25,4 @@ class StoppedState(State):
     def in_state(self, dt):
         device = self._context
         device.frequency = approaches.linear(device.frequency, 0, 1, dt)
+        device.phase = approaches.linear(device.phase, 0, 1, dt)
