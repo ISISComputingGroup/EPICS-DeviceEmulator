@@ -68,7 +68,7 @@ class SimulatedTriton(StateMachineDevice):
         """
         self.heater_range = 0
         self.heater_power = 1
-        self.heater_power_units = "mA"
+        self.heater_current = 0
 
         self.temperature_setpoint = 0
         self.p = 0

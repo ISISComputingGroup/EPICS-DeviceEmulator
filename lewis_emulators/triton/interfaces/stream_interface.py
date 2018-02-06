@@ -45,6 +45,9 @@ class TritonStreamInterface(StreamInterface):
         # Get heater power
         CmdBuilder("get_heater_power").escape("READ:DEV:{}:HTR:SIG:POWR".format(HEATER_NAME)).eos().build(),
 
+        # Get heater current
+        CmdBuilder("get_heater_current").escape("READ:DEV:{}:HTR:SIG:CURR".format(HEATER_NAME)).eos().build(),
+
         # Heater control sensor
         CmdBuilder("get_heater_control_sensor").escape("READ:DEV:{}:HTR:LOOP".format(HEATER_NAME)).eos().build(),
 
@@ -144,8 +147,10 @@ class TritonStreamInterface(StreamInterface):
         return "STAT:DEV:{}:TEMP:LOOP:HTR:{}".format(chan, HEATER_NAME)
 
     def get_heater_power(self):
-        return "STAT:DEV:{}:HTR:SIG:POWR:{}{}"\
-            .format(HEATER_NAME, self.device.heater_power, self.device.heater_power_units)
+        return "STAT:DEV:{}:HTR:SIG:POWR:{}uW".format(HEATER_NAME, self.device.heater_power)
+
+    def get_heater_current(self):
+        return "STAT:DEV:{}:HTR:SIG:CURR:{}mA".format(HEATER_NAME, self.device.heater_current)
 
     def get_closed_loop_mode(self, chan):
         self.raise_if_channel_is_not_sample_channel(chan)
