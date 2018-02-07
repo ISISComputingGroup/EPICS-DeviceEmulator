@@ -45,8 +45,8 @@ class TritonStreamInterface(StreamInterface):
         # Get heater power
         CmdBuilder("get_heater_power").escape("READ:DEV:{}:HTR:SIG:POWR".format(HEATER_NAME)).eos().build(),
 
-        # Get heater current
-        CmdBuilder("get_heater_current").escape("READ:DEV:{}:HTR:SIG:CURR".format(HEATER_NAME)).eos().build(),
+        # Get heater resistance
+        CmdBuilder("get_heater_resistance").escape("READ:DEV:{}:HTR:RES".format(HEATER_NAME)).eos().build(),
 
         # Heater control sensor
         CmdBuilder("get_heater_control_sensor").escape("READ:DEV:{}:HTR:LOOP".format(HEATER_NAME)).eos().build(),
@@ -148,6 +148,9 @@ class TritonStreamInterface(StreamInterface):
 
     def get_heater_power(self):
         return "STAT:DEV:{}:HTR:SIG:POWR:{}uW".format(HEATER_NAME, self.device.heater_power)
+
+    def get_heater_resistance(self):
+        return "STAT:DEV:{}:HTR:RES:{}Ohm".format(HEATER_NAME, self.device.heater_resistance)
 
     def get_heater_current(self):
         return "STAT:DEV:{}:HTR:SIG:CURR:{}mA".format(HEATER_NAME, self.device.heater_current)

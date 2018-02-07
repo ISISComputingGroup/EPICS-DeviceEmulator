@@ -53,13 +53,6 @@ class Valve(object):
         self.open = False
 
 
-class Heater(object):
-    def __init__(self):
-        self.range = 0
-        self.power = 0
-        self.power_units = 0
-
-
 class SimulatedTriton(StateMachineDevice):
 
     def _initialize_data(self):
@@ -68,7 +61,7 @@ class SimulatedTriton(StateMachineDevice):
         """
         self.heater_range = 0
         self.heater_power = 1
-        self.heater_current = 0
+        self.heater_resistance = 0
 
         self.temperature_setpoint = 0
         self.p = 0
