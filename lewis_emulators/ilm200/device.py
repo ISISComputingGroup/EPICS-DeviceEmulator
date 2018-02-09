@@ -15,7 +15,7 @@ class SimulatedIlm200(StateMachineDevice):
         """
         Initialize all of the device's attributes.
         """
-        self.channels = {1: Channel(), 2: Channel(), 3: Channel()}
+        self.channels = {1: Channel(Channel.NITROGEN), 2: Channel(Channel.HELIUM), 3: Channel(Channel.HELIUM_CONT)}
 
     def _get_state_handlers(self):
         return {
@@ -37,3 +37,6 @@ class SimulatedIlm200(StateMachineDevice):
 
     def set_fill_rate(self, channel, fast):
         self.fast_fill_rate = self.channels[channel].set_fill_rate(fast)
+
+    def get_cryo_type(self, channel):
+        return self.channels[channel].get_cryo_type()

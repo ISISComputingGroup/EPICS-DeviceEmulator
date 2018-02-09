@@ -1,5 +1,6 @@
 from lewis.adapters.stream import StreamInterface, Cmd
 from lewis.core.logging import has_log
+from lewis_emulators.utils.command_builder import CmdBuilder
 
 
 @has_log
@@ -7,22 +8,29 @@ class Ilm200StreamInterface(StreamInterface):
 
     # Commands that we expect via serial during normal operation
     commands = {
-        Cmd("get_channel_1_level", "^R1$"),
-        Cmd("get_channel_2_level", "^R2$"),
-        Cmd("get_channel_3_level", "^R3$"),
 
         Cmd("get_version", "^V$"),
 
-        Cmd("set_channel_1_fast", "^T1$"),
-        Cmd("set_channel_2_fast", "^T2$"),
-        Cmd("set_channel_3_fast", "^T3$"),
-        Cmd("set_channel_1_slow", "^S1$"),
-        Cmd("set_channel_2_slow", "^S2$"),
-        Cmd("set_channel_3_slow", "^S3$"),
+        Cmd("get_status", "^X$"),
+
+        Cmd("get_level", "^R1$"),
+        Cmd("set_rate_fast", "^T1$"),
+        Cmd("set_rate_slow", "^S2$"),
     }
 
-    in_terminator = "\r\n"
-    out_terminator = "\r\n"
+    in_terminator = "\r"
+    out_terminator = "\r"
+
+    def __init__(self):
+
+        super(Ilm200StreamInterface, self).__init__()
+        self.commands = {
+            CmdBuilder(self.get_version).escape("V").build(),
+            CmdBuilder(self.get_status).escape("X").build(),
+            CmdBuilder(self.get_level).escape("R").int().build(),
+            CmdBuilder(self.set_rate_slow).escape("S").int().build(),
+            CmdBuilder(self.set_rate_fast).escape("T").int().build(),
+        }
 
     def handle_error(self, request, error):
         print("An error occurred at request " + repr(request) + ": " + repr(error))
@@ -31,29 +39,26 @@ class Ilm200StreamInterface(StreamInterface):
     def get_version(self):
         return "IBEX Emulator"
 
-    def get_channel_1_level(self):
-        return self._device.get_level(channel=1)
+    def set_rate_slow(self, channel):
+        self._device.set_fill_rate(channel=int(channel), fast=False)
 
-    def get_channel_2_level(self):
-        return self._device.get_level(channel=2)
+    def set_rate_fast(self, channel):
+        self._device.set_fill_rate(channel=int(channel), fast=True)
 
-    def get_channel_3_level(self):
-        return self._device.get_level(channel=3)
+    def get_level(self, channel):
+        return self._device.get_level(channel=int(channel))
 
-    def set_channel_1_fast(self):
-        self._device.set_rate(channel=1, fast=True)
+    def _get_status(self, channel):
+        return 0
 
-    def set_channel_2_fast(self):
-        self._device.set_rate(channel=2, fast=True)
+    def _get_logic_status(self):
+        return 0
 
-    def set_channel_3_fast(self):
-        self._device.set_rate(channel=3, fast=True)
-
-    def set_channel_1_slow(self):
-        self._device.set_rate(channel=1, fast=False)
-
-    def set_channel_2_slow(self):
-        self._device.set_rate(channel=2, fast=False)
-
-    def set_channel_3_slow(self):
-        self._device.set_rate(channel=3, fast=False)
+    def get_status(self):
+        d = self._device
+        return "X{ch1_type:01d}{ch2_type:01d}{ch3_type:01d}S{ch1_status:02d}{ch2_status:02d}"\
+               "{ch3_status:02d}R{logic_status:02d}".format(
+                   ch1_type=d.get_cryo_type(1), ch2_type=d.get_cryo_type(2), ch3_type=d.get_cryo_type(3),
+                   ch1_status=self._get_status(1), ch2_status=self._get_status(2), ch3_status=self._get_status(3),
+                   logic_status=self._get_logic_status()
+               )
