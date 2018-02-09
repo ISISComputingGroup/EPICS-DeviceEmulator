@@ -5,7 +5,13 @@ class Channel(object):
     HELIUM_CONT = 3
     CRYO_TYPES = (NITROGEN, HELIUM, HELIUM_CONT)
 
-    FILL_RATE = 10.0
+    FAST_FILL_RATE = 50.0
+    SLOW_FILL_RATE = 10.0
+    GAS_USE_RATE = 5.0
+
+    FULL = 95.0
+    FILL = 5.0
+    LOW = 10.0
 
     def __init__(self, cryo_type):
         """
@@ -15,6 +21,7 @@ class Channel(object):
         self.fast_fill_rate = True
         assert cryo_type in Channel.CRYO_TYPES
         self.cryo_type = cryo_type
+        self.filling = False
 
     def get_level(self):
         return self.level
@@ -27,3 +34,18 @@ class Channel(object):
 
     def get_cryo_type(self):
         return self.cryo_type
+
+    def has_helium_current(self):
+        return self.cryo_type in (Channel.HELIUM, Channel.HELIUM_CONT)
+
+    def trigger_auto_fill(self):
+        self.filling = self.level < (Channel.FULL if self.filling else Channel.FILL)
+
+    def is_filling(self):
+        return self.filling
+
+    def start_filling(self):
+        return self.level < Channel.FILL
+
+    def is_level_low(self):
+        return self.level < Channel.LOW
