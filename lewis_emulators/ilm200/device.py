@@ -43,3 +43,6 @@ class SimulatedIlm200(StateMachineDevice):
 
     def set_level(self, channel, level):
         self.channels[channel].level = level
+
+    def set_helium_current(self, channel, is_on):
+        self.channels[channel].set_helium_current(is_on)
