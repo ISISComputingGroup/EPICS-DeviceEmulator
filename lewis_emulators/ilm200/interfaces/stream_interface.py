@@ -69,6 +69,7 @@ class Ilm200StreamInterface(StreamInterface):
 
     def get_status(self, _):
         d = self._device
+        # "XabcSuuvvwwRxyz" : Described fully in ILM 200 manual section 8.2
         status_string = "X{ch1_type:01d}{ch2_type:01d}{ch3_type:01d}S{ch1_status:02x}{ch2_status:02x}"\
                         "{ch3_status:02x}R{logic_status:02d}".format(
                             ch1_type=d.get_cryo_type(1), ch2_type=d.get_cryo_type(2), ch3_type=d.get_cryo_type(3),
