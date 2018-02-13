@@ -59,6 +59,8 @@ class Ilm200StreamInterface(StreamInterface):
             False,  # Alarm requested is always
             False,  # Pre-Pulse flowing current
         )
+
+        # Construct bitwise return code from the various status bits
         return sum([int(set_it)*2**bit for bit, set_it in enumerate(bits)])
 
     @staticmethod
