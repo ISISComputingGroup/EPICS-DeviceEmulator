@@ -13,7 +13,7 @@ class SimulatedAmint2l(StateMachineDevice):
         """
         Sets the initial state of the device.
         """
-        self._pressure = 2.0
+        self.pressure = 2.0
         self.address = "AB"
 
     def _get_state_handlers(self):
@@ -33,18 +33,3 @@ class SimulatedAmint2l(StateMachineDevice):
         Returns: the state transitions
         """
         return OrderedDict()
-
-    @property
-    def pressure(self):
-        """
-        Returns: the pressure
-        """
-        return self._pressure
-
-    @pressure.setter
-    def pressure(self, pressure):
-        """
-        :param pressure: set the pressure
-        :return:
-        """
-        self._pressure = pressure
