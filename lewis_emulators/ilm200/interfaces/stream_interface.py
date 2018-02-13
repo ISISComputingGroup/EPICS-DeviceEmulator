@@ -65,7 +65,7 @@ class Ilm200StreamInterface(StreamInterface):
 
     @staticmethod
     def _get_logic_status():
-        return 0
+        return 0  # Describes the state of the ILM relay. Not currently used in IOC
 
     def get_status(self, _):
         d = self._device
