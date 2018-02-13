@@ -43,7 +43,7 @@ class Channel(object):
         self.current = self.cryo_type in (Channel.HELIUM, Channel.HELIUM_CONT) and is_on
 
     def trigger_auto_fill(self, cycle):
-        if not cycle:  # Channel not cycling, use not filling level
+        if not cycle:  # Channel not cycling, set a fill level between 0 and 100
             filling_trigger_level = Channel.FILL
         elif self.filling:  # Channel cycling but already filling. Only stop filling when full
             filling_trigger_level = Channel.FULL
