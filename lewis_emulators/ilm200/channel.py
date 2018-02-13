@@ -5,9 +5,10 @@ class Channel(object):
     HELIUM_CONT = 3
     CRYO_TYPES = (NITROGEN, HELIUM, HELIUM_CONT)
 
-    FAST_FILL_RATE = 50.0
-    SLOW_FILL_RATE = 10.0
-    GAS_USE_RATE = 5.0
+    SPEED_MODIFIER = 0.01
+    FAST_FILL_RATE = SPEED_MODIFIER*50.0
+    SLOW_FILL_RATE = SPEED_MODIFIER*10.0
+    GAS_USE_RATE = SPEED_MODIFIER*5.0
 
     FULL = 95.0
     FILL = 5.0
@@ -22,6 +23,7 @@ class Channel(object):
         assert cryo_type in Channel.CRYO_TYPES
         self.cryo_type = cryo_type
         self.filling = False
+        self.current = False
 
     def get_level(self):
         return self.level
@@ -36,10 +38,20 @@ class Channel(object):
         return self.cryo_type
 
     def has_helium_current(self):
-        return self.cryo_type in (Channel.HELIUM, Channel.HELIUM_CONT)
+        return self.cryo_type in (Channel.HELIUM, Channel.HELIUM_CONT) and self.current
 
-    def trigger_auto_fill(self):
-        self.filling = self.level < (Channel.FULL if self.filling else Channel.FILL)
+    def set_helium_current(self, is_on):
+        self.current = self.cryo_type in (Channel.HELIUM, Channel.HELIUM_CONT) and is_on
+
+    def trigger_auto_fill(self, cycle):
+        if not cycle:  # Channel not cycling, use not filling level
+            filling_trigger_level = Channel.FILL
+        elif self.filling:  # Channel cycling but already filling. Only stop filling when full
+            filling_trigger_level = Channel.FULL
+        else:  # Channel cycling and not already filling. Start filling when it hits the filling level
+            filling_trigger_level = Channel.FILL
+
+        self.filling = self.level < filling_trigger_level
 
     def is_filling(self):
         return self.filling

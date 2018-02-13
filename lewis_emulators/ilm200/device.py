@@ -9,13 +9,13 @@ from .channel import Channel
 class SimulatedIlm200(StateMachineDevice):
 
     LOW_LEVEL = 10.0
-    FILL_RATE = 10.0
 
     def _initialize_data(self):
         """
         Initialize all of the device's attributes.
         """
         self.channels = {1: Channel(Channel.NITROGEN), 2: Channel(Channel.HELIUM), 3: Channel(Channel.HELIUM_CONT)}
+        self.cycle = True  # Whether the device will continuously cycle through fill states
 
     def _get_state_handlers(self):
         return {
@@ -40,3 +40,6 @@ class SimulatedIlm200(StateMachineDevice):
 
     def get_cryo_type(self, channel):
         return self.channels[channel].get_cryo_type()
+
+    def set_level(self, channel, level):
+        self.channels[channel].level = level
