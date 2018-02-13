@@ -47,6 +47,8 @@ class Ilm200StreamInterface(StreamInterface):
 
     def _get_channel_status(self, channel_number):
         channel = self._device.channels[channel_number]
+
+        #  A full description of these bits can be found in the IOC or the manual
         bits = (
             channel.has_helium_current(),
             channel.is_fill_rate_fast(),
