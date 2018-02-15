@@ -95,4 +95,4 @@ ENV/
 
 
 #pycharm
-.idea/
+**/.idea/
