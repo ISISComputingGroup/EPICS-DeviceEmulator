@@ -77,5 +77,5 @@ class Ilm200StreamInterface(StreamInterface):
                             ch3_status=self._get_channel_status(3),
                             logic_status=Ilm200StreamInterface._get_logic_status()
                         )
-        print("STATUS: " + status_string)
+        self.log.info("STATUS: " + status_string)
         return status_string
