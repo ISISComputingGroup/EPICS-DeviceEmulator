@@ -39,7 +39,7 @@ class GemorcStreamInterface(StreamInterface):
         Returns:
             Device's PnP identity
         """
-        return "IBEX_GEMORC_DEVICE_EMULATOR"
+        return "IBEX GEMORC DEVICE EMULATOR"
 
     def initialise(self):
         """
