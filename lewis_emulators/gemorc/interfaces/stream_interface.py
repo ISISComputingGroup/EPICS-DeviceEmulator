@@ -121,8 +121,8 @@ class GemorcStreamInterface(StreamInterface):
         Get the current state of the collimator. This is backwards engineered from the VI. I haven't actually seen
         what the real thing returns as the VI code doesn't match the spec
         """
-        request_format = "{oscillating:01d}....{initialising:01d}....{initialised:01d}.....{width:03d}....." \
-                         "{offset:+04d}......{speed:02d}.....{acceleration:03d}..{cycles:05d}..........{backlash:03d}"
+        request_format = "{oscillating:01d}    {initialising:01d}    {initialised:01d}     {width:03d}     " \
+                         "{offset:+04d}      {speed:02d}     {acceleration:03d}  {cycles:05d}          {backlash:03d}"
         status_string = request_format.format(
             oscillating=int(self.device.is_oscillating()),
             initialising=int(self.device.is_initialising()),
