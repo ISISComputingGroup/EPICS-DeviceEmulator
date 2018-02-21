@@ -46,35 +46,35 @@ class GemorcStreamInterface(StreamInterface):
         Initialise the collimator after 1 turn rotation
         """
         self.device.initialise()
-        return "inok"
+        return "OK"
 
     def re_zero_to_datum(self):
         """
         Re-zero position from datum marker
         """
         self.device.re_zero_to_datum()
-        return "daok"
+        return "OK"
 
     def start(self):
         """
         Start motion
         """
         self.device.start()
-        return "stok"
+        return "OK"
 
     def stop(self):
         """
         Stop motion
         """
         self.device.stop()
-        return "spok"
+        return "OK"
 
     def stop_next_initialisation(self):
         """
         Stop motion after next auto-initialisation
         """
         self.device.stop_next_initialisation()
-        return "siok"
+        return "OK"
 
     def set_window_width(self, width):
         """
@@ -84,7 +84,7 @@ class GemorcStreamInterface(StreamInterface):
             width: Width in centi-degrees
         """
         self.device.set_window_width(int(width))
-        return "wwok"
+        return "OK"
 
     def set_offset(self, offset):
         """
@@ -94,7 +94,7 @@ class GemorcStreamInterface(StreamInterface):
             offset: Datum offset in centi-degrees
         """
         self.device.set_offset(int(offset))
-        return "ofok"
+        return "OK"
 
     def set_acceleration(self, acceleration):
         """
@@ -104,7 +104,7 @@ class GemorcStreamInterface(StreamInterface):
             acceleration: Rate of acceleration in centi-degrees per second^2
         """
         self.device.set_acceleration(int(acceleration))
-        return "acok"
+        return "OK"
 
     def set_speed(self, speed):
         """
@@ -114,7 +114,7 @@ class GemorcStreamInterface(StreamInterface):
             speed: Speed in centi-degrees per second
         """
         self.device.set_speed(int(speed))
-        return "dsok"
+        return "OK"
 
     def get_status(self):
         """
