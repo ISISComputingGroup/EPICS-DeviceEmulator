@@ -39,7 +39,7 @@ class GemorcStreamInterface(StreamInterface):
         Returns:
             Device's PnP identity
         """
-        return "IBEX GEMORC DEVICE EMULATOR"
+        return "0002 0001 ISIS Gem Oscillating Rotary Collimator (IBEX EMULATOR)"
 
     def initialise(self):
         """
