@@ -39,42 +39,42 @@ class GemorcStreamInterface(StreamInterface):
         Returns:
             Device's PnP identity
         """
-        return "IBEX_GEMORC_DEVICE_EMULATOR"
+        return "0002 0001 ISIS Gem Oscillating Rotary Collimator (IBEX EMULATOR)"
 
     def initialise(self):
         """
         Initialise the collimator after 1 turn rotation
         """
         self.device.initialise()
-        return "inok"
+        return "OK"
 
     def re_zero_to_datum(self):
         """
         Re-zero position from datum marker
         """
         self.device.re_zero_to_datum()
-        return "daok"
+        return "OK"
 
     def start(self):
         """
         Start motion
         """
         self.device.start()
-        return "stok"
+        return "OK"
 
     def stop(self):
         """
         Stop motion
         """
         self.device.stop()
-        return "spok"
+        return "OK"
 
     def stop_next_initialisation(self):
         """
         Stop motion after next auto-initialisation
         """
         self.device.stop_next_initialisation()
-        return "siok"
+        return "OK"
 
     def set_window_width(self, width):
         """
@@ -84,7 +84,7 @@ class GemorcStreamInterface(StreamInterface):
             width: Width in centi-degrees
         """
         self.device.set_window_width(int(width))
-        return "wwok"
+        return "OK"
 
     def set_offset(self, offset):
         """
@@ -94,7 +94,7 @@ class GemorcStreamInterface(StreamInterface):
             offset: Datum offset in centi-degrees
         """
         self.device.set_offset(int(offset))
-        return "ofok"
+        return "OK"
 
     def set_acceleration(self, acceleration):
         """
@@ -104,7 +104,7 @@ class GemorcStreamInterface(StreamInterface):
             acceleration: Rate of acceleration in centi-degrees per second^2
         """
         self.device.set_acceleration(int(acceleration))
-        return "acok"
+        return "OK"
 
     def set_speed(self, speed):
         """
@@ -114,15 +114,15 @@ class GemorcStreamInterface(StreamInterface):
             speed: Speed in centi-degrees per second
         """
         self.device.set_speed(int(speed))
-        return "dsok"
+        return "OK"
 
     def get_status(self):
         """
         Get the current state of the collimator. This is backwards engineered from the VI. I haven't actually seen
         what the real thing returns as the VI code doesn't match the spec
         """
-        request_format = "{oscillating:01d}....{initialising:01d}....{initialised:01d}.....{width:03d}....." \
-                         "{offset:+04d}......{speed:02d}.....{acceleration:03d}..{cycles:05d}..........{backlash:03d}"
+        request_format = "{oscillating:01d}    {initialising:01d}    {initialised:01d}     {width:03d}     " \
+                         "{offset:+04d}      {speed:02d}     {acceleration:03d}  {cycles:05d}          {backlash:03d}"
         status_string = request_format.format(
             oscillating=int(self.device.is_oscillating()),
             initialising=int(self.device.is_initialising()),
