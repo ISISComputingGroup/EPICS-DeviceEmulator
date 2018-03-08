@@ -15,7 +15,7 @@ class SimulatedCCD100(StateMachineDevice):
         self.speed = 1
 
         # When the device is in an error state it can respond with junk
-        self.is_giving_errors = True
+        self.is_giving_errors = False
         self.out_error = "}{<7f>w"
         self.out_terminator_in_error = ""
 
