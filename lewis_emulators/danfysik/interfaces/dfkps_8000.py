@@ -33,7 +33,7 @@ class Danfysik8000StreamInterface(CommonStreamInterface, StreamInterface):
 
         response = "{power_off}{pol_normal}{pol_reversed}{reg_transformer}{dac16}{dac17}{is_percent}{spare}"\
                    "{transistor_fault}{sum_interlock}{dc_overcurrent}{dc_overload}{reg_mod_fail}{prereg_fail}" \
-                   "{phase_fail}""{mps_waterflow_fail}{earth_leak_fail}{thermal_fail}{mps_overtemperature}" \
+                   "{phase_fail}{mps_waterflow_fail}{earth_leak_fail}{thermal_fail}{mps_overtemperature}" \
                    "{door_switch}{mag_waterflow_fail}{mag_overtemp}{mps_not_ready}{spare}".format(
                         spare=bit(False),
                         power_off=bit(not self.device.power),
@@ -44,7 +44,7 @@ class Danfysik8000StreamInterface(CommonStreamInterface, StreamInterface):
                         dac17=bit(False),
                         is_percent=bit(False),
                         transistor_fault=ilk("transistor_fault"),
-                        sum_interlock=len(self.device.active_interlocks) > 0,
+                        sum_interlock=bit(len(self.device.active_interlocks) > 0),
                         dc_overcurrent=ilk("dc_overcurrent"),
                         dc_overload=ilk("dc_overload"),
                         reg_mod_fail=ilk("reg_mod_fail"),
@@ -60,5 +60,5 @@ class Danfysik8000StreamInterface(CommonStreamInterface, StreamInterface):
                         mps_not_ready=bit(not self.device.power),
                     )
 
-        assert len(response) == 24
+        assert len(response) == 24, "length should have been 24 but was {}".format(len(response))
         return response
