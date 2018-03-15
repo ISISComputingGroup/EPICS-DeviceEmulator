@@ -9,6 +9,7 @@ from lewis_emulators.utils.command_builder import CmdBuilder
 
 
 @has_log
+@six.add_metaclass(abc.ABCMeta)
 class CommonStreamInterface(object):
     """
     Stream interface for a Danfysik.
@@ -65,7 +66,6 @@ class CommonStreamInterface(object):
     def set_power_on(self):
         self.device.power = True
 
+    @abc.abstractmethod
     def get_status(self):
-        return ("{pow}" + "." * 21 + "{pow}.").format(
-            pow="." if self.device.power else "!"
-        )
+        pass

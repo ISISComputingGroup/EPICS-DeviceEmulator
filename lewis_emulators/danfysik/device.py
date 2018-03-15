@@ -29,6 +29,16 @@ class SimulatedDanfysik(StateMachineDevice):
         self.negative_polarity = False
         self.power = True
 
+        self.active_interlocks = []
+
+    def enable_interlock(self, name):
+        if name not in self.active_interlocks:
+            self.active_interlocks.append(name)
+
+    def disable_interlock(self, name):
+        if name in self.active_interlocks:
+            self.active_interlocks.remove(name)
+
     def reset(self):
         self._initialize_data()
 
