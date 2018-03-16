@@ -38,6 +38,7 @@ class SimulatedFermichopper(StateMachineDevice):
         self.parameters = None
 
         self.is_lying_about_delay_sp_rbv = False
+        self.is_lying_about_gatewidth = False
         self.is_broken = False
 
     def reset(self):
@@ -125,9 +126,13 @@ class SimulatedFermichopper(StateMachineDevice):
 
     def set_gate_width(self, value):
         self.gatewidth = value
+        self.is_lying_about_gatewidth = False  # Resending the setpoint causes the device to no longer be confused
 
     def get_gate_width(self):
-        return self.gatewidth
+        if self.is_lying_about_gatewidth:
+            return self.gatewidth + 123
+        else:
+            return self.gatewidth
 
     def get_electronics_temp(self):
         return self.electronics_temp
