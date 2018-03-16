@@ -1,6 +1,7 @@
 from collections import OrderedDict
-from states import DefaultState, GoingState, BrokenState, StoppedState, StoppingState
+from states import DefaultState, GoingState, StoppedState, StoppingState
 from lewis.devices import StateMachineDevice
+
 
 class SimulatedFermichopper(StateMachineDevice):
 
@@ -36,13 +37,18 @@ class SimulatedFermichopper(StateMachineDevice):
 
         self.parameters = None
 
+        self.is_lying_about_delay_sp_rbv = False
+        self.is_broken = False
+
+    def reset(self):
+        self._initialize_data()
+
     def _get_state_handlers(self):
         return {
             'default': DefaultState(),
             'stopping': StoppingState(),
             'going': GoingState(),
             'stopped': StoppedState(),
-            'broken': BrokenState()
         }
 
     def _get_initial_state(self):
@@ -53,10 +59,8 @@ class SimulatedFermichopper(StateMachineDevice):
             (('default', 'stopped'), lambda: not self.runmode),
             (('default', 'going'), lambda: self.runmode),
             (('stopped', 'going'), lambda: self.runmode),
-            (('going', 'broken'), lambda: self.speed > 10 and not self.magneticbearing),
             (('going', 'stopping'), lambda: self.runmode is False),
             (('stopping', 'stopped'), lambda: self.speed == 0),
-            (('stopping', 'broken'), lambda: self.speed > 10 and not self.magneticbearing),
         ])
 
     def do_command(self, command):
@@ -72,6 +76,8 @@ class SimulatedFermichopper(StateMachineDevice):
         elif command == "0002":
             self.drive = False
         elif command == "0003":
+            if self.drive and self.speed_setpoint == 600:
+                self.is_broken = True
             self.drive = True
             self.runmode = True
         elif command == "0004":
@@ -90,6 +96,10 @@ class SimulatedFermichopper(StateMachineDevice):
 
     def set_speed_setpoint(self, value):
         assert value in self._allowed_speed_setpoints
+
+        if value == 600 and self.speed_setpoint == 600 and self.speed == 600:
+            self.is_broken = True
+
         self.speed_setpoint = value
 
     def get_speed_setpoint(self):
@@ -111,6 +121,7 @@ class SimulatedFermichopper(StateMachineDevice):
 
     def update_delay(self):
         self.delay = (self.delay_highword * 65536 + self.delay_lowword)/50.4
+        self.is_lying_about_delay_sp_rbv = False  # Resending the setpoint causes the device to no longer be confused
 
     def set_gate_width(self, value):
         self.gatewidth = value
@@ -130,8 +141,17 @@ class SimulatedFermichopper(StateMachineDevice):
     def get_current(self):
         return self.current
 
+    def get_nominal_delay(self):
+        if self.is_lying_about_delay_sp_rbv:
+            return self.delay + 123
+        else:
+            return self.delay
+
+    def get_actual_delay(self):
+        return self.delay
+
+
 class ChopperParameters(object):
     MERLIN_SMALL = 1
     MERLIN_LARGE = 2
     HET_MARI = 3
-
