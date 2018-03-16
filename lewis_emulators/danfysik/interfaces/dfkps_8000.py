@@ -24,7 +24,9 @@ class Danfysik8000StreamInterface(CommonStreamInterface, StreamInterface):
     ]
 
     def get_status(self):
-
+        """
+        Respond to the get_status command (S1)
+        """
         def bit(condition):
             return "!" if condition else "."
 

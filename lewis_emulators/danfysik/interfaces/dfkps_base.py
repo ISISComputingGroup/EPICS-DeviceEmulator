@@ -2,8 +2,8 @@
 Stream device for danfysik
 """
 import abc
-
 import six
+
 from lewis.core.logging import has_log
 from lewis_emulators.utils.command_builder import CmdBuilder
 
@@ -12,7 +12,7 @@ from lewis_emulators.utils.command_builder import CmdBuilder
 @six.add_metaclass(abc.ABCMeta)
 class CommonStreamInterface(object):
     """
-    Stream interface for a Danfysik.
+    Common part of the stream interface for a Danfysik.
     """
 
     in_terminator = "\r"
@@ -35,7 +35,6 @@ class CommonStreamInterface(object):
         Args:
             request: requested string
             error: problem
-
         """
         self.log.error("An error occurred at request " + repr(request) + ": " + repr(error))
 
@@ -68,4 +67,6 @@ class CommonStreamInterface(object):
 
     @abc.abstractmethod
     def get_status(self):
-        pass
+        """
+        Respond to the get_status command.
+        """
