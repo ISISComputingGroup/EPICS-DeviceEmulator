@@ -20,7 +20,9 @@ class Keithley2700StreamInterface(StreamInterface):
         CmdBuilder("get_buffer_stats").escape("TRAC:FREE?").build(),
         CmdBuilder("get_readings_range",  arg_sep="").escape("TRAC:DATA:SEL? ").int().escape(",").int().build(),
         CmdBuilder("set_buffer_size").escape("TRAC:POIN ").int().build(),
+        CmdBuilder("get_buffer_size").escape("TRAC:POIN?").build(),
         CmdBuilder("set_time_stamp_format").escape("TRAC:TST:FORM ").arg("ABS|DELT").build(),
+        CmdBuilder("get_time_stamp_format").escape("TRAC:TST:FORM?").build(),
         CmdBuilder("get_delay_state").escape("TRIG:DEL:AUTO?").build(),
         CmdBuilder("set_delay_state").escape("TRIG:DEL:AUTO ").arg("ON|OFF").build(),
         CmdBuilder("set_init_state").escape("INIT:CONT ").arg("ON|OFF").build(),
@@ -31,10 +33,12 @@ class Keithley2700StreamInterface(StreamInterface):
         CmdBuilder("set_data_elements").escape("FORM:ELEM READ, CHAN, TST").build(),
         CmdBuilder("set_auto_range_status", arg_sep="").escape("FRES:RANG:AUTO ").arg("ON|OFF").
         escape(", (@").int().escape(":").int().escape(")").build(),
+        CmdBuilder("get_auto_range_status").escape("FRES:RANG:AUTO?").build(),
         CmdBuilder("set_resistance_digits", arg_sep="").escape(":FRES:DIG ").int().escape(", (@").
         int().escape(":").int().escape(")").build(),
         CmdBuilder("set_resistance_rate").escape(":FRES:NPLC ").float().build(),
         CmdBuilder("set_scan_state").escape("ROUT:SCAN:LSEL ").arg("NONE|INT").build(),
+        CmdBuilder("get_scan_state").escape("ROUT:SCAN:LSEL").build(),
         CmdBuilder("set_scan_channels", arg_sep="").escape("ROUT:SCAN (@").int().escape(":").int().escape(")").build(),
         CmdBuilder("get_scan_channels").escape("ROUT:SCAN?").build()
     }
@@ -102,14 +106,26 @@ class Keithley2700StreamInterface(StreamInterface):
 
         return self._device.buffer_range_readings
 
+    def return_enum_value(self, string_value):
+        if string_value == "ON":
+            return 1
+        else:
+            return 0
+
     def set_buffer_size(self, size):
         self._device.buffer_size = size
+
+    def get_buffer_size(self):
+        return self._device.buffer_size
 
     def set_time_stamp_format(self, format):
         self._device.time_stamp_format = format
 
+    def get_time_stamp_format(self):
+        return self._device.time_stamp_format
+
     def get_delay_state(self):
-        return "{0}".format(self._device.delay_state)
+        return self.return_enum_value(self._device.delay_state)
 
     def set_delay_state(self, state):
         self._device.delay_state = state
@@ -118,7 +134,7 @@ class Keithley2700StreamInterface(StreamInterface):
         self._device.init_state = state
 
     def get_init_state(self):
-        return "{0}".format(self._device.init_state)
+        return self.return_enum_value(self._device.init_state)
 
     def set_sample_count(self, count):
         self._device.sample_count = count
@@ -135,6 +151,9 @@ class Keithley2700StreamInterface(StreamInterface):
     def set_auto_range_status(self, state, start, end):
         self._device.auto_range_status = state
 
+    def get_auto_range_status(self):
+        return self.return_enum_value(self._device.auto_range_status)
+
     def set_resistance_digits(self, digit, start, end):
             self._device.measurement_digits = digit
 
@@ -144,8 +163,11 @@ class Keithley2700StreamInterface(StreamInterface):
     def set_scan_state(self, state):
         self._device.scan_state_status = state
 
+    def get_scan_state(self):
+        return self._device.scan_state_status
+
     def get_scan_channels(self):
-        return "(@{}:{})".format(self._device.scan_channel_start, self._device.scan_channel_end)
+        return "(@{}:110,201:{})".format(self._device.scan_channel_start, self._device.scan_channel_end)
 
     def set_scan_channels(self, start, end):
         self._device.scan_channel_start = start
