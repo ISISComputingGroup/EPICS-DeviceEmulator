@@ -82,9 +82,9 @@ class SimulatedTriton(StateMachineDevice):
         self.pressure_sensors["P{}".format(sensor)].pressure = float(newpressure)
 
     def set_sensor_property_backdoor(self, sensor, property, value):
-        # The sensor + 1 is due to an indexing error in the Oxford Instruments firmware.
-        # We are emulating this off-by-one error.
-        setattr(self.temperature_stages["T{}".format(sensor+1)], property, value)
+        # In older versions of the software, there was an off-by-one error here in the OI software.
+        # This has now been fixed by O.I. so no longer need to adjust by one here.
+        setattr(self.temperature_stages["T{}".format(sensor)], property, value)
 
     def _get_state_handlers(self):
         return {'default': DefaultState()}

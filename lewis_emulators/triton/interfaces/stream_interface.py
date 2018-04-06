@@ -4,7 +4,6 @@ from lewis.adapters.stream import StreamInterface, Cmd
 from lewis.core.logging import has_log
 from lewis_emulators.utils.command_builder import CmdBuilder
 from lewis_emulators.triton.device import HEATER_NAME
-from lewis_emulators.triton.device import ValveStates
 
 
 @has_log
