@@ -6,15 +6,6 @@ from lewis.devices import StateMachineDevice
 HEATER_NAME = "H1"
 
 
-class ValveStates(object):
-    """
-    Enum representing the possible states of a valve.
-    """
-    OPEN = 0
-    CLOSED = 1
-    NOT_FOUND = 2
-
-
 class TemperatureStage(object):
     """
     Class representing a temperature stage.
@@ -43,16 +34,6 @@ class PressureSensor(object):
         self.pressure = 0
 
 
-class Valve(object):
-    """
-    Class to represent a valve.
-
-    Having this as a class makes it more extensible in future, as the triton driver is still in flux.
-    """
-    def __init__(self):
-        self.open = False
-
-
 class SimulatedTriton(StateMachineDevice):
 
     def _initialize_data(self):
@@ -72,7 +53,6 @@ class SimulatedTriton(StateMachineDevice):
         self.status = "This is a device status message."
         self.automation = "This is the automation status"
 
-        self.valves = {"V{}".format(i): Valve() for i in range(1, 11)}
         self.pressure_sensors = {"P{}".format(i): PressureSensor() for i in range(1, 6)}
 
         self.temperature_stages = {
@@ -97,9 +77,6 @@ class SimulatedTriton(StateMachineDevice):
 
     def set_temperature_backdoor(self, stage_name, new_temp):
         self.temperature_stages[self.find_temperature_channel(stage_name)].temperature = new_temp
-
-    def set_valve_state_backdoor(self, valve, newstate):
-        self.valves["V{}".format(valve)].open = bool(newstate)
 
     def set_pressure_backdoor(self, sensor, newpressure):
         self.pressure_sensors["P{}".format(sensor)].pressure = float(newpressure)
@@ -153,12 +130,6 @@ class SimulatedTriton(StateMachineDevice):
 
     def set_heater_range(self, value):
         self.heater_range = value
-
-    def get_valve_state(self, valve):
-        try:
-            return ValveStates.OPEN if self.valves[valve].open else ValveStates.CLOSED
-        except KeyError:
-            return ValveStates.NOT_FOUND
 
     def is_channel_enabled(self, chan):
         try:
