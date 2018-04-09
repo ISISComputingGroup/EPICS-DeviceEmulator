@@ -10,9 +10,6 @@ class Channel(object):
         self.reading = 0
         self.timestamp = 0
 
-    def to_string(self):
-        return str("{},{},{},".format(self.reading, self.timestamp, self.channel))
-
 @has_log
 class SimulatedKeithley2700(StateMachineDevice):
     """
@@ -23,24 +20,24 @@ class SimulatedKeithley2700(StateMachineDevice):
         """
         Initialize all of the device's attributes.
         """
-        self.idn = "Keithley 2700 Emulator IDN"
+        self.idn = "KEITHLEY"
         self.buffer_full = []
         self.buffer_range_readings = ""
         self.measurement = "FRES"
         self.buffer_feed = "SENS"
         self.buffer_control = "NEXT"
-        self.buffer_state = "ON"
+        self.buffer_autoclear_state = 0
         self.next_buffer_location = 0
         self.bytes_used = 0
         self.bytes_available = 0
         self.buffer_size = 55000
         self.time_stamp_format = "ABS"
-        self.delay_state = "ON"
-        self.init_state = "OFF"
+        self.delay_state = 1
+        self.init_state = 0
         self.sample_count = 1
         self.source = "EXT"
         self.data_elements = ""
-        self.auto_range_status = "ON"
+        self.auto_range_status = 1
         self.measurement_digits = 6
         self.nplc = 5.0
         self.scan_state_status = "NONE"
@@ -80,7 +77,10 @@ class SimulatedKeithley2700(StateMachineDevice):
                 self.generate_channel_values()
                 i = 0
             self.channels[i].buffer_loc = b
-            self.buffer_full.append(self.channels[i].to_string())
+            channel_string = "{},{},{},".format(self.channels[i].reading,
+                                                self.channels[i].timestamp,
+                                                self.channels[i].channel)
+            self.buffer_full.append(channel_string)
             i += 1
 
     def set_channel_param(self, index, param, value):
