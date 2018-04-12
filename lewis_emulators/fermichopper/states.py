@@ -2,8 +2,14 @@ from lewis.core.statemachine import State
 from lewis.core import approaches
 
 
+def check_speed(device):
+    if device.get_true_speed() > 10 and not device.magneticbearing:
+        device.is_broken = True
+
+
 class DefaultState(State):
-    pass
+    def in_state(self, dt):
+        check_speed(self._context)
 
 
 class StoppingState(State):
@@ -19,6 +25,8 @@ class StoppingState(State):
 
         device.set_true_speed(approaches.linear(device.get_true_speed(), 0, rate, dt))
 
+        check_speed(device)
+
 
 class GoingState(State):
     def in_state(self, dt):
@@ -33,16 +41,12 @@ class GoingState(State):
 
         device.set_true_speed(approaches.linear(device.get_true_speed(), device.get_speed_setpoint(), rate, dt))
 
+        check_speed(device)
+
 
 class StoppedState(State):
     def in_state(self, dt):
-        pass
+        check_speed(self._context)
 
     def on_entry(self, dt):
         self._context.drive = False
-
-
-class BrokenState(State):
-    def in_state(self, dt):
-        # Fail hard - This crashes the emulator (which is the realistic behaviour in this situation...)
-        assert False, "The device is broken. Game over."
