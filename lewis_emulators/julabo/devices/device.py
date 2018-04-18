@@ -23,6 +23,11 @@ from lewis.core.utils import check_limits
 from . import states
 
 
+class ControlModes(object):
+    EXTERNAL = 0
+    INTERNAL = 1
+
+
 class SimulatedJulabo(StateMachineDevice):
     internal_p = 0.1  # The proportional
     internal_i = 3  # The integral
@@ -41,6 +46,7 @@ class SimulatedJulabo(StateMachineDevice):
     external_temperature = 26.0  # External temperature in C
     circulate_commanded = False
     temperature_ramp_rate = 5.0  # Guessed value in C/min
+    control_mode = ControlModes.EXTERNAL
 
     def _initialize_data(self):
         """
@@ -166,4 +172,14 @@ class SimulatedJulabo(StateMachineDevice):
         :return: Empty string.
         """
         self.external_d = param
+        return ""
+
+    @check_limits(0, 1)
+    def set_control_mode(self, control_mode):
+        """
+        Sets the control mode of the julabo.
+        :param control_mode: (int) 1 for internal control, 0 for external control
+        :return: Empty string
+        """
+        self.control_mode = ControlModes.INTERNAL if control_mode == 1 else ControlModes.EXTERNAL
         return ""

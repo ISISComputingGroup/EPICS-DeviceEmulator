@@ -54,6 +54,8 @@ class JulaboStreamInterfaceV1(StreamInterface):
         Cmd('set_external_i', '^OUT_PAR_11 ([0-9]*)$', argument_mappings=(int,)),
         Var('external_d', read_pattern='^IN_PAR_12$', doc='The external derivative.'),
         Cmd('set_external_d', '^OUT_PAR_12 ([0-9]*)$', argument_mappings=(int,)),
+        Var('control_mode', read_pattern='^IN_MODE_04', doc='The control mode internal/external'),
+        Cmd('set_control_mode', '^OUT_MODE_04 (0|1)$', argument_mappings=(int,)),
     }
 
     in_terminator = '\r'
