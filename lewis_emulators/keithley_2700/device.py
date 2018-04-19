@@ -23,24 +23,24 @@ class SimulatedKeithley2700(StateMachineDevice):
         self.idn = "KEITHLEY"
         self.buffer_full = []
         self.buffer_range_readings = ""
-        self.measurement = "FRES"
-        self.buffer_feed = "SENS"
-        self.buffer_control = "NEXT"
-        self.buffer_autoclear_state = 0
+        self.measurement = 0
+        self.buffer_feed = 0
+        self.buffer_control = 0
+        self.buffer_autoclear_on = False
         self.next_buffer_location = 0
         self.bytes_used = 0
         self.bytes_available = 0
         self.buffer_size = 55000
-        self.time_stamp_format = "ABS"
-        self.delay_state = 1
-        self.init_state = 0
+        self.time_stamp_format = 0
+        self.auto_delay_on = True
+        self.init_state_on = False
         self.sample_count = 1
-        self.source = "EXT"
+        self.source = 4
         self.data_elements = ""
-        self.auto_range_status = 1
+        self.auto_range_on = True
         self.measurement_digits = 6
         self.nplc = 5.0
-        self.scan_state_status = "NONE"
+        self.scan_state_status = 2
         self.scan_channel_start = 101
         self.scan_channel_end = 210
         self.buffer_count = 10
@@ -54,34 +54,41 @@ class SimulatedKeithley2700(StateMachineDevice):
         self.generate_channel_values()
         self.fill_buffer()
 
-    # Populate channels with read values and timestamps
     def generate_channel_values(self):
+        """
+        Creates a random selection of channel resistance reading values
+        :return:
+        """
         timestamp = 0
-        for t in self.channels:
-            if t.timestamp > timestamp:
-                timestamp = t.timestamp
+        # Find current highest timestamp
+        timestamp = max(t.timestamp for t in self.channels)
 
-        for c in range(len(self.channels)):
-            self.channels[c].reading = random.uniform(1000.0, 1500.0)
-            self.channels[c].timestamp = timestamp
+        for channel in self.channels:
+            channel.reading = random.uniform(1000.0, 1500.0)
+            channel.timestamp = timestamp
             timestamp += 0.005
 
     def fill_buffer(self):
-        i = 0
+        """
+        Creates a new set of channel reading values and fills the buffer
+        with these readings.
+        The buffer values are then parsed by the IOC into the appropriate channel PVs.
+        """
+        chan_index = 0
         self.buffer_full = []
         self.generate_channel_values()
         self.current_buffer_loc = 0
         self.next_buffer_location = 0
-        for b in range(self.buffer_size):
-            if i == len(self.channels):
+        for buffer_index in range(self.buffer_size):
+            # If we reach the end of the channel readings, create a new set of channel readings to fill buffer with
+            if chan_index == len(self.channels):
                 self.generate_channel_values()
-                i = 0
-            self.channels[i].buffer_loc = b
-            channel_string = "{},{},{},".format(self.channels[i].reading,
-                                                self.channels[i].timestamp,
-                                                self.channels[i].channel)
+                chan_index = 0
+            channel_string = "{},{},{},".format(self.channels[chan_index].reading,
+                                                self.channels[chan_index].timestamp,
+                                                self.channels[chan_index].channel)
             self.buffer_full.append(channel_string)
-            i += 1
+            chan_index += 1
 
     def set_channel_param(self, index, param, value):
         """
@@ -97,7 +104,7 @@ class SimulatedKeithley2700(StateMachineDevice):
         Gets Attribute for Channel Instance within self.channels list
         :param index: (Integer) position in list
         :param param: Attribute
-        :return: str
+        :return: Channel parameter (int or double)
         """
         return getattr(self.channels[int(index)], str(param))
 
