@@ -2,6 +2,13 @@ from lewis.adapters.stream import StreamInterface
 from lewis_emulators.utils.command_builder import CmdBuilder
 from lewis.core.logging import has_log
 
+MEASUREMENT_TYPE = {0: "VOLT:DC", 1: "VOLT:AC", 2: "CURR:DC", 3: "CURR:AC", 4: "RES", 5: "FRES", 6: "CONT",
+                    7: "FREQ", 8: "PER"}
+BUFFER_SOURCE = {0: "SENS", 1: "CALC", 2: "NONE"}
+BUFFER_CONTROL_MODE = {0: "NEXT", 1: "ALW", 2: "NEV"}
+TIMESTAMP_FORMAT = {0: "ABS", 1: "DELT"}
+CONTROL_SOURCE = {0: "IMM", 1: "TIM", 2: "MAN", 3: "BUS", 4: "EXT"}
+SCAN_STATE = {0: "INT", 1: "NONE"}
 
 @has_log
 class Keithley2700StreamInterface(StreamInterface):
@@ -9,14 +16,14 @@ class Keithley2700StreamInterface(StreamInterface):
     out_terminator = "\r\n"
     commands = {
         CmdBuilder("get_idn").escape("*IDN?").build(),
-        CmdBuilder("empty_queue").escape("SYST:CLE").build(),
+        CmdBuilder("empty_queue").escape(":SYST:CLE").build(),
         CmdBuilder("clear_buffer").escape("TRAC:CLE").build(),
         CmdBuilder("set_measurement").escape(":FUNC '").arg("VOLT:DC|VOLT:AC|CURR:DC|CURR:AC|RES|FRES|CONT|FREQ|PER")
             .escape("'").build(),
         CmdBuilder("get_measurement").escape(":FUNC?").build(),
         CmdBuilder("set_buffer_feed").escape("TRAC:FEED ").arg("SENS|CALC|NONE").build(),
         CmdBuilder("set_buffer_control").escape("TRAC:FEED:CONT ").arg("NEV|NEXT|ALW").build(),
-        CmdBuilder("set_buffer_state", arg_sep="").escape("TRAC:CLE:AUTO ").arg("OFF|ON").build(),
+        CmdBuilder("set_buffer_state").escape("TRAC:CLE:AUTO ").arg("OFF|ON").build(),
         CmdBuilder("get_buffer_state").escape("TRAC:CLE:AUTO?").build(),
         CmdBuilder("get_next_buffer_location").escape("TRAC:NEXT?").build(),
         CmdBuilder("get_buffer_stats").escape("TRAC:FREE?").build(),
@@ -48,21 +55,23 @@ class Keithley2700StreamInterface(StreamInterface):
         self.log.error("An error occurred at request" + repr(request) + ": " + repr(error))
         print("An error occurred at request" + repr(request) + ": " + repr(error))
 
-    def enum_onoff_value(self, string_value):
-        if string_value == "ON":
-            return 1
-        elif string_value == "OFF":
-            return 0
+    def bool_onoff_value(self, string_value):
+        if string_value not in ["ON", "OFF"]:
+            raise ValueError("Invalid on/off value!")
         else:
-            return string_value
+            if string_value == "ON":
+                return True
+            else:
+                return False
 
-    def string_onoff_value(self, enum_value):
-        if enum_value == 1:
-            return "ON"
-        elif enum_value == 0:
-            return "OFF"
+    def enum_onoff_value(self, bool_value):
+        if bool_value not in [True, False]:
+            raise ValueError("Invalid on/off value!")
         else:
-            return enum_value
+            if bool_value:
+                return 1
+            else:
+                return 0
 
     def get_idn(self):
         return self._device.idn
@@ -74,37 +83,54 @@ class Keithley2700StreamInterface(StreamInterface):
         self._device.buffer = ""
 
     def set_measurement(self, measurement):
-        self._device.measurement = measurement
+        if measurement in MEASUREMENT_TYPE.values():
+            self._device.measurement = MEASUREMENT_TYPE.keys()[MEASUREMENT_TYPE.values().index(measurement)]
+        else:
+            raise ValueError("Invalid measurement value!")
 
     def get_measurement(self):
-        return "\"{}\"".format(self._device.measurement)
+        return "\"{}\"".format(MEASUREMENT_TYPE[self._device.measurement])
 
     def set_buffer_feed(self, feed):
-        self._device.buffer_feed = feed
+        if feed in BUFFER_SOURCE.values():
+            self._device.buffer_feed = BUFFER_SOURCE.keys()[BUFFER_SOURCE.values().index(feed)]
+        else:
+            raise ValueError("Invalid feed source value!")
 
     def set_buffer_control(self, control):
-        self._device.buffer_control = control
+        if control in BUFFER_SOURCE.values():
+            self._device.buffer_control = BUFFER_CONTROL_MODE.keys()[BUFFER_CONTROL_MODE.values().index(control)]
+        else:
+            raise ValueError("Invalid buffer control source value!")
 
     def set_buffer_state(self, state):
-        self._device.buffer_autoclear_state = state
+        self._device.buffer_autoclear_on = state
 
     def get_buffer_state(self):
-        return self.enum_onoff_value(self._device.buffer_autoclear_state)
+        return self.bool_onoff_value(self._device.buffer_autoclear_on)
 
     def get_next_buffer_location(self):
+        """
+
+        :return: String-formatted integer of the next buffer location to retrieve
+        """
         self._device.next_buffer_location = self._device.current_buffer_loc + 5
-        # If the next buffer location is larger than the buffer size, restart from the beginning of the buffer
         if self._device.next_buffer_location >= len(self._device.buffer_full):
             self._device.next_buffer_location -= len(self._device.buffer_full)
             self._device.current_buffer_loc = 0
-
         return "{}".format(self._device.next_buffer_location)
 
     def get_buffer_stats(self):
+        """
+        :return: String containing number of bytes available, and number of bytes used
+        """
         return "{}, {}".format(str(self._device.bytes_available), str(self._device.bytes_used))
 
     def get_readings_range(self, start, count):
-        # Return channel readings from location to + count
+        """
+        :param count: Number of buffer values to retrieve
+        :return: String value of readings from buffer
+        """
         self._device.buffer_range_readings = ""
         for i in range(int(count)):
             if int(self._device.current_buffer_loc) >= len(self._device.buffer_full):
@@ -121,25 +147,28 @@ class Keithley2700StreamInterface(StreamInterface):
         self._device.buffer_size = size
 
     def get_buffer_size(self):
-        return self.enum_onoff_value(self._device.buffer_size)
+        return self._device.buffer_size
 
     def set_time_stamp_format(self, format):
-        self._device.time_stamp_format = format
+        if format in TIMESTAMP_FORMAT.values():
+            self._device.time_stamp_format = TIMESTAMP_FORMAT.keys()[TIMESTAMP_FORMAT.values().index(format)]
+        else:
+            raise ValueError("Invalid timestamp format value")
 
     def get_time_stamp_format(self):
-        return self._device.time_stamp_format
+        return TIMESTAMP_FORMAT[self._device.time_stamp_format]
 
     def get_delay_state(self):
-        return self.enum_onoff_value(self._device.delay_state)
+        return self.enum_onoff_value(self._device.auto_delay_on)
 
     def set_delay_state(self, state):
-        self._device.delay_state = state
+        self._device.auto_delay_on = self.bool_onoff_value(state)
 
     def set_init_state(self, state):
-        self._device.init_state = state
+        self._device.init_state_on = self.bool_onoff_value(state)
 
     def get_init_state(self):
-        return self.enum_onoff_value(self._device.init_state)
+        return self.enum_onoff_value(self._device.init_state_on)
 
     def set_sample_count(self, count):
         self._device.sample_count = count
@@ -148,16 +177,19 @@ class Keithley2700StreamInterface(StreamInterface):
         return "{0}".format(self._device.sample_count)
 
     def set_source(self, source):
-        self._device.source = source
+        if source in CONTROL_SOURCE.values():
+            self._device.source = CONTROL_SOURCE.keys()[CONTROL_SOURCE.values().index(source)]
+        else:
+            raise ValueError("Invalid control source value")
 
     def set_data_elements(self):
         self._device.data_elements = "READ, CHAN, TST"
 
     def set_auto_range_status(self, state):
-        self._device.auto_range_status = state
+        self._device.auto_range_on = self.bool_onoff_value(state)
 
     def get_auto_range_status(self):
-        return self.enum_onoff_value(self._device.auto_range_status)
+        return self.enum_onoff_value(self._device.auto_range_on)
 
     def set_resistance_digits(self, digit, start, end):
             self._device.measurement_digits = digit
@@ -166,10 +198,13 @@ class Keithley2700StreamInterface(StreamInterface):
         self._device.nplc = rate
 
     def set_scan_state(self, state):
-        self._device.scan_state_status = state
+        if state in SCAN_STATE.values():
+            self._device.scan_state_status = SCAN_STATE.keys()[SCAN_STATE.values().index(state)]
+        else:
+            raise ValueError("Invalid scan state source value")
 
     def get_scan_state(self):
-        return self._device.scan_state_status
+        return SCAN_STATE[self._device.scan_state_status]
 
     def get_scan_channels(self):
         return "(@{}:110,201:{})".format(self._device.scan_channel_start, self._device.scan_channel_end)
