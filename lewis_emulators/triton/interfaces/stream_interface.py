@@ -4,7 +4,6 @@ from lewis.adapters.stream import StreamInterface, Cmd
 from lewis.core.logging import has_log
 from lewis_emulators.utils.command_builder import CmdBuilder
 from lewis_emulators.triton.device import HEATER_NAME
-from lewis_emulators.triton.device import ValveStates
 
 
 @has_log
@@ -54,9 +53,6 @@ class TritonStreamInterface(StreamInterface):
         # Loop mode
         CmdBuilder("get_closed_loop_mode").escape("READ:DEV:").arg("T[0-9]+").escape(":TEMP:LOOP:MODE").eos().build(),
         CmdBuilder("set_closed_loop_mode").escape("SET:DEV:").arg("T[0-9]+").escape(":TEMP:LOOP:MODE:").any().eos().build(),
-
-        # Valve state
-        CmdBuilder("get_valve_state").escape("READ:DEV:").arg("V[0-9]+").escape(":VALV:SIG:STATE").eos().build(),
 
         # Channel enablement
         CmdBuilder("get_channel_enabled").escape("READ:DEV:").arg("T[0-9]+").escape(":TEMP:MEAS:ENAB").eos().build(),
@@ -167,21 +163,6 @@ class TritonStreamInterface(StreamInterface):
 
         self.device.set_closed_loop_mode(mode == "ON")
         return "STAT:SET:DEV:{}:TEMP:LOOP:MODE:{}:VALID".format(chan, mode)
-
-    def get_valve_state(self, valve):
-
-        state = self.device.get_valve_state(valve)
-
-        if state == ValveStates.CLOSED:
-            response = "CLOSE"
-        elif state == ValveStates.OPEN:
-            response = "OPEN"
-        elif state == ValveStates.NOT_FOUND:
-            response = "NOT_FOUND"
-        else:
-            raise ValueError("Invalid valve state: {}".format(state))
-
-        return "STAT:DEV:{}:VALV:SIG:STATE:{}".format(valve, response)
 
     def get_channel_enabled(self, channel):
         return "STAT:DEV:{}:TEMP:MEAS:ENAB:{}"\
