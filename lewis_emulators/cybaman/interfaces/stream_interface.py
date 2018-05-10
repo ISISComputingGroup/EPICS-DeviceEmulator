@@ -59,13 +59,13 @@ class CybamanStreamInterface(StreamInterface):
         return ""
 
     def get_a(self):
-        return self._device.a*3577
+        return "{}\r".format(self._device.a*3577)
 
     def get_b(self):
-        return self._device.b*3663
+        return "{}\r".format(self._device.b*3663)
 
     def get_c(self):
-        return self._device.c*3663
+        return "{}\r".format(self._device.c*3663)
 
     def set_all(self, a, b, c, tm):
         self._verify_tm(a, b, c, tm)

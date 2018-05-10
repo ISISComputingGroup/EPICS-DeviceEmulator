@@ -1,7 +1,12 @@
+"""
+Stream device for amint2l
+"""
+
 from lewis.adapters.stream import StreamInterface
 from lewis.core.logging import has_log
 
 from lewis_emulators.utils.command_builder import CmdBuilder
+
 
 @has_log
 class Amint2lStreamInterface(StreamInterface):
@@ -9,12 +14,15 @@ class Amint2lStreamInterface(StreamInterface):
     Stream interface for the serial port
     """
 
-    commands = {
-        CmdBuilder("get_pressure").stx().arg("[A-Fa-f0-9]+").escape("r").build()
-    }
-
     in_terminator = chr(3)
     out_terminator = chr(3)
+
+    def __init__(self):
+
+        super(Amint2lStreamInterface, self).__init__()
+        self.commands = {
+            CmdBuilder(self.get_pressure).stx().arg("[A-Fa-f0-9]+").escape("r").build()
+        }
 
     def handle_error(self, request, error):
         """
