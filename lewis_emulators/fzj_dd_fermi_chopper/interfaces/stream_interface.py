@@ -164,14 +164,14 @@ class FZJDDFCHStreamInterface(StreamInterface):
         if self._device.disconnected or chopper_name != device.chopper_name:
             return None
 
-        # commented out values in user manual but not actually used/sent by device
+        # commented out values in user manual that are not actually used/sent by device
 
         values = [
             "{0:3s}".format(device.chopper_name),
             "ASTA?",
             "{0:3s}".format(device.chopper_name),
         #    "{0:.2f}".format(device.frequency_reference),
-            "{0:.2f}".format(device.frequency_setpoint / device.frequency_reference),  # multiplier of reference frequency
+            "{0:2d}".format(device.frequency_setpoint / device.frequency_reference),  # multiplier of reference frequency
             "{0:.2f}".format(device.frequency_setpoint),
             "{0:.2f}".format(device.frequency),
             "{0:.2f}".format(device.phase_setpoint),
