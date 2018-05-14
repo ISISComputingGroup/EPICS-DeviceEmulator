@@ -6,6 +6,7 @@ from states import DefaultInitState, DefaultStartedState, DefaultStoppedState
 class SimulatedHFMAGPSU(StateMachineDevice):
 
     def _initialize_data(self):
+
         self._is_output_mode_tesla = True
         self._is_heater_on = True
         self._is_paused = True
@@ -13,13 +14,12 @@ class SimulatedHFMAGPSU(StateMachineDevice):
         self._direction = '+'
         self._ramp_target = 'MID'
         self._heater_value = 0.0
-        self._max_target = 34.92
+        self._max_target = 10
         self._mid_target = 0.0
         self._ramp_rate = 0.5
         self._limit = 5.0
         self._log_message = "this is the initial log message"
-        self._error_message = "this is the initial error message"
-        self._constant = 0.00029
+        self._constant = 0.029
         self._zero_target = 0.0
         self._mid_final_target = 0
 
@@ -92,16 +92,8 @@ class SimulatedHFMAGPSU(StateMachineDevice):
         return self._log_message
 
     @property
-    def error_message(self):
-        return self._error_message
-
-    @property
     def constant(self):
         return float(self._constant)
-
-    @property
-    def zero_value(self):
-        return self._zero_target
 
     @property
     def mid_final_target(self):
@@ -151,10 +143,6 @@ class SimulatedHFMAGPSU(StateMachineDevice):
     def log_message(self, lm):
         self._log_message = lm
 
-    @error_message.setter
-    def error_message(self, em):
-        self._error_message = em
-
     @output.setter
     def output(self, op):
         self._output = op
@@ -162,10 +150,6 @@ class SimulatedHFMAGPSU(StateMachineDevice):
     @constant.setter
     def constant(self, cons):
         self._constant = cons
-
-    @zero_value.setter
-    def zero_value(self, zv):
-        self._zero_value = zv
 
     @mid_final_target.setter
     def mid_final_target(self, mft):
