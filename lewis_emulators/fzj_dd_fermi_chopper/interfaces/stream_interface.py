@@ -79,7 +79,7 @@ class FZJDDFCHStreamInterface(StreamInterface):
         if self._device.disconnected:
             return None
         if self._device.error_on_set_phase is None:
-            self._device.phase_setpoint = "{:5.1f}".format(phase)  # float(phase)
+            self._device.phase_setpoint = float(phase)
             reply = "{chopper_name}OK".format(chopper_name=chopper_name)
         else:
             reply = "ERROR;{}".format(self._device.error_on_set_phase)
@@ -170,29 +170,29 @@ class FZJDDFCHStreamInterface(StreamInterface):
             "{0:3s}".format(device.chopper_name),
             "ASTA?",
             "{0:3s}".format(device.chopper_name),
-        #    "{0:.2f}".format(device.frequency_reference),
+            # "{0:.2f}".format(device.frequency_reference),
             "{0:2d}".format(device.frequency_setpoint / device.frequency_reference),  # multiplier of reference frequency
             "{0:.2f}".format(device.frequency_setpoint),
             "{0:.2f}".format(device.frequency),
-            "{0:.2f}".format(device.phase_setpoint),
-            "{0:.2f}".format(device.phase),
+            "{0:.1f}".format(device.phase_setpoint),
+            "{0:.1f}".format(device.phase),
             "{0:s}".format(OK_NOK[device.phase_status_is_ok]),
             "{0:s}".format(ON_OFF[device.magnetic_bearing_is_on]),
             "{0:s}".format(OK_NOK[device.magnetic_bearing_status_is_ok]),
-        #    "{0:.1f}".format(device.magnetic_bearing_integrator),
+            # "{0:.1f}".format(device.magnetic_bearing_integrator),
             "{0:s}".format(ON_OFF[device.drive_is_on]),
             "{0:s}".format(START_STOP[device.drive_mode_is_start]),
             "{0:.2f}".format(device.drive_l1_current),
             "{0:.2f}".format(device.drive_l2_current),
             "{0:.2f}".format(device.drive_l3_current),
             "{0:s}".format(CW_CCW[device.drive_direction_is_cw]),
-        #    "{0:s}".format(OK_NOK[device.parked_open_status_is_ok]),
+            # "{0:s}".format(OK_NOK[device.parked_open_status_is_ok]),
             "{0:.2f}".format(device.drive_temperature),
-        #    "{0:.2f}".format(device.input_clock),
+            # "{0:.2f}".format(device.input_clock),
             "{0:.2f}".format(device.phase_outage),
             "{0:2s}".format(device.master_chopper),
             "{0:s}".format(ON_OFF[device.logging_is_on]),
-        #    "{0:s}".format(OK_NOK[device.lmsr_status_is_ok]),
+            # "{0:s}".format(OK_NOK[device.lmsr_status_is_ok]),
             "{0:s}".format(OK_NOK[False]),  # Device always responds with "NOK" - constant defined in server code
             "{0:s}".format(OK_NOK[device.dsp_status_is_ok]),
             "{0:s}".format(OK_NOK[device.interlock_er_status_is_ok]),
