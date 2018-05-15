@@ -9,17 +9,27 @@ class SimulatedItc503(StateMachineDevice):
         """
         Initialize all of the device's attributes.
         """
-        pass
+        self.p, self.i, self.d = 0, 0, 0
+        self.gas_flow = 0
+        self.temperature = 0
+        self.temperature_sp = 0
+        self.mode = 0
+        self.control = 0
+        self.sweeping = False
+        self.control_channel = 1
+        self.autopid = False
+
+        self.heater_v = 0
+        self.heater_v_max = 100
 
     def _get_state_handlers(self):
-        return {
-            'default': DefaultState(),
-        }
+        return {'default': DefaultState()}
 
     def _get_initial_state(self):
         return 'default'
 
     def _get_transition_handlers(self):
-        return OrderedDict([
-        ])
+        return OrderedDict([])
 
+    def set_heater_voltage(self, volts):
+        self.heater_v = min((self.heater_v_max, volts))
