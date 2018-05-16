@@ -17,6 +17,8 @@ class Itc503StreamInterface(StreamInterface):
         CmdBuilder("set_gas_flow").escape("G").float().eos().build(),
 
         CmdBuilder("get_temp").escape("R1").eos().build(),
+        CmdBuilder("get_temp").escape("R2").eos().build(),
+        CmdBuilder("get_temp").escape("R3").eos().build(),
         CmdBuilder("get_temp_sp").escape("R0").eos().build(),
         CmdBuilder("set_temp").escape("T").float().eos().build(),
 
@@ -118,19 +120,18 @@ class Itc503StreamInterface(StreamInterface):
         return "L"
 
     def set_heater_v(self, manv):
-        self.device.set_heater_voltage(manv)
+        self.device.heater_v = float(manv)
         return "O"
 
     def get_heater_v(self):
         return "R{:.1f}".format(self.device.heater_v)
 
     def get_heater_p(self):
-        # Not clear if this can be set. Return heater voltage as a substitute.
+        # Return heater voltage number as a substitute for percentage.
         return "R{:.1f}".format(self.device.heater_v)
 
     def set_heater_maxv(self, volts):
-        self.device.heater_v_max = float(volts)
-        return "M"
+        raise ValueError("At ISIS, do not use this command!")
 
     def get_temp_error(self):
         return "R{:.1f}".format(abs(self.device.temperature_sp - self.device.temperature))

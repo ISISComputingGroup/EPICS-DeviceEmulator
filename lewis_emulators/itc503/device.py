@@ -1,8 +1,10 @@
 from collections import OrderedDict
+from lewis.core.logging import has_log
 from states import DefaultState
 from lewis.devices import StateMachineDevice
 
 
+@has_log
 class SimulatedItc503(StateMachineDevice):
 
     def _initialize_data(self):
@@ -20,7 +22,6 @@ class SimulatedItc503(StateMachineDevice):
         self.autopid = False
 
         self.heater_v = 0
-        self.heater_v_max = 100
 
     def _get_state_handlers(self):
         return {'default': DefaultState()}
@@ -30,6 +31,3 @@ class SimulatedItc503(StateMachineDevice):
 
     def _get_transition_handlers(self):
         return OrderedDict([])
-
-    def set_heater_voltage(self, volts):
-        self.heater_v = min((self.heater_v_max, volts))
