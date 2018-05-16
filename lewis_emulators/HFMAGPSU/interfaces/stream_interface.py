@@ -68,8 +68,8 @@ class HFMAGPSUStreamInterface(StreamInterface):
 
     def write_direction(self, direction):
         self._device.direction = direction
-        self._create_log_message("DIRECTION", str(direction))
-        return self._device.log_message
+        #self._create_log_message("DIRECTION", str(direction))
+        return "........\r\n"
 
     def read_output_mode(self):
         mode = "AMPS"
@@ -160,7 +160,7 @@ class HFMAGPSUStreamInterface(StreamInterface):
         output = "HOLDING ON PAUSE AT {} {}".format(self._device.output, mode)
         if paused == "ON":
             self._device.is_paused = True
-            self._create_log_message("RAMP STATUS", output)
+            self._create_log_message("PAUSE STATUS", output)
         elif paused == "OFF":
             self._device.is_paused = False
             ramp_complete = abs(float(self._device.output) - float(target)) < 0.00001
@@ -216,5 +216,5 @@ class HFMAGPSUStreamInterface(StreamInterface):
 
     def write_constant(self, constant):
         self._device.constant = constant
-        self._create_log_message("FIELD CONSTANT", constant, suffix="T/A")
+        self._create_log_message("FIELD CONSTANT", constant, suffix="T/A\r\n")
         return self._device.log_message
