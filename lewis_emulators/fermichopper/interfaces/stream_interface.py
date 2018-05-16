@@ -1,7 +1,5 @@
 from lewis.adapters.stream import StreamInterface, Cmd
 
-import math
-
 from ..device import ChopperParameters
 
 
@@ -66,7 +64,7 @@ class FermichopperStreamInterface(StreamInterface):
     def build_status_code(self):
         status = 0
 
-        if True: # Microcontroller OK?
+        if True:  # Microcontroller OK?
             status += 1
         if self._device.get_true_speed() == self._device.get_speed_setpoint():
             status += 2
@@ -78,7 +76,7 @@ class FermichopperStreamInterface(StreamInterface):
             status += 32
         if self._device.parameters == ChopperParameters.MERLIN_LARGE:
             status += 64
-        if False: # Interlock open?
+        if False:  # Interlock open?
             status += 128
         if self._device.parameters == ChopperParameters.HET_MARI:
             status += 256
@@ -88,7 +86,8 @@ class FermichopperStreamInterface(StreamInterface):
             status += 1024
         if self._device.speed > 10 and not self._device.magneticbearing:
             status += 2048
-        if any(abs(voltage) > 3 for voltage in [self._device.autozero_1_lower, self._device.autozero_2_lower, self._device.autozero_1_upper, self._device.autozero_2_upper,]):
+        if any(abs(voltage) > 3 for voltage in [self._device.autozero_1_lower, self._device.autozero_2_lower,
+                                                self._device.autozero_1_upper, self._device.autozero_2_upper]):
             status += 4096
 
         return status
@@ -100,23 +99,45 @@ class FermichopperStreamInterface(StreamInterface):
     def get_all_data(self, checksum):
         JulichChecksum.verify('#0', '0000', checksum)
 
-        return JulichChecksum.append('#1' + self._device.get_last_command()) \
-            + JulichChecksum.append("#2{:04X}".format(self.build_status_code())) \
-            + JulichChecksum.append("#3000{:01X}".format(12 - (self._device.get_speed_setpoint() / 50))) \
-            + JulichChecksum.append("#4{:04X}".format(int(round(self._device.get_true_speed() * 60)))) \
-            + JulichChecksum.append("#5{:04X}".format(int(round((self._device.delay * 50.4) % 65536)))) \
-            + JulichChecksum.append("#6{:04X}".format(int(round((self._device.delay * 50.4) / 65536)))) \
-            + JulichChecksum.append("#7{:04X}".format(int(round((self._device.delay * 50.4) % 65536)))) \
-            + JulichChecksum.append("#8{:04X}".format(int(round((self._device.delay * 50.4) / 65536)))) \
-            + JulichChecksum.append("#9{:04X}".format(int(round(self._device.get_gate_width() * 50.4)))) \
-            + JulichChecksum.append("#A{:04X}".format(int(round(self._device.get_current() / 0.002016)))) \
-            + JulichChecksum.append("#B{:04X}".format(int(round((self._device.autozero_1_upper + 22.86647) / 0.04486)))) \
-            + JulichChecksum.append("#C{:04X}".format(int(round((self._device.autozero_2_upper + 22.86647) / 0.04486)))) \
-            + JulichChecksum.append("#D{:04X}".format(int(round((self._device.autozero_1_lower + 22.86647) / 0.04486)))) \
-            + JulichChecksum.append("#E{:04X}".format(int(round((self._device.autozero_2_lower + 22.86647) / 0.04486)))) \
-            + JulichChecksum.append("#F{:04X}".format(int(round(self._device.get_voltage() / 0.4274)))) \
-            + JulichChecksum.append("#G{:04X}".format(int(round((self._device.get_electronics_temp() + 25.0) / 0.14663)))) \
-            + JulichChecksum.append("#H{:04X}".format(int(round((self._device.get_motor_temp() + 12.124) / 0.1263))))\
+        def autozero_calibrate(value):
+            return (value + 22.86647) / 0.04486
+
+        timing_freq_mhz = 50.4
+
+        return JulichChecksum.append(
+                '#1' + self._device.get_last_command()) \
+            + JulichChecksum.append(
+                "#2{:04X}".format(self.build_status_code())) \
+            + JulichChecksum.append(
+                "#3000{:01X}".format(12 - (self._device.get_speed_setpoint() / 50))) \
+            + JulichChecksum.append(
+                "#4{:04X}".format(int(round(self._device.get_true_speed() * 60)))) \
+            + JulichChecksum.append(
+                "#5{:04X}".format(int(round((self._device.get_nominal_delay() * timing_freq_mhz) % 65536)))) \
+            + JulichChecksum.append(
+                "#6{:04X}".format(int(round((self._device.get_nominal_delay() * timing_freq_mhz) / 65536)))) \
+            + JulichChecksum.append(
+                "#7{:04X}".format(int(round((self._device.get_actual_delay() * timing_freq_mhz) % 65536)))) \
+            + JulichChecksum.append(
+                "#8{:04X}".format(int(round((self._device.get_actual_delay() * timing_freq_mhz) / 65536)))) \
+            + JulichChecksum.append(
+                "#9{:04X}".format(int(round(self._device.get_gate_width() * timing_freq_mhz)))) \
+            + JulichChecksum.append(
+                "#A{:04X}".format(int(round(self._device.get_current() / 0.002016)))) \
+            + JulichChecksum.append(
+                "#B{:04X}".format(int(round(autozero_calibrate(self._device.autozero_1_upper))))) \
+            + JulichChecksum.append(
+                "#C{:04X}".format(int(round(autozero_calibrate(self._device.autozero_2_upper))))) \
+            + JulichChecksum.append(
+                "#D{:04X}".format(int(round(autozero_calibrate(self._device.autozero_1_lower))))) \
+            + JulichChecksum.append(
+                "#E{:04X}".format(int(round(autozero_calibrate(self._device.autozero_2_lower))))) \
+            + JulichChecksum.append(
+                "#F{:04X}".format(int(round(self._device.get_voltage() / 0.4274)))) \
+            + JulichChecksum.append(
+                "#G{:04X}".format(int(round((self._device.get_electronics_temp() + 25.0) / 0.14663)))) \
+            + JulichChecksum.append(
+                "#H{:04X}".format(int(round((self._device.get_motor_temp() + 12.124) / 0.1263))))\
             + "$"
 
     def execute_command(self, command, checksum):
