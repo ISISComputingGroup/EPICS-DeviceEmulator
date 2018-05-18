@@ -13,10 +13,8 @@ class SimulatedFZJDDFCH(StateMachineDevice):
         """
         Sets the initial state of the device.
         """
-        # only one chopper in this case
-        self.chopper_name = "C01"
-        # reference frequency set to 50Hz to match actual device
-        self.frequency_reference = 50
+        self.chopper_name = "C01"       # only one chopper in this case
+        self.frequency_reference = 50   # reference frequency set to 50Hz to match actual device
         self.frequency_setpoint = 0
         self.frequency = 0
         self.phase_setpoint = 0
@@ -24,20 +22,16 @@ class SimulatedFZJDDFCH(StateMachineDevice):
         self.phase_status_is_ok = False
         self.magnetic_bearing_is_on = False
         self.magnetic_bearing_status_is_ok = False
-        # self.magnetic_bearing_integrator = 0
         self.drive_is_on = False
         self.drive_mode_is_start = False
         self.drive_l1_current = 0
         self.drive_l2_current = 0
         self.drive_l3_current = 0
         self.drive_direction_is_cw = False
-        # self.parked_open_status_is_ok = False
         self.drive_temperature = 0
-        # self.input_clock = 0
         self.phase_outage = 0
         self.master_chopper = "C1"
         self.logging_is_on = False
-        # self.lmsr_status_is_ok = False
         self.dsp_status_is_ok = False
         self.interlock_er_status_is_ok = False
         self.interlock_vacuum_status_is_ok = False
