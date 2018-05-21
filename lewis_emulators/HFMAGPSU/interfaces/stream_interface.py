@@ -36,7 +36,7 @@ class HFMAGPSUStreamInterface(StreamInterface):
 
     def _create_log_message(self, pv, value, suffix=""):
         current_time = datetime.now().strftime('%H:%M:%S')
-        self._device.log_message = "{} {}: {} {}".format(current_time, pv, value, suffix)
+        self._device.log_message = "{} {}: {}{}\r\n".format(current_time, pv, value, suffix)
 
     def handle_error(self, request, error):
         self.log.error("Error occurred at {}: {}".format(request, error))
@@ -68,7 +68,6 @@ class HFMAGPSUStreamInterface(StreamInterface):
 
     def write_direction(self, direction):
         self._device.direction = direction
-        #self._create_log_message("DIRECTION", str(direction))
         return "........\r\n"
 
     def read_output_mode(self):
@@ -78,8 +77,6 @@ class HFMAGPSUStreamInterface(StreamInterface):
         return "........ UNITS: {}\r\n".format(mode)
 
     def read_output(self):
-        # If target is + or - the current output, we are ramping up or down
-        # new output = current output +/- ramp rate
         mode = self._get_output_mode_string()
         return "OUTPUT: {} {} AT {} VOLTS \r\n".format(self._device.output, mode, self._device.heater_value)
 
@@ -92,7 +89,7 @@ class HFMAGPSUStreamInterface(StreamInterface):
                 self._device.max_target *= constant
                 self._device.mid_target *= constant
                 self._device.is_output_mode_tesla = True
-                self._create_log_message("OUTPUT MODE", output_mode)
+                self._create_log_message("UNITS", "TESLA")
         elif output_mode == "OFF":
             if constant == 0:
                 self._device.error_message = "------> No field constant has been entered"
@@ -102,7 +99,7 @@ class HFMAGPSUStreamInterface(StreamInterface):
                     self._device.max_target /= constant
                     self._device.mid_target /= constant
                     self._device.is_output_mode_tesla = False
-                    self._create_log_message("OUTPUT MODE", output_mode)
+                    self._create_log_message("UNITS", "AMPS")
         else:
             raise AssertionError("Invalid arguments sent")
         return self._device.log_message
@@ -112,7 +109,7 @@ class HFMAGPSUStreamInterface(StreamInterface):
 
     def write_ramp_target(self, ramp_target):
         self._device.ramp_target = ramp_target
-        self._create_log_message("RAMP TARGET", ramp_target, suffix="A/SEC")
+        self._create_log_message("RAMP TARGET", ramp_target, suffix=" A/SEC")
         return self._device.log_message
 
     def read_ramp_rate(self):
@@ -120,29 +117,22 @@ class HFMAGPSUStreamInterface(StreamInterface):
 
     def write_ramp_rate(self, ramp_rate):
         self._device.ramp_rate = ramp_rate
-        self._create_log_message("RAMP RATE", ramp_rate, suffix="A/SEC\r\n")
+        self._create_log_message("RAMP RATE", ramp_rate, suffix=" A/SEC")
         return self._device.log_message
 
     def read_heater_status(self):
         heater_value = "OFF"
         if self._device.is_heater_on:
             heater_value = "ON"
-            return "........ HEATER STATUS: {}\r\n".format(heater_value)
-        else:
-            if self._device.is_output_mode_tesla:
-                mode = "TESLA"
-            else:
-                mode = "AMPS"
-            #return "........ HEATER STATUS: {} AT {} {}".format(heater_value, self._device.output, mode)
-            return "........ HEATER STATUS: {}\r\n".format(mode)
+        return "........ HEATER STATUS: {}\r\n".format(heater_value)
 
     def write_heater_status(self, heater_status):
         if heater_status == "ON":
             self._device.is_heater_on = True
-            self._create_log_message("HEATER STATUS", heater_status)
+            self._create_log_message("........ HEATER STATUS", heater_status)
         elif heater_status == "OFF":
             self._device.is_heater_on = False
-            self._create_log_message("HEATER STATUS", heater_status)
+            self._create_log_message("........ HEATER STATUS", heater_status)
         else:
             raise AssertionError("Invalid arguments sent")
         return self._device.log_message
@@ -173,14 +163,14 @@ class HFMAGPSUStreamInterface(StreamInterface):
         else:
             raise AssertionError("Invalid arguments sent")
 
-        return self._device.log_message
+        return "........ PAUSE STATUS: {}\r\n".format(paused)
 
     def read_heater_value(self):
         return "........ HEATER OUTPUT: {} VOLTS\r\n".format(self._device.heater_value)
 
     def write_heater_value(self, heater_value):
         self._device.heater_value = heater_value
-        self._create_log_message("HEATER OUTPUT", heater_value)
+        self._create_log_message("HEATER OUTPUT", heater_value, suffix=" VOLTS")
         return self._device.log_message
 
     def read_max_target(self):
@@ -190,7 +180,7 @@ class HFMAGPSUStreamInterface(StreamInterface):
     def write_max_target(self, max_target):
         self._device.max_target = max_target
         units = self._get_output_mode_string()
-        self._create_log_message("MAX SETTING", max_target,  suffix=units)
+        self._create_log_message("MAX SETTING", max_target,  suffix=" {}\r\n".format(units))
         return self._device.log_message
 
     def read_mid_target(self):
@@ -200,7 +190,7 @@ class HFMAGPSUStreamInterface(StreamInterface):
     def write_mid_target(self, mid_target):
         self._device.mid_target = mid_target
         units = self._get_output_mode_string()
-        self._create_log_message("MID SETTING", mid_target, suffix="{}\r\n".format(units))
+        self._create_log_message("MID SETTING", mid_target, suffix=" {}".format(units))
         return self._device.log_message
 
     def read_limit(self):
@@ -208,7 +198,7 @@ class HFMAGPSUStreamInterface(StreamInterface):
 
     def write_limit(self, limit):
         self._device.limit = limit
-        self._create_log_message("VOLTAGE LIMIT", limit)
+        self._create_log_message("VOLTAGE LIMIT", limit, suffix=" VOLTS")
         return self._device.log_message
 
     def read_constant(self):
@@ -216,5 +206,5 @@ class HFMAGPSUStreamInterface(StreamInterface):
 
     def write_constant(self, constant):
         self._device.constant = constant
-        self._create_log_message("FIELD CONSTANT", constant, suffix="T/A\r\n")
+        self._create_log_message("FIELD CONSTANT", constant, suffix=" T/A")
         return self._device.log_message

@@ -22,7 +22,6 @@ class SimulatedHFMAGPSU(StateMachineDevice):
         self._constant = 0.029
         self._zero_target = 0.0
         self._mid_final_target = 0
-
         self.ready = True
 
     def _get_state_handlers(self):
