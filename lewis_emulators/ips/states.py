@@ -1,6 +1,8 @@
 from lewis.core.statemachine import State
 from lewis.core import approaches
 
+from lewis_emulators.ips.modes import Activity
+
 SECS_PER_MIN = 60
 
 
@@ -20,11 +22,14 @@ class HeaterOnState(State):
         elif abs(device.current - device.magnet_current) > device.QUENCH_CURRENT_DELTA * dt:
             device.quench("Difference between PSU current ({}) and magnet current ({}) is higher than allowed ({})"
                           .format(device.current, device.magnet_current, device.QUENCH_CURRENT_DELTA * dt))
-        else:
-            device.current = approaches.linear(
-                device.current, device.current_setpoint, curr_ramp_rate, dt)
-            device.magnet_current = approaches.linear(
-                device.magnet_current, device.current_setpoint, curr_ramp_rate, dt)
+
+        elif device.activity == Activity.TO_SETPOINT:
+            device.current = approaches.linear(device.current, device.current_setpoint, curr_ramp_rate, dt)
+            device.magnet_current = approaches.linear(device.magnet_current, device.current_setpoint, curr_ramp_rate, dt)
+
+        elif device.activity == Activity.TO_ZERO:
+            device.current = approaches.linear(device.current, 0, curr_ramp_rate, dt)
+            device.magnet_current = approaches.linear(device.magnet_current, 0, curr_ramp_rate, dt)
 
 
 class HeaterOffState(State):
@@ -37,12 +42,11 @@ class HeaterOffState(State):
         curr_ramp_rate = device.current_ramp_rate / SECS_PER_MIN
 
         # In this state, the magnet current is totally unaffected by whatever the PSU decides to do.
-        device.current = approaches.linear(
-            device.current, device.current_setpoint, curr_ramp_rate, dt)
+        if device.activity == Activity.TO_SETPOINT:
+            device.current = approaches.linear(device.current, device.current_setpoint, curr_ramp_rate, dt)
+        elif device.activity == Activity.TO_ZERO:
+            device.current = approaches.linear(device.current, 0, curr_ramp_rate, dt)
 
 
 class MagnetQuenchedState(State):
-    def on_entry(self, dt):
-        device = self._context
-
-        device.trip_current = device.current
+    pass

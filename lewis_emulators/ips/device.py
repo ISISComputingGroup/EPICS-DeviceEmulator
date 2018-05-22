@@ -1,8 +1,8 @@
 from collections import OrderedDict
 
 from lewis.core.logging import has_log
-from numpy import mean
 
+from lewis_emulators.ips.modes import Activity
 from states import HeaterOffState, HeaterOnState, MagnetQuenchedState
 from lewis.devices import StateMachineDevice
 
@@ -75,14 +75,21 @@ class SimulatedIps(StateMachineDevice):
         # This could be used for diagnostics e.g. finding maximum field which magnet is capable of in a certain config.
         self.trip_current = 0
 
-        self.current_sweep_rate = 0
-
-        self.voltage = 0
-
+        # Ramp rate == sweep rate
         self.current_ramp_rate = 1000
 
         # Set to true if the magnet is quenched - this will cause lewis to enter the quenched state
         self.quenched = False
+
+        # Mode of the magnet e.g. HOLD, TO SET POINT, TO ZERO, CLAMP
+        self.activity = Activity.TO_SETPOINT
+
+        # No idea what a sensible value is. Hard-code this here for now - can't be changed on real device.
+        self.inductance = 0.005
+
+        # No idea what sensible values are here. Also not clear what the behaviour is of the controller when these
+        # limits are hit.
+        self.neg_current_limit, self.pos_current_limit = -10**6, 10**6
 
     def _get_state_handlers(self):
         return {
@@ -103,12 +110,20 @@ class SimulatedIps(StateMachineDevice):
             (('heater_off', 'quenched'), lambda: self.quenched),
 
             # Only triggered when device is reset or similar
-            (('quenched', 'heater_off'), lambda: not self.quenched),
+            (('quenched', 'heater_off'), lambda: not self.quenched and not self.heater_on),
+            (('quenched', 'heater_on'), lambda: not self.quenched and self.heater_on),
         ])
 
     def quench(self, reason):
-        self.log.info("Magnet quenching because: {}".format(reason))
+        self.log.info("Magnet quenching at current={} because: {}".format(self.current, reason))
+        self.trip_current = self.current
+        self.magnet_current = 0
+        self.current = 0
+        self.measured_current = 0
         self.quenched = True  # Causes LeWiS to enter Quenched state
+
+    def unquench(self):
+        self.quenched = False
 
     def get_voltage(self):
         """

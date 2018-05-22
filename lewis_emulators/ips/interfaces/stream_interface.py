@@ -2,7 +2,17 @@ from lewis.adapters.stream import StreamInterface
 from lewis.core.logging import has_log
 
 from lewis_emulators.utils.command_builder import CmdBuilder
+
+from lewis_emulators.ips.modes import Activity
 from ..device import amps_to_tesla, tesla_to_amps
+
+
+MODE_MAPPING = {
+    0: Activity.HOLD,
+    1: Activity.TO_SETPOINT,
+    2: Activity.TO_ZERO,
+    4: Activity.CLAMP,
+}
 
 
 @has_log
@@ -36,6 +46,8 @@ class IpsStreamInterface(StreamInterface):
         CmdBuilder("set_mode").escape("A").int().eos().build(),
         CmdBuilder("set_current").escape("I").float().eos().build(),
         CmdBuilder("set_field").escape("J").float().eos().build(),
+        CmdBuilder("set_field_sweep_rate").escape("T").float().eos().build(),
+        CmdBuilder("set_sweep_mode").escape("M").int().eos().build(),
 
         CmdBuilder("set_heater_on").escape("H1").eos().build(),
         CmdBuilder("set_heater_off").escape("H0").eos().build(),
@@ -63,20 +75,37 @@ class IpsStreamInterface(StreamInterface):
         return "C"
 
     def set_mode(self, mode):
-        #  TODO: This command?
+        mode = int(mode)
+        try:
+            self.device.activity = MODE_MAPPING[mode]
+        except KeyError:
+            raise ValueError("Invalid mode specified")
         return "A"
 
     def get_status(self):
         resp = "X{x1}{x2}A{a}C{c}H{h}M{m1}{m2}P{p1}{p2}"
 
+        def translate_activity():
+            for k, v in MODE_MAPPING.iteritems():
+                if v == self.device.activity:
+                    return k
+            else:
+                raise ValueError("Device was in invalid mode, can't construct status")
+
+        def get_heater_status_number():
+            if self.device.heater_on:
+                return 1
+            else:
+                return 0 if self.device.magnet_current == 0 else 2
+
         statuses = {
-            "x1": 0,
+            "x1": 1 if self.device.quenched else 0,
             "x2": 0,
-            "a": 0,
-            "c": 3,
-            "h": 1 if self.device.heater_on else 0,
-            "m1": 1,
-            "m2": 0,
+            "a": translate_activity(),
+            "c": 4 if self.device.quenched else 3,
+            "h": get_heater_status_number(),
+            "m1": self.device.sweep_mode,
+            "m2": 0 if self.device.current == self.device.current_ramp_rate else 1,
             "p1": 0,
             "p2": 0,
         }
@@ -87,7 +116,7 @@ class IpsStreamInterface(StreamInterface):
         return "R{}".format(self.device.current_setpoint)
 
     def get_supply_voltage(self): 
-        return "R{}".format(self.device.voltage)
+        return "R{}".format(self.device.get_voltage())
 
     def get_measured_current(self):
         return "R{}".format(self.device.measured_current)
@@ -96,7 +125,7 @@ class IpsStreamInterface(StreamInterface):
         return "R{}".format(self.device.current)
 
     def get_current_sweep_rate(self): 
-        return "R{}".format(self.device.current_sweep_rate)
+        return "R{}".format(self.device.current_ramp_rate)
 
     def get_field(self):
         return "R{}".format(amps_to_tesla(self.device.current))
@@ -105,7 +134,7 @@ class IpsStreamInterface(StreamInterface):
         return "R{}".format(amps_to_tesla(self.device.current_setpoint))
 
     def get_field_sweep_rate(self): 
-        return "R{}".format(amps_to_tesla(self.device.current_sweep_rate))
+        return "R{}".format(amps_to_tesla(self.device.current_ramp_rate))
 
     def get_software_voltage_limit(self): 
         return "R0"
@@ -126,16 +155,16 @@ class IpsStreamInterface(StreamInterface):
         return "R{}".format(self.device.heater_current)
 
     def get_neg_current_limit(self): 
-        return "R0"
+        return "R{}".format(self.device.neg_current_limit)
 
-    def get_pos_current_limit(self): 
-        return "R0"
+    def get_pos_current_limit(self):
+        return "R{}".format(self.device.pos_current_limit)
 
     def get_lead_resistance(self): 
         return "R{}".format(self.device.lead_resistance)
 
-    def get_magnet_inductance(self): 
-        return "R0"
+    def get_magnet_inductance(self):
+        return "R{}".format(self.device.inductance)
 
     def set_current(self, current):
         self.device.current_setpoint = float(current)
@@ -152,3 +181,11 @@ class IpsStreamInterface(StreamInterface):
     def set_heater_off(self):
         self.device.set_heater_status(False)
         return "H"
+
+    def set_field_sweep_rate(self, tesla):
+        self.device.current_ramp_rate = tesla_to_amps(float(tesla))
+        return "T"
+
+    def set_sweep_mode(self, mode):
+        self.device.sweep_mode = int(mode)
+        return "M"
