@@ -59,7 +59,7 @@ class SimulatedIps(StateMachineDevice):
 
         # "Leads" are the non-superconducting wires between the superconducting magnet and the power supply.
         # Not sure what a realistic value is for these leads, so I've guessed.
-        self.lead_resistance = 0.1
+        self.lead_resistance = 50
 
         # Current = what the power supply is providing.
         self.current = 0
@@ -76,7 +76,7 @@ class SimulatedIps(StateMachineDevice):
         self.trip_current = 0
 
         # Ramp rate == sweep rate
-        self.current_ramp_rate = 1000
+        self.current_ramp_rate = 1 / LOAD_LINE_GRADIENT
 
         # Set to true if the magnet is quenched - this will cause lewis to enter the quenched state
         self.quenched = False
