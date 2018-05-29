@@ -105,7 +105,7 @@ class IpsStreamInterface(StreamInterface):
             "c": 4 if self.device.quenched else 3,
             "h": get_heater_status_number(),
             "m1": self.device.sweep_mode,
-            "m2": 0 if self.device.current == self.device.current_ramp_rate else 1,
+            "m2": 0 if self.device.current == self.device.current_setpoint else 1,
             "p1": 0,
             "p2": 0,
         }
