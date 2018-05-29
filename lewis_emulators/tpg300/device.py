@@ -14,10 +14,10 @@ class SimulatedTpg300(StateMachineDevice):
         Sets the initial state of the device.
         """
 
-        self._pressure_A1 = 1.0
-        self._pressure_A2 = 2.0
-        self._pressure_B1 = 3.0
-        self._pressure_B2 = 4.0
+        self._pressure_a1 = 1.0
+        self._pressure_a2 = 2.0
+        self._pressure_b1 = 3.0
+        self._pressure_b2 = 4.0
         self._units = 0
 
     def _get_state_handlers(self):
@@ -40,40 +40,40 @@ class SimulatedTpg300(StateMachineDevice):
         return OrderedDict()
 
     @property
-    def pressure_A1(self):
+    def pressure_a1(self):
         """
-        Returns: Pressure A1
+        Returns: Pressure a1
         """
 
-        return self._pressure_A1
+        return self._pressure_a1
 
-    @pressure_A1.setter
-    def pressure_A1(self, pressure):
+    @pressure_a1.setter
+    def pressure_a1(self, pressure):
         """
-        Sets the pressure for pressure A1
+        Sets the pressure for pressure a1
 
         :param pressure: The pressure value to set A1 to
         """
 
-        self._pressure_A1 = pressure
+        self._pressure_a1 = pressure
 
     @property
-    def pressure_A2(self):
+    def pressure_a2(self):
         """
         Returns: Pressure A2
         """
 
-        return self._pressure_A2
+        return self._pressure_a2
 
-    @pressure_A2.setter
-    def pressure_A2(self, pressure):
+    @pressure_a2.setter
+    def pressure_a2(self, pressure):
         """
         Sets the pressure for pressure A2
 
         :param pressure: The pressure value to set A2 to
         """
 
-        self._pressure_A2 = pressure
+        self._pressure_a2 = pressure
 
     @property
     def pressure_B1(self):
