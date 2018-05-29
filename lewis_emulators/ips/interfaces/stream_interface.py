@@ -98,6 +98,14 @@ class IpsStreamInterface(StreamInterface):
             else:
                 return 0 if self.device.magnet_current == 0 else 2
 
+        def is_sweeping():
+            if self.device.activity == Activity.TO_SETPOINT:
+                return self.device.current != self.device.current_setpoint
+            elif self.device.activity == Activity.TO_ZERO:
+                return self.device.current != 0
+            else:
+                return False
+
         statuses = {
             "x1": 1 if self.device.quenched else 0,
             "x2": 0,
@@ -105,7 +113,7 @@ class IpsStreamInterface(StreamInterface):
             "c": 4 if self.device.quenched else 3,
             "h": get_heater_status_number(),
             "m1": self.device.sweep_mode,
-            "m2": 0 if self.device.current == self.device.current_setpoint else 1,
+            "m2": 1 if is_sweeping() else 0,
             "p1": 0,
             "p2": 0,
         }
