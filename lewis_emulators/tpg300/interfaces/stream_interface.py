@@ -9,6 +9,7 @@ class Tpg300StreamInterface(StreamInterface):
 
     _last_command = None
     ACK = chr(6)
+    DEVICE_STATUS = 0
 
     commands = {
         CmdBuilder("acknowledge_pressure").escape("PA1").build(),
@@ -41,7 +42,7 @@ class Tpg300StreamInterface(StreamInterface):
         """
 
         if self._last_command == "PA1":
-            return str(self._device.pressure_a1)
+            return "{},{}".format(self.DEVICE_STATUS, self._device.pressure_a1)
         elif self._last_command == "PA2":
             return str(self._device.pressure_a2)
         elif self._last_command == "PB1":
