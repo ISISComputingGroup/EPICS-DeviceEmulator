@@ -92,7 +92,7 @@ class Tpg300StreamInterface(StreamInterface):
             units_value = self._last_command[-1]
             return self.set_units(units_value)
         else:
-            print("Last command was unknown: ", str(self._last_command))
+            print("Last command was unknown: {}".format(self._last_command))
 
     def get_units(self):
         """
