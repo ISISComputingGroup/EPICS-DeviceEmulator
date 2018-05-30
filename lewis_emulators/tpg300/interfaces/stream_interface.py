@@ -14,6 +14,7 @@ class Tpg300StreamInterface(StreamInterface):
 
     commands = {
         CmdBuilder("acknowledge_pressure").escape("P").arg("A1").build(),#|A2|B1|B2}").build(),
+        CmdBuilder("acknowledge_units").escape("UNI").build(),
         CmdBuilder("handle_enquiry").enq().build()
     }
 
@@ -36,6 +37,16 @@ class Tpg300StreamInterface(StreamInterface):
 
         self._last_command = "P{}".format(request)
         self.log.debug(self._last_command)
+        return self.ACK
+
+    def acknowledge_units(self):
+        """
+        Acknowledge that the request for current units was received.
+
+        Returns:
+            ASCII acknowledgement character (0x6)
+        """
+        self._last_command = "UNI"
         return self.ACK
 
     def define_channel_lookup(self):
@@ -65,6 +76,15 @@ class Tpg300StreamInterface(StreamInterface):
             self.log.debug("{},{}".format(self.DEVICE_STATUS, channel_lookup[self._last_command]))
             return "{},{}".format(self.DEVICE_STATUS, channel_lookup[self._last_command])
         elif self._last_command == "UNI":
+            return self.get_units()
             return "{},{}".format("")
         else:
             print("Last command was unknown: ", str(self._last_command))
+
+    def get_units(self):
+        """
+
+        Returns:
+            Devices current units. (mbar, Torr or Pa).
+        """
+        return self._device.units
