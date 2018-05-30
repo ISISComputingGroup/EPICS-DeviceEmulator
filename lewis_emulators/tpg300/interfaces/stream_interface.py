@@ -27,7 +27,7 @@ class Tpg300StreamInterface(StreamInterface):
         :param error: problem
         :return:
         """
-        print("An error occurred at request ", repr(request), ": ", repr(error))
+        print("An error occurred at request ", str(request), ": ", str(error))
 
     def acknowledge_pressure(self):
 
@@ -50,4 +50,4 @@ class Tpg300StreamInterface(StreamInterface):
         elif self._last_command == "PB2":
             return str(self._device.pressure_b2)
         else:
-            print("Last command was unknown: ", repr(self._last_command))
+            print("Last command was unknown: ", str(self._last_command))
