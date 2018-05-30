@@ -33,7 +33,7 @@ class Tpg300StreamInterface(StreamInterface):
         Returns:
             None.
         """
-        print("An error occurred at request ", str(request), ": ", str(error))
+        print("An error occurred at request {}: {}".format(request, error))
 
     def acknowledge_pressure(self, request):
         """
