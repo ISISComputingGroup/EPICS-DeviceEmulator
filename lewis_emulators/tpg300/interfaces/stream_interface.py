@@ -64,7 +64,7 @@ class Tpg300StreamInterface(StreamInterface):
         Acknowledge that the request to set the units was received.
 
         Args:
-            units (integer): unit flag value.
+            units (integer): unit flag value. Takes the value 1, 2 or 3.
 
         Returns:
             ASCII acknowledgement character (0x6).
@@ -78,10 +78,10 @@ class Tpg300StreamInterface(StreamInterface):
         Handles an enquiry using the last command sent.
 
         Returns:
-            Channel pressure (string): Returns a string with DEVICE_STATE and
-                current channel pressure.
-            get_units(): Returns the devices current units.
-            set_units(): Sets the devices units.
+            String: Channel pressure if last command was in channels.
+            String: Returns the devices current units if last command is 'UNI'.
+            None: Sets the devices units to 1,2, or 3 if last command is 'UNI{}' where {} is 1, 2 or 3
+                respectively.
         """
 
         if self._last_command in self.channels:
@@ -99,7 +99,7 @@ class Tpg300StreamInterface(StreamInterface):
         Gets the units of the device.
 
         Returns:
-            units (string): Devices current units: mbar, Torr, or Pa.
+            String: Devices current units from (mbar, Torr, or Pa).
         """
         return self._device.units
 
@@ -114,6 +114,15 @@ class Tpg300StreamInterface(StreamInterface):
         self._device.units = units
 
     def get_pressure(self, channel):
+        """
+        Gets the pressure for a channel.
+
+        Args:
+            channel (string): channel name. E.g. PA1.
+
+        Returns:
+            String: Device status and pressure from the channel.
+        """
         channel_lower_case = channel[-2:].lower()
         pressure_channel = "pressure_{}".format(channel_lower_case)
         pressure = getattr(self._device, pressure_channel)
