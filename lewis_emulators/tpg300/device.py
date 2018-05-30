@@ -137,8 +137,9 @@ class SimulatedTpg300(StateMachineDevice):
     @property
     def connected(self):
         """
-        Returns: Whether or not the emulator is running in disconnected mode
-
+        Returns:
+            bool: True if emulator is running in connected mode.
+                False if emulator is running in disconnected mode.
         """
         return self._connected
 
@@ -148,7 +149,6 @@ class SimulatedTpg300(StateMachineDevice):
         Set the (connected|disconnected) status for the emulator
 
         Args:
-            connected: True or False
-
+            connected: bool
         """
         self._connected = connected
