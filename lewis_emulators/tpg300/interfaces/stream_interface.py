@@ -114,6 +114,10 @@ class Tpg300StreamInterface(StreamInterface):
             print("Last command was unknown: ", str(self._last_command))
             enquiry_return = None
 
+        if self._device.connected:
+            return enquiry_return
+        else:
+            return None
 
     def get_units(self):
         """
