@@ -122,7 +122,9 @@ class Tpg300StreamInterface(StreamInterface):
             print("Last command was unknown: ", str(self._last_command))
             enquiry_return = None
 
-        if self._connected:
+        print(self._device.connected)
+
+        if self._device.connected:
             return enquiry_return
         else:
             return None
@@ -135,7 +137,7 @@ class Tpg300StreamInterface(StreamInterface):
             units (string): Devices current units: mbar, Torr, or Pa.
         """
 
-        if self._connected:
+        if self._device.connected:
             return self._device.units
         else:
             return None
@@ -148,6 +150,6 @@ class Tpg300StreamInterface(StreamInterface):
             None.
         """
 
-        if self._connected:
+        if self._device.connected:
             self._device.units = units
 
