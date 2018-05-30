@@ -18,7 +18,7 @@ class SimulatedTpg300(StateMachineDevice):
         self._pressure_a2 = 2.0
         self._pressure_b1 = 3.0
         self._pressure_b2 = 4.0
-        self._units = 0
+        self._units = 1
 
     def _get_state_handlers(self):
         """
