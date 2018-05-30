@@ -32,6 +32,7 @@ class Tpg300StreamInterface(StreamInterface):
         Returns:
             None.
         """
+
         print("An error occurred at request {}: {}".format(request, error))
 
     def acknowledge_pressure(self, request):
@@ -46,11 +47,7 @@ class Tpg300StreamInterface(StreamInterface):
         """
 
         self._last_command = "P{}".format(request)
-
-        if self._device.connected:
-            return self.ACK
-        else:
-            return None
+        return self.acknowledge_if_connected()
 
     def acknowledge_units(self):
         """
@@ -59,12 +56,9 @@ class Tpg300StreamInterface(StreamInterface):
         Returns:
             ASCII acknowledgement character (0x6).
         """
-        self._last_command = "UNI"
 
-        if self._device.connected:
-            return self.ACK
-        else:
-            return None
+        self._last_command = "UNI"
+        return self.acknowledge_if_connected()
 
     def acknowledge_set_units(self, units):
         """
@@ -78,6 +72,16 @@ class Tpg300StreamInterface(StreamInterface):
         """
 
         self._last_command = "UNI{}".format(units)
+        return self.acknowledge_if_connected()
+
+    def acknowledge_if_connected(self):
+        """
+        Returns an acknowledgement character if connected.
+
+        Returns:
+            ASCII acknowledgement character (0x6): If connected.
+            None: If disconnected.
+        """
 
         if self._device.connected:
             return self.ACK
@@ -95,6 +99,7 @@ class Tpg300StreamInterface(StreamInterface):
                 respectively.
             None: Last command unknown.
         """
+
         pressure_channels = ("PA1", "PA2", "PB1", "PB2")
         change_unit_commands = ("UNI1", "UNI2", "UNI3")
 
@@ -142,6 +147,7 @@ class Tpg300StreamInterface(StreamInterface):
         Returns:
             String: Device status and pressure from the channel.
         """
+
         channel_lower_case = channel[-2:].lower()
         pressure_channel = "pressure_{}".format(channel_lower_case)
         pressure = getattr(self._device, pressure_channel)
