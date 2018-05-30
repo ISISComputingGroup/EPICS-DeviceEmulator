@@ -20,20 +20,23 @@ class SimulatedTpg300(StateMachineDevice):
         self._pressure_b2 = 4.0
         self._units = 1
 
-    def _get_state_handlers(self):
+    @staticmethod
+    def _get_state_handlers():
         """
         Returns: states and their names
         """
 
         return {DefaultState.NAME: DefaultState()}
 
-    def _get_initial_state(self):
+    @staticmethod
+    def _get_initial_state():
         """
         Returns: the name of the initial state
         """
         return DefaultState.NAME
 
-    def _get_transition_handlers(self):
+    @staticmethod
+    def _get_transition_handlers():
         """
         Returns: the state transitions
         """
