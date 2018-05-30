@@ -13,7 +13,7 @@ class Tpg300StreamInterface(StreamInterface):
     DEVICE_STATUS = 0
 
     commands = {
-        CmdBuilder("acknowledge_pressure").escape("P").arg("A1").build(),#|A2|B1|B2}").build(),
+        CmdBuilder("acknowledge_pressure").escape("P").arg("A1|A2|B1|B2").build(),
         CmdBuilder("handle_enquiry").enq().build()
     }
 
@@ -31,11 +31,10 @@ class Tpg300StreamInterface(StreamInterface):
         """
         print("An error occurred at request ", str(request), ": ", str(error))
 
-    @has_log
     def acknowledge_pressure(self, request):
 
         self._last_command = "P{}".format(request)
-        self.log.debug(self._last_command)
+        print(self._last_command)
         return self.ACK
 
     def define_channel_lookup(self):
@@ -46,10 +45,10 @@ class Tpg300StreamInterface(StreamInterface):
             A dictionary which points to the 4 pressure variables
         """
 
-        return {"PA1": self._device.pressure_a1}#,
-                #"PA2": self._device.pressure_a2,
-                #"PB1": self._device.pressure_b1,
-                #"PB2": self._device.pressure_b2}
+        return {"PA1": self._device.pressure_a1,
+                "PA2": self._device.pressure_a2,
+                "PB1": self._device.pressure_b1,
+                "PB2": self._device.pressure_b2}
 
     @has_log
     def handle_enquiry(self):
@@ -62,7 +61,6 @@ class Tpg300StreamInterface(StreamInterface):
         channel_lookup = self.define_channel_lookup()
 
         if self._last_command in channel_lookup:
-            self.log.debug("{},{}".format(self.DEVICE_STATUS, channel_lookup[self._last_command]))
             return "{},{}".format(self.DEVICE_STATUS, channel_lookup[self._last_command])
         elif self._last_command == "UNI":
             return "{},{}".format("")
