@@ -5,7 +5,7 @@ from lewis_emulators.utils.command_builder import CmdBuilder
 
 class Tpg300StreamInterface(StreamInterface):
     """
-    Stream interface for the serial port
+    Stream interface for the serial port.
     """
 
     _last_command = None
@@ -33,8 +33,16 @@ class Tpg300StreamInterface(StreamInterface):
         """
         print("An error occurred at request ", str(request), ": ", str(error))
 
-    @has_log
     def acknowledge_pressure(self, request):
+        """
+        Acknowledges a request to get the pressure and stores the request.
+
+        Args:
+            request: Pressure chanel to read from.
+
+        Returns:
+            ASCII acknowledgement character (0x6).
+        """
 
         self._last_command = "P{}".format(request)
         self.log.debug(self._last_command)
@@ -45,17 +53,26 @@ class Tpg300StreamInterface(StreamInterface):
         Acknowledge that the request for current units was received.
 
         Returns:
-            ASCII acknowledgement character (0x6)
+            ASCII acknowledgement character (0x6).
         """
         self._last_command = "UNI"
         return self.ACK
 
-    def acknowledge_set_units(self, units_value):
+    def acknowledge_set_units(self, units):
+        """
+        Acknowledge that the request to set the units was received.
 
-        self._last_command = "UNI{}".format(units_value)
+        Args:
+            units (integer {1|2|3}): unit flag value.
+
+        Returns:
+            ASCII acknowledgement character (0x6).
+        """
+
+        self._last_command = "UNI{}".format(units)
         return self.ACK
 
-    def define_channel_lookup(self):
+    def _define_channel_lookup(self):
         """
         Defines a lookup dictionary for the 4 pressure channels
 
@@ -68,18 +85,20 @@ class Tpg300StreamInterface(StreamInterface):
                 #"PB1": self._device.pressure_b1,
                 #"PB2": self._device.pressure_b2}
 
-    @has_log
     def handle_enquiry(self):
         """
-        Handle an enquiry using the last command sent.
+        Handles an enquiry using the last command sent.
 
-        :return:
+        Returns:
+            Channel pressure (string): Returns a string with DEVICE_STATE and
+                current channel pressure.
+            get_units(): Returns the devices current units.
+            set_units(): Sets the devices units.
         """
 
-        channel_lookup = self.define_channel_lookup()
+        channel_lookup = self._define_channel_lookup()
 
         if self._last_command in channel_lookup:
-            self.log.debug("{},{}".format(self.DEVICE_STATUS, channel_lookup[self._last_command]))
             return "{},{}".format(self.DEVICE_STATUS, channel_lookup[self._last_command])
         elif self._last_command == "UNI":
             return self.get_units()
@@ -94,7 +113,7 @@ class Tpg300StreamInterface(StreamInterface):
         Gets the units of the device.
 
         Returns:
-            Devices current units. (mbar, Torr, or Pa).
+            units (string): Devices current units: mbar, Torr, or Pa.
         """
         return self._device.units
 
