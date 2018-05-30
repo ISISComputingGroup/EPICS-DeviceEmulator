@@ -22,14 +22,16 @@ class Tpg300StreamInterface(StreamInterface):
     in_terminator = "\r\n"
     out_terminator = "\r\n"
 
-
-    def handle_error(self, request, error):
+    @staticmethod
+    def handle_error(request, error):
         """
-        If command is not recognised print and error.
+        Prints an error message if a command is not recognised.
 
-        :param request: requested string
-        :param error: problem
-        :return:
+        Args:
+            request : Request.
+            error: The error that has occurred.
+        Returns:
+            None.
         """
         print("An error occurred at request ", str(request), ": ", str(error))
 
