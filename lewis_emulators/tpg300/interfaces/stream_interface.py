@@ -10,7 +10,7 @@ class Tpg300StreamInterface(StreamInterface):
     _last_command = None
     ACK = chr(6)
     DEVICE_STATUS = 0
-    channels = ("PA1", "PA2", "PB1", "PB2")
+    PRESSURE_CHANNELS = ("PA1", "PA2", "PB1", "PB2")
 
     commands = {
         CmdBuilder("acknowledge_pressure").escape("P").arg("A1|A2|B1|B2").build(),
@@ -84,7 +84,7 @@ class Tpg300StreamInterface(StreamInterface):
                 respectively.
         """
 
-        if self._last_command in self.channels:
+        if self._last_command in self.PRESSURE_CHANNELS:
             return self.get_pressure(self._last_command)
         elif self._last_command == "UNI":
             return self.get_units()
@@ -118,7 +118,7 @@ class Tpg300StreamInterface(StreamInterface):
         Gets the pressure for a channel.
 
         Args:
-            channel (string): channel name. E.g. PA1.
+            channel (string): Pressure channel name. E.g. PA1.
 
         Returns:
             String: Device status and pressure from the channel.
