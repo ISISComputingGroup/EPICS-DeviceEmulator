@@ -99,22 +99,17 @@ class Tpg300StreamInterface(StreamInterface):
         change_unit_commands = ("UNI1", "UNI2", "UNI3")
 
         if self._last_command in self.PRESSURE_CHANNELS:
-            enquiry_return = self.get_pressure(self._last_command)
+            return self.get_pressure(self._last_command)
 
         elif self._last_command == "UNI":
-            enquiry_return = self.get_units()
+            return self.get_units()
 
         elif self._last_command in change_unit_commands:
             units_value = self._last_command[-1]
-            enquiry_return = self.set_units(units_value)
+            return self.set_units(units_value)
 
         else:
             print("Last command was unknown: ", str(self._last_command))
-            enquiry_return = None
-
-        if self._device.connected:
-            return enquiry_return
-        else:
             return None
 
     def get_units(self):
