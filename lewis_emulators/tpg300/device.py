@@ -76,40 +76,40 @@ class SimulatedTpg300(StateMachineDevice):
         self._pressure_a2 = pressure
 
     @property
-    def pressure_B1(self):
+    def pressure_b1(self):
         """
         Returns: Pressure B1
         """
 
-        return self._pressure_B1
+        return self._pressure_b1
 
-    @pressure_B1.setter
-    def pressure_B1(self, pressure):
+    @pressure_b1.setter
+    def pressure_b1(self, pressure):
         """
         Sets the pressure for pressure B1
 
         :param pressure: The pressure value to set B1 to
         """
 
-        self._pressure_B1 = pressure
+        self._pressure_b1 = pressure
 
     @property
-    def pressure_B2(self):
+    def pressure_b2(self):
         """
         Returns: Pressure B2
         """
 
-        return self._pressure_B2
+        return self._pressure_b2
 
-    @pressure_B2.setter
-    def pressure_B2(self, pressure):
+    @pressure_b2.setter
+    def pressure_b2(self, pressure):
         """
         Sets the pressure for pressure B2
 
         :param pressure: The pressure value to set B2 to
         """
 
-        self._pressure_B2 = pressure
+        self._pressure_b2 = pressure
 
     @property
     def units(self):
