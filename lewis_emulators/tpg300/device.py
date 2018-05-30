@@ -19,6 +19,8 @@ class SimulatedTpg300(StateMachineDevice):
         self._pressure_b1 = 3.0
         self._pressure_b2 = 4.0
         self._units = 1
+        
+        self._connected = True
 
     def _get_state_handlers(self):
         """
@@ -118,6 +120,7 @@ class SimulatedTpg300(StateMachineDevice):
         """
         return self._units
 
+
     @units.setter
     def units(self, units):
         """
@@ -127,3 +130,22 @@ class SimulatedTpg300(StateMachineDevice):
             units (string): The units to set the device to.
         """
         self._units = units
+
+    @property
+    def connected(self):
+        """
+        Returns: Whether or not the emulator is running in disconnected mode
+
+        """
+        return self._connected
+
+    @connected.setter
+    def connected(self, connected):
+        """
+        Set the (connected|disconnected) status for the emulator
+
+        Args:
+            connected: True or False
+
+        """
+        self._connected = connected

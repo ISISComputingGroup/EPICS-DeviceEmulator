@@ -47,7 +47,11 @@ class Tpg300StreamInterface(StreamInterface):
 
         self._last_command = "P{}".format(request)
         print(self._last_command)
-        return self.ACK
+
+        if self._device.connected:
+            return self.ACK
+        else:
+            return None
 
     def acknowledge_units(self):
         """
@@ -57,7 +61,11 @@ class Tpg300StreamInterface(StreamInterface):
             ASCII acknowledgement character (0x6).
         """
         self._last_command = "UNI"
-        return self.ACK
+
+        if self._device.connected:
+            return self.ACK
+        else:
+            return None
 
     def acknowledge_set_units(self, units):
         """
@@ -71,7 +79,11 @@ class Tpg300StreamInterface(StreamInterface):
         """
 
         self._last_command = "UNI{}".format(units)
-        return self.ACK
+
+        if self._device.connected:
+            return self.ACK
+        else:
+            return
 
     def _define_channel_lookup(self):
         """
@@ -100,14 +112,20 @@ class Tpg300StreamInterface(StreamInterface):
         channel_lookup = self._define_channel_lookup()
 
         if self._last_command in channel_lookup:
-            return "{},{}".format(self.DEVICE_STATUS, channel_lookup[self._last_command])
+            enquiry_return = "{},{}".format(self.DEVICE_STATUS, channel_lookup[self._last_command])
         elif self._last_command == "UNI":
-            return self.get_units()
+            enquiry_return = self.get_units()
         elif self._last_command == "UNI{1|2|3}":
             units = self._last_command[-1]
-            return self.set_units(units)
+            enquiry_return = self.set_units(units)
         else:
             print("Last command was unknown: ", str(self._last_command))
+            enquiry_return = None
+
+        if self._connected:
+            return enquiry_return
+        else:
+            return None
 
     def get_units(self):
         """
@@ -116,7 +134,11 @@ class Tpg300StreamInterface(StreamInterface):
         Returns:
             units (string): Devices current units: mbar, Torr, or Pa.
         """
-        return self._device.units
+
+        if self._connected:
+            return self._device.units
+        else:
+            return None
 
     def set_units(self, units):
         """
@@ -126,5 +148,6 @@ class Tpg300StreamInterface(StreamInterface):
             None.
         """
 
-        self._device.units = units
+        if self._connected:
+            self._device.units = units
 
