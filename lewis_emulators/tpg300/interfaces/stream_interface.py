@@ -10,11 +10,12 @@ class Tpg300StreamInterface(StreamInterface):
     _last_command = None
     ACK = chr(6)
     DEVICE_STATUS = 0
+    channels = ("PA1", "PA2", "PB1", "PB2")
 
     commands = {
         CmdBuilder("acknowledge_pressure").escape("P").arg("A1|A2|B1|B2").build(),
         CmdBuilder("acknowledge_units").escape("UNI").build(),
-        CmdBuilder("acknowledge_set_units").escape("UNI").arg("{1|2|3}").build(),
+        CmdBuilder("acknowledge_set_units").escape("UNI").arg("1|2|3").build(),
         CmdBuilder("handle_enquiry").enq().build()
     }
 
@@ -46,7 +47,6 @@ class Tpg300StreamInterface(StreamInterface):
         """
 
         self._last_command = "P{}".format(request)
-        print(self._last_command)
         return self.ACK
 
     def acknowledge_units(self):
@@ -64,7 +64,7 @@ class Tpg300StreamInterface(StreamInterface):
         Acknowledge that the request to set the units was received.
 
         Args:
-            units (integer {1|2|3}): unit flag value.
+            units (integer): unit flag value.
 
         Returns:
             ASCII acknowledgement character (0x6).
@@ -72,19 +72,6 @@ class Tpg300StreamInterface(StreamInterface):
 
         self._last_command = "UNI{}".format(units)
         return self.ACK
-
-    def _define_channel_lookup(self):
-        """
-        Defines a lookup dictionary for the 4 pressure channels
-
-        Returns:
-            A dictionary which points to the 4 pressure variables
-        """
-
-        return {"PA1": self._device.pressure_a1,
-                "PA2": self._device.pressure_a2,
-                "PB1": self._device.pressure_b1,
-                "PB2": self._device.pressure_b2}
 
     def handle_enquiry(self):
         """
@@ -97,15 +84,13 @@ class Tpg300StreamInterface(StreamInterface):
             set_units(): Sets the devices units.
         """
 
-        channel_lookup = self._define_channel_lookup()
-
-        if self._last_command in channel_lookup:
-            return "{},{}".format(self.DEVICE_STATUS, channel_lookup[self._last_command])
+        if self._last_command in self.channels:
+            return self.get_pressure(self._last_command)
         elif self._last_command == "UNI":
             return self.get_units()
-        elif self._last_command == "UNI{1|2|3}":
-            units = self._last_command[-1]
-            return self.set_units(units)
+        elif self._last_command == "UNI1" or self._last_command == "UNI2" or self._last_command == "UNI3":
+            units_value = self._last_command[-1]
+            return self.set_units(units_value)
         else:
             print("Last command was unknown: ", str(self._last_command))
 
@@ -128,3 +113,9 @@ class Tpg300StreamInterface(StreamInterface):
 
         self._device.units = units
 
+    def get_pressure(self, channel):
+        channel_lower_case = channel[-2:].lower()
+        pressure_channel = "pressure_{}".format(channel_lower_case)
+        pressure = getattr(self._device, pressure_channel)
+
+        return "{},{}".format(self.DEVICE_STATUS, pressure)
