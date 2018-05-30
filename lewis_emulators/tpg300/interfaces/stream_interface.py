@@ -15,6 +15,7 @@ class Tpg300StreamInterface(StreamInterface):
     commands = {
         CmdBuilder("acknowledge_pressure").escape("P").arg("A1").build(),#|A2|B1|B2}").build(),
         CmdBuilder("acknowledge_units").escape("UNI").build(),
+        CmdBuilder("acknowledge_set_units").escape("UNI").arg("{1|2|3}").build(),
         CmdBuilder("handle_enquiry").enq().build()
     }
 
@@ -49,6 +50,11 @@ class Tpg300StreamInterface(StreamInterface):
         self._last_command = "UNI"
         return self.ACK
 
+    def acknowledge_set_units(self, units_value):
+
+        self._last_command = "UNI{}".format(units_value)
+        return self.ACK
+
     def define_channel_lookup(self):
         """
         Defines a lookup dictionary for the 4 pressure channels
@@ -77,14 +83,28 @@ class Tpg300StreamInterface(StreamInterface):
             return "{},{}".format(self.DEVICE_STATUS, channel_lookup[self._last_command])
         elif self._last_command == "UNI":
             return self.get_units()
-            return "{},{}".format("")
+        elif self._last_command == "UNI{1|2|3}":
+            units = self._last_command[-1]
+            return self.set_units(units)
         else:
             print("Last command was unknown: ", str(self._last_command))
 
     def get_units(self):
         """
+        Gets the units of the device.
 
         Returns:
-            Devices current units. (mbar, Torr or Pa).
+            Devices current units. (mbar, Torr, or Pa).
         """
         return self._device.units
+
+    def set_units(self, units):
+        """
+        Sets the units on the device.
+
+        Returns:
+            None.
+        """
+
+        self._device.units = units
+
