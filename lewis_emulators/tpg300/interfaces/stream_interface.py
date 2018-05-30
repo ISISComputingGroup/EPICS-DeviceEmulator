@@ -83,7 +83,7 @@ class Tpg300StreamInterface(StreamInterface):
         if self._device.connected:
             return self.ACK
         else:
-            return
+            return None
 
     def handle_enquiry(self):
         """
@@ -94,18 +94,21 @@ class Tpg300StreamInterface(StreamInterface):
             String: Returns the devices current units if last command is 'UNI'.
             None: Sets the devices units to 1,2, or 3 if last command is 'UNI{}' where {} is 1, 2 or 3
                 respectively.
+            None: Last command unknown.
         """
 
         if self._last_command in self.PRESSURE_CHANNELS:
-            return self.get_pressure(self._last_command)
+            enquiry_return = self.get_pressure(self._last_command)
         elif self._last_command == "UNI":
             enquiry_return = self.get_units()
         elif self._last_command == "UNI1" or self._last_command == "UNI2" or self._last_command == "UNI3":
             units_value = self._last_command[-1]
             enquiry_return = self.set_units(units_value)
         else:
-            print("Last command was unknown: ", str(self._last_command))
+            print("Last command was unknown: ".format(self._last_command))
             enquiry_return = None
+
+        return enquiry_return
 
     def get_units(self):
         """
@@ -115,10 +118,7 @@ class Tpg300StreamInterface(StreamInterface):
             String: Devices current units from (mbar, Torr, or Pa).
         """
 
-        if self._device.connected:
-            return self._device.units
-        else:
-            return None
+        return self._device.units
 
     def set_units(self, units):
         """
@@ -128,8 +128,8 @@ class Tpg300StreamInterface(StreamInterface):
             None.
         """
 
-        if self._device.connected:
-            self._device.units = units
+        self._device.units = units
+
 
     def get_pressure(self, channel):
         """
