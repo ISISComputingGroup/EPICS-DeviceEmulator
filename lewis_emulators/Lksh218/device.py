@@ -14,7 +14,7 @@ class SimulatedLakeshore218(StateMachineDevice):
         """
         Sets the initial state of the device.
         """
-        self._temps = [1] * 8
+        self._temps = [1.0] * 8
 
     @staticmethod
     def _get_state_handlers():
@@ -41,5 +41,5 @@ class SimulatedLakeshore218(StateMachineDevice):
         return self._temps[number - 1]
 
     def set_temp(self, number, temperature):
-        self._temps[int(number) - 1] = float(temperature)
+        self._temps[number - 1] = temperature
 

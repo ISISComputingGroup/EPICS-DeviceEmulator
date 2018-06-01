@@ -13,10 +13,15 @@ class Lakeshore218StreamInterface(StreamInterface):
     out_terminator = "\r\n"
 
     commands = {
-        CmdBuilder("get_temp").escape("KRDG? ").arg("\d").build()
+        CmdBuilder("get_temp").escape("KRDG? ").arg("\d").build(),
+        CmdBuilder("get_sensor").escape("SRDG? ").arg("\d").build()
     }
 
     def get_temp(self, number):
         number = int(number)
         temperature = self._device.get_temp(number)
+
         return temperature
+
+    def get_sensor(self, number):
+        return 0
