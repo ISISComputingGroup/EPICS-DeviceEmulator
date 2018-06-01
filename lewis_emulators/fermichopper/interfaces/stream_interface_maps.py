@@ -13,7 +13,7 @@ class JulichChecksum(object):
         :return: the Julich checksum of the given input data
         """
         assert all(i in list("#0123456789ABCDEFGH") for i in alldata), "Invalid character can't calculate checksum"
-        return "00" if all(x in ['0', '#'] for x in alldata) else hex(sum(ord(i) for i in alldata)).upper()[-2:]
+        return "00" if all(x in ['0', '#'] for x in alldata) else hex(sum(ord(i) for i in alldata[1:])).upper()[-2:]
 
     @staticmethod
     def verify(header, data, actual_checksum):
@@ -45,17 +45,17 @@ class FermichopperStreamInterface(StreamInterface):
 
     # Commands that we expect via serial during normal operation
     commands = {
-        Cmd("get_all_data", "^#00000([0-9A-F]{2})\$$"),
-        Cmd("execute_command", "^#1([0-9A-F]{4})([0-9A-F]{2})\$$"),
-        Cmd("set_speed", "^#3([0-9A-F]{4})([0-9A-F]{2})\$$"),
-        Cmd("set_delay_highword", "^#6([0-9A-F]{4})([0-9A-F]{2})\$$"),
-        Cmd("set_delay_lowword", "^#5([0-9A-F]{4})([0-9A-F]{2})\$$"),
-        Cmd("set_gate_width", "^#9([0-9A-F]{4})([0-9A-F]{2})\$$"),
+        Cmd("get_all_data", "^#00000([0-9A-F]{2})$"),
+        Cmd("execute_command", "^#1([0-9A-F]{4})([0-9A-F]{2})$"),
+        Cmd("set_speed", "^#3([0-9A-F]{4})([0-9A-F]{2})$"),
+        Cmd("set_delay_highword", "^#6([0-9A-F]{4})([0-9A-F]{2})$"),
+        Cmd("set_delay_lowword", "^#5([0-9A-F]{4})([0-9A-F]{2})$"),
+        Cmd("set_gate_width", "^#9([0-9A-F]{4})([0-9A-F]{2})$"),
         # Cmd("catch_all", "^#9.*$"), # Catch-all command for debugging
     }
 
-    in_terminator = "\n"
-    out_terminator = "\n"
+    in_terminator = "$"
+    out_terminator = ""
 
     # Catch all command for debugging if the IOC sends strange characters in the checksum.
     # def catch_all(self):
@@ -109,7 +109,7 @@ class FermichopperStreamInterface(StreamInterface):
             + JulichChecksum.append(
                 "#2{:04X}".format(self.build_status_code())) \
             + JulichChecksum.append(
-                "#3000{:01X}".format(12 - (self._device.get_speed_setpoint() / 50))) \
+                "#3{:04X}".format(self._device.get_speed_setpoint() * 60)) \
             + JulichChecksum.append(
                 "#4{:04X}".format(int(round(self._device.get_true_speed() * 60)))) \
             + JulichChecksum.append(
@@ -132,12 +132,6 @@ class FermichopperStreamInterface(StreamInterface):
                 "#D{:04X}".format(int(round(autozero_calibrate(self._device.autozero_1_lower))))) \
             + JulichChecksum.append(
                 "#E{:04X}".format(int(round(autozero_calibrate(self._device.autozero_2_lower))))) \
-            + JulichChecksum.append(
-                "#F{:04X}".format(int(round(self._device.get_voltage() / 0.4274)))) \
-            + JulichChecksum.append(
-                "#G{:04X}".format(int(round((self._device.get_electronics_temp() + 25.0) / 0.14663)))) \
-            + JulichChecksum.append(
-                "#H{:04X}".format(int(round((self._device.get_motor_temp() + 12.124) / 0.1263))))\
             + "$"
 
     def execute_command(self, command, checksum):
@@ -146,7 +140,7 @@ class FermichopperStreamInterface(StreamInterface):
 
     def set_speed(self, command, checksum):
         JulichChecksum.verify("#3", command, checksum)
-        self._device.set_speed_setpoint(int((12-int(command, 16))*50))
+        self._device.set_speed_setpoint(int(command, 16) / 60)
 
     def set_delay_lowword(self, command, checksum):
         JulichChecksum.verify('#5', command, checksum)
