@@ -121,7 +121,7 @@ class SimulatedFermichopper(StateMachineDevice):
         self.update_delay()
 
     def update_delay(self):
-        self.delay = (self.delay_highword * 65536 + self.delay_lowword)/50.4
+        self.delay = (self.delay_highword * 65536 + self.delay_lowword)
         self.is_lying_about_delay_sp_rbv = False  # Resending the setpoint causes the device to no longer be confused
 
     def set_gate_width(self, value):

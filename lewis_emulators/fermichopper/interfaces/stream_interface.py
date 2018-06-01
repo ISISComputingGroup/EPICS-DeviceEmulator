@@ -3,6 +3,9 @@ from lewis.adapters.stream import StreamInterface, Cmd
 from ..device import ChopperParameters
 
 
+TIMING_FREQ_MHZ = 50.4
+
+
 class JulichChecksum(object):
 
     @staticmethod
@@ -42,6 +45,8 @@ class JulichChecksum(object):
 
 
 class FermichopperStreamInterface(StreamInterface):
+
+    protocol = "fermi_merlin"
 
     # Commands that we expect via serial during normal operation
     commands = {
@@ -102,7 +107,7 @@ class FermichopperStreamInterface(StreamInterface):
         def autozero_calibrate(value):
             return (value + 22.86647) / 0.04486
 
-        timing_freq_mhz = 50.4
+        timing_freq_mhz = TIMING_FREQ_MHZ
 
         return JulichChecksum.append(
                 '#1' + self._device.get_last_command()) \
@@ -150,12 +155,12 @@ class FermichopperStreamInterface(StreamInterface):
 
     def set_delay_lowword(self, command, checksum):
         JulichChecksum.verify('#5', command, checksum)
-        self._device.set_delay_lowword(int(command, 16))
+        self._device.set_delay_lowword(int(command, 16) / TIMING_FREQ_MHZ)
 
     def set_delay_highword(self, command, checksum):
         JulichChecksum.verify('#6', command, checksum)
-        self._device.set_delay_highword(int(command, 16))
+        self._device.set_delay_highword(int(command, 16) / TIMING_FREQ_MHZ)
 
     def set_gate_width(self, command, checksum):
         JulichChecksum.verify('#9', command, checksum)
-        self._device.set_gate_width(int(command, 16) / 50.4)
+        self._device.set_gate_width(int(command, 16) / TIMING_FREQ_MHZ)
