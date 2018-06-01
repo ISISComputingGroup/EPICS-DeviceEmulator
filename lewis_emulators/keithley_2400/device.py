@@ -15,6 +15,9 @@ class SimulatedKeithley2400(StateMachineDevice):
     MINIMUM_CURRENT = 1.0e-20
     RESISTANCE_RANGE_MULTIPLIER = 2.1
 
+    INITIAL_SOURCE_CURRENT = 1.0e-20
+    INITIAL_SOURCE_VOLTAGE = 5.0
+
     def _initialize_data(self):
         """
         Initialize all of the device's attributes.
@@ -24,6 +27,9 @@ class SimulatedKeithley2400(StateMachineDevice):
         # Power properties
         self._current = SimulatedKeithley2400.INITIAL_CURRENT
         self._voltage = SimulatedKeithley2400.INITIAL_VOLTAGE
+
+        self._source_current = SimulatedKeithley2400.INITIAL_SOURCE_CURRENT
+        self._source_voltage = SimulatedKeithley2400.INITIAL_SOURCE_VOLTAGE
 
         # Modes
         self._output_mode = OutputMode.OFF
@@ -188,3 +194,9 @@ class SimulatedKeithley2400(StateMachineDevice):
 
     def get_voltage_compliance(self):
         return self._voltage_compliance
+
+    def get_source_voltage(self):
+        return self._source_voltage
+
+    def set_source_voltage(self, value):
+        self._source_voltage = value

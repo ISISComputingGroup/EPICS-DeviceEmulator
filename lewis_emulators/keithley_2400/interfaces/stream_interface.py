@@ -27,6 +27,8 @@ class Keithley2400StreamInterface(StreamInterface):
         Cmd("get_current_compliance", "^\:SENS:CURR:PROT\?$"),
         Cmd("set_voltage_compliance", "^\:SENS:VOLT:PROT\s([-+]?[0-9]*\.?[0-9]+)$"),
         Cmd("get_voltage_compliance", "^\:SENS:VOLT:PROT\?$"),
+        Cmd("set_source_voltage", "^\:SOUR:VOLT:LEV\s([-+]?[0-9]*\.?[0-9]+)$"),
+        Cmd("get_source_voltage", "^\:SOUR:VOLT:LEV\?$"),
     }
 
     # Private control commands that can be used as an alternative to the lewis backdoor
@@ -133,6 +135,12 @@ class Keithley2400StreamInterface(StreamInterface):
 
     def get_voltage_compliance(self):
         return self._device.get_voltage_compliance()
+
+    def set_source_voltage(self, value):
+        return self._set_mode(self._device.set_source_voltage, value)
+
+    def get_source_voltage(self):
+        return self._device.get_source_voltage()
 
     def handle_error(self, request, error):
         print "An error occurred at request " + repr(request) + ": " + repr(error)
