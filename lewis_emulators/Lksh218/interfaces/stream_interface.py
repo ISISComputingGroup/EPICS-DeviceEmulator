@@ -15,7 +15,8 @@ class Lakeshore218StreamInterface(StreamInterface):
     commands = {
         CmdBuilder("get_temp").escape("KRDG? ").arg("[1-8]").build(),
         CmdBuilder("get_sensor").escape("SRDG? ").arg("[1-8]").build(),
-        CmdBuilder("get_temp_all").escape("KRDG? 0").build()
+        CmdBuilder("get_temp_all").escape("KRDG? 0").build(),
+        CmdBuilder("get_sensor_all").escape("SRDG? 0").build()
     }
 
     def get_temp(self, number):
@@ -31,3 +32,5 @@ class Lakeshore218StreamInterface(StreamInterface):
     def get_temp_all(self):
         return self._device.temp_all
 
+    def get_sensor_all(self):
+        return self._device.sensor_all
