@@ -1,7 +1,10 @@
 from collections import OrderedDict
 from lewis.devices import StateMachineDevice
 from .states import DefaultState
+from lewis.core.logging import has_log
 
+
+@has_log
 class SimulatedLakeshore218(StateMachineDevice):
     """
     Simulated Lakeshore 218
@@ -11,7 +14,7 @@ class SimulatedLakeshore218(StateMachineDevice):
         """
         Sets the initial state of the device.
         """
-        self._temp_1 = 1.0
+        self._temps = [1] * 8
 
     @staticmethod
     def _get_state_handlers():
@@ -33,3 +36,10 @@ class SimulatedLakeshore218(StateMachineDevice):
         Returns: the state transitions
         """
         return OrderedDict()
+
+    def get_temp(self, number):
+        return self._temps[number - 1]
+
+    def set_temp(self, number, temperature):
+        self._temps[int(number) - 1] = float(temperature)
+
