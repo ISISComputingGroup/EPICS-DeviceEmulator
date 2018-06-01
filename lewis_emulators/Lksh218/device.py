@@ -16,6 +16,8 @@ class SimulatedLakeshore218(StateMachineDevice):
         """
         self._temps = [1.0] * 8
         self._sensors = [0.5] * 8
+        self.temp_all = None
+
 
     @staticmethod
     def _get_state_handlers():
@@ -49,4 +51,5 @@ class SimulatedLakeshore218(StateMachineDevice):
 
     def set_sensor(self, number, value):
         self._sensors[number - 1] = value
+
 
