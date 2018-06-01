@@ -20,8 +20,9 @@ class Lakeshore218StreamInterface(StreamInterface):
     def get_temp(self, number):
         number = int(number)
         temperature = self._device.get_temp(number)
-
         return temperature
 
     def get_sensor(self, number):
-        return 0
+        number = int(number)
+        sensor_reading = self._device.get_sensor(number)
+        return sensor_reading
