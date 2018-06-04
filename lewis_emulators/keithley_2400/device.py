@@ -16,7 +16,7 @@ class SimulatedKeithley2400(StateMachineDevice):
     RESISTANCE_RANGE_MULTIPLIER = 2.1
 
     INITIAL_SOURCE_CURRENT = 1.0e-20
-    INITIAL_SOURCE_VOLTAGE = 5.0
+    INITIAL_SOURCE_VOLTAGE = 0.8
 
     def _initialize_data(self):
         """
