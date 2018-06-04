@@ -1,10 +1,8 @@
 from collections import OrderedDict
 from lewis.devices import StateMachineDevice
 from .states import DefaultState
-from lewis.core.logging import has_log
 
 
-@has_log
 class SimulatedLakeshore218(StateMachineDevice):
     """
     Simulated Lakeshore 218
@@ -23,34 +21,72 @@ class SimulatedLakeshore218(StateMachineDevice):
     @staticmethod
     def _get_state_handlers():
         """
-        Returns: states and their names
+        Returns: States and their names.
         """
         return {DefaultState.NAME: DefaultState()}
 
     @staticmethod
     def _get_initial_state():
         """
-        Returns: the name of the initial state
+        Returns: The name of the initial state.
         """
         return DefaultState.NAME
 
     @staticmethod
     def _get_transition_handlers():
         """
-        Returns: the state transitions
+        Returns: The state transitions.
         """
         return OrderedDict()
 
     def get_temp(self, number):
+        """
+        Gets the temperature of a specific temperature sensor.
+
+        Args:
+            number: Integer between 1 and 8.
+
+        Returns:
+            float: Temperature value at position (number - 1) in temps.
+        """
         return self._temps[number - 1]
 
     def set_temp(self, number, temperature):
+        """
+        Sets the (number - 1) temp pv to temperature.
+
+        Args:
+            number: Integer between 1 and 8.
+            temperature: Temperature reading to set.
+
+        Returns:
+            None
+        """
         self._temps[number - 1] = temperature
 
     def get_sensor(self, number):
+        """
+        Gets the sensor reading of a specific sensor.
+
+        Args:
+            number: Integer between 1 and 8.
+
+        Returns:
+            float: Value of sensor at position (number - 1) in sensors.
+        """
         return self._sensors[number - 1]
 
     def set_sensor(self, number, value):
+        """
+        Sets the (number - 1) sensor pv to value.
+
+        Args:
+            number: Integer between 1 and 8.
+            value: Sensor reading to set.
+
+        Returns:
+            None
+        """
         self._sensors[number - 1] = value
 
 

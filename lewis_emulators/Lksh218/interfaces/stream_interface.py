@@ -32,20 +32,50 @@ class Lakeshore218StreamInterface(StreamInterface):
 
     @if_connected
     def get_temp(self, number):
+        """
+        Returns the temperature of a TEMP pv.
+
+        Args:
+            number: integer between 1 and 8
+
+        Returns:
+            float: temperature
+        """
         number = int(number)
         temperature = self._device.get_temp(number)
         return temperature
 
     @if_connected
     def get_sensor(self, number):
+        """
+        Returns the temperature of a SENSOR pv.
+
+        Args:
+            number: integer between 1 and 8
+
+        Returns:
+            float: sensor_reading
+        """
         number = int(number)
         sensor_reading = self._device.get_sensor(number)
         return sensor_reading
 
     @if_connected
     def get_temp_all(self):
+        """
+        Returns a string from TEMPALL pv.
+
+        Returns:
+            string: value of TEMPALL pv.
+        """
         return self._device.temp_all
 
     @if_connected
     def get_sensor_all(self):
+        """
+        Returns a string from SENSORALL pv.
+
+        Returns:
+            string: value of SENSORALL pv.
+        """
         return self._device.sensor_all
