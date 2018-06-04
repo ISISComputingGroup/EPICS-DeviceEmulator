@@ -1,5 +1,15 @@
 from lewis.adapters.stream import StreamInterface
 from lewis_emulators.utils.command_builder import CmdBuilder
+from enum import Enum
+
+class ReadState(Enum):
+    PRESSURE_A1 = "PA1"
+    PRESSURE_A2 = "PA2"
+    PRESSURE_B1 = "PB1"
+    PRESSURE_B2 = "PB2"
+    mbar = "UNI1"
+    Torr = "UNI2"
+    Pa = "UNI3"
 
 
 class Tpg300StreamInterface(StreamInterface):
@@ -7,14 +17,13 @@ class Tpg300StreamInterface(StreamInterface):
     Stream interface for the serial port.
     """
 
-    _last_command = None
     ACK = chr(6)
     DEVICE_STATUS = 0
 
     commands = {
         CmdBuilder("acknowledge_pressure").escape("P").arg("A1|A2|B1|B2").build(),
-        CmdBuilder("acknowledge_units").escape("UNI").build(),
-        CmdBuilder("acknowledge_set_units").escape("UNI").arg("1|2|3").build(),
+        CmdBuilder("acknowledge_units").escape("UNI").eos().build(),
+        CmdBuilder("acknowledge_set_units").escape("UNI").arg("1|2|3").eos().build(),
         CmdBuilder("handle_enquiry").enq().build()
     }
 
@@ -46,7 +55,7 @@ class Tpg300StreamInterface(StreamInterface):
             ASCII acknowledgement character (0x6).
         """
 
-        self._last_command = "P{}".format(request)
+        self._device.readstate = ReadState["P{}".format(request)]
         return self.acknowledge_if_connected()
 
     def acknowledge_units(self):

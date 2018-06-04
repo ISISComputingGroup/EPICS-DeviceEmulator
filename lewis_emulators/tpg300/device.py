@@ -10,6 +10,16 @@ class Units(Enum):
     Pa = 3
 
 
+class ReadState(Enum):
+    PRESSURE_A1 = "PA1"
+    PRESSURE_A2 = "PA2"
+    PRESSURE_B1 = "PB1"
+    PRESSURE_B2 = "PB2"
+    mbar = "UNI1"
+    Torr = "UNI2"
+    Pa = "UNI3"
+
+
 class SimulatedTpg300(StateMachineDevice):
     """
     Simulated TPG300.
@@ -26,6 +36,7 @@ class SimulatedTpg300(StateMachineDevice):
         self.pressure_b2 = 0
         self.units = Units["mbar"]
         self.connected = True
+        self.readstate = None
 
     @staticmethod
     def _get_state_handlers():
