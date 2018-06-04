@@ -1,9 +1,17 @@
 from lewis.adapters.stream import StreamInterface
-from lewis.core.logging import has_log
 from lewis_emulators.utils.command_builder import CmdBuilder
 
 
 def if_connected(f):
+    """
+    Decorator that executes f if the device is connected and returns None otherwise.
+
+    Args:
+        f: function to be executed if the device is connected.
+
+    Returns:
+        The value of f(*args) if the device is connected and None otherwise.
+    """
     def wrapper(*args):
         connected = getattr(args[0], "_device").connected
         if connected:
@@ -14,7 +22,6 @@ def if_connected(f):
     return wrapper
 
 
-@has_log
 class Lakeshore218StreamInterface(StreamInterface):
     """
     Stream interface for the serial port
