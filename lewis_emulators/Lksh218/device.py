@@ -16,8 +16,8 @@ class SimulatedLakeshore218(StateMachineDevice):
         """
         self._temps = [1.0] * 8
         self._sensors = [0.5] * 8
-        self.temp_all = None
-        self.sensor_all = None
+        self.temp_all = ""
+        self.sensor_all = ""
         self.connected = True
 
     @staticmethod

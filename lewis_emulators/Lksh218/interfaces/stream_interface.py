@@ -3,7 +3,7 @@ from lewis.core.logging import has_log
 from lewis_emulators.utils.command_builder import CmdBuilder
 
 
-def is_connected(f):
+def if_connected(f):
     def wrapper(*args):
         connected = getattr(args[0], "_device").connected
         if connected:
@@ -30,22 +30,22 @@ class Lakeshore218StreamInterface(StreamInterface):
         CmdBuilder("get_sensor_all").escape("SRDG? 0").build()
     }
 
-    @is_connected
+    @if_connected
     def get_temp(self, number):
         number = int(number)
         temperature = self._device.get_temp(number)
         return temperature
 
-    @is_connected
+    @if_connected
     def get_sensor(self, number):
         number = int(number)
         sensor_reading = self._device.get_sensor(number)
         return sensor_reading
 
-    @is_connected
+    @if_connected
     def get_temp_all(self):
         return self._device.temp_all
 
-    @is_connected
+    @if_connected
     def get_sensor_all(self):
         return self._device.sensor_all
