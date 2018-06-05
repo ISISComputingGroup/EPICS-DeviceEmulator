@@ -4,8 +4,10 @@ from collections import OrderedDict
 from states import DefaultInitState, DefaultRunningState
 from control_modes import *
 from lewis.devices import StateMachineDevice
+from lewis.core.logging import has_log
 
 
+@has_log
 class SimulatedKeithley2400(StateMachineDevice):
 
     INITIAL_CURRENT = 0.1
@@ -92,6 +94,7 @@ class SimulatedKeithley2400(StateMachineDevice):
         """
         Update the current and voltage values based on the current mode and time elapsed.
         """
+
         def update_value(value):
             return abs(value + uniform(-1,1)*dt)
         new_current = max(update_value(self._current), SimulatedKeithley2400.MINIMUM_CURRENT)
@@ -169,6 +172,7 @@ class SimulatedKeithley2400(StateMachineDevice):
         return self._source_mode
 
     def set_resistance_range(self, value):
+        self.log.info('Setting resistance range to {}'.format(value))
         from math import pow
         # Set the resistance range to the smallest value of 2.1En the requested
         # value exceeds
@@ -200,3 +204,13 @@ class SimulatedKeithley2400(StateMachineDevice):
 
     def set_source_voltage(self, value):
         self._source_voltage = value
+
+    @has_log
+    def get_source_current(self):
+        self.log.info(self._source_current)
+        return self._source_current
+
+    @has_log
+    def set_source_current(self, value):
+        self.log.info(self._source_current, value)
+        self._source_current = value
