@@ -1,7 +1,9 @@
 from lewis.adapters.stream import StreamInterface, Cmd
 from ..control_modes import OutputMode
+from lewis.core.logging import has_log
 
 
+@has_log
 class Keithley2400StreamInterface(StreamInterface):
 
     # Commands that we expect via serial during normal operation
@@ -29,6 +31,8 @@ class Keithley2400StreamInterface(StreamInterface):
         Cmd("get_voltage_compliance", "^\:SENS:VOLT:PROT\?$"),
         Cmd("set_source_voltage", "^\:SOUR:VOLT:LEV\s([-+]?[0-9]*\.?[0-9]+)$"),
         Cmd("get_source_voltage", "^\:SOUR:VOLT:LEV\?$"),
+        Cmd("set_source_current", "^\:SOUR:CURR:LEV\s([-+]?[0-9]*\.?[0-9]+)$"),
+        Cmd("get_source_current", "^\:SOUR:CURR:LEV\?$"),
     }
 
     # Private control commands that can be used as an alternative to the lewis backdoor
@@ -80,6 +84,7 @@ class Keithley2400StreamInterface(StreamInterface):
         The generic form of how mode sets are executed and responded to.
         """
         set_method(mode)
+
         return command + " " + mode
 
     def set_output_mode(self, new_mode):
@@ -137,11 +142,19 @@ class Keithley2400StreamInterface(StreamInterface):
         return self._device.get_voltage_compliance()
 
     def set_source_voltage(self, value):
-        return self._set_mode(self._device.set_source_voltage, value)
+        self.log.info("Source voltage set to {}".format(float(value)))
+        return self._device.set_source_voltage(float(value))
 
     def get_source_voltage(self):
         return self._device.get_source_voltage()
 
+    def set_source_current(self, value):
+        self.log.info("Source current set to {}".format(float(value)))
+        return self._device.set_source_current(float(value))
+
+    def get_source_current(self):
+        return self._device.get_source_current()
+
     def handle_error(self, request, error):
-        print "An error occurred at request " + repr(request) + ": " + repr(error)
+        print "An error occurred at request {}: {}".format(str(request), str(error))
         return str(error)
