@@ -2,6 +2,7 @@ from lewis.adapters.stream import StreamInterface
 from lewis_emulators.utils.command_builder import CmdBuilder
 from ..device import ReadState, Units
 from ...utils.if_connected import if_connected
+from ...utils.constants import ACK
 
 
 class Tpg300StreamInterface(StreamInterface):
@@ -9,7 +10,6 @@ class Tpg300StreamInterface(StreamInterface):
     Stream interface for the serial port.
     """
 
-    ACK = chr(6)
     DEVICE_STATUS = 0
 
     commands = {
@@ -49,7 +49,7 @@ class Tpg300StreamInterface(StreamInterface):
         """
 
         self._device.readstate = ReadState[channel]
-        return self.ACK
+        return ACK
 
     @if_connected
     def acknowledge_units(self):
@@ -61,7 +61,7 @@ class Tpg300StreamInterface(StreamInterface):
         """
 
         self._device.readstate = ReadState["UNI"]
-        return self.ACK
+        return ACK
 
     @if_connected
     def acknowledge_set_units(self, units):
@@ -75,7 +75,7 @@ class Tpg300StreamInterface(StreamInterface):
             ASCII acknowledgement character (0x6).
         """
         self._device.readstate = ReadState(units)
-        return self.ACK
+        return ACK
 
     def handle_enquiry(self):
         """
