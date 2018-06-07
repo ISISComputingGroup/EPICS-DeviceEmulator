@@ -38,8 +38,10 @@ class SimulatedTpg300(StateMachineDevice):
         self.pressure_b1 = 0
         self.pressure_b2 = 0
         self.__units = None
-        self.connected = True
+        self.__connected = None
         self.__readstate = None
+
+        self.connect()
 
     @staticmethod
     def _get_state_handlers():
@@ -86,6 +88,36 @@ class SimulatedTpg300(StateMachineDevice):
         self.__units = units
 
     @property
+    def connected(self):
+        """
+        Returns the current connected state.
+
+        Returns:
+            bool: Current connected state.
+        """
+        return self.__connected
+
+    def connect(self):
+        """
+        Connects the device.
+
+        Returns:
+            None
+        """
+
+        self.__connected = True
+
+    def disconnect(self):
+        """
+        Disconnects the device.
+
+        Returns:
+            None
+        """
+
+        self.__connected = False
+
+    @property
     def readstate(self):
         """
         Returns the readstate for the device
@@ -101,7 +133,7 @@ class SimulatedTpg300(StateMachineDevice):
         Sets the readstate of the device
 
         Args:
-            state: Enum readstate of the device to be set.
+            state: Enum readstate of the device to be set
 
         Returns:
             None
@@ -113,7 +145,7 @@ class SimulatedTpg300(StateMachineDevice):
         Sets unit on device. Called only via the backdoor using lewis.
 
         Args:
-            unit: integer 1, 2, or 3.
+            unit: integer 1, 2, or 3
 
         Returns:
             None
