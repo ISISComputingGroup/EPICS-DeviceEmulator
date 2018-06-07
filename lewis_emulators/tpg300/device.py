@@ -33,10 +33,10 @@ class SimulatedTpg300(StateMachineDevice):
         Sets the initial state of the device.
         """
 
-        self.pressure_a1 = 0
-        self.pressure_a2 = 0
-        self.pressure_b1 = 0
-        self.pressure_b2 = 0
+        self.__pressure_a1 = 0.0
+        self.__pressure_a2 = 0.0
+        self.__pressure_b1 = 0.0
+        self.__pressure_b2 = 0.0
         self.__units = None
         self.__connected = None
         self.__readstate = None
@@ -64,6 +64,94 @@ class SimulatedTpg300(StateMachineDevice):
         Returns: the state transitions
         """
         return OrderedDict()
+
+    @property
+    def pressure_a1(self):
+        """
+        Returns the value of the A1 pressure sensor.
+
+        Returns:
+            float: Pressure A1 value.
+        """
+        return self.__pressure_a1
+
+    @pressure_a1.setter
+    def pressure_a1(self, value):
+        """
+        Sets the A1 pressure sensor.
+
+        Args:
+            value: Value to set A1 pressure sensor to.
+        Returns:
+            None
+        """
+        self.__pressure_a1 = value
+
+    @property
+    def pressure_a2(self):
+        """
+        Returns the value of the A2 pressure sensor.
+
+        Returns:
+            float: Pressure A1 value.
+        """
+        return self.__pressure_a2
+
+    @pressure_a2.setter
+    def pressure_a2(self, value):
+        """
+        Sets the B1 pressure sensor.
+
+        Args:
+            value: Value to set B1 pressure sensor to.
+        Returns:
+            None
+        """
+        self.__pressure_a2 = value
+
+    @property
+    def pressure_b1(self):
+        """
+        Returns the value of the A2 pressure sensor.
+
+        Returns:
+            float: Pressure A1 value.
+        """
+        return self.__pressure_b1
+
+    @pressure_b1.setter
+    def pressure_b1(self, value):
+        """
+        Sets the B1 pressure sensor.
+
+        Args:
+            value: Value to set B1 pressure sensor to.
+        Returns:
+            None
+        """
+        self.__pressure_b1 = value
+
+    @property
+    def pressure_b2(self):
+        """
+        Returns the value of the B2 pressure sensor.
+
+        Returns:
+            float: Pressure B2 value.
+        """
+        return self.__pressure_b2
+
+    @pressure_b2.setter
+    def pressure_b2(self, value):
+        """
+        Sets the B2 pressure sensor.
+
+        Args:
+            value: Value to set B2 pressure sensor to.
+        Returns:
+            None
+        """
+        self.__pressure_b2 = value
 
     @property
     def units(self):
