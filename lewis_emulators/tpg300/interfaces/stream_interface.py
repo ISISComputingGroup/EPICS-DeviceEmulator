@@ -1,26 +1,7 @@
 from lewis.adapters.stream import StreamInterface
 from lewis_emulators.utils.command_builder import CmdBuilder
 from ..device import ReadState, Units
-
-
-def if_connected(f):
-    """
-    Decorator that executes f if the device is connected and returns None otherwise.
-
-    Args:
-        f: function to be executed if the device is connected.
-
-    Returns:
-       The value of f(*args) if the device is connected and None otherwise.
-   """
-    def wrapper(*args):
-        connected = getattr(args[0], "_device").connected
-        if connected:
-            result = f(*args)
-        else:
-            result = None
-        return result
-    return wrapper
+from ...utils.if_connected import if_connected
 
 
 class Tpg300StreamInterface(StreamInterface):
