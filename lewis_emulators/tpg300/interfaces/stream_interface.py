@@ -1,15 +1,6 @@
 from lewis.adapters.stream import StreamInterface
 from lewis_emulators.utils.command_builder import CmdBuilder
-from enum import Enum
-
-class ReadState(Enum):
-    PRESSURE_A1 = "PA1"
-    PRESSURE_A2 = "PA2"
-    PRESSURE_B1 = "PB1"
-    PRESSURE_B2 = "PB2"
-    mbar = "UNI1"
-    Torr = "UNI2"
-    Pa = "UNI3"
+from ..device import ReadState, Units
 
 
 class Tpg300StreamInterface(StreamInterface):
@@ -21,7 +12,7 @@ class Tpg300StreamInterface(StreamInterface):
     DEVICE_STATUS = 0
 
     commands = {
-        CmdBuilder("acknowledge_pressure").escape("P").arg("A1|A2|B1|B2").build(),
+        CmdBuilder("acknowledge_pressure").escape("P").arg("A1|A2|B1|B2").eos().build(),
         CmdBuilder("acknowledge_units").escape("UNI").eos().build(),
         CmdBuilder("acknowledge_set_units").escape("UNI").arg("1|2|3").eos().build(),
         CmdBuilder("handle_enquiry").enq().build()
@@ -44,18 +35,18 @@ class Tpg300StreamInterface(StreamInterface):
 
         print("An error occurred at request {}: {}".format(request, error))
 
-    def acknowledge_pressure(self, request):
+    def acknowledge_pressure(self, channel):
         """
         Acknowledges a request to get the pressure and stores the request.
 
         Args:
-            request: Pressure chanel to read from.
+            channel: Pressure chanel to read from.
 
         Returns:
             ASCII acknowledgement character (0x6).
         """
 
-        self._device.readstate = ReadState["P{}".format(request)]
+        self._device.readstate = ReadState[channel]
         return self.acknowledge_if_connected()
 
     def acknowledge_units(self):
@@ -66,7 +57,7 @@ class Tpg300StreamInterface(StreamInterface):
             ASCII acknowledgement character (0x6).
         """
 
-        self._last_command = "UNI"
+        self._device.readstate = ReadState["UNI"]
         return self.acknowledge_if_connected()
 
     def acknowledge_set_units(self, units):
@@ -74,13 +65,12 @@ class Tpg300StreamInterface(StreamInterface):
         Acknowledge that the request to set the units was received.
 
         Args:
-            units (integer): unit flag value. Takes the value 1, 2 or 3.
+            units (integer): Takes the value 1, 2 or 3.
 
         Returns:
             ASCII acknowledgement character (0x6).
         """
-
-        self._last_command = "UNI{}".format(units)
+        self._device.readstate = ReadState(units)
         return self.acknowledge_if_connected()
 
     def acknowledge_if_connected(self):
@@ -108,42 +98,42 @@ class Tpg300StreamInterface(StreamInterface):
                 respectively.
             None: Last command unknown.
         """
+        self.log.info(self._device.readstate)
 
-        pressure_channels = ("PA1", "PA2", "PB1", "PB2")
-        change_unit_commands = ("UNI1", "UNI2", "UNI3")
+        channels = ("A1", "A2", "B1", "B2")
+        units_flags = range(1, 4)
 
-        if self._last_command in pressure_channels:
-            return self.get_pressure(self._last_command)
+        if self._device.readstate.name in channels:
+            return self.get_pressure(self._device.readstate)
 
-        elif self._last_command == "UNI":
+        elif self._device.readstate.name == "UNI":
             return self.get_units()
 
-        elif self._last_command in change_unit_commands:
-            units_value = self._last_command[-1]
-            return self.set_units(units_value)
+        elif self._device.readstate.value in units_flags:
+            return self.set_units(Units(self._device.readstate.value))
 
         else:
-            print("Last command was unknown: ", str(self._last_command))
-            return None
+            print("Last command was unknown. Current readstate is {}.". format(self._device.readstate))
 
     def get_units(self):
         """
         Gets the units of the device.
 
         Returns:
-            String: Devices current units from (mbar, Torr, or Pa).
+            Name of the units.
         """
-
-        return self._device.units
+        return self._device.units.value
 
     def set_units(self, units):
         """
         Sets the units on the device.
 
+        Args:
+            units (Units member): Units to be set
+
         Returns:
             None.
         """
-
         self._device.units = units
 
     def get_pressure(self, channel):
@@ -151,14 +141,13 @@ class Tpg300StreamInterface(StreamInterface):
         Gets the pressure for a channel.
 
         Args:
-            channel (string): Pressure channel name. E.g. PA1.
+            channel (Enum member): Enum readstate pressure channel. E.g. Readstate.A1.
 
         Returns:
             String: Device status and pressure from the channel.
         """
 
-        channel_lower_case = channel[-2:].lower()
-        pressure_channel = "pressure_{}".format(channel_lower_case)
+        pressure_channel = "pressure_{}".format(channel.value)
         pressure = getattr(self._device, pressure_channel)
 
         return "{},{}".format(self.DEVICE_STATUS, pressure)

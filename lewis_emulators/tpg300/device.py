@@ -1,23 +1,26 @@
 from collections import OrderedDict
 from lewis.devices import StateMachineDevice
 from .states import DefaultState
-from enum import Enum
+from enum import Enum, unique
 
 
+@unique
 class Units(Enum):
     mbar = 1
     Torr = 2
     Pa = 3
 
 
+@unique
 class ReadState(Enum):
-    PRESSURE_A1 = "PA1"
-    PRESSURE_A2 = "PA2"
-    PRESSURE_B1 = "PB1"
-    PRESSURE_B2 = "PB2"
-    mbar = "UNI1"
-    Torr = "UNI2"
-    Pa = "UNI3"
+    A1 = "a1"
+    A2 = "a2"
+    B1 = "b1"
+    B2 = "b2"
+    UNI = 0
+    mbar = 1
+    Torr = 2
+    Pa = 3
 
 
 class SimulatedTpg300(StateMachineDevice):
@@ -34,9 +37,9 @@ class SimulatedTpg300(StateMachineDevice):
         self.pressure_a2 = 0
         self.pressure_b1 = 0
         self.pressure_b2 = 0
-        self.units = Units["mbar"]
+        self.__units = None
         self.connected = True
-        self.readstate = None
+        self.__readstate = None
 
     @staticmethod
     def _get_state_handlers():
@@ -59,4 +62,63 @@ class SimulatedTpg300(StateMachineDevice):
         Returns: the state transitions
         """
         return OrderedDict()
+
+    @property
+    def units(self):
+        """
+        Returns units currently set of the device.
+
+        Returns:
+            unit (Enum member): Enum member of Units Enum.
+        """
+        return self.__units
+
+    @units.setter
+    def units(self, units):
+        """
+        Sets the devices units.
+
+        Args:
+            units: Enum member of Units.
+        Returns:
+            None
+        """
+        self.__units = units
+
+    @property
+    def readstate(self):
+        """
+        Returns the readstate for the device
+
+        Returns:
+            Enum: Readstate of the device.
+        """
+        return self.__readstate
+
+    @readstate.setter
+    def readstate(self, state):
+        """
+        Sets the readstate of the device
+
+        Args:
+            state: Enum readstate of the device to be set.
+
+        Returns:
+            None
+        """
+        self.__readstate = state
+
+    def backdoor_set_unit(self, unit):
+        """
+        Sets unit on device. Called only via the backdoor using lewis.
+
+        Args:
+            unit: integer 1, 2, or 3.
+
+        Returns:
+            None
+        """
+
+        self.units = Units(unit)
+
 
