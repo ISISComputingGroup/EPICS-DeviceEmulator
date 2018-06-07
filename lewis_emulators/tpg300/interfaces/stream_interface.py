@@ -3,6 +3,26 @@ from lewis_emulators.utils.command_builder import CmdBuilder
 from ..device import ReadState, Units
 
 
+def if_connected(f):
+    """
+    Decorator that executes f if the device is connected and returns None otherwise.
+
+    Args:
+        f: function to be executed if the device is connected.
+
+    Returns:
+       The value of f(*args) if the device is connected and None otherwise.
+   """
+    def wrapper(*args):
+        connected = getattr(args[0], "_device").connected
+        if connected:
+            result = f(*args)
+        else:
+            result = None
+        return result
+    return wrapper
+
+
 class Tpg300StreamInterface(StreamInterface):
     """
     Stream interface for the serial port.
@@ -35,6 +55,7 @@ class Tpg300StreamInterface(StreamInterface):
 
         print("An error occurred at request {}: {}".format(request, error))
 
+    @if_connected
     def acknowledge_pressure(self, channel):
         """
         Acknowledges a request to get the pressure and stores the request.
@@ -47,8 +68,9 @@ class Tpg300StreamInterface(StreamInterface):
         """
 
         self._device.readstate = ReadState[channel]
-        return self.acknowledge_if_connected()
+        return self.ACK
 
+    @if_connected
     def acknowledge_units(self):
         """
         Acknowledge that the request for current units was received.
@@ -58,8 +80,9 @@ class Tpg300StreamInterface(StreamInterface):
         """
 
         self._device.readstate = ReadState["UNI"]
-        return self.acknowledge_if_connected()
+        return self.ACK
 
+    @if_connected
     def acknowledge_set_units(self, units):
         """
         Acknowledge that the request to set the units was received.
@@ -71,21 +94,7 @@ class Tpg300StreamInterface(StreamInterface):
             ASCII acknowledgement character (0x6).
         """
         self._device.readstate = ReadState(units)
-        return self.acknowledge_if_connected()
-
-    def acknowledge_if_connected(self):
-        """
-        Returns an acknowledgement character if connected.
-
-        Returns:
-            ASCII acknowledgement character (0x6): If connected.
-            None: If disconnected.
-        """
-
-        if self._device.connected:
-            return self.ACK
-        else:
-            return None
+        return self.ACK
 
     def handle_enquiry(self):
         """
