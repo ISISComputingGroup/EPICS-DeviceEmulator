@@ -96,7 +96,7 @@ class SimulatedFermichopper(StateMachineDevice):
         return self.last_command
 
     def set_speed_setpoint(self, value):
-        assert value in self._allowed_speed_setpoints
+        assert value in self._allowed_speed_setpoints, "Speed setpoint {} not allowed".format(value)
 
         if value == 600 and self.speed_setpoint == 600 and self.speed == 600:
             self.is_broken = True
@@ -121,7 +121,7 @@ class SimulatedFermichopper(StateMachineDevice):
         self.update_delay()
 
     def update_delay(self):
-        self.delay = (self.delay_highword * 65536 + self.delay_lowword)/50.4
+        self.delay = (self.delay_highword * 65536 + self.delay_lowword)
         self.is_lying_about_delay_sp_rbv = False  # Resending the setpoint causes the device to no longer be confused
 
     def set_gate_width(self, value):
