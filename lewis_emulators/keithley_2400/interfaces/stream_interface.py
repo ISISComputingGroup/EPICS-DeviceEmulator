@@ -33,6 +33,8 @@ class Keithley2400StreamInterface(StreamInterface):
         Cmd("get_source_voltage", "^\:SOUR:VOLT:LEV\?$"),
         Cmd("set_source_current", "^\:SOUR:CURR:LEV\s([-+]?[0-9]*\.?[0-9]+)$"),
         Cmd("get_source_current", "^\:SOUR:CURR:LEV\?$"),
+        Cmd("set_source_current_autorange_mode", "^\:SOUR:CURR:RANG:AUTO\s(1|0)$"),
+        Cmd("get_source_current_autorange_mode", "^\:SOUR:CURR:RANG:AUTO\?$"),
     }
 
     # Private control commands that can be used as an alternative to the lewis backdoor
@@ -154,6 +156,13 @@ class Keithley2400StreamInterface(StreamInterface):
 
     def get_source_current(self):
         return self._device.get_source_current()
+
+    def get_source_current_autorange_mode(self):
+        return self._device.get_source_current_autorange_mode()
+
+    def set_source_current_autorange_mode(self, value):
+        self.log.info("Setting autorange mode: {}".format(value))
+        return self._device.set_source_current_autorange_mode(value)
 
     def handle_error(self, request, error):
         print "An error occurred at request {}: {}".format(str(request), str(error))
