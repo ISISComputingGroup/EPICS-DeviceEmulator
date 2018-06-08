@@ -2,6 +2,8 @@ from collections import OrderedDict
 from lewis.devices import StateMachineDevice
 from .states import DefaultState
 
+NUMBER_OF_TEMP_CHANNELS = 8
+NUMBER_OF_SENSOR_CHANNELS = 8
 
 class SimulatedLakeshore218(StateMachineDevice):
     """
@@ -12,8 +14,8 @@ class SimulatedLakeshore218(StateMachineDevice):
         """
         Sets the initial state of the device.
         """
-        self._temps = [1.0] * 8
-        self._sensors = [0.5] * 8
+        self._temps = [1.0] * NUMBER_OF_TEMP_CHANNELS
+        self._sensors = [0.5] * NUMBER_OF_SENSOR_CHANNELS
         self.temp_all = ""
         self.sensor_all = ""
         self.connected = True
