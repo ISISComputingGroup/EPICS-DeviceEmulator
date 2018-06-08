@@ -144,14 +144,12 @@ class Keithley2400StreamInterface(StreamInterface):
         return self._device.get_voltage_compliance()
 
     def set_source_voltage(self, value):
-        self.log.info("Source voltage set to {}".format(float(value)))
         return self._device.set_source_voltage(float(value))
 
     def get_source_voltage(self):
         return self._device.get_source_voltage()
 
     def set_source_current(self, value):
-        self.log.info("Source current set to {}".format(float(value)))
         return self._device.set_source_current(float(value))
 
     def get_source_current(self):
@@ -161,7 +159,6 @@ class Keithley2400StreamInterface(StreamInterface):
         return self._device.get_source_current_autorange_mode()
 
     def set_source_current_autorange_mode(self, value):
-        self.log.info("Setting autorange mode: {}".format(value))
         return self._device.set_source_current_autorange_mode(value)
 
     def handle_error(self, request, error):
