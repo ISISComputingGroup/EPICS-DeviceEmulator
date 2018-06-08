@@ -17,7 +17,7 @@ class SimulatedKeithley2400(StateMachineDevice):
     MINIMUM_CURRENT = 1.0e-20
     RESISTANCE_RANGE_MULTIPLIER = 2.1
 
-    INITIAL_SOURCE_CURRENT = 1.0e-20
+    INITIAL_SOURCE_CURRENT = 1.0e-4
     INITIAL_SOURCE_VOLTAGE = 0.8
 
     def _initialize_data(self):
@@ -40,6 +40,7 @@ class SimulatedKeithley2400(StateMachineDevice):
         self._remote_sensing_mode = RemoteSensingMode.OFF
         self._resistance_range_mode = ResistanceRangeMode.AUTO
         self._source_mode = SourceMode.CURRENT
+        self._source_current_autorange_mode = AutorangeMode.AUTO
 
         # Mode settings
         self._resistance_range = SimulatedKeithley2400.RESISTANCE_RANGE_MULTIPLIER
@@ -205,12 +206,15 @@ class SimulatedKeithley2400(StateMachineDevice):
     def set_source_voltage(self, value):
         self._source_voltage = value
 
-    @has_log
     def get_source_current(self):
-        self.log.info(self._source_current)
         return self._source_current
 
-    @has_log
     def set_source_current(self, value):
-        self.log.info(self._source_current, value)
         self._source_current = value
+
+    def get_source_current_autorange_mode(self):
+        return self._source_current_autorange_mode
+
+    def set_source_current_autorange_mode(self, mode):
+        if SimulatedKeithley2400._check_mode(mode, AutorangeMode):
+            self._source_current_autorange_mode = mode
