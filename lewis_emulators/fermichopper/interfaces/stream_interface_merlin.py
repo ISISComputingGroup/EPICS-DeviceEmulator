@@ -107,8 +107,6 @@ class FermichopperStreamInterface(StreamInterface):
         def autozero_calibrate(value):
             return (value + 22.86647) / 0.04486
 
-        timing_freq_mhz = TIMING_FREQ_MHZ
-
         return JulichChecksum.append(
                 '#1' + self._device.get_last_command()) \
             + JulichChecksum.append(
@@ -118,15 +116,15 @@ class FermichopperStreamInterface(StreamInterface):
             + JulichChecksum.append(
                 "#4{:04X}".format(int(round(self._device.get_true_speed() * 60)))) \
             + JulichChecksum.append(
-                "#5{:04X}".format(int(round((self._device.get_nominal_delay() * timing_freq_mhz) % 65536)))) \
+                "#5{:04X}".format(int(round((self._device.get_nominal_delay() * TIMING_FREQ_MHZ) % 65536)))) \
             + JulichChecksum.append(
-                "#6{:04X}".format(int(round((self._device.get_nominal_delay() * timing_freq_mhz) / 65536)))) \
+                "#6{:04X}".format(int(round((self._device.get_nominal_delay() * TIMING_FREQ_MHZ) / 65536)))) \
             + JulichChecksum.append(
-                "#7{:04X}".format(int(round((self._device.get_actual_delay() * timing_freq_mhz) % 65536)))) \
+                "#7{:04X}".format(int(round((self._device.get_actual_delay() * TIMING_FREQ_MHZ) % 65536)))) \
             + JulichChecksum.append(
-                "#8{:04X}".format(int(round((self._device.get_actual_delay() * timing_freq_mhz) / 65536)))) \
+                "#8{:04X}".format(int(round((self._device.get_actual_delay() * TIMING_FREQ_MHZ) / 65536)))) \
             + JulichChecksum.append(
-                "#9{:04X}".format(int(round(self._device.get_gate_width() * timing_freq_mhz)))) \
+                "#9{:04X}".format(int(round(self._device.get_gate_width() * TIMING_FREQ_MHZ)))) \
             + JulichChecksum.append(
                 "#A{:04X}".format(int(round(self._device.get_current() / 0.002016)))) \
             + JulichChecksum.append(
