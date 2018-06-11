@@ -41,6 +41,8 @@ class Keithley2400StreamInterface(StreamInterface):
         Cmd("set_source_current_range", "^\:SOUR:CURR:RANG\s([-+]?[0-9]*\.?[0-9]+)$"),
         Cmd("get_source_voltage_range", "^\:SOUR:VOLT:RANG\?$"),
         Cmd("set_source_voltage_range", "^\:SOUR:VOLT:RANG\s([-+]?[0-9]*\.?[0-9]*e?[-+]?[0-9]+$)"),
+        Cmd("set_measured_voltage_autorange_mode", "^\:SENS:VOLT:RANG:AUTO\s(1|0)$"),
+        Cmd("get_measured_voltage_autorange_mode", "^\:SENS:VOLT:RANG:AUTO\?$"),
     }
 
     # Private control commands that can be used as an alternative to the lewis backdoor
@@ -202,3 +204,8 @@ class Keithley2400StreamInterface(StreamInterface):
         self.log.info("Getting value {}".format(val))
         return val
 
+    def get_measured_voltage_autorange_mode(self):
+        return self._device.get_measured_voltage_autorange_mode()
+
+    def set_measured_voltage_autorange_mode(self, value):
+        return self._device.set_measured_voltage_autorange_mode(value)

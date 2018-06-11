@@ -50,6 +50,12 @@ class SimulatedKeithley2400(StateMachineDevice):
         self._source_current_range = SimulatedKeithley2400.INITIAL_CURRENT
         self._source_voltage_range = SimulatedKeithley2400.INITIAL_VOLTAGE
 
+        self._measured_current_autorange_mode = AutorangeMode.AUTO
+        self._measured_voltage_autorange_mode = AutorangeMode.AUTO
+
+        self._measured_current_range = SimulatedKeithley2400.INITIAL_CURRENT
+        self._measured_voltage_range = SimulatedKeithley2400.INITIAL_VOLTAGE
+
         # Mode settings
         self._resistance_range = SimulatedKeithley2400.RESISTANCE_RANGE_MULTIPLIER
         self._current_compliance = SimulatedKeithley2400.INITIAL_CURRENT_COMPLIANCE
@@ -245,3 +251,10 @@ class SimulatedKeithley2400(StateMachineDevice):
 
     def set_source_voltage_range(self, value):
         self._source_voltage_range = value
+
+    def set_measured_voltage_autorange_mode(self, mode):
+        if SimulatedKeithley2400._check_mode(mode, AutorangeMode):
+            self._measured_voltage_autorange_mode = mode
+
+    def get_measured_voltage_autorange_mode(self):
+        return self._measured_voltage_autorange_mode
