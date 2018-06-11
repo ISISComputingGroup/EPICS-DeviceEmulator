@@ -39,6 +39,9 @@ class Keithley2400StreamInterface(StreamInterface):
         Cmd("get_source_voltage_autorange_mode", "^\:SOUR:VOLT:RANG:AUTO\?$"),
         Cmd("get_source_current_range", "^\:SOUR:CURR:RANG\?$"),
         Cmd("set_source_current_range", "^\:SOUR:CURR:RANG\s([-+]?[0-9]*\.?[0-9]+)$"),
+        Cmd("get_source_voltage_range", "^\:SOUR:VOLT:RANG\?$"),
+        #Cmd("set_source_voltage_range", "^\:SOUR:VOLT:RANG\s([-+]?[0-9]*\.?[0-9]+)$"),
+        Cmd("set_source_voltage_range", "^\:SOUR:VOLT:RANG\s([-+]?[0-9]*\.?[0-9]+e?-?[0-9]+?)$"),
     }
 
     # Private control commands that can be used as an alternative to the lewis backdoor
@@ -171,12 +174,32 @@ class Keithley2400StreamInterface(StreamInterface):
     def set_source_voltage_autorange_mode(self, value):
         return self._device.set_source_voltage_autorange_mode(value)
 
+    @has_log
     def handle_error(self, request, error):
-        print "An error occurred at request {}: {}".format(str(request), str(error))
-        return str(error)
+        err = "An error occurred at request {}: {}".format(str(request), str(error))
+        print(err)
+        self.log.info(err)
+        return str(err)
 
     def set_source_current_range(self, value):
         return self._device.set_source_current_range(float(value))
 
     def get_source_current_range(self):
         return self._device.get_source_current_range()
+
+    @has_log
+    def set_source_voltage_range(self, value):
+        self.log.info("Setting value to {:16f}".format(float(value)))
+
+        val = self._device.set_source_voltage_range(float(value))
+
+        self.log.info("Set value to {:16f}".format(float(self._device._source_voltage_range)))
+
+        return val
+
+    @has_log
+    def get_source_voltage_range(self):
+        val = self._device.get_source_voltage_range()
+        self.log.info("Getting value {}".format(val))
+        return val
+

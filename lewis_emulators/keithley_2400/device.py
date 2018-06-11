@@ -239,3 +239,9 @@ class SimulatedKeithley2400(StateMachineDevice):
 
     def set_source_current_range(self, value):
         self._source_current_range = value
+
+    def get_source_voltage_range(self):
+        return self._source_voltage_range
+
+    def set_source_voltage_range(self, value):
+        self._source_voltage_range = value
