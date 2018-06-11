@@ -45,6 +45,11 @@ class Keithley2400StreamInterface(StreamInterface):
         Cmd("get_measured_voltage_autorange_mode", "^\:SENS:VOLT:RANG:AUTO\?$"),
         Cmd("set_measured_current_autorange_mode", "^\:SENS:CURR:RANG:AUTO\s(1|0)$"),
         Cmd("get_measured_current_autorange_mode", "^\:SENS:CURR:RANG:AUTO\?$"),
+        Cmd("get_measured_current_range", "^\:SENS:CURR:RANG\?$"),
+        Cmd("set_measured_current_range", "^\:SENS:CURR:RANG\s([-+]?[0-9]*\.?[0-9]*e?[-+]?[0-9]+$)"),
+        Cmd("get_measured_voltage_range", "^\:SENS:VOLT:RANG\?$"),
+        Cmd("set_measured_voltage_range", "^\:SENS:VOLT:RANG\s([-+]?[0-9]*\.?[0-9]*e?[-+]?[0-9]+$)"),
+
     }
 
     # Private control commands that can be used as an alternative to the lewis backdoor
@@ -190,21 +195,11 @@ class Keithley2400StreamInterface(StreamInterface):
     def get_source_current_range(self):
         return self._device.get_source_current_range()
 
-    @has_log
     def set_source_voltage_range(self, value):
-        self.log.info("Setting value to {:16f}".format(float(value)))
+        return self._device.set_source_voltage_range(float(value))
 
-        val = self._device.set_source_voltage_range(float(value))
-
-        self.log.info("Set value to {:16f}".format(float(self._device._source_voltage_range)))
-
-        return val
-
-    @has_log
     def get_source_voltage_range(self):
-        val = self._device.get_source_voltage_range()
-        self.log.info("Getting value {}".format(val))
-        return val
+        return self._device.get_source_voltage_range()
 
     def get_measured_voltage_autorange_mode(self):
         return self._device.get_measured_voltage_autorange_mode()
@@ -212,8 +207,17 @@ class Keithley2400StreamInterface(StreamInterface):
     def set_measured_voltage_autorange_mode(self, value):
         return self._device.set_measured_voltage_autorange_mode(value)
 
+    @has_log
     def get_measured_current_autorange_mode(self):
+        self.log.info('Getting {}'.format(self._device.get_measured_current_autorange_mode()))
         return self._device.get_measured_current_autorange_mode()
 
+    @has_log
     def set_measured_current_autorange_mode(self, value):
-        return self._device.set_measured_current_autorange_mode(value)
+        self.log.info('Setting {}'.format(value))
+
+        val = self._device.set_measured_current_autorange_mode(value)
+
+        self.log.info('Set {}'.format(val))
+
+        return val

@@ -259,9 +259,25 @@ class SimulatedKeithley2400(StateMachineDevice):
     def get_measured_voltage_autorange_mode(self):
         return self._measured_voltage_autorange_mode
 
+    @has_log
     def set_measured_current_autorange_mode(self, mode):
         if SimulatedKeithley2400._check_mode(mode, AutorangeMode):
+            print('Setting {}'.format(mode))
             self._measured_current_autorange_mode = mode
 
+    @has_log
     def get_measured_current_autorange_mode(self):
+        self.log.info("Getting {}".format(self._measured_current_autorange_mode))
         return self._measured_current_autorange_mode
+
+    def get_measured_current_range(self):
+        return self._measured_current_range
+
+    def set_measured_current_range(self, value):
+        self._measured_current_range = value
+
+    def get_measured_voltage_range(self):
+        return self._measured_voltage_range
+
+    def set_measured_voltage_range(self, value):
+        self._measured_voltage_range = value
