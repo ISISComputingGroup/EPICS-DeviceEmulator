@@ -40,8 +40,7 @@ class Keithley2400StreamInterface(StreamInterface):
         Cmd("get_source_current_range", "^\:SOUR:CURR:RANG\?$"),
         Cmd("set_source_current_range", "^\:SOUR:CURR:RANG\s([-+]?[0-9]*\.?[0-9]+)$"),
         Cmd("get_source_voltage_range", "^\:SOUR:VOLT:RANG\?$"),
-        #Cmd("set_source_voltage_range", "^\:SOUR:VOLT:RANG\s([-+]?[0-9]*\.?[0-9]+)$"),
-        Cmd("set_source_voltage_range", "^\:SOUR:VOLT:RANG\s([-+]?[0-9]*\.?[0-9]+e?-?[0-9]+?)$"),
+        Cmd("set_source_voltage_range", "^\:SOUR:VOLT:RANG\s([-+]?[0-9]*\.?[0-9]*e?[-+]?[0-9]+$)"),
     }
 
     # Private control commands that can be used as an alternative to the lewis backdoor
