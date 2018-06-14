@@ -5,6 +5,7 @@ from lewis.adapters.stream import StreamInterface
 from lewis.core.logging import has_log
 
 from lewis_emulators.utils.command_builder import CmdBuilder
+from lewis_emulators.utils.replies import conditional_reply
 from .dfkps_base import CommonStreamInterface
 
 __all__ = ["Danfysik8800StreamInterface"]
@@ -21,8 +22,10 @@ class Danfysik8800StreamInterface(CommonStreamInterface, StreamInterface):
     commands = CommonStreamInterface.commands + [
         CmdBuilder("set_current").escape("WA ").int().eos().build(),
         CmdBuilder("get_current").escape("ADCV").eos().build(),
+        CmdBuilder("init_comms").escape("ADR 000").build(),
     ]
 
+    @conditional_reply("comms_initialized")
     def get_status(self):
         """
         Respond to the get_status command (S1)

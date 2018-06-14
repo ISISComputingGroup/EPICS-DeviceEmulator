@@ -1,8 +1,8 @@
 from lewis.adapters.stream import StreamInterface
 from lewis_emulators.utils.command_builder import CmdBuilder
 from ..device import ReadState, Units
-from ...utils.if_connected import if_connected
-from ...utils.constants import ACK
+from lewis_emulators.utils.replies import conditional_reply
+from lewis_emulators.utils.constants import ACK
 
 
 class Tpg300StreamInterface(StreamInterface):
@@ -36,7 +36,7 @@ class Tpg300StreamInterface(StreamInterface):
 
         print("An error occurred at request {}: {}".format(request, error))
 
-    @if_connected
+    @conditional_reply("connected")
     def acknowledge_pressure(self, channel):
         """
         Acknowledges a request to get the pressure and stores the request.
@@ -51,7 +51,7 @@ class Tpg300StreamInterface(StreamInterface):
         self._device.readstate = ReadState[channel]
         return ACK
 
-    @if_connected
+    @conditional_reply("connected")
     def acknowledge_units(self):
         """
         Acknowledge that the request for current units was received.
@@ -63,7 +63,7 @@ class Tpg300StreamInterface(StreamInterface):
         self._device.readstate = ReadState["UNI"]
         return ACK
 
-    @if_connected
+    @conditional_reply("connected")
     def acknowledge_set_units(self, units):
         """
         Acknowledge that the request to set the units was received.
