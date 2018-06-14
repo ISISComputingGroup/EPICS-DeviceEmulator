@@ -3,7 +3,7 @@ from states import DefaultState
 from lewis.devices import StateMachineDevice
 
 
-class SimulatedSp2Xx(StateMachineDevice):
+class SimulatedSp2XX(StateMachineDevice):
 
     def _initialize_data(self):
         """

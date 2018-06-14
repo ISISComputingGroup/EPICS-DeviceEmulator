@@ -1,7 +1,7 @@
 from lewis.adapters.stream import StreamInterface, Cmd
 
 
-class Sp2XxStreamInterface(StreamInterface):
+class Sp2XXStreamInterface(StreamInterface):
 
     # Commands that we expect via serial during normal operation
     commands = {

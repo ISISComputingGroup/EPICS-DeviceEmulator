@@ -1,3 +1,3 @@
-from .stream_interface import Sp2XxStreamInterface
+from .stream_interface import Sp2XXStreamInterface
 
-__all__ = ['Sp2XxStreamInterface']
+__all__ = ['Sp2XXStreamInterface']
