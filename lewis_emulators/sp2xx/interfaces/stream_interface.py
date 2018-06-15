@@ -3,7 +3,7 @@ from lewis.core.logging import has_log
 
 from lewis_emulators.utils.command_builder import CmdBuilder
 from lewis_emulators.utils.if_connected import if_connected
-from ..device import RunStatus
+from ..device import RunStatus, Direction
 
 
 @has_log
@@ -14,7 +14,8 @@ class Sp2XXStreamInterface(StreamInterface):
 
     # Commands that we expect via serial during normal operation
     commands = {
-        CmdBuilder("set_run_status").escape("run").eos().build(),
+        CmdBuilder("start").escape("run").eos().build(),
+        CmdBuilder("stop").escape("stop").eos().build(),
         CmdBuilder("get_run_status").escape("run?").eos().build()
     }
 
@@ -41,18 +42,19 @@ class Sp2XXStreamInterface(StreamInterface):
         print("An error occurred at request {}: {}".format(request, error))
 
     @if_connected
-    def set_run_status(self):
+    def start(self):
         """
         Starts the device running to present settings if it is not running.
 
         Returns:
-            ">" : If device's run direction is in infusion mode.
-            "<" : If device's run direction is in withdrawing mode.
+
         """
-        if self._device.running_status != RunStatus.Stopped:
-            if self._device.running_status == RunStatus.Infusing:
+        if self._device.running is False:
+            if self._device.direction == Direction.Infusing:
+                self._device.start_device()
                 return self.Infusing
-            elif self._device.running_status == RunStatus.Withdrawing:
+            elif self._device.direction == Direction.Withdrawing:
+                self._device.start_device()
                 return self.Withdrawing
             else:
                 print("An error occurred when trying to run the device. The device's running direction \
@@ -66,8 +68,8 @@ class Sp2XXStreamInterface(StreamInterface):
 
         Returns:
             ":" : If the device is not running.
-            ">" : If device's run direction is in infusion mode.
-            "<" : If device's run direction is in withdrawing mode.
+            ">" : Prompt saying the device's run direction is infusing.
+            "<" : Prompt saying the device's run direction is withdrawing.
         """
         if self._device.running_status == RunStatus.Infusing:
             return self.Infusing
@@ -79,6 +81,17 @@ class Sp2XXStreamInterface(StreamInterface):
             print("""An error occurred when trying to run the device
                   "The device's running direction is {} and the running state is {}""".format(
                     self._device.running_direction, self._device.running))
+
+    @if_connected
+    def stop(self):
+        """
+        Stops the device running.
+        Returns:
+            "\r\n:" : stopped prompt
+        """
+        self._device.stop_device()
+        return self.Stopped
+
 
 
 

@@ -10,6 +10,10 @@ class RunStatus(Enum):
     Withdrawing = 2
 
 
+class Direction(Enum):
+    Infusing = 0
+    Withdrawing = 1
+
 
 class SimulatedSp2XX(StateMachineDevice):
 
@@ -17,7 +21,9 @@ class SimulatedSp2XX(StateMachineDevice):
         """
         Initialize all of the device's attributes.
         """
-        self.running_status = RunStatus.Stopped
+        self._running_status = RunStatus.Stopped
+        self._direction = Direction.Infusing
+        self._running = False
         self.connect()
 
     @staticmethod
@@ -35,16 +41,47 @@ class SimulatedSp2XX(StateMachineDevice):
         return OrderedDict([
         ])
 
-    def set_running_status_via_the_back_door(self, status):
+    @property
+    def running(self):
         """
-        Sets running direction as an Enum to infusion or withdrawing. Called only via the backdoor.
-        Args:
-            direction: "infusion" or "withdrawing".
+        Returns True if the device is running and False otherwise.
+        """
+        return self._running
+
+    @property
+    def direction(self):
+        """
+        Returns the direction the pump is set to.
+
+        """
+        return self._direction
+
+    @property
+    def running_status(self):
+        """
+        Returns the running status of the device
+        """
+        return self._running_status
+
+    def start_device(self):
+        """
+        Starts the device running to present settings.
 
         Returns:
             None
         """
-        self.running_status = RunStatus[status]
+        self._running = True
+        self._running_status = RunStatus[self._direction.name]
+
+    def stop_device(self):
+        """
+        Stops the device running.
+
+        Returns:
+            None
+        """
+        self._running = False
+        self._running_status = RunStatus.Stopped
 
     @property
     def connected(self):
