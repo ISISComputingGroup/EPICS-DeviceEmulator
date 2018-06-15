@@ -9,6 +9,9 @@ class Keithley2400StreamInterface(StreamInterface):
     # Commands that we expect via serial during normal operation
     serial_commands = {
         Cmd("get_values", "^:READ\?$"),
+        Cmd("get_values", "\:MEAS:VOLT\?$"),
+        Cmd("get_values", "\:MEAS:CURR\?$"),
+        Cmd("get_values", "\:MEAS:RES\?$"),
         Cmd("reset", "^\*RST$"),
         Cmd("identify", "^\*IDN?"),
         Cmd("set_output_mode", "^\:OUTP\s(1|0)$"),
@@ -21,13 +24,13 @@ class Keithley2400StreamInterface(StreamInterface):
         Cmd("get_remote_sensing_mode", "^\:SYST:RSEN\?$"),
         Cmd("set_resistance_range_mode", "^\:SENS:RES:RANG:AUTO\s(0|1)$"),
         Cmd("get_resistance_range_mode", "^\:SENS:RES:RANG:AUTO\?$"),
-        Cmd("set_resistance_range", "^\:SENS:RES:RANG\s([-+]?[0-9]*\.?[0-9]+)$"),
+        Cmd("set_resistance_range", "^\:SENS:RES:RANG\s([-+]?[0-9]*\.?[0-9]*e?[-+]?[0-9]+$)"),
         Cmd("get_resistance_range", "^\:SENS:RES:RANG\?$"),
         Cmd("set_source_mode", "^\:SOUR:FUNC\s(CURR|VOLT)$"),
         Cmd("get_source_mode", "^\:SOUR:FUNC\?$"),
-        Cmd("set_current_compliance", "^\:SENS:CURR:PROT\s([-+]?[0-9]*\.?[0-9]+)$"),
+        Cmd("set_current_compliance", "^\:SENS:CURR:PROT\s([-+]?[0-9]*\.?[0-9]*e?[-+]?[0-9]+$)"),
         Cmd("get_current_compliance", "^\:SENS:CURR:PROT\?$"),
-        Cmd("set_voltage_compliance", "^\:SENS:VOLT:PROT\s([-+]?[0-9]*\.?[0-9]+)$"),
+        Cmd("set_voltage_compliance", "^\:SENS:VOLT:PROT\s([-+]?[0-9]*\.?[0-9]*e?[-+]?[0-9]+$)"),
         Cmd("get_voltage_compliance", "^\:SENS:VOLT:PROT\?$"),
         Cmd("set_source_voltage", "^\:SOUR:VOLT:LEV\s([-+]?[0-9]*\.?[0-9]*e?[-+]?[0-9]+$)"),
         Cmd("get_source_voltage", "^\:SOUR:VOLT:LEV\?$"),
@@ -207,17 +210,9 @@ class Keithley2400StreamInterface(StreamInterface):
     def set_measured_voltage_autorange_mode(self, value):
         return self._device.set_measured_voltage_autorange_mode(value)
 
-    @has_log
     def get_measured_current_autorange_mode(self):
-        self.log.info('Getting {}'.format(self._device.get_measured_current_autorange_mode()))
         return self._device.get_measured_current_autorange_mode()
 
-    @has_log
     def set_measured_current_autorange_mode(self, value):
-        self.log.info('Setting {}'.format(value))
-
         val = self._device.set_measured_current_autorange_mode(value)
-
-        self.log.info('Set {}'.format(val))
-
         return val
