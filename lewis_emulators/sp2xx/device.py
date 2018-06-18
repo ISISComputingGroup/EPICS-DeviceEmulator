@@ -15,6 +15,17 @@ class Direction(Enum):
     Withdrawing = 1
 
 
+class LastError(Enum):
+    No_error = 0
+    Communication_error = 1
+    Stall = 2
+    Communication_error_and_stall = 3
+    Serial_overrun = 4
+    Serial_error_and_overrun = 5
+    Stall_and_serial_overrun = 6
+    Stall_and_serial_error_and_overrun = 7
+
+
 class SimulatedSp2XX(StateMachineDevice):
 
     def _initialize_data(self):
@@ -24,6 +35,7 @@ class SimulatedSp2XX(StateMachineDevice):
         self._running_status = RunStatus.Stopped
         self._direction = Direction.Infusing
         self._running = False
+        self._last_error = LastError.No_error
         self.connect()
 
     @staticmethod
@@ -52,16 +64,8 @@ class SimulatedSp2XX(StateMachineDevice):
     def direction(self):
         """
         Returns the direction the pump is set to.
-
         """
         return self._direction
-
-    @property
-    def running_status(self):
-        """
-        Returns the running status of the device
-        """
-        return self._running_status
 
     def start_device(self):
         """
@@ -70,6 +74,7 @@ class SimulatedSp2XX(StateMachineDevice):
         Returns:
             None
         """
+        #self.clear_last_error()
         self._running = True
         self._running_status = RunStatus[self._direction.name]
 
@@ -80,8 +85,46 @@ class SimulatedSp2XX(StateMachineDevice):
         Returns:
             None
         """
+        #self.clear_last_error()
         self._running = False
         self._running_status = RunStatus.Stopped
+
+    @property
+    def running_status(self):
+        """
+        Returns the running status of the device.
+        """
+        #self.clear_last_error()
+        return self._running_status
+
+    @property
+    def last_error(self):
+        """
+         Returns the last error type.
+
+        """
+        return self._last_error
+
+    def throw_error(self, error_type):
+        """
+        Throws an error of type error_type.
+
+        Args:
+            error_type: Integer 0-7 of the error type.
+
+        Returns:
+            "\r\nE": Device error prompt.
+        """
+        self._last_error = LastError(error_type)
+
+    def clear_last_error(self):
+        """
+        Clears the last error.
+
+        Returns:
+            None.
+        """
+        self._last_error = LastError.No_error
 
     @property
     def connected(self):
@@ -107,5 +150,3 @@ class SimulatedSp2XX(StateMachineDevice):
             None
         """
         self._connected = False
-
-

@@ -1,9 +1,30 @@
-from lewis.adapters.stream import StreamInterface, Cmd
+from lewis.adapters.stream import StreamInterface
 from lewis.core.logging import has_log
 
 from lewis_emulators.utils.command_builder import CmdBuilder
 from lewis_emulators.utils.if_connected import if_connected
 from ..device import RunStatus, Direction
+
+
+def if_error(f):
+    """
+    Decorator that executes f if the device has no errors on it and returns the error prompt otherwise.
+
+    Args:
+        f: function to be executed if the device has no error.
+
+    Returns:
+       The value of f(*args) if the device has no error and "\r\nE" otherwise.
+   """
+
+    def wrapper(*args):
+        error = getattr(args[0], "_device").last_error.value
+        if error == 0:
+            result = f(*args)
+        else:
+            result = "\r\nE"
+        return result
+    return wrapper
 
 
 @has_log
@@ -16,11 +37,12 @@ class Sp2XXStreamInterface(StreamInterface):
     commands = {
         CmdBuilder("start").escape("run").eos().build(),
         CmdBuilder("stop").escape("stop").eos().build(),
-        CmdBuilder("get_run_status").escape("run?").eos().build()
+        CmdBuilder("get_run_status").escape("run?").eos().build(),
+        CmdBuilder("get_error_status").escape("error?").eos().build()
     }
 
-    in_terminator = "\r\n"
     out_terminator = ""
+    in_terminator = "\r"
 
     _return = "\r\n"
     Infusing = "{}>".format(_return)
@@ -41,6 +63,7 @@ class Sp2XXStreamInterface(StreamInterface):
 
         print("An error occurred at request {}: {}".format(request, error))
 
+    @if_error
     @if_connected
     def start(self):
         """
@@ -57,10 +80,11 @@ class Sp2XXStreamInterface(StreamInterface):
                 self._device.start_device()
                 return self.Withdrawing
             else:
-                print("An error occurred when trying to run the device. The device's running direction \
-                    is {} and the running state is {}.".format(
-                    self._device.running_direction, self._device.running))
+                print("An error occurred when trying to run the device. The device's running state is \
+                    is {}.".format(
+                    self._device.running_direction))
 
+    @if_error
     @if_connected
     def get_run_status(self):
         """
@@ -82,6 +106,7 @@ class Sp2XXStreamInterface(StreamInterface):
                   "The device's running direction is {} and the running state is {}""".format(
                     self._device.running_direction, self._device.running))
 
+    @if_error
     @if_connected
     def stop(self):
         """
