@@ -117,6 +117,15 @@ class Sp2XXStreamInterface(StreamInterface):
         self._device.stop_device()
         return self.Stopped
 
+    @if_connected
+    def get_error_status(self):
+        """
+        Gets the error status from the device.
+
+        Returns:
+            \r\n%i where %i is the error_type value.
+        """
+        return "{}{}".format(self._return, self._device.last_error.value)
 
 
 
