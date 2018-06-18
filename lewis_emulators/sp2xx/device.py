@@ -14,16 +14,22 @@ class Direction(Enum):
     Infusing = 0
     Withdrawing = 1
 
+class ErrorType(object):
+    """
+    Error Type.
 
-class LastError(Enum):
-    No_error = 0
-    Communication_error = 1
-    Stall = 2
-    Communication_error_and_stall = 3
-    Serial_overrun = 4
-    Serial_error_and_overrun = 5
-    Stall_and_serial_overrun = 6
-    Stall_and_serial_error_and_overrun = 7
+    Attributes:
+        name: String name of the error
+        value: integer value of the error
+        alarm_severity: Alarm severity of the error
+    """
+    def __init__(self, name, value, alarm_severity):
+        self.name = name
+        self.value = value
+        self.alarm_severity = alarm_severity
+
+
+NO_ERROR = ErrorType("No error", 0, "NO_ALARM")
 
 
 class SimulatedSp2XX(StateMachineDevice):
@@ -35,7 +41,7 @@ class SimulatedSp2XX(StateMachineDevice):
         self._running_status = RunStatus.Stopped
         self._direction = Direction.Infusing
         self._running = False
-        self._last_error = LastError.No_error
+        self._last_error = NO_ERROR
         self.connect()
 
     @staticmethod
@@ -105,9 +111,9 @@ class SimulatedSp2XX(StateMachineDevice):
         """
         return self._last_error
 
-    def throw_error(self, error_type):
+    def throw_error_via_the_backdoor(self, error_name, error_value, error_alarm_severity):
         """
-        Throws an error of type error_type.
+        Throws an error of type error_type. Set only via the backdoor
 
         Args:
             error_type: Integer 0-7 of the error type.
@@ -115,7 +121,7 @@ class SimulatedSp2XX(StateMachineDevice):
         Returns:
             "\r\nE": Device error prompt.
         """
-        self._last_error = LastError(error_type)
+        self._last_error = ErrorType(error_name, error_value, error_alarm_severity)
 
     def clear_last_error(self):
         """
@@ -124,7 +130,7 @@ class SimulatedSp2XX(StateMachineDevice):
         Returns:
             None.
         """
-        self._last_error = LastError.No_error
+        self._last_error = NO_ERROR
 
     @property
     def connected(self):
