@@ -32,8 +32,8 @@ class Mode(object):
 
 infusion = Mode("i", "I", "Infusion")
 withdrawal = Mode("w", "W", "Withdrawal")
-infusion_withdrawal = Mode("i/w", "I/W", "Infusion/Withdrawal")
-withdrawal_infusion = Mode("w/i", "W/I", "Withdrawal/Infusion")
+infusion_withdrawal = Mode("i/w", "IW", "Infusion/Withdrawal")
+withdrawal_infusion = Mode("w/i", "WI", "Withdrawal/Infusion")
 continuous = Mode("con", "CON", "Continuous")
 
 MODES = {
@@ -112,7 +112,7 @@ class SimulatedSp2XX(StateMachineDevice):
         Returns:
             None
         """
-        # self.clear_last_error()
+
         self._running = True
         self._running_status = RunStatus[self._direction.name]
 
@@ -123,7 +123,7 @@ class SimulatedSp2XX(StateMachineDevice):
         Returns:
             None
         """
-        #self.clear_last_error()
+
         self._running = False
         self._running_status = RunStatus.Stopped
 
@@ -132,7 +132,7 @@ class SimulatedSp2XX(StateMachineDevice):
         """
         Returns the running status of the device.
         """
-        #self.clear_last_error()
+
         return self._running_status
 
     @property
@@ -143,26 +143,22 @@ class SimulatedSp2XX(StateMachineDevice):
         Returns:
             mode (Enum) the device is in.
         """
-        #self.clear_last_error()
+
         return self._mode
 
     def set_mode(self, mode_symbol):
+        """
+        Sets the mode of the device.
+
+        Args:
+            mode_symbol: one of i, w, w//i, i//w, con.
+
+        Returns:
+            None
+        """
+
         self._mode = MODES[mode_symbol]
-    #
-    # @mode.setter
-    # def mode(self, mode_symbol):
-    #     """
-    #     Sets the mode of the device.
-    #
-    #     Args:
-    #         mode_symbol: one of i, w, w//i, i//w, con.
-    #
-    #     Returns:
-    #         None
-    #     """
-    #     #self.clear_last_error()
-    #     self._mode = MODES[mode_symbol]
-    #
+
     def set_mode_via_the_backdoor(self, mode_symbol):
         """
         Sets the mode of the device. Only used via the backdoor.
@@ -174,7 +170,6 @@ class SimulatedSp2XX(StateMachineDevice):
             None
         """
 
-        #self.clear_last_error()
         self._mode = MODES[mode_symbol]
 
     @property

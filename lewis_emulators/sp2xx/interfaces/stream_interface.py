@@ -122,19 +122,46 @@ class Sp2XXStreamInterface(StreamInterface):
     @if_connected
     def get_error_status(self):
         """
-        Gets the error status from the device.
+        Gets the error status from the device and returns the error value and run status.
 
         Returns:
-            \r\n%i where %i is the error_type value.
+            \r\n%i\r\n{} where %i is the error_type value and {} the run status.
         """
-        return "{}{}".format(self._return, self._device.last_error.value)
+        last_error = self._device.last_error
+        current_status = None
+
+        if self._device.running_status == RunStatus.Infusing:
+            current_status = self.Infusing
+        elif self._device.running_status == RunStatus.Withdrawing:
+            current_status = self.Withdrawing
+        elif self._device.running_status == RunStatus.Stopped:
+            current_status = self.Stopped
+
+        return "{}{}{}".format(self._return, last_error.value, current_status)
 
     @if_error
     @if_connected
     def set_mode(self, mode_symbol):
+        """
+        Sets the mode of the device.
+
+        Args:
+            mode_symbol: symbol to change the mode setting
+
+        Returns:
+            run_status
+        """
         self._device.set_mode(mode_symbol)
+        return self.get_run_status()
 
     @if_error
     @if_connected
     def get_mode(self):
-        return self._device.mode.response
+        """
+        Gets the mode of the device
+
+        Returns:
+            The mode the device is in and the run status.
+            E.g. \r\nI\r\n: if the device is in infusion mode and stopped.
+        """
+        return "{}{}{}".format(self._return, self._device.mode.response, self.get_run_status())
