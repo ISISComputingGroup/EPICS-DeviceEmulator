@@ -35,6 +35,8 @@ class SimulatedDanfysik(StateMachineDevice):
         # Use a list of active interlocks because each danfysik has different sets of interlocks which can be enabled.
         self.active_interlocks = []
 
+        self.comms_initialized = False
+
     def enable_interlock(self, name):
         """
         Adds an interlock to the list of enabled interlock
