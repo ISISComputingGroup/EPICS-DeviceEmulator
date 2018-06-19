@@ -178,7 +178,7 @@ class SimulatedJulabo(StateMachineDevice):
     def set_control_mode(self, control_mode):
         """
         Sets the control mode of the julabo.
-        :param control_mode: (int) 1 for internal control, 0 for external control
+        :param control_mode: (int) 1 for external control, 0 for internal control
         :return: Empty string
         """
         self.control_mode = ControlModes.EXTERNAL if control_mode == 1 else ControlModes.INTERNAL
