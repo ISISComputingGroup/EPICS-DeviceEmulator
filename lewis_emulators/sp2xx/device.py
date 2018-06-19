@@ -20,28 +20,29 @@ class Mode(object):
     Operation mode for the device.
 
     Attributes:
-        input (string): Symbol for setting the mode
-        query (string): Response to a query for the mode.
-        description: Description of the mode.
+        set_symbol (string): Symbol for setting the mode
+        response (string): Response to a query for the mode.
+        name: Description of the mode.
     """
-    def __init__(self, input, query, description):
-        self.input = input
-        self.query = query
-        self.description = description
+    def __init__(self, set_symbol, response, name):
+        self.set_symbol = set_symbol
+        self.response = response
+        self.name = name
 
 
 infusion = Mode("i", "I", "Infusion")
 withdrawal = Mode("w", "W", "Withdrawal")
-infusion_withdrawal = Mode("i//w", "I//W", "Infusion/withdrawal")
-withdrawal_infusion = Mode("w//i", "W//I", "Withdrawal//Infusion")
+infusion_withdrawal = Mode("i/w", "I/W", "Infusion/Withdrawal")
+withdrawal_infusion = Mode("w/i", "W/I", "Withdrawal/Infusion")
 continuous = Mode("con", "CON", "Continuous")
 
-MODES = {"i": infusion,
-         "w": withdrawal,
-         "i//w": infusion_withdrawal,
-         "w//i": withdrawal_infusion,
-         "con": continuous
-         }
+MODES = {
+    "i": infusion,
+    "w": withdrawal,
+    "i/w": infusion_withdrawal,
+    "w/i": withdrawal_infusion,
+    "con": continuous
+}
 
 
 class ErrorType(object):
@@ -111,7 +112,7 @@ class SimulatedSp2XX(StateMachineDevice):
         Returns:
             None
         """
-        self.clear_last_error()
+        # self.clear_last_error()
         self._running = True
         self._running_status = RunStatus[self._direction.name]
 
@@ -122,7 +123,7 @@ class SimulatedSp2XX(StateMachineDevice):
         Returns:
             None
         """
-        self.clear_last_error()
+        #self.clear_last_error()
         self._running = False
         self._running_status = RunStatus.Stopped
 
@@ -131,7 +132,7 @@ class SimulatedSp2XX(StateMachineDevice):
         """
         Returns the running status of the device.
         """
-        self.clear_last_error()
+        #self.clear_last_error()
         return self._running_status
 
     @property
@@ -142,23 +143,23 @@ class SimulatedSp2XX(StateMachineDevice):
         Returns:
             mode (Enum) the device is in.
         """
-        self.clear_last_error()
+        #self.clear_last_error()
         return self._mode
-
-    @mode.setter
-    def mode(self, mode_symbol):
-        """
-        Sets the mode of the device.
-
-        Args:
-            mode_symbol: one of i, w, w//i, i//w, con.
-
-        Returns:
-            None
-        """
-        self.clear_last_error()
-        self._mode = MODES[mode_symbol]
-
+    #
+    # @mode.setter
+    # def mode(self, mode_symbol):
+    #     """
+    #     Sets the mode of the device.
+    #
+    #     Args:
+    #         mode_symbol: one of i, w, w//i, i//w, con.
+    #
+    #     Returns:
+    #         None
+    #     """
+    #     #self.clear_last_error()
+    #     self._mode = MODES[mode_symbol]
+    #
     def set_mode_via_the_backdoor(self, mode_symbol):
         """
         Sets the mode of the device. Only used via the backdoor.
@@ -186,12 +187,15 @@ class SimulatedSp2XX(StateMachineDevice):
         Throws an error of type error_type. Set only via the backdoor
 
         Args:
-            error_type: Integer 0-7 of the error type.
+            error_name: Name of the error to throw.
+            error_value: Integer value of error.
+            error_alarm_severity: Alarm severity.
 
         Returns:
             "\r\nE": Device error prompt.
         """
-        self._last_error = ErrorType(error_name, error_value, error_alarm_severity)
+        new_error = ErrorType(error_name, error_value, error_alarm_severity)
+        self._last_error = new_error
 
     def clear_last_error(self):
         """
