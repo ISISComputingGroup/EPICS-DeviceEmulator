@@ -145,6 +145,9 @@ class SimulatedSp2XX(StateMachineDevice):
         """
         #self.clear_last_error()
         return self._mode
+
+    def set_mode(self, mode_symbol):
+        self._mode = MODES[mode_symbol]
     #
     # @mode.setter
     # def mode(self, mode_symbol):
@@ -171,7 +174,7 @@ class SimulatedSp2XX(StateMachineDevice):
             None
         """
 
-        self.clear_last_error()
+        #self.clear_last_error()
         self._mode = MODES[mode_symbol]
 
     @property

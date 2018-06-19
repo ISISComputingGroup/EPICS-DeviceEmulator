@@ -39,7 +39,7 @@ class Sp2XXStreamInterface(StreamInterface):
         CmdBuilder("stop").escape("stop").eos().build(),
         CmdBuilder("get_run_status").escape("run?").eos().build(),
         CmdBuilder("get_error_status").escape("error?").eos().build(),
-        # CmdBuilder("set_mode").escape("mode ").arg("i/w|w/i|i|w|con").eos().build(),
+        CmdBuilder("set_mode").escape("mode ").arg("i/w|w/i|i|w|con").eos().build(),
         CmdBuilder("get_mode").escape("mode?").eos().build()
     }
 
@@ -129,11 +129,11 @@ class Sp2XXStreamInterface(StreamInterface):
         """
         return "{}{}".format(self._return, self._device.last_error.value)
 
-    # @if_error
-    # @if_connected
-    # def set_mode(self, mode_symbol):
-    #     self._device.mode = mode_symbol
-    #
+    @if_error
+    @if_connected
+    def set_mode(self, mode_symbol):
+        self._device.set_mode(mode_symbol)
+
     @if_error
     @if_connected
     def get_mode(self):
