@@ -15,13 +15,33 @@ class Direction(Enum):
     Withdrawing = 1
 
 
-MODES = {
-    "i": "Infusion",
-    "w": "Withdrawal",
-    "i//w": "Infusion_Withdrawal",
-    "w//i": "Withdrawal_Infusion",
-    "con": "Continuous"
-}
+class Mode(object):
+    """
+    Operation mode for the device.
+
+    Attributes:
+        input (string): Symbol for setting the mode
+        query (string): Response to a query for the mode.
+        description: Description of the mode.
+    """
+    def __init__(self, input, query, description):
+        self.input = input
+        self.query = query
+        self.description = description
+
+
+infusion = Mode("i", "I", "Infusion")
+withdrawal = Mode("w", "W", "Withdrawal")
+infusion_withdrawal = Mode("i//w", "I//W", "Infusion/withdrawal")
+withdrawal_infusion = Mode("w//i", "W//I", "Withdrawal//Infusion")
+continuous = Mode("con", "CON", "Continuous")
+
+MODES = {"i": infusion,
+         "w": withdrawal,
+         "i//w": infusion_withdrawal,
+         "w//i": withdrawal_infusion,
+         "con": continuous
+         }
 
 
 class ErrorType(object):
@@ -52,7 +72,7 @@ class SimulatedSp2XX(StateMachineDevice):
         self._direction = Direction.Infusing
         self._running = False
         self._last_error = NO_ERROR
-        self._mode = MODES["i"]
+        self._mode = infusion
         self.connect()
 
     @staticmethod
@@ -124,6 +144,20 @@ class SimulatedSp2XX(StateMachineDevice):
         """
         self.clear_last_error()
         return self._mode
+
+    @mode.setter
+    def mode(self, mode_symbol):
+        """
+        Sets the mode of the device.
+
+        Args:
+            mode_symbol: one of i, w, w//i, i//w, con.
+
+        Returns:
+            None
+        """
+        self.clear_last_error()
+        self._mode = MODES[mode_symbol]
 
     def set_mode_via_the_backdoor(self, mode_symbol):
         """

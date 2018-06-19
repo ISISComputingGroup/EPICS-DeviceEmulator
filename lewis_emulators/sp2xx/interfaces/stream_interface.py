@@ -131,7 +131,10 @@ class Sp2XXStreamInterface(StreamInterface):
 
     @if_error
     @if_connected
-    def set_mode(self, mode):
+    def set_mode(self, mode_symbol):
+        self._device.mode = mode_symbol
 
-
-
+    @if_error
+    @if_connected
+    def get_mode(self):
+        return self._device.mode.query
