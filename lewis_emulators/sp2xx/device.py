@@ -1,66 +1,9 @@
 from collections import OrderedDict
 from states import DefaultState
 from lewis.devices import StateMachineDevice
-from enum import Enum
 
-
-class RunStatus(Enum):
-    Stopped = 0
-    Infusing = 1
-    Withdrawing = 2
-
-
-class Direction(Enum):
-    I = 0
-    W = 1
-
-
-class Mode(object):
-    """
-    Operation mode for the device.
-
-    Attributes:
-        set_symbol (string): Symbol for setting the mode
-        response (string): Response to a query for the mode.
-        name: Description of the mode.
-    """
-    def __init__(self, set_symbol, response, name):
-        self.set_symbol = set_symbol
-        self.response = response
-        self.name = name
-
-
-infusion = Mode("i", "I", "Infusion")
-withdrawal = Mode("w", "W", "Withdrawal")
-infusion_withdrawal = Mode("i/w", "IW", "Infusion/Withdrawal")
-withdrawal_infusion = Mode("w/i", "WI", "Withdrawal/Infusion")
-continuous = Mode("con", "CON", "Continuous")
-
-MODES = {
-    "i": infusion,
-    "w": withdrawal,
-    "i/w": infusion_withdrawal,
-    "w/i": withdrawal_infusion,
-    "con": continuous
-}
-
-
-class ErrorType(object):
-    """
-    Error Type.
-
-    Attributes:
-        name: String name of the error
-        value: integer value of the error
-        alarm_severity: Alarm severity of the error
-    """
-    def __init__(self, name, value, alarm_severity):
-        self.name = name
-        self.value = value
-        self.alarm_severity = alarm_severity
-
-
-NO_ERROR = ErrorType("No error", 0, "NO_ALARM")
+from .util_classes import RunStatus, ErrorType
+from .util_constants import NO_ERROR, DIRECTIONS, MODES
 
 
 class SimulatedSp2XX(StateMachineDevice):
@@ -70,10 +13,10 @@ class SimulatedSp2XX(StateMachineDevice):
         Initialize all of the device's attributes.
         """
         self._running_status = RunStatus.Stopped
-        self._direction = Direction.I
+        self._direction = DIRECTIONS["I"]
         self._running = False
         self._last_error = NO_ERROR
-        self._mode = infusion
+        self._mode = MODES["i"]
         self.connect()
 
     @staticmethod
@@ -105,17 +48,17 @@ class SimulatedSp2XX(StateMachineDevice):
         """
         return self._direction
 
-    def set_direction_via_the_backdoor(self, direction):
+    def set_direction_via_the_backdoor(self, direction_symbol):
         """
         Sets the direction via the backdoor. Only called using lewis via the backdoor.
 
         Args:
-            direction: Infusion or Withdrawal.
+            direction_symbol: Infusion or Withdrawal.
 
         Returns:
             None
         """
-        self._direction = Direction[direction]
+        self._direction = DIRECTIONS[direction_symbol]
 
     def start_device(self):
         """
@@ -168,6 +111,12 @@ class SimulatedSp2XX(StateMachineDevice):
         Returns:
             None
         """
+        if mode_symbol in ["i", "i/w", "con"]:
+            self._direction = DIRECTIONS["I"]
+        elif mode_symbol in ["w", "w/i"]:
+            self._direction = DIRECTIONS["W"]
+        else:
+            print("Could not set direction.")
 
         self._mode = MODES[mode_symbol]
 
