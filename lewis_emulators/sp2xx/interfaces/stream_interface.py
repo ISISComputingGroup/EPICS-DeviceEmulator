@@ -152,7 +152,7 @@ class Sp2XXStreamInterface(StreamInterface):
             run_status
         """
         self._device.set_mode(mode_symbol)
-        return self.get_run_status()
+        self.stop()
 
     @if_error
     @if_connected
@@ -164,4 +164,4 @@ class Sp2XXStreamInterface(StreamInterface):
             The mode the device is in and the run status.
             E.g. \r\nI\r\n: if the device is in infusion mode and stopped.
         """
-        return "{}{}{}".format(self._return, self._device.mode.response, self.get_run_status())
+        return "{}{}{}:".format(self._return, self._device.mode.response, self.get_run_status)
