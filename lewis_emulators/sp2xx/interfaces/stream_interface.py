@@ -3,7 +3,9 @@ from lewis.core.logging import has_log
 
 from lewis_emulators.utils.command_builder import CmdBuilder
 from lewis_emulators.utils.if_connected import if_connected
-from ..device import RunStatus, Direction
+
+from ..util_classes import RunStatus
+from ..util_constants import DIRECTIONS
 
 
 def if_error(f):
@@ -48,8 +50,8 @@ class Sp2XXStreamInterface(StreamInterface):
     in_terminator = "\r"
 
     _return = "\r\n"
-    Infusing = "{}>".format(_return)
-    Withdrawing = "{}<".format(_return)
+    Infusion = "{}>".format(_return)
+    Withdrawal = "{}<".format(_return)
     Stopped = "{}:".format(_return)
 
     def handle_error(self, request, error):
@@ -76,12 +78,12 @@ class Sp2XXStreamInterface(StreamInterface):
 
         """
         if self._device.running is False:
-            if self._device.direction == Direction.Infusion:
+            if self._device.direction == DIRECTIONS["I"]:
                 self._device.start_device()
-                return self.Infusing
-            elif self._device.direction == Direction.Withdrawal:
+                return self.Infusion
+            elif self._device.direction == DIRECTIONS["W"]:
                 self._device.start_device()
-                return self.Withdrawing
+                return self.Withdrawal
             else:
                 print("An error occurred when trying to run the device. The device's running state is \
                     is {}.".format(
@@ -98,10 +100,10 @@ class Sp2XXStreamInterface(StreamInterface):
             ">" : Prompt saying the device's run direction is infusing.
             "<" : Prompt saying the device's run direction is withdrawing.
         """
-        if self._device.running_status == RunStatus.Infusing:
-            return self.Infusing
-        elif self._device.running_status == RunStatus.Withdrawing:
-            return self.Withdrawing
+        if self._device.running_status == RunStatus.Infusion:
+            return self.Infusion
+        elif self._device.running_status == RunStatus.Withdrawal:
+            return self.Withdrawal
         elif self._device.running_status == RunStatus.Stopped:
             return self.Stopped
         else:
@@ -131,10 +133,10 @@ class Sp2XXStreamInterface(StreamInterface):
         last_error = self._device.last_error
         current_status = None
 
-        if self._device.running_status == RunStatus.Infusing:
-            current_status = self.Infusing
-        elif self._device.running_status == RunStatus.Withdrawing:
-            current_status = self.Withdrawing
+        if self._device.running_status == RunStatus.Infusion:
+            current_status = self.Infusion
+        elif self._device.running_status == RunStatus.Withdrawal:
+            current_status = self.Withdrawal
         elif self._device.running_status == RunStatus.Stopped:
             current_status = self.Stopped
 
@@ -177,4 +179,4 @@ class Sp2XXStreamInterface(StreamInterface):
             The direction the device is in and the run status.
             E.g. \r\nI\r\n: if the device in the infusion direction and stopped.
         """
-        return "{}{}{}".format(self._return, self._device.direction.name, self.get_run_status())
+        return "{}{}{}".format(self._return, self._device.direction.symbol, self.get_run_status())
