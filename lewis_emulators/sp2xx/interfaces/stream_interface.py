@@ -43,7 +43,8 @@ class Sp2XXStreamInterface(StreamInterface):
         CmdBuilder("get_error_status").escape("error?").eos().build(),
         CmdBuilder("set_mode").escape("mode ").arg("i/w|w/i|i|w|con").eos().build(),
         CmdBuilder("get_mode").escape("mode?").eos().build(),
-        CmdBuilder("get_direction").escape("dir?").eos().build()
+        CmdBuilder("get_direction").escape("dir?").eos().build(),
+        CmdBuilder("reverse_direction").escape("dir rev").eos().build()
     }
 
     out_terminator = ""
@@ -167,7 +168,9 @@ class Sp2XXStreamInterface(StreamInterface):
             The mode the device is in and the run status.
             E.g. \r\nI\r\n: if the device is in infusion mode and stopped.
         """
-        return "{}{}{}".format(self._return, self._device.mode.response, self.get_run_status())
+        mode_response = self._device.mode.response
+        run_status = self.get_run_status()
+        return "{}{}{}".format(self._return, mode_response, run_status)
 
     @if_error
     @if_connected
@@ -180,3 +183,19 @@ class Sp2XXStreamInterface(StreamInterface):
             E.g. \r\nI\r\n: if the device in the infusion direction and stopped.
         """
         return "{}{}{}".format(self._return, self._device.direction.symbol, self.get_run_status())
+
+    @if_error
+    @if_connected
+    def reverse_direction(self):
+        """
+        Reverse the direction of a running device if in infusion or withdrawal mode.
+
+        Returns:
+            Run status if the device is running and in infusion or withdrawal mode.
+            NA otherwise.
+        """
+        if self._device.mode.response in ["I", "W"] and self._device.running:
+            self._device.reverse_direction()
+            self.get_run_status()
+        else:
+            return "NA"

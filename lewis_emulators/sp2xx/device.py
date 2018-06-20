@@ -60,6 +60,18 @@ class SimulatedSp2XX(StateMachineDevice):
         """
         self._direction = DIRECTIONS[direction_symbol]
 
+    def reverse_direction(self):
+        """
+        Reverses the direction of the device and change mode accordingly.
+
+        Returns:
+            None
+        """
+        if self.mode.response == "I":
+            self.set_mode("w")
+        else:
+            self.set_mode("i")
+
     def start_device(self):
         """
         Starts the device running to present settings.
@@ -96,7 +108,7 @@ class SimulatedSp2XX(StateMachineDevice):
         Returns the mode the device is in.
 
         Returns:
-            mode (Enum) the device is in.
+            _mode: Mode class that the device is in.
         """
 
         return self._mode
@@ -106,7 +118,7 @@ class SimulatedSp2XX(StateMachineDevice):
         Sets the mode of the device.
 
         Args:
-            mode_symbol: one of i, w, w//i, i//w, con.
+            mode_symbol: one of i, w, w/i, i/w, con.
 
         Returns:
             None
@@ -117,19 +129,6 @@ class SimulatedSp2XX(StateMachineDevice):
             self._direction = DIRECTIONS["W"]
         else:
             print("Could not set direction.")
-
-        self._mode = MODES[mode_symbol]
-
-    def set_mode_via_the_backdoor(self, mode_symbol):
-        """
-        Sets the mode of the device. Only used via the backdoor.
-
-        Args:
-            mode_symbol: Symbol of the mode to be set. One of i, w, i//w, w//i, con.
-
-        Returns:
-            None
-        """
 
         self._mode = MODES[mode_symbol]
 

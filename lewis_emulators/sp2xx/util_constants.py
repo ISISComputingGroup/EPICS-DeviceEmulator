@@ -1,16 +1,25 @@
-from . util_classes import Mode, Direction, ErrorType
+from .util_classes import Mode, Direction, ErrorType
+
+infusion_mode = Mode("i", "I", "Infusion")
+withdrawal_mode = Mode("w", "W", "Withdrawal")
+infusion_withdrawal_mode = Mode("i/w", "IW", "Infusion/Withdrawal")
+withdrawal_infusion_mode = Mode("w/i", "WI", "Withdrawal/Infusion")
+continuous = Mode("con", "CON", "Continuous")
 
 MODES = {
-    "i": Mode("i", "I", "Infusion"),
-    "w": Mode("w", "W", "Withdrawal"),
-    "i/w": Mode("i/w", "IW", "Infusion/Withdrawal"),
-    "w/i": Mode("w/i", "WI", "Withdrawal/Infusion"),
-    "con": Mode("con", "CON", "Continuous")
+    "i": infusion_mode,
+    "w": withdrawal_mode,
+    "i/w": infusion_withdrawal_mode,
+    "w/i": withdrawal_infusion_mode,
+    "con": continuous
+}
+
+infusion_direction = Direction("I", "Infusion")
+withdrawal_direction = Direction("W", "Withdrawal")
+
+DIRECTIONS = {
+    "I": infusion_direction,
+    "W": withdrawal_direction
 }
 
 NO_ERROR = ErrorType("No error", 0, "NO_ALARM")
-
-DIRECTIONS = {
-    "I": Direction("I", "Infusion"),
-    "W": Direction("W", "Withdrawal"),
-}
