@@ -11,8 +11,8 @@ class RunStatus(Enum):
 
 
 class Direction(Enum):
-    Infusing = 0
-    Withdrawing = 1
+    I = 0
+    W = 1
 
 
 class Mode(object):
@@ -70,7 +70,7 @@ class SimulatedSp2XX(StateMachineDevice):
         Initialize all of the device's attributes.
         """
         self._running_status = RunStatus.Stopped
-        self._direction = Direction.Infusing
+        self._direction = Direction.I
         self._running = False
         self._last_error = NO_ERROR
         self._mode = infusion
@@ -104,6 +104,18 @@ class SimulatedSp2XX(StateMachineDevice):
         Returns the direction the pump is set to.
         """
         return self._direction
+
+    def set_direction_via_the_backdoor(self, direction):
+        """
+        Sets the direction via the backdoor. Only called using lewis via the backdoor.
+
+        Args:
+            direction: Infusion or Withdrawal.
+
+        Returns:
+            None
+        """
+        self._direction = Direction[direction]
 
     def start_device(self):
         """
