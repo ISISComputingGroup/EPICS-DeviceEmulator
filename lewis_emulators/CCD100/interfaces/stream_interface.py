@@ -10,9 +10,9 @@ class CCD100StreamInterface(StreamInterface):
 
     commands = {
         Cmd("get_sp", "^[a-h]" + SP_COMM + "\?$"),
-        Cmd("set_sp", "^[a-h]" + SP_COMM + " ([\-0-9.]+)$", argument_mappings=[float]),
+        Cmd("set_sp", "^([a-h])" + SP_COMM + " ([\-0-9.]+)$", argument_mappings=[str, float]),
         Cmd("get_units", "^[a-h]" + UNITS_COMM + "\?$"),
-        Cmd("set_units", "^[a-h]" + UNITS_COMM + " ([a-z]+)$"),
+        Cmd("set_units", "^([a-h])" + UNITS_COMM + " ([a-z]+)$"),
         Cmd("get_reading", "^[a-h]" + READING_COMM + "$"),
     }
 
@@ -37,15 +37,17 @@ class CCD100StreamInterface(StreamInterface):
     def get_sp(self):
         return self.create_response(SP_COMM + "?", data="SP VALUE: " + str(self._device.setpoint) + " ")
 
-    def set_sp(self, new_sp):
-        self._device.setpoint = new_sp
+    def set_sp(self, addr, new_sp):
+        if self._device.address == addr:
+            self._device.setpoint = new_sp
         return self.create_response(SP_COMM)
 
     def get_units(self):
         return self.create_response(UNITS_COMM + "?", data="INPUT UNITS STR: " + str(self._device.units))
 
-    def set_units(self, new_units):
-        self._device.units = new_units
+    def set_units(self, addr, new_units):
+        if self._device.address == addr:
+            self._device.units = new_units
         return self.create_response(UNITS_COMM)
 
     def get_reading(self):
