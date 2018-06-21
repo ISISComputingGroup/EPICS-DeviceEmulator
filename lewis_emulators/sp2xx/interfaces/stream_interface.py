@@ -44,7 +44,9 @@ class Sp2XXStreamInterface(StreamInterface):
         CmdBuilder("set_mode").escape("mode ").arg("i/w|w/i|i|w|con").eos().build(),
         CmdBuilder("get_mode").escape("mode?").eos().build(),
         CmdBuilder("get_direction").escape("dir?").eos().build(),
-        CmdBuilder("reverse_direction").escape("dir rev").eos().build()
+        CmdBuilder("reverse_direction").escape("dir rev").eos().build(),
+        CmdBuilder("get_diameter").escape("dia?").eos().build(),
+        CmdBuilder("set_diameter").escape("dia ").float().eos().build()
     }
 
     out_terminator = ""
@@ -200,4 +202,26 @@ class Sp2XXStreamInterface(StreamInterface):
             run_status = self.get_run_status()
             return "{}NA{}".format(self._return, run_status)
 
+    @if_error
+    @if_connected
+    def get_diameter(self):
+        """
+        Gets the diameter that the syringe is set to.
 
+        Returns:
+            float: Diameter of the syringe.
+        """
+        run_status = self.get_run_status()
+        return "{}{}{}".format(self._return, self._device.diameter, run_status)
+
+    def set_diameter(self, value):
+        """
+        Sets the diameter of the
+        Returns:
+            \r\nNA{}: If value is
+        """
+        if self._device.successfully_set_diameter(value):
+            return "{}".format(self.Stopped)
+        else:
+            run_status = self.get_run_status()
+            return "{}NA{}".format(self._return, run_status)

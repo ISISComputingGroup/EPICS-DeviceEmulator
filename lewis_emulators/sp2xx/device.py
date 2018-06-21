@@ -17,6 +17,7 @@ class SimulatedSp2XX(StateMachineDevice):
         self._running = False
         self._last_error = NO_ERROR
         self._mode = MODES["i"]
+        self._diameter = 0.0
         self.connect()
 
     @staticmethod
@@ -165,6 +166,26 @@ class SimulatedSp2XX(StateMachineDevice):
         self._last_error = NO_ERROR
 
     @property
+    def diameter(self):
+        return self._diameter
+
+    def successfully_set_diameter(self, value):
+        """
+        Sets the diameter after checking the input value.
+
+        Returns:
+            True if the diameter has been set and False otherwise.
+        """
+        value = float(value)
+
+        if value >= 100 or value <= 0.01:
+            return False
+        else:
+            value = round(value, 2)
+            self._diameter = value
+            return True
+
+    @property
     def connected(self):
         """
         Returns True if the device is connected and False if disconnected.
@@ -188,3 +209,5 @@ class SimulatedSp2XX(StateMachineDevice):
             None
         """
         self._connected = False
+
+
