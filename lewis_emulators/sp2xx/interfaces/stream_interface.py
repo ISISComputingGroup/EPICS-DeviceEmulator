@@ -39,7 +39,7 @@ class Sp2XXStreamInterface(StreamInterface):
     commands = {
         CmdBuilder("start").escape("run").eos().build(),
         CmdBuilder("stop").escape("stop").eos().build(),
-        CmdBuilder("get_run_status").escape("run?").eos().build(),
+        CmdBuilder("get_status").escape("run?").eos().build(),
         CmdBuilder("get_error_status").escape("error?").eos().build(),
         CmdBuilder("set_mode").escape("mode ").arg("i/w|w/i|i|w|con").eos().build(),
         CmdBuilder("get_mode").escape("mode?").eos().build(),
@@ -51,9 +51,9 @@ class Sp2XXStreamInterface(StreamInterface):
     in_terminator = "\r"
 
     _return = "\r\n"
-    Infusion = "{}>".format(_return)
-    Withdrawal = "{}<".format(_return)
-    Stopped = "{}:".format(_return)
+    Infusion = ">"
+    Withdrawal = "<"
+    Stopped = ":"
 
     def handle_error(self, request, error):
         """
@@ -81,10 +81,10 @@ class Sp2XXStreamInterface(StreamInterface):
         if self._device.running is False:
             if self._device.direction == DIRECTIONS["I"]:
                 self._device.start_device()
-                return self.Infusion
+                return "{}{}".format(self._return, self.Infusion)
             elif self._device.direction == DIRECTIONS["W"]:
                 self._device.start_device()
-                return self.Withdrawal
+                return "{}{}".format(self._return, self.Withdrawal)
             else:
                 print("An error occurred when trying to run the device. The device's running state is \
                     is {}.".format(
@@ -92,25 +92,28 @@ class Sp2XXStreamInterface(StreamInterface):
 
     @if_error
     @if_connected
-    def get_run_status(self):
+    def get_status(self):
         """
         Gets the run status of the pump.
 
         Returns:
-            ":" : If the device is not running.
-            ">" : Prompt saying the device's run direction is infusing.
-            "<" : Prompt saying the device's run direction is withdrawing.
+            "\r\n:" : If the device is not running.
+            "\r\n>" : Prompt saying the device's run direction is infusing.
+            "\r\n<" : Prompt saying the device's run direction is withdrawing.
         """
+        try:
+            run_status = self._get_run_status()
+            return "{}{}".format(self._return, run_status)
+        except Exception as e:
+            print("An error occurred when trying to run the device: {}.".format(e))
+
+    def _get_run_status(self):
         if self._device.running_status == RunStatus.Infusion:
             return self.Infusion
         elif self._device.running_status == RunStatus.Withdrawal:
             return self.Withdrawal
-        elif self._device.running_status == RunStatus.Stopped:
-            return self.Stopped
         else:
-            print("""An error occurred when trying to run the device
-                  "The device's running direction is {} and the running state is {}""".format(
-                    self._device.running_direction, self._device.running))
+            return self.Stopped
 
     @if_error
     @if_connected
@@ -129,7 +132,7 @@ class Sp2XXStreamInterface(StreamInterface):
         Gets the error status from the device and returns the error value and run status.
 
         Returns:
-            \r\n%i\r\n{} where %i is the error_type value and {} the run status.
+            \r\n%i\r{} where %i is the error_type value and {} the run status.
         """
         last_error = self._device.last_error
         current_status = None
@@ -141,7 +144,7 @@ class Sp2XXStreamInterface(StreamInterface):
         elif self._device.running_status == RunStatus.Stopped:
             current_status = self.Stopped
 
-        return "{}{}{}".format(self._return, last_error.value, current_status)
+        return "{}{}\r{}".format(self._return, last_error.value, current_status)
 
     @if_error
     @if_connected
@@ -169,8 +172,8 @@ class Sp2XXStreamInterface(StreamInterface):
             E.g. \r\nI\r\n: if the device is in infusion mode and stopped.
         """
         mode_response = self._device.mode.response
-        run_status = self.get_run_status()
-        return "{}{}{}".format(self._return, mode_response, run_status)
+        run_status = self._get_run_status()
+        return "{}{}\r{}".format(self._return, mode_response, run_status)
 
     @if_error
     @if_connected
@@ -180,9 +183,10 @@ class Sp2XXStreamInterface(StreamInterface):
 
         Returns:
             The direction the device is in and the run status.
-            E.g. \r\nI\r\n: if the device in the infusion direction and stopped.
+            E.g. \r\nI\r: if the device in the infusion direction and stopped.
         """
-        return "{}{}{}".format(self._return, self._device.direction.symbol, self.get_run_status())
+        run_status = self._get_run_status()
+        return "{}{}\r{}".format(self._return, self._device.direction.symbol, run_status)
 
     @if_error
     @if_connected
@@ -198,4 +202,7 @@ class Sp2XXStreamInterface(StreamInterface):
             self._device.reverse_direction()
             self.get_run_status()
         else:
-            return "NA"
+            run_status = self._get_run_status()
+            return "{}NA\r{}".format(self._return, run_status)
+
+
