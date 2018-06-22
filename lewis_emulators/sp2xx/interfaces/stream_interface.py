@@ -1,3 +1,6 @@
+"""
+Stream interface for the SP2xx device.
+"""
 from lewis.adapters.stream import StreamInterface
 from lewis.core.logging import has_log
 
@@ -6,6 +9,9 @@ from lewis_emulators.utils.if_connected import if_connected
 
 from ..util_classes import RunStatus
 from ..util_constants import DIRECTIONS
+
+ALLOWED_VOLUME_UNITS = ["ul", "ml"]
+ALLOWED_RATE_UNITS = ["ul/m", "ml/m", "ul/h", "ml/h"]
 
 
 def if_error(f):
@@ -19,14 +25,14 @@ def if_error(f):
        The value of f(*args) if the device has no error and "\r\nE" otherwise.
    """
 
-    def wrapper(*args):
+    def _wrapper(*args):
         error = getattr(args[0], "_device").last_error.value
         if error == 0:
             result = f(*args)
         else:
             result = "\r\nE"
         return result
-    return wrapper
+    return _wrapper
 
 
 @has_log
@@ -35,19 +41,25 @@ class Sp2XXStreamInterface(StreamInterface):
     Stream interface for the serial port.
     """
 
-    # Commands that we expect via serial during normal operation
-    commands = {
-        CmdBuilder("start").escape("run").eos().build(),
-        CmdBuilder("stop").escape("stop").eos().build(),
-        CmdBuilder("get_run_status").escape("run?").eos().build(),
-        CmdBuilder("get_error_status").escape("error?").eos().build(),
-        CmdBuilder("set_mode").escape("mode ").arg("i/w|w/i|i|w|con").eos().build(),
-        CmdBuilder("get_mode").escape("mode?").eos().build(),
-        CmdBuilder("get_direction").escape("dir?").eos().build(),
-        CmdBuilder("reverse_direction").escape("dir rev").eos().build(),
-        CmdBuilder("get_diameter").escape("dia?").eos().build(),
-        CmdBuilder("set_diameter").escape("dia ").float().eos().build()
-    }
+    def __init__(self):
+
+        super(Sp2XXStreamInterface, self).__init__()
+        # Commands that we expect via serial during normal operation
+        self.commands = {
+            CmdBuilder(self.start).escape("run").eos().build(),
+            CmdBuilder(self.stop).escape("stop").eos().build(),
+            CmdBuilder(self.get_run_status).escape("run?").eos().build(),
+            CmdBuilder(self.get_error_status).escape("error?").eos().build(),
+            CmdBuilder(self.set_mode).escape("mode ").arg("i/w|w/i|i|w|con").eos().build(),
+            CmdBuilder(self.get_mode).escape("mode?").eos().build(),
+            CmdBuilder(self.get_direction).escape("dir?").eos().build(),
+            CmdBuilder(self.reverse_direction).escape("dir rev").eos().build(),
+            CmdBuilder(self.get_diameter).escape("dia?").eos().build(),
+            CmdBuilder(self.set_diameter).escape("dia ").float().eos().build(),
+            CmdBuilder(
+                self.set_volume_or_rate).arg("vol|rate").char().escape(" ").float().escape(" ").string().eos().build(),
+            CmdBuilder(self.get_volume_or_rate).arg("vol|rate").char().escape("?").eos().build()
+        }
 
     out_terminator = ""
     in_terminator = "\r"
@@ -225,3 +237,93 @@ class Sp2XXStreamInterface(StreamInterface):
         else:
             run_status = self.get_run_status()
             return "{}NA{}".format(self._return, run_status)
+
+    @if_error
+    @if_connected
+    def set_volume_or_rate(self, vol_or_rate, vol_or_rate_type, value, units):
+        """
+        Set a volume or rate.
+        Args:
+            vol_or_rate: vol to set a volume, rate to set a rate, anything else is an error
+            vol_or_rate_type: the type of the volume or rate, i for infusion, w for withdrawal, anything else
+            is an error
+            value:  value to set it too; of form nnnnn (0-9 and. won't accept number larger than 9999)
+            units: units
+        Returns:
+            return string
+        """
+        run_status = self.get_run_status()
+        if len(value) > 5:
+            self.log.error("Value is too long: '{}' ".format(value))
+            return "{}NA{}".format(self._return, run_status)
+        actual_volume = float(value)
+
+        if vol_or_rate == "vol":
+            allowed_units = ALLOWED_VOLUME_UNITS
+        else:
+            allowed_units = ALLOWED_RATE_UNITS
+        if units not in allowed_units:
+            self.log.error("Units are unknown: '{}' ".format(units))
+            return "{}NA{}".format(self._return, run_status)
+
+        if vol_or_rate == "vol" and vol_or_rate_type == "i":
+            self._device.infusion_volume_units = units
+            self._device.infusion_volume = actual_volume
+        elif vol_or_rate == "vol" and vol_or_rate_type == "w":
+            self._device.withdrawal_volume_units = units
+            self._device.withdrawal_volume = actual_volume
+        elif vol_or_rate == "rate" and vol_or_rate_type == "i":
+            self._device.infusion_rate_units = units
+            self._device.infusion_rate = actual_volume
+        elif vol_or_rate == "rate" and vol_or_rate_type == "w":
+            self._device.withdrawal_rate_units = units
+            self._device.withdrawal_rate = actual_volume
+        else:
+            self.log.error("command is not know: '{}{}' ".format(vol_or_rate, vol_or_rate_type))
+            return "{}NA{}".format(self._return, run_status)
+
+        return "{}".format(self.Stopped)
+
+    @if_error
+    @if_connected
+    def get_volume_or_rate(self, vol_or_rate, vol_or_rate_type):
+        """
+        Get a volume or rate.
+        Args:
+            vol_or_rate: vol to set a volume, rate to set a rate, anything else is an error
+            vol_or_rate_type: the type of the volume or rate, i for infusion, w for withdrawal, anything else
+            is an error
+        Returns:
+            return string
+        """
+        run_status = self.get_run_status()
+
+        if vol_or_rate == "vol" and vol_or_rate_type == "i":
+            value = self._device.infusion_volume
+            units = self._device.infusion_volume_units
+
+        elif vol_or_rate == "vol" and vol_or_rate_type == "w":
+            value = self._device.withdrawal_volume
+            units = self._device.withdrawal_volume_units
+        elif vol_or_rate == "rate" and vol_or_rate_type == "i":
+            value = self._device.infusion_rate
+            units = self._device.infusion_rate_units
+        elif vol_or_rate == "rate" and vol_or_rate_type == "w":
+            value = self._device.withdrawal_rate
+            units = self._device.withdrawal_rate_units
+        else:
+            self.log.error("Command is not know: '{}{}?' ".format(vol_or_rate, vol_or_rate_type))
+            return "{}NA{}".format(self._return, run_status)
+
+        if value < 10.0:
+            format_string = "{:5.3f} {}"
+        elif value < 100.0:
+            format_string = "{:5.2f} {}"
+        elif value < 1000.0:
+            format_string = "{:5.1f} {}"
+        else:
+            format_string = "{:5f} {}"
+
+        volume_as_string = format_string.format(value, units)
+
+        return "{}{}{}".format(self._return, volume_as_string, self.get_run_status())

@@ -19,6 +19,14 @@ class SimulatedSp2XX(StateMachineDevice):
         self._mode = MODES["i"]
         self._diameter = 0.0
         self.connect()
+        self.infusion_volume_units = "ml"
+        self.infusion_volume = 12.0
+        self.withdrawal_volume_units = "ml"
+        self.withdrawal_volume = 12.0
+        self.infusion_rate_units = "ml/m"
+        self.infusion_rate = 12.0
+        self.withdrawal_rate_units = "ml/m"
+        self.withdrawal_rate = 12.0
 
     @staticmethod
     def _get_state_handlers():
@@ -171,14 +179,14 @@ class SimulatedSp2XX(StateMachineDevice):
 
     def successfully_set_diameter(self, value):
         """
-        Sets the diameter after checking the input value.
+        Sets the diameter after checking the input value. Must be in the form nn.nn.
 
         Returns:
             True if the diameter has been set and False otherwise.
         """
         value = float(value)
 
-        if value >= 100 or value <= 0.01:
+        if value >= 100 or value < 0.01:
             return False
         else:
             value = round(value, 2)
