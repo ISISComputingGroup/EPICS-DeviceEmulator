@@ -12,13 +12,14 @@ class Kynctm3KStreamInterface(StreamInterface):
     out_terminator = "\r"
 
     def return_data(self):
+        """
+        Returns the data in the format specified in the user manual
+
+        Returns:
+            String: A carriage-return separated string of measurments for all OUT values in the program.
+
+        """
         return self._device.format_output_data()
-
-    def catch_all(self):
-        return "Hello, world!"
-
-    def catch_other(self):
-        return "Hello, world!"
 
     def handle_error(self, request, error):
         print "An error occurred at request " + repr(request) + ": " + repr(error)
