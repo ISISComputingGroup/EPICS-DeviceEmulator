@@ -1,6 +1,7 @@
 from collections import OrderedDict
 from states import DefaultState
 from lewis.devices import StateMachineDevice
+from lewis.core.logging import has_log
 
 
 class SimulatedKynctm3K(StateMachineDevice):
@@ -10,7 +11,6 @@ class SimulatedKynctm3K(StateMachineDevice):
         Initialize all of the device's attributes.
         """
         self.OUT_values = None
-        self.program = None
 
         pass
 
@@ -26,6 +26,7 @@ class SimulatedKynctm3K(StateMachineDevice):
         return OrderedDict([
         ])
 
+    @has_log
     def format_output_data(self):
         """
         Formats a data output string given the current measurement values and program.
@@ -35,14 +36,16 @@ class SimulatedKynctm3K(StateMachineDevice):
 
         """
 
-        if self.program is None or self.OUT_values is None:
+        if self.OUT_values is None:
             return None
         else:
             channel_strings = []
-            for channel, program_switch in enumerate(self.program):
-                if program_switch == "1":
-                    channel_strings.append("TG,{:02d},{:+06.3f}\r".format(channel, self.OUT_values[channel]))
+            self.log.info(self.OUT_values)
+            for channel, output_value in enumerate(self.OUT_values):
+                if output_value is not False:
+                    channel_strings.append("TG,{:02d},{:+08.3f}\r".format(channel+1, self.OUT_values[channel]))
                 else:
                     continue
 
+        self.log.info('channel strings ' + ''.join(channel_strings))
         return ''.join(channel_strings)

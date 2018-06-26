@@ -6,7 +6,6 @@ class Kynctm3KStreamInterface(StreamInterface):
     # Commands that we expect via serial during normal operation
     commands = {
         Cmd("return_data", "MA$"),
-        Cmd("catch_all", "^.*$"),  # Catch-all command for debugging
     }
 
     in_terminator = "\r"
@@ -17,3 +16,10 @@ class Kynctm3KStreamInterface(StreamInterface):
 
     def catch_all(self):
         return "Hello, world!"
+
+    def catch_other(self):
+        return "Hello, world!"
+
+    def handle_error(self, request, error):
+        print "An error occurred at request " + repr(request) + ": " + repr(error)
+        return str(error)
