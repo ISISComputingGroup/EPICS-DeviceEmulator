@@ -9,7 +9,8 @@ class SimulatedRkndio(StateMachineDevice):
         """
         Initialize all of the device's attributes.
         """
-        pass
+        self._idn = "RIKENFE Prototype v1.0"
+        self._connected = True
 
     def _get_state_handlers(self):
         return {
@@ -22,4 +23,36 @@ class SimulatedRkndio(StateMachineDevice):
     def _get_transition_handlers(self):
         return OrderedDict([
         ])
+
+    @property
+    def idn(self):
+        """
+        Returns the IDN of the device.
+
+        Returns:
+            (string): The IDN of the device.
+        """
+        return self._idn
+
+    @property
+    def connected(self):
+        return self._connected
+
+    def connect(self):
+        """
+        Connects the device.
+
+        Returns:
+            None
+        """
+        self._connected = True
+
+    def disconnect(self):
+        """
+        Disconnects the device.
+
+        Returns:
+            Nome
+        """
+        self._connected = False
 
