@@ -5,7 +5,7 @@ class Kynctm3KStreamInterface(StreamInterface):
 
     # Commands that we expect via serial during normal operation
     commands = {
-        Cmd("return_data", "MA$"),
+        Cmd("return_data", "MM,1111111111111111$"),
     }
 
     in_terminator = "\r"
