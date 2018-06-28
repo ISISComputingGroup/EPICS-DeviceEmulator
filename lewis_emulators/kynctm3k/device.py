@@ -3,6 +3,8 @@ from states import DefaultState
 from lewis.devices import StateMachineDevice
 from lewis.core.logging import has_log
 
+import random
+
 
 class SimulatedKynctm3K(StateMachineDevice):
 
@@ -39,17 +41,31 @@ class SimulatedKynctm3K(StateMachineDevice):
 
         """
 
+        out_of_range_return = "FFFFFFF"
+        off_return = "XXXXXXXX"
+
         if self.OUT_values is None:
             return None
         else:
             channel_strings = ["MM,1111111111111111", ]
             for channel, output_value in enumerate(self.OUT_values):
+                self.log.info(output_value)
                 # Only return output if the OUT value is in the program
-                if output_value is not False:
-                    # channel_strings.append("TG,{:02d},{:+08.3f}\r".format(channel+1, self.OUT_values[channel]))
+
+                if output_value == "off":
+                    channel_strings.append(off_return)
+
+                elif output_value == "out_of_range":
+                    # Add a random sign to the out of range string
+                    sign = random.sample(('+', '-'), 1)[0]
+                    channel_strings.append(sign + out_of_range_return)
+
+                elif type(output_value) is float:
                     channel_strings.append("{:+08.3f}".format(self.OUT_values[channel]))
+
                 else:
-                    channel_strings.append("+FFFFFFF")
+                    channel_strings.append(off_return)
+
         self.log.info(self.OUT_values)
         self.log.info(','.join(channel_strings))
 
