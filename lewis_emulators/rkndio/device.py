@@ -2,6 +2,9 @@ from collections import OrderedDict
 from states import DefaultState
 from lewis.devices import StateMachineDevice
 
+NUMBER_OF_D_Is = 6
+NUMBER_OF_D_Os = 6
+
 
 class SimulatedRkndio(StateMachineDevice):
 
@@ -13,6 +16,8 @@ class SimulatedRkndio(StateMachineDevice):
         self._connected = True
         self.status = "No Error"
         self.error = "No Error"
+        self._read_states = ["False"] * NUMBER_OF_D_Is
+        self._set_states = ["False"] * NUMBER_OF_D_Os
 
     def _get_state_handlers(self):
         return {
@@ -39,6 +44,56 @@ class SimulatedRkndio(StateMachineDevice):
     @property
     def connected(self):
         return self._connected
+
+    def get_state(self, pin):
+        """
+        Gets the state
+
+        Args:
+            pin: Pin number of DO
+
+        Returns:
+            State pin value - True or False.
+        """
+        return self._read_states[pin - 2]
+
+    def set_read_state_via_the_backdoor(self, pin, state):
+        """
+        Sets the read state of a pin. Called only via the backdoor.
+
+        Args:
+            pin: pin number (int 2-7)
+            state: True or False
+
+        Returns:
+            None
+        """
+        self._read_states[pin - 2] = state
+
+    def get_set_state_via_the_backdoor(self, pin):
+        """
+        Gets the set state of a pin. Called only via the backdoor.
+
+        Args:
+            pin: pin number (int 8-13)
+
+        Returns:
+            (string): True or False
+        """
+        return self._set_states[pin - 8]
+
+    def set_state(self, pin, state):
+        """
+        Gets the state
+
+        Args:
+            pin: Pin number of DI
+            state (string): TRUE or FALSE
+
+        Returns:
+            None
+        """
+        self._set_states[pin - 8] = state.lower().title()
 
     def connect(self):
         """

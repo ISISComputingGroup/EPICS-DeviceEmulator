@@ -9,7 +9,9 @@ class RkndioStreamInterface(StreamInterface):
     commands = {
         CmdBuilder("get_idn").escape("*IDN?").eos().build(),
         CmdBuilder("get_status").escape("STATUS").eos().build(),
-        CmdBuilder("get_error").escape("ERR").eos().build()
+        CmdBuilder("get_error").escape("ERR").eos().build(),
+        CmdBuilder("get_d_i_state").escape("READ ").arg("2|3|4|5|6|7").eos().build(),
+        CmdBuilder("set_d_o_state").escape("WRITE ").arg("8|9|10|11|12|13").escape(" ").arg("FALSE|TRUE").eos().build()
     }
 
     in_terminator = "\r\n"
@@ -40,5 +42,26 @@ class RkndioStreamInterface(StreamInterface):
     @conditional_reply("connected")
     def get_error(self):
         return self._device.error
+
+    @conditional_reply("connected")
+    def get_d_i_state(self, pin):
+        if pin in range(2, 8):
+            return self._device.get_state(pin)
+        else:
+            self._device.error = "The pin is not readable"
+            return "Error"
+
+    @conditional_reply("connected")
+    def set_d_o_state(self, pin, state):
+        if pin not in range(8, 13):
+            self._device.error = "The pin is not writeable"
+            return "Error"
+        elif state in ["TRUE", "FALSE"]:
+            self._device.set_output_state(pin, state)
+            return "OK"
+        else:
+            self._device.error = "Cannot set pin {} to {}".format(pin, state)
+            return "Error"
+
 
 
