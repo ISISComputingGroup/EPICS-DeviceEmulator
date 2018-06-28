@@ -7,7 +7,9 @@ class RkndioStreamInterface(StreamInterface):
 
     # Commands that we expect via serial during normal operation
     commands = {
-        CmdBuilder("get_idn").escape("*IDN?").eos().build()
+        CmdBuilder("get_idn").escape("*IDN?").eos().build(),
+        CmdBuilder("get_status").escape("STATUS").eos().build(),
+        CmdBuilder("get_error").escape("ERR").eos().build()
     }
 
     in_terminator = "\r\n"
@@ -30,3 +32,13 @@ class RkndioStreamInterface(StreamInterface):
     @conditional_reply("connected")
     def get_idn(self):
         return self._device.idn
+
+    @conditional_reply("connected")
+    def get_status(self):
+        return self._device.status
+
+    @conditional_reply("connected")
+    def get_error(self):
+        return self._device.error
+
+

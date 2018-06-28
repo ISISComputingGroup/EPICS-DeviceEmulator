@@ -9,8 +9,10 @@ class SimulatedRkndio(StateMachineDevice):
         """
         Initialize all of the device's attributes.
         """
-        self._idn = "RIKENFE Prototype v1.0"
+        self._idn = "RIKENFE Prototype v2.0"
         self._connected = True
+        self.status = "No Error"
+        self.error = "No Error"
 
     def _get_state_handlers(self):
         return {
