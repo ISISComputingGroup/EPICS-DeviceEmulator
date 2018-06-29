@@ -65,7 +65,7 @@ class SimulatedRkndio(StateMachineDevice):
             self.status = "The pin is not readable"
             return "Error"
 
-    def set_read_state_via_the_backdoor(self, pin, state):
+    def set_input_state_via_the_backdoor(self, pin, state):
         """
         Sets the read state of a pin. Called only via the backdoor.
 
@@ -89,9 +89,21 @@ class SimulatedRkndio(StateMachineDevice):
         Returns:
             None
         """
-        self._set_states[pin - 8] = state.lower().title()
+        pin = int(pin)
+        if pin not in range(8, 14):
+            self._device.error = "The pin is not writeable"
+            self._device.status = "The pin is not writeable"
+            return "Error"
+        elif state in ["TRUE", "FALSE"]:
+            self._reset_error()
+            self._output_states[pin - 8] = state.lower().title()
+            return "OK"
+        else:
+            self._device.error = "Cannot set pin {} to {}".format(pin, state)
+            self._device.status = "Cannot set pin {} to {}".format(pin, state)
+            return "Error"
 
-    def get_set_state_via_the_backdoor(self, pin):
+    def get_output_state_via_the_backdoor(self, pin):
         """
         Gets the set state of a pin. Called only via the backdoor.
 
@@ -101,7 +113,7 @@ class SimulatedRkndio(StateMachineDevice):
         Returns:
             (string): True or False
         """
-        return self._set_states[pin - 8]
+        return self._output_states[pin - 8]
 
     def connect(self):
         """

@@ -49,15 +49,8 @@ class RkndioStreamInterface(StreamInterface):
 
     @conditional_reply("connected")
     def set_d_o_state(self, pin, state):
-        if pin not in range(8, 13):
-            self._device.error = "The pin is not writeable"
-            return "Error"
-        elif state in ["TRUE", "FALSE"]:
-            self._device.set_output_state(pin, state)
-            return "OK"
-        else:
-            self._device.error = "Cannot set pin {} to {}".format(pin, state)
-            return "Error"
+        return self._device.set_output_state(pin, state)
+
 
 
 
