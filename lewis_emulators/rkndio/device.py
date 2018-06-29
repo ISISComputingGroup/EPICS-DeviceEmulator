@@ -14,10 +14,9 @@ class SimulatedRkndio(StateMachineDevice):
         """
         self._idn = "RIKENFE Prototype v2.0"
         self._connected = True
-        self.status = "No Error"
-        self.error = "No Error"
-        self._input_states = ["False"] * NUMBER_OF_D_Is
-        self._output_states = ["False"] * NUMBER_OF_D_Os
+        self.reset_error()
+        self._input_states = ["FALSE"] * NUMBER_OF_D_Is
+        self._output_states = ["FALSE"] * NUMBER_OF_D_Os
 
     def _get_state_handlers(self):
         return {
@@ -58,8 +57,8 @@ class SimulatedRkndio(StateMachineDevice):
         """
         pin = int(pin)
         if pin in range(2, 8):
-            self._reset_error()
             return self._input_states[pin - 2]
+            self.reset_error()
         else:
             self.error = "The pin is not readable"
             self.status = "The pin is not readable"
@@ -95,8 +94,8 @@ class SimulatedRkndio(StateMachineDevice):
             self._device.status = "The pin is not writeable"
             return "Error"
         elif state in ["TRUE", "FALSE"]:
-            self._reset_error()
-            self._output_states[pin - 8] = state.lower().title()
+            self._output_states[pin - 8] = state
+            self.reset_error()
             return "OK"
         else:
             self._device.error = "Cannot set pin {} to {}".format(pin, state)
@@ -133,8 +132,8 @@ class SimulatedRkndio(StateMachineDevice):
         """
         self._connected = False
 
-    def _reset_error(self):
-        self.error = "No error"
-        self.status = "No error"
+    def reset_error(self):
+        self.error = "No Error"
+        self.status = "No Error"
 
 
