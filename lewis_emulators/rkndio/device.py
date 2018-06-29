@@ -16,8 +16,8 @@ class SimulatedRkndio(StateMachineDevice):
         self._connected = True
         self.status = "No Error"
         self.error = "No Error"
-        self._read_states = ["False"] * NUMBER_OF_D_Is
-        self._set_states = ["False"] * NUMBER_OF_D_Os
+        self._input_states = ["False"] * NUMBER_OF_D_Is
+        self._output_states = ["False"] * NUMBER_OF_D_Os
 
     def _get_state_handlers(self):
         return {
@@ -45,7 +45,7 @@ class SimulatedRkndio(StateMachineDevice):
     def connected(self):
         return self._connected
 
-    def get_state(self, pin):
+    def get_input_state(self, pin):
         """
         Gets the state
 
@@ -54,8 +54,16 @@ class SimulatedRkndio(StateMachineDevice):
 
         Returns:
             State pin value - True or False.
+            Error: if pin not in range.
         """
-        return self._read_states[pin - 2]
+        pin = int(pin)
+        if pin in range(2, 8):
+            self._reset_error()
+            return self._input_states[pin - 2]
+        else:
+            self.error = "The pin is not readable"
+            self.status = "The pin is not readable"
+            return "Error"
 
     def set_read_state_via_the_backdoor(self, pin, state):
         """
@@ -68,7 +76,20 @@ class SimulatedRkndio(StateMachineDevice):
         Returns:
             None
         """
-        self._read_states[pin - 2] = state
+        self._input_states[pin - 2] = state
+
+    def set_output_state(self, pin, state):
+        """
+        Gets the state
+
+        Args:
+            pin: Pin number of DI
+            state (string): TRUE or FALSE
+
+        Returns:
+            None
+        """
+        self._set_states[pin - 8] = state.lower().title()
 
     def get_set_state_via_the_backdoor(self, pin):
         """
@@ -81,19 +102,6 @@ class SimulatedRkndio(StateMachineDevice):
             (string): True or False
         """
         return self._set_states[pin - 8]
-
-    def set_state(self, pin, state):
-        """
-        Gets the state
-
-        Args:
-            pin: Pin number of DI
-            state (string): TRUE or FALSE
-
-        Returns:
-            None
-        """
-        self._set_states[pin - 8] = state.lower().title()
 
     def connect(self):
         """
@@ -112,4 +120,9 @@ class SimulatedRkndio(StateMachineDevice):
             Nome
         """
         self._connected = False
+
+    def _reset_error(self):
+        self.error = "No error"
+        self.status = "No error"
+
 
