@@ -1,22 +1,51 @@
 from collections import OrderedDict
+
 from states import DefaultState
 from lewis.devices import StateMachineDevice
 from lewis.core.logging import has_log
 
 import random
 
+import six
 
-def truncate_if_set(function):
+
+def truncate_if_set(f):
     """
     Truncates the decorated function's string output if truncated_output is True
 
     """
 
+    @six.wraps(f)
     def wrapper(self, *args, **kwargs):
-        output = function(self, *args, **kwargs)
+        output = f(self, *args, **kwargs)
 
         if self.truncated_output:
             output = output[:int(round(len(output) / 2.))]
+
+            self.log.info("Truncated")
+            self.log.info(output)
+
+
+        return output
+
+    return wrapper
+
+@has_log
+def fake_auto_send(f):
+    """
+    Changes the decorated functions's string output to a simulate a device in auto-send mode
+
+    """
+
+    @six.wraps(f)
+    def wrapper(self, *args, **kwargs):
+        output = f(self, *args, **kwargs)
+
+        if self.auto_send:
+            self.log.info(self.auto_send)
+            output = "TG,{:02d},+FFFFFFF".format(random.randint(1, 4))
+
+            self.log.info('autosend out {} {}'.format(output, self.auto_send))
 
         return output
 
@@ -25,6 +54,8 @@ def truncate_if_set(function):
 
 @has_log
 class SimulatedKynctm3K(StateMachineDevice):
+
+    INPUT_MODES = ("R0", "R1", "Q0")
 
     def _initialize_data(self):
         """
@@ -35,8 +66,24 @@ class SimulatedKynctm3K(StateMachineDevice):
         """
         self.OUT_values = None
         self.truncated_output = False
+        self.auto_send = False
+        self.input_mode = "R0"
 
         pass
+
+    def reset_device(self):
+        """
+        Resets the device to a known state. This can be confirmed when the OUT channels equal -256.0
+
+        Returns: None
+
+        """
+
+        self._initialize_data()
+        self.OUT_values = ["off"]*16
+
+        return None
+
 
     def _get_state_handlers(self):
         return {
@@ -49,6 +96,54 @@ class SimulatedKynctm3K(StateMachineDevice):
     def _get_transition_handlers(self):
         return OrderedDict([
         ])
+
+    def set_autosend_status(self, new_state):
+        """
+        Sets the autosend status between True (autosend on) and False (autosend off)
+
+        Args:
+            new_state: Boolean, the new autosend state
+
+        Returns:
+            A string acknowledging the status change, or an error if the device is in the wrong state to change the setting
+
+        """
+        assert isinstance(new_state, six.string_types)
+
+        if self.input_mode in ("R0", "R1"):
+            # Cannot change the autosend in this input mode, send error
+            self.log.info("Can't change state! Wrong input mode!"+str(self.input_mode))
+            return "ER,SW,01"
+
+        elif new_state == "1":
+            # In the correct mode to  toggle auto send, make the change
+            self.auto_send = True
+            return "SW,EA"
+
+        elif new_state == "0":
+            # In the correct mode to  toggle auto send, make the change
+            self.auto_send = False
+            return "SW,EA"
+
+        else:
+            return "ER,SW,08"
+
+    def set_input_mode(self, new_state):
+        """
+        Changes the state of the device to a measurment screen (R0/R1) or a RS232C comms mode (Q0)
+        Args:
+            new_state: String, denoting measurement screen (R0/R1) or RS232C mode (Q0)
+
+        Returns:
+            new_state: String. Either the name of the new state, or an error code if the new state was not recognised
+
+        """
+        if new_state in self.INPUT_MODES:
+            self.input_mode = new_state
+            self.log.info(new_state)
+            return new_state
+        else:
+            return "ER,{:.2},01".format(new_state)
 
     def parse_status(self, output_setting):
         """
@@ -77,6 +172,7 @@ class SimulatedKynctm3K(StateMachineDevice):
         else:
             return off_return
 
+    @fake_auto_send
     @truncate_if_set
     def format_output_data(self):
         """
