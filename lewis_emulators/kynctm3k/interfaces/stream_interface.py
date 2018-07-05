@@ -16,20 +16,13 @@ class Kynctm3KStreamInterface(StreamInterface):
     out_terminator = "\r"
 
     def return_data(self):
-        """
-        Returns the data in the format specified in the user manual
-
-        Returns:
-            String: A carriage-return separated string of measurments for all OUT values in the program.
-
-        """
         return self._device.format_output_data()
 
     def change_input_mode(self, new_state):
         return self._device.set_input_mode(new_state)
 
     def toggle_autosend(self, new_state):
-        return self._device.set_autosend_status(new_state)
+        return self._device.set_autosend_status(int(new_state))
 
     def handle_error(self, request, error):
         err = "An error occurred at request " + repr(request) + ": " + repr(error)

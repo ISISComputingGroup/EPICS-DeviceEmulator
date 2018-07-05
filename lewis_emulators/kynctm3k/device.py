@@ -100,24 +100,18 @@ class SimulatedKynctm3K(StateMachineDevice):
             A string acknowledging the status change, or an error if the device is in the wrong state to change the setting
 
         """
-        assert isinstance(new_state, six.string_types)
+        try:
+            assert isinstance(new_state, int)
+        except AssertionError:
+            return "ER,SW,08"
 
         if self.input_mode in ("R0", "R1"):
-            # Cannot change the autosend in this input mode, send error
+            # Cannot change the autosend in this input mode
             return "ER,SW,01"
 
-        elif new_state == "1":
-            # In the correct mode to  toggle auto send, make the change
-            self.auto_send = True
-            return "SW,EA"
-
-        elif new_state == "0":
-            # In the correct mode to  toggle auto send, make the change
-            self.auto_send = False
-            return "SW,EA"
-
         else:
-            return "ER,SW,08"
+            self.auto_send = bool(new_state)
+            return "SW,EA"
 
     def set_input_mode(self, new_state):
         """
