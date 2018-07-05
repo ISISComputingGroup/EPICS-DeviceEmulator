@@ -23,17 +23,13 @@ class Kynctm3KStreamInterface(StreamInterface):
             String: A carriage-return separated string of measurments for all OUT values in the program.
 
         """
-        self.log.info("Actual output string: "+self._device.format_output_data())
         return self._device.format_output_data()
 
     def change_input_mode(self, new_state):
-        self.log.info("New state: {}".format(new_state))
         return self._device.set_input_mode(new_state)
 
     def toggle_autosend(self, new_state):
-        a = self._device.set_autosend_status(new_state)
-        self.log.info(a)
-        return a#self._device.set_autosend_status(new_state)
+        return self._device.set_autosend_status(new_state)
 
     def handle_error(self, request, error):
         err = "An error occurred at request " + repr(request) + ": " + repr(error)

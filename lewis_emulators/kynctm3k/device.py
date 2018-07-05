@@ -22,10 +22,6 @@ def truncate_if_set(f):
         if self.truncated_output:
             output = output[:int(round(len(output) / 2.))]
 
-            self.log.info("Truncated")
-            self.log.info(output)
-
-
         return output
 
     return wrapper
@@ -42,10 +38,7 @@ def fake_auto_send(f):
         output = f(self, *args, **kwargs)
 
         if self.auto_send:
-            self.log.info(self.auto_send)
             output = "TG,{:02d},+FFFFFFF".format(random.randint(1, 4))
-
-            self.log.info('autosend out {} {}'.format(output, self.auto_send))
 
         return output
 
@@ -84,7 +77,6 @@ class SimulatedKynctm3K(StateMachineDevice):
 
         return None
 
-
     def _get_state_handlers(self):
         return {
             'default': DefaultState(),
@@ -112,7 +104,6 @@ class SimulatedKynctm3K(StateMachineDevice):
 
         if self.input_mode in ("R0", "R1"):
             # Cannot change the autosend in this input mode, send error
-            self.log.info("Can't change state! Wrong input mode!"+str(self.input_mode))
             return "ER,SW,01"
 
         elif new_state == "1":
@@ -140,7 +131,6 @@ class SimulatedKynctm3K(StateMachineDevice):
         """
         if new_state in self.INPUT_MODES:
             self.input_mode = new_state
-            self.log.info(new_state)
             return new_state
         else:
             return "ER,{:.2},01".format(new_state)
@@ -190,7 +180,5 @@ class SimulatedKynctm3K(StateMachineDevice):
             for channel, output_value in enumerate(self.OUT_values):
                 # Only return output if the OUT value is in the program
                 channel_strings.append(self.parse_status(output_value))
-
-        self.log.info(','.join(channel_strings))
 
         return ','.join(channel_strings)
