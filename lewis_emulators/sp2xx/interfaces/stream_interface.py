@@ -5,13 +5,15 @@ from lewis.adapters.stream import StreamInterface
 from lewis.core.logging import has_log
 
 from lewis_emulators.utils.command_builder import CmdBuilder
-from lewis_emulators.utils.if_connected import if_connected
+from lewis_emulators.utils.replies import conditional_reply
 
 from ..util_classes import RunStatus
 from ..util_constants import DIRECTIONS
 
 ALLOWED_VOLUME_UNITS = ["ul", "ml"]
 ALLOWED_RATE_UNITS = ["ul/m", "ml/m", "ul/h", "ml/h"]
+
+if_connected = conditional_reply("connected")
 
 
 def if_error(f):
