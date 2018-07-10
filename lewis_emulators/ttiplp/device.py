@@ -9,8 +9,15 @@ class SimulatedTtiplp(StateMachineDevice):
         """
         Initialize all of the device's attributes.
         """
-        pass
-
+        self.ident="THURLBY THANDAR, PL303-P, 490296, 3.02-4.06"
+        self.volt=0
+        self.volt_sp=0
+        self.curr=0
+        self.curr_sp=0
+        self.output=0
+        self.overvolt=0
+        self.overcurr=0
+        
     def _get_state_handlers(self):
         return {
             'default': DefaultState(),
