@@ -96,6 +96,18 @@ class CmdBuilder(object):
         self._current_sep = self._arg_sep
         return self
 
+    def string(self, length=None):
+        """
+        Add an argument which is a string of a given length (if blank string is any length)
+        :param length: length of string; None for any length
+        :return: builder
+        """
+        if length is None:
+            self.arg(".+")
+        else:
+            self.arg(".{{{}}}".format(length))
+        return self
+
     def float(self):
         """
         Add a float argument.
