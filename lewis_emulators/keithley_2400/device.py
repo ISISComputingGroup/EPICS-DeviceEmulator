@@ -1,13 +1,13 @@
+from __future__ import division
+
 from utilities import format_value
 from random import uniform
 from collections import OrderedDict
-from states import DefaultInitState, DefaultRunningState, StaticRunningState
+from states import DefaultRunningState, StaticRunningState
 from control_modes import *
 from lewis.devices import StateMachineDevice
-from lewis.core.logging import has_log
 
 
-@has_log
 class SimulatedKeithley2400(StateMachineDevice):
 
     INITIAL_CURRENT = 0.1
@@ -63,18 +63,17 @@ class SimulatedKeithley2400(StateMachineDevice):
 
     def _get_state_handlers(self):
         return {
-            'init': DefaultInitState(),
             'running': DefaultRunningState(),
             'static': StaticRunningState(),
         }
 
     def _get_initial_state(self):
-        return 'init'
+        return 'static'
 
     def _get_transition_handlers(self):
         return OrderedDict([
-            (('init', 'running'), lambda: self.random_output),
-            (("running", "static"), lambda: not self.random_output),
+            (('static', 'running'), lambda: self.random_output),
+            (('running', 'static'), lambda: not self.random_output),
         ])
 
     def _resistance(self):
@@ -113,7 +112,7 @@ class SimulatedKeithley2400(StateMachineDevice):
         """
 
         def update_value(value):
-            return abs(value + uniform(-1,1)*dt)
+            return abs(value + uniform(-1, 1)*dt)
         new_current = max(update_value(self.current), SimulatedKeithley2400.MINIMUM_CURRENT)
         new_voltage = update_value(self.voltage)
 
@@ -141,7 +140,7 @@ class SimulatedKeithley2400(StateMachineDevice):
         if mode in mode_class.MODES:
             return True
         else:
-            print "Invalid mode, " + mode + ", received for: " + mode_class.__name__
+            print "Invalid mode, {}, received for: {}".format(mode, mode_class.__name__)
             return False
 
     def set_output_mode(self, mode):
