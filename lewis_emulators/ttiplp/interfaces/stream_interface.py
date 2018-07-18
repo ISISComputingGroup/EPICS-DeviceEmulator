@@ -1,7 +1,9 @@
 from lewis.adapters.stream import StreamInterface, Cmd
+from lewis.core.logging import has_log
 from lewis_emulators.utils.command_builder import CmdBuilder
 from random import random as rnd
 
+@has_log
 class TtiplpStreamInterface(StreamInterface):
 
     # Commands that we expect via serial during normal operation
@@ -81,7 +83,6 @@ class TtiplpStreamInterface(StreamInterface):
             self.device.output = 0
     
     def set_overvolt(self,_,overvolt):
-        print "Here"
         self.device.overvolt = float(overvolt)
         if float(overvolt)<self.device.volt_sp:
             self.device.volt=0

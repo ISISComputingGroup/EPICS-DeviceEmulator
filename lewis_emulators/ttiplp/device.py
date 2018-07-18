@@ -18,6 +18,9 @@ class SimulatedTtiplp(StateMachineDevice):
         self.overvolt=0
         self.overcurr=0
         
+    def reset(self):
+        self._initialize_data()
+        
     def _get_state_handlers(self):
         return {
             'default': DefaultState(),
