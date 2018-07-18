@@ -14,6 +14,12 @@ class ResistanceRangeMode(Mode):
     MODES = [AUTO, MANUAL]
 
 
+class AutorangeMode(Mode):
+    AUTO = "1"
+    MANUAL = "0"
+    MODES = [AUTO, MANUAL]
+
+
 class SourceMode(Mode):
     CURRENT = "CURR"
     VOLTAGE = "VOLT"
