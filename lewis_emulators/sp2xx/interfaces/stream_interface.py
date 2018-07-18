@@ -170,7 +170,7 @@ class Sp2XXStreamInterface(StreamInterface):
             run_status
         """
         self._device.set_mode(mode_symbol)
-        self.stop()
+        return self.stop()
 
     @if_error
     @if_connected
