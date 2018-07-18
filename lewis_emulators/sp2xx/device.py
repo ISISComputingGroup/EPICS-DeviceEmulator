@@ -1,3 +1,6 @@
+"""
+Items associated with WPI SP2XX syringe pump
+"""
 from collections import OrderedDict
 from states import DefaultState
 from lewis.devices import StateMachineDevice
@@ -7,6 +10,9 @@ from .util_constants import NO_ERROR, DIRECTIONS, MODES
 
 
 class SimulatedSp2XX(StateMachineDevice):
+    """
+    Simulation of the WPI SP2XX syringe pump
+    """
 
     def _initialize_data(self):
         """
@@ -28,18 +34,15 @@ class SimulatedSp2XX(StateMachineDevice):
         self.withdrawal_rate_units = "ml/m"
         self.withdrawal_rate = 12.0
 
-    @staticmethod
-    def _get_state_handlers():
+    def _get_state_handlers(self):
         return {
             'default': DefaultState(),
         }
 
-    @staticmethod
-    def _get_initial_state():
+    def _get_initial_state(self):
         return 'default'
 
-    @staticmethod
-    def _get_transition_handlers():
+    def _get_transition_handlers(self):
         return OrderedDict([
         ])
 
@@ -175,6 +178,9 @@ class SimulatedSp2XX(StateMachineDevice):
 
     @property
     def diameter(self):
+        """
+        Returns: the diameter of the syringe set on the device
+        """
         return self._diameter
 
     def successfully_set_diameter(self, value):
@@ -217,5 +223,3 @@ class SimulatedSp2XX(StateMachineDevice):
             None
         """
         self._connected = False
-
-
