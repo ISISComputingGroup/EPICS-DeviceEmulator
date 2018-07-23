@@ -9,7 +9,7 @@ class SimulatedNgpspsu(StateMachineDevice):
         """
         Initialize all of the device's attributes.
         """
-        pass
+        self.__model_no_and_firmware = "NGPS 100-50:0.9.01"
 
     def _get_state_handlers(self):
         return {
@@ -23,3 +23,10 @@ class SimulatedNgpspsu(StateMachineDevice):
         return OrderedDict([
         ])
 
+    @property
+    def model_number_and_firmware(self):
+        """
+        Returns the model number and firmware version.
+        """
+
+        return self.__model_no_and_firmware
