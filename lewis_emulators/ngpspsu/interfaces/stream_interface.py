@@ -7,7 +7,8 @@ class NgpspsuStreamInterface(StreamInterface):
     # Commands that we expect via serial during normal operation
     commands = {
         CmdBuilder("get_version").escape("VER").build(),
-        CmdBuilder("turn_on_device").escape("MON").build()
+        CmdBuilder("turn_on_device").escape("MON").build(),
+        CmdBuilder("turn_off_device").escape("MOFF").build()
     }
 
     out_terminator = "\r"
@@ -45,3 +46,13 @@ class NgpspsuStreamInterface(StreamInterface):
                 error code.
         """
         return self._device.turn_on_device()
+
+    def turn_off_device(self):
+        """
+        Turns off the device.
+
+        Returns:
+            string: "#AK" if the device is turned on. "#NAK%i" otherwise, where %i is an
+                error code.
+        """
+        return self._device.turn_off_device()

@@ -62,6 +62,22 @@ class SimulatedNgpspsu(StateMachineDevice):
         else:
             return "#NAK99"
 
+    def turn_off_device(self):
+        """
+        Turns off the device.
+
+        Returns:
+            string: "#AK" if successful. #NK:%i otherwise where %i is an error
+                code.
+        """
+        if self.__status == Status.Off:
+            return "#NAK:13"
+        elif self.__status == Status.On:
+            self.__status = Status.Off
+            return "#AK"
+        else:
+            return "#NAK99"
+
     def get_status_via_the_backdoor(self):
         """
         Gets the status of the device as a string.
@@ -71,4 +87,3 @@ class SimulatedNgpspsu(StateMachineDevice):
             string: name of the status of the device
         """
         return self.__status.name
-
