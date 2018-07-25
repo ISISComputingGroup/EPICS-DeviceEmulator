@@ -7,12 +7,13 @@ class NgpspsuStreamInterface(StreamInterface):
     # Commands that we expect via serial during normal operation
     commands = {
         CmdBuilder("get_version").escape("VER").build(),
-        CmdBuilder("turn_on_device").escape("MON").build(),
-        CmdBuilder("turn_off_device").escape("MOFF").build()
+        CmdBuilder("start").escape("MON").build(),
+        CmdBuilder("stop").escape("MOFF").build(),
+        CmdBuilder("read_status").escape("MST").build()
     }
 
-    out_terminator = "\r"
-    in_terminator = "\r\n"
+    out_terminator = "\r\n"
+    in_terminator = "\r"
 
     def handle_error(self, request, error):
         """
@@ -37,7 +38,7 @@ class NgpspsuStreamInterface(StreamInterface):
         """
         return "#VER:{}".format(self._device.model_number_and_firmware)
 
-    def turn_on_device(self):
+    def start(self):
         """
         Turns on the device.
 
@@ -45,9 +46,9 @@ class NgpspsuStreamInterface(StreamInterface):
             string: "#AK" if the device is turned on. "#NAK%i" otherwise, where %i is an
                 error code.
         """
-        return self._device.turn_on_device()
+        return self._device.start_device()
 
-    def turn_off_device(self):
+    def stop(self):
         """
         Turns off the device.
 
@@ -55,4 +56,12 @@ class NgpspsuStreamInterface(StreamInterface):
             string: "#AK" if the device is turned on. "#NAK%i" otherwise, where %i is an
                 error code.
         """
-        return self._device.turn_off_device()
+        return self._device.stop_device()
+
+    def read_status(self):
+        """
+        Gets the status of the device
+        Returns:
+            The status of the device which is composed of 8 hexadecimal digts.
+        """
+        return "#MST:{}".format(self._device.status)
