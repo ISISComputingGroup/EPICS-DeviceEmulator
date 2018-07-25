@@ -6,7 +6,8 @@ class NgpspsuStreamInterface(StreamInterface):
 
     # Commands that we expect via serial during normal operation
     commands = {
-        CmdBuilder("get_version").escape("VER").build()
+        CmdBuilder("get_version").escape("VER").build(),
+        CmdBuilder("turn_on_device").escape("MON").build()
     }
 
     out_terminator = "\r"
@@ -28,9 +29,19 @@ class NgpspsuStreamInterface(StreamInterface):
 
     def get_version(self):
         """
+        Returns the model number and firmware of the device
 
-        Returns:
-            The device's model number and firmware.
+        E.g. #VER:NGPS 100-50:0.9.01 where NGPS 100-50 is the model
+        number and 0.9.01 is the firmware number.
         """
         return "#VER:{}".format(self._device.model_number_and_firmware)
 
+    def turn_on_device(self):
+        """
+        Turns on the device.
+
+        Returns:
+            string: #AK if the device is turned on. #NAK%i otherwise, where %i is an
+                error code.
+        """
+        return self._device.turn_on_device()
