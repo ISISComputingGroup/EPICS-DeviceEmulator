@@ -32,8 +32,8 @@ class NgpspsuStreamInterface(StreamInterface):
         """
         Returns the model number and firmware of the device
 
-        E.g. #VER:NGPS 100-50:0.9.01 where NGPS 100-50 is the model
-        number and 0.9.01 is the firmware number.
+        E.g. "#VER:NGPS 100-50:0.9.01" where "NGPS 100-50" is the model
+        number and "0.9.01" is the firmware number.
         """
         return "#VER:{}".format(self._device.model_number_and_firmware)
 
@@ -42,7 +42,7 @@ class NgpspsuStreamInterface(StreamInterface):
         Turns on the device.
 
         Returns:
-            string: #AK if the device is turned on. #NAK%i otherwise, where %i is an
+            string: "#AK" if the device is turned on. "#NAK%i" otherwise, where %i is an
                 error code.
         """
         return self._device.turn_on_device()
