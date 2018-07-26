@@ -10,7 +10,7 @@ class SimulatedNgpspsu(StateMachineDevice):
         Initialize all of the device's attributes.
         """
         self.__model_no_and_firmware = "NGPS 100-50:0.9.01"
-        self.__status = ['0'] * 8
+        self.__status = [["0"] * 4] * 8
 
     def _get_state_handlers(self):
         return {
@@ -37,8 +37,8 @@ class SimulatedNgpspsu(StateMachineDevice):
         """
         Returns the status of the device (Off or On).
         """
-
-        return "".join(self.__status)
+        status_as_eight_hex_digits = [hex(int("".join(word), 2))[2] for word in self.__status]
+        return "".join(status_as_eight_hex_digits)
 
     def start_device(self):
         """
@@ -48,10 +48,10 @@ class SimulatedNgpspsu(StateMachineDevice):
             string: "#AK" if successful. #NK:%i if not where %i is an error
                 code.
         """
-        if self.__status[0] == '1':
+        if self.__status[0][3] == '1':
             return "#NAK:09"
-        elif self.__status[0] == '0':
-            self.__status[0] = '1'
+        elif self.__status[0][3] == '0':
+            self.__status[0][3] = '1'
             return "#AK"
         else:
             return "#NAK99"
@@ -64,10 +64,10 @@ class SimulatedNgpspsu(StateMachineDevice):
             string: "#AK" if successful. #NK:%i otherwise where %i is an error
                 code.
         """
-        if self.__status[0] == '0':
+        if self.__status[0][3] == '0':
             return "#NAK:13"
-        elif self.__status[0] == '1':
-            self.__status[0] = '0'
+        elif self.__status[0][3] == '1':
+            self.__status[0][3] = '0'
             return "#AK"
         else:
             return "#NAK99"
