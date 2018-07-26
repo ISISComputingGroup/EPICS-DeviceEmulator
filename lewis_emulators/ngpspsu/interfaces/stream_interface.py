@@ -10,7 +10,8 @@ class NgpspsuStreamInterface(StreamInterface):
         CmdBuilder("start").escape("MON").build(),
         CmdBuilder("stop").escape("MOFF").build(),
         CmdBuilder("read_status").escape("MST").build(),
-        CmdBuilder("reset").escape("MRESET").build()
+        CmdBuilder("reset").escape("MRESET").build(),
+        CmdBuilder("get_voltage").escape("MRV").build()
     }
 
     out_terminator = "\r\n"
@@ -62,6 +63,7 @@ class NgpspsuStreamInterface(StreamInterface):
     def read_status(self):
         """
         Gets the status of the device
+
         Returns:
             The status of the device which is composed of 8 hexadecimal digts.
         """
@@ -76,3 +78,13 @@ class NgpspsuStreamInterface(StreamInterface):
                 error code.
         """
         return self._device.reset_device()
+
+    def get_voltage(self):
+        """
+        Gets the status of the device
+
+        Returns:
+            The status of the device which is composed of 8 hexadecimal digts.
+        """
+        return "#MRV:{}".format(self._device.voltage)
+

@@ -11,6 +11,7 @@ class SimulatedNgpspsu(StateMachineDevice):
         """
         self.__model_no_and_firmware = "NGPS 100-50:0.9.01"
         self.__status = [["0"] * 4] * 8
+        self.__voltage = 0.0
 
     def _get_state_handlers(self):
         return {
@@ -35,10 +36,19 @@ class SimulatedNgpspsu(StateMachineDevice):
     @property
     def status(self):
         """
-        Returns the status of the device (Off or On).
+        Returns the status of the device as a 8 digit hexadecimal string.
         """
+
         status_as_eight_hex_digits = [hex(int("".join(word), 2))[2] for word in self.__status]
         return "".join(status_as_eight_hex_digits)
+
+    @property
+    def voltage(self):
+        """
+        Returns device's current voltage to 6 decimal places.
+        """
+
+        return "{0:.6f}".format(self.__voltage)
 
     def start_device(self):
         """
