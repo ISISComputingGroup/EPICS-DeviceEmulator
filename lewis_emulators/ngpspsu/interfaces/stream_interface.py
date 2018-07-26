@@ -11,7 +11,9 @@ class NgpspsuStreamInterface(StreamInterface):
         CmdBuilder("stop").escape("MOFF").build(),
         CmdBuilder("read_status").escape("MST").build(),
         CmdBuilder("reset").escape("MRESET").build(),
-        CmdBuilder("get_voltage").escape("MRV").build()
+        CmdBuilder("read_voltage").escape("MRV").build(),
+        CmdBuilder("set_voltage_setpoint").escape("MWV:").float().build(),
+        CmdBuilder("read_voltage_setpoint").escape("MWV:?").build()
     }
 
     out_terminator = "\r\n"
@@ -79,12 +81,33 @@ class NgpspsuStreamInterface(StreamInterface):
         """
         return self._device.reset_device()
 
-    def get_voltage(self):
+    def read_voltage(self):
         """
-        Gets the status of the device
+        Reads the current voltage from the device
 
         Returns:
             The status of the device which is composed of 8 hexadecimal digts.
         """
         return "#MRV:{}".format(self._device.voltage)
 
+    def set_voltage_setpoint(self, value):
+        """
+        Try's to set the voltage setpoint to value.
+
+        Args:
+            value: string of a decimal to 6 decimal places
+
+        Returns:
+            "#AK" if successful and "#NAK:%i" if not where %i is an error
+                code.
+        """
+        return self._device.try_setting_voltage_setpoint(value)
+
+    def read_voltage_setpoint(self):
+        """
+        Reads the last voltage setpoint from the device.
+
+        Returns:
+            string: #MWV:%f" where %f is the last voltage setpoint set.
+        """
+        return "#MWV:{}".format(self._device.voltage_setpoint)

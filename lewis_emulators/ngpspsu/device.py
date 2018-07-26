@@ -12,6 +12,7 @@ class SimulatedNgpspsu(StateMachineDevice):
         self.__model_no_and_firmware = "NGPS 100-50:0.9.01"
         self.__status = [["0"] * 4] * 8
         self.__voltage = 0.0
+        self.__voltage_setpoint = 0.0
 
     def _get_state_handlers(self):
         return {
@@ -49,6 +50,26 @@ class SimulatedNgpspsu(StateMachineDevice):
         """
 
         return "{0:.6f}".format(self.__voltage)
+
+    @property
+    def voltage_setpoint(self):
+        """
+        Returns device's last voltage setpoint to 6 decimal places.
+        """
+
+        return "{0:.6f}".format(self.__voltage_setpoint)
+
+    def try_setting_voltage_setpoint(self, value):
+        """
+        Sets the  device's setpoint voltage to 6 decimal places.
+        """
+
+        if self.__status[0][3] == "0":
+            return "#NAK:13"
+        else:
+            value = float(value)
+            self.__voltage_setpoint = value
+            return "#AK"
 
     def start_device(self):
         """
