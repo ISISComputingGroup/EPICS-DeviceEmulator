@@ -9,7 +9,8 @@ class NgpspsuStreamInterface(StreamInterface):
         CmdBuilder("get_version").escape("VER").build(),
         CmdBuilder("start").escape("MON").build(),
         CmdBuilder("stop").escape("MOFF").build(),
-        CmdBuilder("read_status").escape("MST").build()
+        CmdBuilder("read_status").escape("MST").build(),
+        CmdBuilder("reset").escape("MRESET").build()
     }
 
     out_terminator = "\r\n"
@@ -65,3 +66,13 @@ class NgpspsuStreamInterface(StreamInterface):
             The status of the device which is composed of 8 hexadecimal digts.
         """
         return "#MST:{}".format(self._device.status)
+
+    def reset(self):
+        """
+        Resets the device.
+
+        Returns:
+            string: "#AK" if the device is turned on. "#NAK%i" otherwise, where %i is an
+                error code.
+        """
+        return self._device.reset_device()

@@ -71,3 +71,14 @@ class SimulatedNgpspsu(StateMachineDevice):
             return "#AK"
         else:
             return "#NAK99"
+
+    def reset_device(self):
+        """
+        Resets the device.
+
+        Returns:
+            string: "#AK" if successful. #NK:%i otherwise where %i is an error
+                code.
+        """
+        self.__status = [['0']*4] * 8
+        return "#AK"
