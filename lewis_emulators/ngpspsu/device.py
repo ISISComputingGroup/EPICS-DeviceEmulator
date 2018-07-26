@@ -2,6 +2,8 @@ from collections import OrderedDict
 from states import DefaultState
 from lewis.devices import StateMachineDevice
 
+STATUS_SETUP = [["0" for _ in range(4)] for _ in range(8)]
+
 
 class SimulatedNgpspsu(StateMachineDevice):
 
@@ -10,7 +12,7 @@ class SimulatedNgpspsu(StateMachineDevice):
         Initialize all of the device's attributes.
         """
         self.__model_no_and_firmware = "NGPS 100-50:0.9.01"
-        self.__status = [["0"] * 4] * 8
+        self.__status = STATUS_SETUP
         self.__voltage = 0.0
         self.__voltage_setpoint = 0.0
 
@@ -111,5 +113,5 @@ class SimulatedNgpspsu(StateMachineDevice):
             string: "#AK" if successful. #NK:%i otherwise where %i is an error
                 code.
         """
-        self.__status = [['0']*4] * 8
+        self.__status = STATUS_SETUP
         return "#AK"
