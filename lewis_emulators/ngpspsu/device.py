@@ -147,4 +147,8 @@ class SimulatedNgpspsu(StateMachineDevice):
                 code.
         """
         self.__status = STATUS_SETUP
+        self.__voltage = 0
+        self.__voltage_setpoint = 0
+        self.__current = 0
+        self.__current_setpoint = 0
         return "#AK"
