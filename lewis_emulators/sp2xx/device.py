@@ -74,15 +74,23 @@ class SimulatedSp2XX(StateMachineDevice):
 
     def reverse_direction(self):
         """
-        Reverses the direction of the device and change mode accordingly.
+        Reverses the direction of the device and change mode and status accordingly. But only if it is in
+        Infusion or withdrawal mode and running. Other reverse can not be sent.
 
         Returns:
-            None
+            True if direction was reversed; False otherwise
         """
-        if self.mode.response == "I":
+        if self.mode.response == "I" and self._running:
             self.set_mode("w")
-        else:
+            self._running_status = RunStatus.Withdrawal
+            did_reverse = True
+        elif self.mode.response == "W" and self._running:
             self.set_mode("i")
+            self._running_status = RunStatus.Infusion
+            did_reverse = True
+        else:
+            did_reverse = False
+        return did_reverse
 
     def start_device(self):
         """
@@ -91,7 +99,6 @@ class SimulatedSp2XX(StateMachineDevice):
         Returns:
             None
         """
-
         self._running = True
         self._running_status = RunStatus[self._direction.name]
 

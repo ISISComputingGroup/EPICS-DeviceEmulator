@@ -203,18 +203,17 @@ class Sp2XXStreamInterface(StreamInterface):
     @if_connected
     def reverse_direction(self):
         """
-        Reverse the direction of a running device if in infusion or withdrawal mode.
+        Attempt to reverse the direction of a running device.
 
         Returns:
             Run status if the device is running and in infusion or withdrawal mode.
             NA otherwise.
         """
-        if self._device.mode.response in ["I", "W"] and self._device.running:
-            self._device.reverse_direction()
-            self.get_run_status()
+        if self._device.reverse_direction():
+            return self.get_run_status()
         else:
-            run_status = self.get_run_status()
-            return "{}NA{}".format(self._return, run_status)
+            return "{}NA{}".format(self._return, self.get_run_status())
+
 
     @if_error
     @if_connected
