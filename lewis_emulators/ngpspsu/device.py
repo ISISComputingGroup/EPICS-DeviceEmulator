@@ -1,12 +1,10 @@
 from collections import OrderedDict
 from states import DefaultState
 from lewis.devices import StateMachineDevice
-
-# List of length 8 of lists of length 4 containing 1's and '0's.
-# Each sublist represent 8 hexadecimal characters in terms of bits.
-STATUS_SETUP = [["0" for _ in range(4)] for _ in range(8)]
+from lewis.adapters.stream import has_log
 
 
+@has_log
 class SimulatedNgpspsu(StateMachineDevice):
 
     def _initialize_data(self):
@@ -14,12 +12,14 @@ class SimulatedNgpspsu(StateMachineDevice):
         Initialize all of the device's attributes.
         """
         self._model_no_and_firmware = "NGPS 100-50:0.9.01"
-        self._status = STATUS_SETUP
         self._voltage = 0.0
         self._voltage_setpoint = 0.0
         self._current = 0.0
         self._current_setpoint = 0.0
         self._connected = False
+        # Status is a list of length 8 of lists of length 4 containing 1's and '0's.
+        # Each sublist represent a hexadecimal character as a list of 4 bits.
+        self._status = [["0" for _ in range(4)] for _ in range(8)]
 
     def _get_state_handlers(self):
         return {
@@ -147,11 +147,12 @@ class SimulatedNgpspsu(StateMachineDevice):
             string: "#AK" if successful. #NK:%i otherwise where %i is an error
                 code.
         """
-        self._status = STATUS_SETUP
+        self._status = [["0" for _ in range(4)] for _ in range(8)]
         self._voltage = 0
         self._voltage_setpoint = 0
         self._current = 0
         self._current_setpoint = 0
+        self.log.info("The changed status is {}".format(self._status))
         return "#AK"
 
     @property
