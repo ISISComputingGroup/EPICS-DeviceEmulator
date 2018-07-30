@@ -14,7 +14,7 @@ class SimulatedNgpspsu(StateMachineDevice):
         self._voltage_setpoint = 0.0
         self._current = 0.0
         self._current_setpoint = 0.0
-        self._connected = False
+        self._connected = True
         # Status is a list of length 8 of lists of length 4 containing 1's and '0's.
         # Each sublist represent a hexadecimal character as a list of 4 bits.
         self._status = [["0" for _ in range(4)] for _ in range(8)]
