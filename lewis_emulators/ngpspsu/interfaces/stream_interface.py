@@ -4,7 +4,7 @@ from lewis_emulators.utils.replies import conditional_reply
 
 if_connected = conditional_reply("connected")
 
-@has_log
+
 class NgpspsuStreamInterface(StreamInterface):
 
     # Commands that we expect via serial during normal operation
@@ -90,8 +90,6 @@ class NgpspsuStreamInterface(StreamInterface):
             string: "#AK" if the device is turned on. "#NAK%i" otherwise, where %i is an
                 error code.
         """
-        self.log.info("Reset function was called")
-        self.log.info("The status of the device is {}".format(self._device.status))
         return self._device.reset_device()
 
     @if_connected

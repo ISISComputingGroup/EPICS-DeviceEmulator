@@ -1,10 +1,8 @@
 from collections import OrderedDict
 from states import DefaultState
 from lewis.devices import StateMachineDevice
-from lewis.adapters.stream import has_log
 
 
-@has_log
 class SimulatedNgpspsu(StateMachineDevice):
 
     def _initialize_data(self):
@@ -152,7 +150,6 @@ class SimulatedNgpspsu(StateMachineDevice):
         self._voltage_setpoint = 0
         self._current = 0
         self._current_setpoint = 0
-        self.log.info("The changed status is {}".format(self._status))
         return "#AK"
 
     @property
@@ -183,7 +180,7 @@ class SimulatedNgpspsu(StateMachineDevice):
 
     def fault(self, fault_name):
         """
-        Sets the status depending on the fault. Set only via the backdoor
+        Sets the status depending on the fault. Set only via the backdoor.
 
         Returns:
             None
