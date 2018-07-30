@@ -1,4 +1,4 @@
-from lewis.adapters.stream import StreamInterface
+from lewis.adapters.stream import StreamInterface, has_log
 from lewis_emulators.utils.command_builder import CmdBuilder
 from lewis_emulators.utils.replies import conditional_reply
 

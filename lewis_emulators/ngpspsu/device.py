@@ -180,4 +180,11 @@ class SimulatedNgpspsu(StateMachineDevice):
 
         self._connected = False
 
+    def fault_condition(self):
+        """
+        Sets the status to have a fault condition. Set only via the backdoor
 
+        Returns:
+            None
+        """
+        self._status[0][2] = "1"
