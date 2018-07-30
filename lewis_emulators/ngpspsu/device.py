@@ -47,7 +47,7 @@ class SimulatedNgpspsu(StateMachineDevice):
         Returns the status of the device as a 8 digit hexadecimal string.
         """
 
-        status_as_eight_hex_digits = [hex(int("".join(word), 2))[2]
+        status_as_eight_hex_digits = [hex(int("".join(word), 2))[-1]
                                       for word in self._status]
         return "".join(status_as_eight_hex_digits)
 
@@ -118,7 +118,7 @@ class SimulatedNgpspsu(StateMachineDevice):
         if self._status[0][3] == '1':
             return "#NAK:09"
         elif self._status[0][3] == '0':
-            self._status[0][3] = '1'
+            self._set_bit_to_on(0, 0)
             return "#AK"
         else:
             return "#NAK99"
@@ -134,7 +134,7 @@ class SimulatedNgpspsu(StateMachineDevice):
         if self._status[0][3] == '0':
             return "#NAK:13"
         elif self._status[0][3] == '1':
-            self._status[0][3] = '0'
+            self._set_bit_to_off(0, 0)
             return "#AK"
         else:
             return "#NAK99"
@@ -181,11 +181,27 @@ class SimulatedNgpspsu(StateMachineDevice):
 
         self._connected = False
 
-    def fault_condition(self):
+    def fault(self, fault_name):
         """
-        Sets the status to have a fault condition. Set only via the backdoor
+        Sets the status depending on the fault. Set only via the backdoor
 
         Returns:
             None
         """
-        self._status[0][2] = "1"
+
+        faults = {
+            "fault_condition": (0, 1),
+            "mains_fault": (5, 1),
+            "earth_leakage_fault": (5, 2),
+            "earth_fuse_fault": (5, 3),
+            "regulation_fault": (6, 0),
+            "dcct_fault": (7, 2)
+        }
+
+        self._set_bit_to_on(*faults[fault_name])
+
+    def _set_bit_to_on(self, x, y):
+        self._status[x][3-y] = '1'
+
+    def _set_bit_to_off(self, x, y):
+        self._status[x][3-y] = '0'
