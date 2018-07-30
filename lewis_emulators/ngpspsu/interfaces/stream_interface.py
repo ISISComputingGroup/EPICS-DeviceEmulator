@@ -1,5 +1,8 @@
 from lewis.adapters.stream import StreamInterface
 from lewis_emulators.utils.command_builder import CmdBuilder
+from lewis_emulators.utils.replies import conditional_reply
+
+if_connected = conditional_reply("connected")
 
 
 class NgpspsuStreamInterface(StreamInterface):
@@ -36,6 +39,7 @@ class NgpspsuStreamInterface(StreamInterface):
 
         print("An error occurred at request {}: {}".format(request, error))
 
+    @if_connected
     def get_version(self):
         """
         Returns the model number and firmware of the device
@@ -45,6 +49,7 @@ class NgpspsuStreamInterface(StreamInterface):
         """
         return "#VER:{}".format(self._device.model_number_and_firmware)
 
+    @if_connected
     def start(self):
         """
         Turns on the device.
@@ -55,6 +60,7 @@ class NgpspsuStreamInterface(StreamInterface):
         """
         return self._device.start_device()
 
+    @if_connected
     def stop(self):
         """
         Turns off the device.
@@ -65,6 +71,7 @@ class NgpspsuStreamInterface(StreamInterface):
         """
         return self._device.stop_device()
 
+    @if_connected
     def read_status(self):
         """
         Gets the status of the device
@@ -74,6 +81,7 @@ class NgpspsuStreamInterface(StreamInterface):
         """
         return "#MST:{}".format(self._device.status)
 
+    @if_connected
     def reset(self):
         """
         Resets the device.
@@ -84,6 +92,7 @@ class NgpspsuStreamInterface(StreamInterface):
         """
         return self._device.reset_device()
 
+    @if_connected
     def read_voltage(self):
         """
         Reads the current voltage from the device
@@ -93,6 +102,7 @@ class NgpspsuStreamInterface(StreamInterface):
         """
         return "#MRV:{}".format(self._device.voltage)
 
+    @if_connected
     def set_voltage_setpoint(self, value):
         """
         Try's to set the voltage setpoint to value.
@@ -106,6 +116,7 @@ class NgpspsuStreamInterface(StreamInterface):
         """
         return self._device.try_setting_voltage_setpoint(value)
 
+    @if_connected
     def read_voltage_setpoint(self):
         """
         Reads the last voltage setpoint from the device.
@@ -115,6 +126,7 @@ class NgpspsuStreamInterface(StreamInterface):
         """
         return "#MWV:{}".format(self._device.voltage_setpoint)
 
+    @if_connected
     def read_current(self):
         """
         Reads the current voltage from the device
@@ -124,6 +136,7 @@ class NgpspsuStreamInterface(StreamInterface):
         """
         return "#MRI:{}".format(self._device.current)
 
+    @if_connected
     def set_current_setpoint(self, value):
         """
         Try's to set the voltage setpoint to value.
@@ -137,6 +150,7 @@ class NgpspsuStreamInterface(StreamInterface):
         """
         return self._device.try_setting_current_setpoint(value)
 
+    @if_connected
     def read_current_setpoint(self):
         """
         Reads the last voltage setpoint from the device.
