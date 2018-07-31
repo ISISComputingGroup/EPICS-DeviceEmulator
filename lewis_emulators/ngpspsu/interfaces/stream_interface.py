@@ -1,4 +1,4 @@
-from lewis.adapters.stream import StreamInterface, has_log
+from lewis.adapters.stream import StreamInterface
 from lewis_emulators.utils.command_builder import CmdBuilder
 from lewis_emulators.utils.replies import conditional_reply
 
@@ -45,40 +45,41 @@ class NgpspsuStreamInterface(StreamInterface):
         Returns the model number and firmware of the device
 
         E.g. "#VER:NGPS 100-50:0.9.01" where "NGPS 100-50" is the model
-        number and "0.9.01" is the firmware number.
+            number and "0.9.01" is the firmware number.
         """
+
         return "#VER:{}".format(self._device.model_number_and_firmware)
 
     @if_connected
     def start(self):
         """
-        Turns on the device.
+        Starts the device.
 
         Returns:
-            string: "#AK" if the device is turned on. "#NAK%i" otherwise, where %i is an
-                error code.
+            string: "#AK" if successful, #NK:%i if not (%i is an error code.).
         """
+
         return self._device.start_device()
 
     @if_connected
     def stop(self):
         """
-        Turns off the device.
+        Stops the device.
 
         Returns:
-            string: "#AK" if the device is turned on. "#NAK%i" otherwise, where %i is an
-                error code.
+            string: "#AK" if successful, #NK:%i if not (%i is an error code.).
         """
         return self._device.stop_device()
 
     @if_connected
     def read_status(self):
         """
-        Gets the status of the device
+        Reads the status of the device.
 
         Returns:
-            The status of the device which is composed of 8 hexadecimal digts.
+            string: The status of the device as a string of 8 hexadecimal digits.
         """
+
         return "#MST:{}".format(self._device.status)
 
     @if_connected
@@ -87,75 +88,74 @@ class NgpspsuStreamInterface(StreamInterface):
         Resets the device.
 
         Returns:
-            string: "#AK" if the device is turned on. "#NAK%i" otherwise, where %i is an
-                error code.
+            string: "#AK" if successful, #NK:%i if not (%i is an error code.).
         """
+
         return self._device.reset_device()
 
     @if_connected
     def read_voltage(self):
         """
-        Reads the current voltage from the device
+        Reads the voltage.
 
         Returns:
-            The status of the device which is composed of 8 hexadecimal digts.
+            string: "#MRV:%f" where %f is the voltage of the device to 6 decimal places.
         """
+
         return "#MRV:{}".format(self._device.voltage)
 
     @if_connected
     def set_voltage_setpoint(self, value):
         """
-        Try's to set the voltage setpoint to value.
+        Sets the voltage setpoint.
 
         Args:
             value: string of a decimal to 6 decimal places
 
         Returns:
-            "#AK" if successful and "#NAK:%i" if not where %i is an error
-                code.
+            string: "#AK" if successful, #NK:%i if not (%i is an error code.).
         """
         return self._device.try_setting_voltage_setpoint(value)
 
     @if_connected
     def read_voltage_setpoint(self):
         """
-        Reads the last voltage setpoint from the device.
+        Reads the voltage setpoint.
 
         Returns:
-            string: #MWV:%f" where %f is the last voltage setpoint set.
+            string: #MWV:%f" where %f is the voltage setpoint value.
         """
         return "#MWV:{}".format(self._device.voltage_setpoint)
 
     @if_connected
     def read_current(self):
         """
-        Reads the current voltage from the device
+        Reads the current.
 
         Returns:
-            The status of the device which is composed of 8 hexadecimal digts.
+            string: "#MRI:%f" where %f is the current of the device to 6 decimal places.
         """
         return "#MRI:{}".format(self._device.current)
 
     @if_connected
     def set_current_setpoint(self, value):
         """
-        Try's to set the voltage setpoint to value.
+        Sets the current setpoint.
 
         Args:
             value: string of a decimal to 6 decimal places
 
         Returns:
-            "#AK" if successful and "#NAK:%i" if not where %i is an error
-                code.
+            string: "#AK" if successful, #NK:%i if not (%i is an error code.).
         """
         return self._device.try_setting_current_setpoint(value)
 
     @if_connected
     def read_current_setpoint(self):
         """
-        Reads the last voltage setpoint from the device.
+        Reads the current setpoint.
 
         Returns:
-            string: #MWV:%f" where %f is the last voltage setpoint set.
+            string: #MWV:%f" where %f is the current setpoint value.
         """
         return "#MWI:{}".format(self._device.current_setpoint)

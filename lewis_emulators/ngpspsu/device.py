@@ -17,6 +17,7 @@ class SimulatedNgpspsu(StateMachineDevice):
         self._connected = True
         # Status is a list of length 8 of lists of length 4 containing 1's and '0's.
         # Each sublist represent a hexadecimal character as a list of 4 bits.
+        # Bit 0 lies in index 3 of the sublist, bit 1 lies in index 2 etc.
         self._status = [["0" for _ in range(4)] for _ in range(8)]
 
     def _get_state_handlers(self):
@@ -52,7 +53,7 @@ class SimulatedNgpspsu(StateMachineDevice):
     @property
     def voltage(self):
         """
-        Returns device's current voltage to 6 decimal places.
+        Returns voltage to 6 decimal places.
         """
 
         return "{0:.6f}".format(self._voltage)
@@ -60,14 +61,17 @@ class SimulatedNgpspsu(StateMachineDevice):
     @property
     def voltage_setpoint(self):
         """
-        Returns device's last voltage setpoint to 6 decimal places.
+        Returns last voltage setpoint to 6 decimal places.
         """
 
         return "{0:.6f}".format(self._voltage_setpoint)
 
     def try_setting_voltage_setpoint(self, value):
         """
-        Sets the  device's setpoint voltage to 6 decimal places.
+        Sets the voltage setpoint.
+
+        Returns:
+            string: "#AK" if successful, #NK:%i if not (%i is an error code.).
         """
 
         if self._status[0][3] == "0":
@@ -80,7 +84,7 @@ class SimulatedNgpspsu(StateMachineDevice):
     @property
     def current(self):
         """
-        Returns device's current voltage to 6 decimal places.
+        Returns current to 6 decimal places.
         """
 
         return "{0:.6f}".format(self._current)
@@ -88,14 +92,17 @@ class SimulatedNgpspsu(StateMachineDevice):
     @property
     def current_setpoint(self):
         """
-        Returns device's last voltage setpoint to 6 decimal places.
+        Returns current setpoint to 6 decimal places.
         """
 
         return "{0:.6f}".format(self._current_setpoint)
 
     def try_setting_current_setpoint(self, value):
         """
-        Sets the  device's setpoint voltage to 6 decimal places.
+        Sets the current setpoint.
+
+        Returns:
+            string: "#AK" if successful, #NK:%i if not (%i is an error code).
         """
 
         if self._status[0][3] == "0":
@@ -107,11 +114,10 @@ class SimulatedNgpspsu(StateMachineDevice):
 
     def start_device(self):
         """
-        Turns on the device.
+        Starts the device.
 
         Returns:
-            string: "#AK" if successful. #NK:%i if not where %i is an error
-                code.
+            string: "#AK" if successful, #NK:%i if not (%i is an error code).
         """
         if self._status[0][3] == '1':
             return "#NAK:09"
@@ -123,11 +129,10 @@ class SimulatedNgpspsu(StateMachineDevice):
 
     def stop_device(self):
         """
-        Turns off the device.
+        Stops the device.
 
         Returns:
-            string: "#AK" if successful. #NK:%i otherwise where %i is an error
-                code.
+            string: "#AK" if successful, #NK:%i if not (%i is an error code).
         """
         if self._status[0][3] == '0':
             return "#NAK:13"
@@ -142,8 +147,7 @@ class SimulatedNgpspsu(StateMachineDevice):
         Resets the device.
 
         Returns:
-            string: "#AK" if successful. #NK:%i otherwise where %i is an error
-                code.
+            string: "#AK" if successful, #NK:%i if not (%i is an error code).
         """
         self._status = [["0" for _ in range(4)] for _ in range(8)]
         self._voltage = 0
@@ -155,13 +159,18 @@ class SimulatedNgpspsu(StateMachineDevice):
     @property
     def connected(self):
         """
-        Returns True if the device is connected. False otherwise.
+        Connected status of the device.
+
+        Returns:
+            True if the device is connected. False otherwise.
         """
+
         return self._connected
 
     def connect(self):
         """
         Connects the device.
+
         Returns:
             None
         """
