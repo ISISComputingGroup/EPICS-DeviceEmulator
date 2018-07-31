@@ -1,12 +1,17 @@
 from lewis.adapters.stream import StreamInterface, Cmd
 from ..control_modes import OutputMode
+from lewis.core.logging import has_log
 
 
+@has_log
 class Keithley2400StreamInterface(StreamInterface):
 
     # Commands that we expect via serial during normal operation
     serial_commands = {
         Cmd("get_values", "^:READ\?$"),
+        Cmd("get_values", "\:MEAS:VOLT\?$"),
+        Cmd("get_values", "\:MEAS:CURR\?$"),
+        Cmd("get_values", "\:MEAS:RES\?$"),
         Cmd("reset", "^\*RST$"),
         Cmd("identify", "^\*IDN?"),
         Cmd("set_output_mode", "^\:OUTP\s(1|0)$"),
@@ -19,14 +24,35 @@ class Keithley2400StreamInterface(StreamInterface):
         Cmd("get_remote_sensing_mode", "^\:SYST:RSEN\?$"),
         Cmd("set_resistance_range_mode", "^\:SENS:RES:RANG:AUTO\s(0|1)$"),
         Cmd("get_resistance_range_mode", "^\:SENS:RES:RANG:AUTO\?$"),
-        Cmd("set_resistance_range", "^\:SENS:RES:RANG\s([-+]?[0-9]*\.?[0-9]+)$"),
+        Cmd("set_resistance_range", "^\:SENS:RES:RANG\s([-+]?[0-9]*\.?[0-9]*e?[-+]?[0-9]+$)"),
         Cmd("get_resistance_range", "^\:SENS:RES:RANG\?$"),
         Cmd("set_source_mode", "^\:SOUR:FUNC\s(CURR|VOLT)$"),
         Cmd("get_source_mode", "^\:SOUR:FUNC\?$"),
-        Cmd("set_current_compliance", "^\:SENS:CURR:PROT\s([-+]?[0-9]*\.?[0-9]+)$"),
+        Cmd("set_current_compliance", "^\:SENS:CURR:PROT\s([-+]?[0-9]*\.?[0-9]*e?[-+]?[0-9]+$)"),
         Cmd("get_current_compliance", "^\:SENS:CURR:PROT\?$"),
-        Cmd("set_voltage_compliance", "^\:SENS:VOLT:PROT\s([-+]?[0-9]*\.?[0-9]+)$"),
+        Cmd("set_voltage_compliance", "^\:SENS:VOLT:PROT\s([-+]?[0-9]*\.?[0-9]*e?[-+]?[0-9]+$)"),
         Cmd("get_voltage_compliance", "^\:SENS:VOLT:PROT\?$"),
+        Cmd("set_source_voltage", "^\:SOUR:VOLT:LEV\s([-+]?[0-9]*\.?[0-9]*e?[-+]?[0-9]+$)"),
+        Cmd("get_source_voltage", "^\:SOUR:VOLT:LEV\?$"),
+        Cmd("set_source_current", "^\:SOUR:CURR:LEV\s([-+]?[0-9]*\.?[0-9]*e?[-+]?[0-9]+$)"),
+        Cmd("get_source_current", "^\:SOUR:CURR:LEV\?$"),
+        Cmd("set_source_current_autorange_mode", "^\:SOUR:CURR:RANG:AUTO\s(1|0)$"),
+        Cmd("get_source_current_autorange_mode", "^\:SOUR:CURR:RANG:AUTO\?$"),
+        Cmd("set_source_voltage_autorange_mode", "^\:SOUR:VOLT:RANG:AUTO\s(1|0)$"),
+        Cmd("get_source_voltage_autorange_mode", "^\:SOUR:VOLT:RANG:AUTO\?$"),
+        Cmd("get_source_current_range", "^\:SOUR:CURR:RANG\?$"),
+        Cmd("set_source_current_range", "^\:SOUR:CURR:RANG\s([-+]?[0-9]*\.?[0-9]*e?[-+]?[0-9]+$)"),
+        Cmd("get_source_voltage_range", "^\:SOUR:VOLT:RANG\?$"),
+        Cmd("set_source_voltage_range", "^\:SOUR:VOLT:RANG\s([-+]?[0-9]*\.?[0-9]*e?[-+]?[0-9]+$)"),
+        Cmd("set_measured_voltage_autorange_mode", "^\:SENS:VOLT:RANG:AUTO\s(1|0)$"),
+        Cmd("get_measured_voltage_autorange_mode", "^\:SENS:VOLT:RANG:AUTO\?$"),
+        Cmd("set_measured_current_autorange_mode", "^\:SENS:CURR:RANG:AUTO\s(1|0)$"),
+        Cmd("get_measured_current_autorange_mode", "^\:SENS:CURR:RANG:AUTO\?$"),
+        Cmd("get_measured_current_range", "^\:SENS:CURR:RANG\?$"),
+        Cmd("set_measured_current_range", "^\:SENS:CURR:RANG\s([-+]?[0-9]*\.?[0-9]*e?[-+]?[0-9]+$)"),
+        Cmd("get_measured_voltage_range", "^\:SENS:VOLT:RANG\?$"),
+        Cmd("set_measured_voltage_range", "^\:SENS:VOLT:RANG\s([-+]?[0-9]*\.?[0-9]*e?[-+]?[0-9]+$)"),
+
     }
 
     # Private control commands that can be used as an alternative to the lewis backdoor
@@ -78,6 +104,7 @@ class Keithley2400StreamInterface(StreamInterface):
         The generic form of how mode sets are executed and responded to.
         """
         set_method(mode)
+
         return command + " " + mode
 
     def set_output_mode(self, new_mode):
@@ -134,6 +161,58 @@ class Keithley2400StreamInterface(StreamInterface):
     def get_voltage_compliance(self):
         return self._device.get_voltage_compliance()
 
+    def set_source_voltage(self, value):
+        return self._device.set_source_voltage(float(value))
+
+    def get_source_voltage(self):
+        return self._device.get_source_voltage()
+
+    def set_source_current(self, value):
+        return self._device.set_source_current(float(value))
+
+    def get_source_current(self):
+        return self._device.get_source_current()
+
+    def get_source_current_autorange_mode(self):
+        return self._device.get_source_current_autorange_mode()
+
+    def set_source_current_autorange_mode(self, value):
+        return self._device.set_source_current_autorange_mode(value)
+
+    def get_source_voltage_autorange_mode(self):
+        return self._device.get_source_voltage_autorange_mode()
+
+    def set_source_voltage_autorange_mode(self, value):
+        return self._device.set_source_voltage_autorange_mode(value)
+
+    @has_log
     def handle_error(self, request, error):
-        print "An error occurred at request " + repr(request) + ": " + repr(error)
-        return str(error)
+        err = "An error occurred at request {}: {}".format(str(request), str(error))
+        print(err)
+        self.log.info(err)
+        return str(err)
+
+    def set_source_current_range(self, value):
+        return self._device.set_source_current_range(float(value))
+
+    def get_source_current_range(self):
+        return self._device.get_source_current_range()
+
+    def set_source_voltage_range(self, value):
+        return self._device.set_source_voltage_range(float(value))
+
+    def get_source_voltage_range(self):
+        return self._device.get_source_voltage_range()
+
+    def get_measured_voltage_autorange_mode(self):
+        return self._device.get_measured_voltage_autorange_mode()
+
+    def set_measured_voltage_autorange_mode(self, value):
+        return self._device.set_measured_voltage_autorange_mode(value)
+
+    def get_measured_current_autorange_mode(self):
+        return self._device.get_measured_current_autorange_mode()
+
+    def set_measured_current_autorange_mode(self, value):
+        val = self._device.set_measured_current_autorange_mode(value)
+        return val
