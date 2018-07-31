@@ -9,17 +9,16 @@ class SimulatedOmibthx(StateMachineDevice):
         """
         Initialize all of the device's attributes.
         """
-        pass
+        self.temperature = 0
+        self.humidity = 0
+        self.pressure = 0
+        self.dew_point = 0
 
     def _get_state_handlers(self):
-        return {
-            'default': DefaultState(),
-        }
+        return {'default': DefaultState()}
 
     def _get_initial_state(self):
         return 'default'
 
     def _get_transition_handlers(self):
-        return OrderedDict([
-        ])
-
+        return OrderedDict([])
