@@ -80,6 +80,8 @@ class SimulatedSp2XX(StateMachineDevice):
         Returns:
             True if direction was reversed; False otherwise
         """
+        # it is not clear whether the actual device sets the mode on reverse or not; and it it not important
+        # enough to find out
         if self.mode.response == "I" and self._running:
             self.set_mode("w")
             self._running_status = RunStatus.Withdrawal
