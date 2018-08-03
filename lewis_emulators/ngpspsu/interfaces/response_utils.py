@@ -14,7 +14,7 @@ REFERENCE = {
     "5": "Regulation mode",
     "6": "Update mode",
     "7": "Update mode",
-    "12": "Rampinge",
+    "12": "Ramping",
     "13": "Waveform",
     "20": "OVT",
     "21": "Mains fault",
