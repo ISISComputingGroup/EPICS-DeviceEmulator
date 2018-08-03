@@ -15,10 +15,26 @@ class SimulatedNgpspsu(StateMachineDevice):
         self._current = 0.0
         self._current_setpoint = 0.0
         self._connected = True
-        # Status is a list of length 8 of lists of length 4 containing 1's and '0's.
-        # Each sublist represent a hexadecimal character as a list of 4 bits.
-        # Bit 0 lies in index 3 of the sublist, bit 1 lies in index 2 etc.
-        self._status = [["0" for _ in range(4)] for _ in range(8)]
+        self._status = {
+            "ON/OFF": False,
+            "Fault condition": False,
+            "Control mode": (False, False),
+            "Regulation mode": False,
+            "Update mode": (False, False),
+            "Ramping": False,
+            "Waveform": False,
+            "OVT": False,
+            "Mains fault": False,
+            "Earth leakage": False,
+            "Earth fuse": False,
+            "Regulation fault": False,
+            "Ext. interlock #1": False,
+            "Ext. interlock #2": False,
+            "Ext. interlock #3": False,
+            "Ext. interlock #4": False,
+            "DCCT fault": False,
+            "OVP": False
+        }
 
     def _get_state_handlers(self):
         return {
@@ -46,9 +62,7 @@ class SimulatedNgpspsu(StateMachineDevice):
         Returns the status of the device as a 8 digit hexadecimal string.
         """
 
-        status_as_eight_hex_digits = [hex(int("".join(word), 2))[-1]
-                                      for word in self._status]
-        return "".join(status_as_eight_hex_digits)
+        return self._status
 
     @property
     def voltage(self):
@@ -74,7 +88,7 @@ class SimulatedNgpspsu(StateMachineDevice):
             string: "#AK" if successful, #NK:%i if not (%i is an error code.).
         """
 
-        if self._status[0][3] == "0":
+        if not self._status["ON/OFF"]:
             return "#NAK:13"
         else:
             value = float(value)
@@ -105,7 +119,7 @@ class SimulatedNgpspsu(StateMachineDevice):
             string: "#AK" if successful, #NK:%i if not (%i is an error code).
         """
 
-        if self._status[0][3] == "0":
+        if not self._status["ON/OFF"]:
             return "#NAK:13"
         else:
             value = float(value)
@@ -119,13 +133,11 @@ class SimulatedNgpspsu(StateMachineDevice):
         Returns:
             string: "#AK" if successful, #NK:%i if not (%i is an error code).
         """
-        if self._status[0][3] == '1':
+        if self._status["ON/OFF"]:
             return "#NAK:09"
-        elif self._status[0][3] == '0':
-            self._set_bit_to_on(0, 0)
-            return "#AK"
         else:
-            return "#NAK99"
+            self._status["ON/OFF"] = True
+            return "#AK"
 
     def stop_device(self):
         """
@@ -134,13 +146,11 @@ class SimulatedNgpspsu(StateMachineDevice):
         Returns:
             string: "#AK" if successful, #NK:%i if not (%i is an error code).
         """
-        if self._status[0][3] == '0':
-            return "#NAK:13"
-        elif self._status[0][3] == '1':
-            self._set_bit_to_off(0, 0)
-            return "#AK"
+        if not self._status["ON/OFF"]:
+            return "#NAK:09"
         else:
-            return "#NAK99"
+            self._status["ON/OFF"] = False
+            return "#AK"
 
     def reset_device(self):
         """
@@ -149,7 +159,9 @@ class SimulatedNgpspsu(StateMachineDevice):
         Returns:
             string: "#AK" if successful, #NK:%i if not (%i is an error code).
         """
-        self._status = [["0" for _ in range(4)] for _ in range(8)]
+        for key in self._status:
+            self._status[key] = False
+
         self._voltage = 0
         self._voltage_setpoint = 0
         self._current = 0
@@ -193,21 +205,14 @@ class SimulatedNgpspsu(StateMachineDevice):
 
         Returns:
             None
+
+        Raises:
+            ValueError if fault_name is not a recognised fault
         """
+        if fault_name in self._status:
+            self._status[fault_name] = True
+        else:
+            raise ValueError("Could not find {}".format(fault_name))
 
-        faults = {
-            "fault_condition": (0, 1),
-            "mains_fault": (5, 1),
-            "earth_leakage_fault": (5, 2),
-            "earth_fuse_fault": (5, 3),
-            "regulation_fault": (6, 0),
-            "dcct_fault": (7, 2)
-        }
 
-        self._set_bit_to_on(*faults[fault_name])
 
-    def _set_bit_to_on(self, x, y):
-        self._status[x][3-y] = '1'
-
-    def _set_bit_to_off(self, x, y):
-        self._status[x][3-y] = '0'
