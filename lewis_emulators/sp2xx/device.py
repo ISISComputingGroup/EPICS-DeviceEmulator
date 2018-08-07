@@ -1,3 +1,6 @@
+"""
+Items associated with WPI SP2XX syringe pump
+"""
 from collections import OrderedDict
 from states import DefaultState
 from lewis.devices import StateMachineDevice
@@ -7,6 +10,9 @@ from .util_constants import NO_ERROR, DIRECTIONS, MODES
 
 
 class SimulatedSp2XX(StateMachineDevice):
+    """
+    Simulation of the WPI SP2XX syringe pump
+    """
 
     def _initialize_data(self):
         """
@@ -28,18 +34,15 @@ class SimulatedSp2XX(StateMachineDevice):
         self.withdrawal_rate_units = "ml/m"
         self.withdrawal_rate = 12.0
 
-    @staticmethod
-    def _get_state_handlers():
+    def _get_state_handlers(self):
         return {
             'default': DefaultState(),
         }
 
-    @staticmethod
-    def _get_initial_state():
+    def _get_initial_state(self):
         return 'default'
 
-    @staticmethod
-    def _get_transition_handlers():
+    def _get_transition_handlers(self):
         return OrderedDict([
         ])
 
@@ -71,15 +74,25 @@ class SimulatedSp2XX(StateMachineDevice):
 
     def reverse_direction(self):
         """
-        Reverses the direction of the device and change mode accordingly.
+        Reverses the direction of the device and change mode and status accordingly. But only if it is in
+        Infusion or withdrawal mode and running. Other reverse can not be sent.
 
         Returns:
-            None
+            True if direction was reversed; False otherwise
         """
-        if self.mode.response == "I":
+        # it is not clear whether the actual device sets the mode on reverse or not; and it it not important
+        # enough to find out
+        if self.mode.response == "I" and self._running:
             self.set_mode("w")
-        else:
+            self._running_status = RunStatus.Withdrawal
+            did_reverse = True
+        elif self.mode.response == "W" and self._running:
             self.set_mode("i")
+            self._running_status = RunStatus.Infusion
+            did_reverse = True
+        else:
+            did_reverse = False
+        return did_reverse
 
     def start_device(self):
         """
@@ -88,7 +101,6 @@ class SimulatedSp2XX(StateMachineDevice):
         Returns:
             None
         """
-
         self._running = True
         self._running_status = RunStatus[self._direction.name]
 
@@ -175,6 +187,9 @@ class SimulatedSp2XX(StateMachineDevice):
 
     @property
     def diameter(self):
+        """
+        Returns: the diameter of the syringe set on the device
+        """
         return self._diameter
 
     def successfully_set_diameter(self, value):
@@ -217,5 +232,3 @@ class SimulatedSp2XX(StateMachineDevice):
             None
         """
         self._connected = False
-
-
