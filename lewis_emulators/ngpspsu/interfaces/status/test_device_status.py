@@ -1,7 +1,7 @@
 import unittest
 from hamcrest import assert_that, is_, equal_to
 
-from status_utils import convert_to_hexadecimal, DeviceStatus
+from lewis_emulators.ngpspsu.interfaces.status import convert_to_hexadecimal, DeviceStatus
 
 
 class DeviceStatusTests(unittest.TestCase):
