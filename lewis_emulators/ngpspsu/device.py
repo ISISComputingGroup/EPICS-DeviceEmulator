@@ -50,33 +50,25 @@ class SimulatedNgpspsu(StateMachineDevice):
 
     @property
     def model_number_and_firmware(self):
-        """
-        Returns the model number and firmware version.
-        """
+        """ Returns the model number and firmware version. """
 
         return self._model_no_and_firmware
 
     @property
     def status(self):
-        """
-        Returns the status of the device as a 8 digit hexadecimal string.
-        """
+        """ Returns the status of the device. """
 
         return self._status
 
     @property
     def voltage(self):
-        """
-        Returns voltage to 6 decimal places.
-        """
+        """ Returns voltage to 6 decimal places. """
 
         return "{0:.6f}".format(self._voltage)
 
     @property
     def voltage_setpoint(self):
-        """
-        Returns last voltage setpoint to 6 decimal places.
-        """
+        """ Returns last voltage setpoint to 6 decimal places. """
 
         return "{0:.6f}".format(self._voltage_setpoint)
 
@@ -97,17 +89,13 @@ class SimulatedNgpspsu(StateMachineDevice):
 
     @property
     def current(self):
-        """
-        Returns current to 6 decimal places.
-        """
+        """ Returns current to 6 decimal places. """
 
         return "{0:.6f}".format(self._current)
 
     @property
     def current_setpoint(self):
-        """
-        Returns current setpoint to 6 decimal places.
-        """
+        """ Returns current setpoint to 6 decimal places. """
 
         return "{0:.6f}".format(self._current_setpoint)
 
@@ -133,6 +121,7 @@ class SimulatedNgpspsu(StateMachineDevice):
         Returns:
             string: "#AK" if successful, #NK:%i if not (%i is an error code).
         """
+
         if self._status["ON/OFF"]:
             return "#NAK:09"
         else:
@@ -146,6 +135,7 @@ class SimulatedNgpspsu(StateMachineDevice):
         Returns:
             string: "#AK" if successful, #NK:%i if not (%i is an error code).
         """
+
         if not self._status["ON/OFF"]:
             return "#NAK:09"
         else:
@@ -159,6 +149,7 @@ class SimulatedNgpspsu(StateMachineDevice):
         Returns:
             string: "#AK" if successful, #NK:%i if not (%i is an error code).
         """
+
         for key in self._status:
             self._status[key] = False
 
@@ -180,22 +171,12 @@ class SimulatedNgpspsu(StateMachineDevice):
         return self._connected
 
     def connect(self):
-        """
-        Connects the device.
-
-        Returns:
-            None
-        """
+        """ Connects the device. """
 
         self._connected = True
 
     def disconnect(self):
-        """
-        Disconnects the device.
-
-        Returns:
-            None
-        """
+        """ Disconnects the device. """
 
         self._connected = False
 
@@ -203,12 +184,10 @@ class SimulatedNgpspsu(StateMachineDevice):
         """
         Sets the status depending on the fault. Set only via the backdoor.
 
-        Returns:
-            None
-
         Raises:
             ValueError if fault_name is not a recognised fault
         """
+
         if fault_name in self._status:
             self._status[fault_name] = True
         else:
