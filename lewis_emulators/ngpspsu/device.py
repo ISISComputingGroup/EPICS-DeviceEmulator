@@ -18,9 +18,9 @@ class SimulatedNgpspsu(StateMachineDevice):
         self._status = {
             "ON/OFF": False,
             "Fault condition": False,
-            "Control mode": (False, False),
-            "Regulation mode": False,
-            "Update mode": (False, False),
+            "Control mode": "Local",
+            "Regulation mode ": False,
+            "Update mode": "Normal",
             "Ramping": False,
             "Waveform": False,
             "OVT": False,

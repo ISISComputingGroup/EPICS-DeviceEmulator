@@ -1,7 +1,7 @@
 from lewis.adapters.stream import StreamInterface
 from lewis_emulators.utils.command_builder import CmdBuilder
 from lewis_emulators.utils.replies import conditional_reply
-from .response_utils import DeviceStatus
+from .status_utils import DeviceStatus
 
 if_connected = conditional_reply("connected")
 
@@ -81,7 +81,7 @@ class NgpspsuStreamInterface(StreamInterface):
             string: The status of the device as a string of 8 hexadecimal digits.
         """
         device_status = DeviceStatus(self._device.status)
-        status = str(device_status)
+        status = device_status.in_hexadecimal()
         return "#MST:{}".format(status)
 
     @if_connected
