@@ -137,7 +137,7 @@ class SimulatedNgpspsu(StateMachineDevice):
         """
 
         if not self._status["ON/OFF"]:
-            return "#NAK:09"
+            return "#NAK:13"
         else:
             self._status["ON/OFF"] = False
             return "#AK"
@@ -151,7 +151,12 @@ class SimulatedNgpspsu(StateMachineDevice):
         """
 
         for key in self._status:
-            self._status[key] = False
+            if key == "Control mode":
+                self._status[key] = "Remote"
+            elif key == "Update mode":
+                self._status[key] = "Normal"
+            else:
+                self._status[key] = False
 
         self._voltage = 0
         self._voltage_setpoint = 0
@@ -185,7 +190,7 @@ class SimulatedNgpspsu(StateMachineDevice):
         Sets the status depending on the fault. Set only via the backdoor.
 
         Raises:
-            ValueError if fault_name is not a recognised fault
+            ValueError if fault_name is not a recognised fault.
         """
 
         if fault_name in self._status:
