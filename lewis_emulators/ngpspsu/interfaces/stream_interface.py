@@ -81,8 +81,8 @@ class NgpspsuStreamInterface(StreamInterface):
             string: The status of the device as a string of 8 hexadecimal digits.
         """
         device_status = DeviceStatus(self._device.status)
-        status = device_status.in_hexadecimal()
-        return "#MST:{}".format(status)
+        hexadecimal_status = device_status.in_hexadecimal()
+        return "#MST:{}".format(hexadecimal_status)
 
     @if_connected
     def reset(self):
