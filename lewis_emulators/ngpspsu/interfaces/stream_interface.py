@@ -10,17 +10,17 @@ class NgpspsuStreamInterface(StreamInterface):
 
     # Commands that we expect via serial during normal operation
     commands = {
-        CmdBuilder("get_version").escape("VER").build(),
-        CmdBuilder("start").escape("MON").build(),
-        CmdBuilder("stop").escape("MOFF").build(),
-        CmdBuilder("read_status").escape("MST").build(),
-        CmdBuilder("reset").escape("MRESET").build(),
+        CmdBuilder("get_version").escape("VER").eos().build(),
+        CmdBuilder("start").escape("MON").eos().build(),
+        CmdBuilder("stop").escape("MOFF").eos().build(),
+        CmdBuilder("read_status").escape("MST").eos().build(),
+        CmdBuilder("reset").escape("MRESET").eos().build(),
         CmdBuilder("read_voltage").escape("MRV").build(),
-        CmdBuilder("set_voltage_setpoint").escape("MWV:").float().build(),
-        CmdBuilder("read_voltage_setpoint").escape("MWV:?").build(),
-        CmdBuilder("read_current").escape("MRI").build(),
-        CmdBuilder("set_current_setpoint").escape("MWI:").float().build(),
-        CmdBuilder("read_current_setpoint").escape("MWI:?").build()
+        CmdBuilder("set_voltage_setpoint").escape("MWV:").float().eos().build(),
+        CmdBuilder("read_voltage_setpoint").escape("MWV:?").eos().build(),
+        CmdBuilder("read_current").escape("MRI").eos().build(),
+        CmdBuilder("set_current_setpoint").escape("MWI:").float().eos().build(),
+        CmdBuilder("read_current_setpoint").escape("MWI:?").eos().build()
     }
 
     out_terminator = "\r\n"
@@ -70,6 +70,7 @@ class NgpspsuStreamInterface(StreamInterface):
         Returns:
             string: "#AK" if successful, #NK:%i if not (%i is an error code.).
         """
+
         return self._device.stop_device()
 
     @if_connected
@@ -117,6 +118,7 @@ class NgpspsuStreamInterface(StreamInterface):
         Returns:
             string: "#AK" if successful, #NK:%i if not (%i is an error code.).
         """
+
         return self._device.try_setting_voltage_setpoint(value)
 
     @if_connected
@@ -127,6 +129,7 @@ class NgpspsuStreamInterface(StreamInterface):
         Returns:
             string: #MWV:%f" where %f is the voltage setpoint value.
         """
+
         return "#MWV:{}".format(self._device.voltage_setpoint)
 
     @if_connected
@@ -137,6 +140,7 @@ class NgpspsuStreamInterface(StreamInterface):
         Returns:
             string: "#MRI:%f" where %f is the current of the device to 6 decimal places.
         """
+
         return "#MRI:{}".format(self._device.current)
 
     @if_connected
@@ -150,6 +154,7 @@ class NgpspsuStreamInterface(StreamInterface):
         Returns:
             string: "#AK" if successful, #NK:%i if not (%i is an error code.).
         """
+
         return self._device.try_setting_current_setpoint(value)
 
     @if_connected
@@ -160,4 +165,5 @@ class NgpspsuStreamInterface(StreamInterface):
         Returns:
             string: #MWV:%f" where %f is the current setpoint value.
         """
+
         return "#MWI:{}".format(self._device.current_setpoint)
