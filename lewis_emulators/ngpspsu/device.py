@@ -63,7 +63,6 @@ class SimulatedNgpspsu(StateMachineDevice):
     @property
     def voltage(self):
         """ Returns voltage to 6 decimal places. """
-
         return "{0:.6f}".format(self._voltage)
 
     @property
@@ -85,12 +84,12 @@ class SimulatedNgpspsu(StateMachineDevice):
         else:
             value = float(value)
             self._voltage_setpoint = value
+            self._voltage = value
             return "#AK"
 
     @property
     def current(self):
         """ Returns current to 6 decimal places. """
-
         return "{0:.6f}".format(self._current)
 
     @property
@@ -112,6 +111,7 @@ class SimulatedNgpspsu(StateMachineDevice):
         else:
             value = float(value)
             self._current_setpoint = value
+            self._current = value
             return "#AK"
 
     def start_device(self):
@@ -140,6 +140,8 @@ class SimulatedNgpspsu(StateMachineDevice):
             return "#NAK:13"
         else:
             self._status["ON/OFF"] = False
+            self._voltage = 0.00000
+            self._current = 0.00000
             return "#AK"
 
     def reset_device(self):
