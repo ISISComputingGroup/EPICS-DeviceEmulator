@@ -1,0 +1,23 @@
+from lewis.adapters.modbus import ModbusInterface, ModbusDataBank, ModbusBasicDataBank
+from lewis.core.logging import has_log
+
+
+@has_log
+class Moxa1210ModbusInterface(ModbusInterface):
+    """
+
+    """
+
+    di = ModbusBasicDataBank(False, last_addr=0x10)
+    co = di
+    ir = ModbusBasicDataBank(0)
+    hr = ir
+
+    # Overrides base implementation to give attached device a reference to self
+    @ModbusInterface.device.setter
+    def device(self, new_device):
+        ModbusInterface.device.fset(self, new_device)
+        self.device.interface = self
+
+    def set_di(self, addr, value):
+        self.interface.di.set(addr, value)
