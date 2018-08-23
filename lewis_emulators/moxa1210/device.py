@@ -3,6 +3,7 @@ from lewis.devices import StateMachineDevice
 from states import DefaultState
 from lewis.core.logging import has_log
 
+
 @has_log
 class SimulatedMoxa1210(StateMachineDevice):
     """

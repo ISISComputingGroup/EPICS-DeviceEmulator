@@ -8,7 +8,5 @@ class DefaultState(State):
     NAME = 'Default'
 
     def in_state(self, dt):
-        #self.device.input_lines[0] = not self.device.input_lines[0]
-        #print(self.device.input_lines[0])
         pass
 
