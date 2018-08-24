@@ -28,7 +28,7 @@ class Itc503StreamInterface(StreamInterface):
         CmdBuilder("set_mode").escape("A").int().eos().build(),
         CmdBuilder("set_ctrl_chan").escape("H").int().eos().build(),
 
-        CmdBuilder("set_autopid_on").escape("L").eos().build(),
+        CmdBuilder("set_autopid_on").escape("L1").eos().build(),
         CmdBuilder("set_autopid_off").escape("L0").eos().build(),
 
         CmdBuilder("set_heater_maxv").escape("M").float().eos().build(),
