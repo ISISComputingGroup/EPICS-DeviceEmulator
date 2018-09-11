@@ -15,7 +15,6 @@ class SimulatedIndfurn(StateMachineDevice):
         self.fet_temperature = 35.8
 
         self.p, self.i, self.d = 0, 0, 0
-
         self.sample_time = 100
 
         self.direction_heating = True
@@ -23,6 +22,13 @@ class SimulatedIndfurn(StateMachineDevice):
         self.pid_lower_limit, self.pid_upper_limit = 0, 0
 
         self.pid_mode_automatic = True
+
+        self.psu_voltage, self.psu_current, self.output = 0, 0, 0
+
+        self.remote_mode = True
+        self.power_supply_on = True
+        self.power_supply_fan_on = True
+        self.hf_on = False
 
         self.psu_overtemp, self.psu_overvolt = False, False
         self.cooling_water_flow = True

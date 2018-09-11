@@ -13,6 +13,15 @@ class IndfurnStreamInterface(StreamInterface):
         CmdBuilder("get_setpoint").escape("?pidSP").eos().build(),
         CmdBuilder("set_setpoint").escape(">pidSP ").float().eos().build(),
 
+        CmdBuilder("get_psu_voltage").escape("?powV").eos().build(),
+        CmdBuilder("set_psu_voltage").escape(">powV ").float().eos().build(),
+
+        CmdBuilder("get_psu_current").escape("?powI").eos().build(),
+        CmdBuilder("set_psu_current").escape(">powI ").float().eos().build(),
+
+        CmdBuilder("get_output").escape("?pidOUTM").eos().build(),
+        CmdBuilder("set_output").escape(">pidOUTM ").float().eos().build(),
+
         CmdBuilder("get_thermocouple_temperature").escape("?tempTC").eos().build(),
         CmdBuilder("get_pipe_temperature").escape("?tempP").eos().build(),
         CmdBuilder("get_capacitor_bank_temperature").escape("?tempC").eos().build(),
@@ -29,6 +38,18 @@ class IndfurnStreamInterface(StreamInterface):
 
         CmdBuilder("get_pid_mode").escape("?pidMode").eos().build(),
         CmdBuilder("set_pid_mode").escape(">pidMode ").char().eos().build(),
+
+        CmdBuilder("set_psu_remote").escape(">powR").eos().build(),
+        CmdBuilder("set_psu_local").escape(">powL").eos().build(),
+
+        CmdBuilder("set_psu_on").escape(">powON").eos().build(),
+        CmdBuilder("set_psu_off").escape(">powOFF").eos().build(),
+
+        CmdBuilder("set_psu_fan_on").escape(">fanON").eos().build(),
+        CmdBuilder("set_psu_fan_off").escape(">fanOFF").eos().build(),
+
+        CmdBuilder("set_hf_on").escape(">oscON").eos().build(),
+        CmdBuilder("set_hf_off").escape(">oscOFF").eos().build(),
 
         CmdBuilder("get_pid_limits").escape("?pidOUTL").eos().build(),
         CmdBuilder("set_pid_limits").escape(">pidOUTL ").float().escape(" ").float().eos().build(),
@@ -69,6 +90,27 @@ class IndfurnStreamInterface(StreamInterface):
 
     def set_setpoint(self, sp):
         self.device.setpoint = float(sp)
+        return "<ack"
+
+    def get_psu_voltage(self):
+        return "<powv {:.2f}".format(self.device.psu_voltage)
+
+    def set_psu_voltage(self, voltage):
+        self.device.psu_voltage = float(voltage)
+        return "<ack"
+
+    def get_psu_current(self):
+        return "<powa {:.2f}".format(self.device.psu_current)
+
+    def set_psu_current(self, current):
+        self.device.psu_current = float(current)
+        return "<ack"
+
+    def get_output(self):
+        return "<pidoutm {:.2f}".format(self.device.output)
+
+    def set_output(self, output):
+        self.device.output = float(output)
         return "<ack"
 
     def get_thermocouple_temperature(self):
@@ -133,3 +175,33 @@ class IndfurnStreamInterface(StreamInterface):
         self.device.psu_overtemp = False
         self.device.psu_overvolt = False
         return "<ack"
+
+    def set_psu_remote(self):
+        self.device.remote_mode = True
+        return "<ack"
+
+    def set_psu_local(self):
+        self.device.remote_mode = False
+        return "<ack"
+
+    def set_psu_on(self):
+        self.device.power_supply_on = True
+        return "<ack"
+
+    def set_psu_off(self):
+        self.device.power_supply_on = False
+        return "<ack"
+
+    def set_psu_fan_on(self):
+        self.device.power_supply_fan_on = True
+        return "<ack"
+
+    def set_psu_fan_off(self):
+        self.device.power_supply_fan_on = False
+        return "<ack"
+
+    def set_hf_on(self):
+        self.device.hf_on = True
+
+    def set_hf_off(self):
+        self.device.hf_on = False
