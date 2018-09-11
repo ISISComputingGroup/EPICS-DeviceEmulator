@@ -9,17 +9,29 @@ class SimulatedIndfurn(StateMachineDevice):
         """
         Initialize all of the device's attributes.
         """
-        pass
+        self.setpoint = 20
+        self.pipe_temperature = 25.1
+        self.capacitor_bank_temperature = 30.3
+        self.fet_temperature = 35.8
+
+        self.p, self.i, self.d = 0, 0, 0
+
+        self.sample_time = 100
+
+        self.direction_heating = True
+
+        self.pid_lower_limit, self.pid_upper_limit = 0, 0
+
+        self.pid_mode_automatic = True
+
+        self.psu_overtemp, self.psu_overvolt = False, False
+        self.cooling_water_flow = True
 
     def _get_state_handlers(self):
-        return {
-            'default': DefaultState(),
-        }
+        return {'default': DefaultState()}
 
     def _get_initial_state(self):
         return 'default'
 
     def _get_transition_handlers(self):
-        return OrderedDict([
-        ])
-
+        return OrderedDict([])
