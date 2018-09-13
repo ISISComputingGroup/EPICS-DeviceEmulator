@@ -58,6 +58,10 @@ class IndfurnStreamInterface(StreamInterface):
         CmdBuilder("get_psu_overvolt").escape("?alarmv").eos().build(),
         CmdBuilder("get_cooling_water_flow").escape("?CWflow").eos().build(),
         CmdBuilder("reset_alarms").escape(">ackAlarm").eos().build(),
+
+        CmdBuilder("set_runmode_on").escape(">pidRUN").eos().build(),
+        CmdBuilder("set_runmode_off").escape(">pidSTP").eos().build(),
+        CmdBuilder("get_runmode").escape("?pidRUN").eos().build(),
     }
 
     in_terminator = "\r\n"
@@ -202,6 +206,19 @@ class IndfurnStreamInterface(StreamInterface):
 
     def set_hf_on(self):
         self.device.hf_on = True
+        return "<ack"
 
     def set_hf_off(self):
         self.device.hf_on = False
+        return "<ack"
+
+    def set_runmode_on(self):
+        self.device.running = True
+        return "<ack"
+
+    def set_runmode_off(self):
+        self.device.running = False
+        return "<ack"
+
+    def get_runmode(self):
+        return "<pid{}".format(1 if self.device.running else 0)

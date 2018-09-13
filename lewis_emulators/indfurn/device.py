@@ -22,6 +22,7 @@ class SimulatedIndfurn(StateMachineDevice):
         self.pid_lower_limit, self.pid_upper_limit = 0, 0
 
         self.pid_mode_automatic = True
+        self.running = True
 
         self.psu_voltage, self.psu_current, self.output = 0, 0, 0
 
