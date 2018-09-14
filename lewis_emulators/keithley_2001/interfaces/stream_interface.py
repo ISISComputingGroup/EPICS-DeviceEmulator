@@ -11,40 +11,53 @@ class Keithley_2001StreamInterface(StreamInterface):
 
     commands = {
         CmdBuilder("get_idn").escape("*IDN?").build(),
-        CmdBuilder("empty_queue").escape(":SYST:CLE").build(),
-        CmdBuilder("clear_buffer").escape("TRAC:CLE").build(),
+        CmdBuilder("empty_error_queue").escape(":SYST:CLE").build(),
+
         CmdBuilder("set_measurement").escape(":FUNC '").arg(
-            "VOLT:DC|VOLT:AC|CURR:DC|CURR:AC|RES|FRES|CONT|FREQ|PER").escape("'").build(),
+            "VOLT:DC|VOLT:AC|CURR:DC|CURR:AC|RES|FRES||FREQ|TEMP").escape("'").build(),
         CmdBuilder("get_measurement").escape(":FUNC?").build(),
-        CmdBuilder("set_buffer_feed").escape("TRAC:FEED ").arg("SENS|CALC|NONE").build(),
-        CmdBuilder("set_buffer_control").escape("TRAC:FEED:CONT ").arg("NEV|NEXT|ALW").build(),
-        CmdBuilder("set_buffer_state").escape("TRAC:CLE:AUTO ").arg("OFF|ON").build(),
-        CmdBuilder("get_buffer_state").escape("TRAC:CLE:AUTO?").build(),
-        CmdBuilder("get_next_buffer_location").escape("TRAC:NEXT?").build(),
-        CmdBuilder("get_buffer_stats").escape("TRAC:FREE?").build(),
-        CmdBuilder("get_readings_range", arg_sep="").escape("TRAC:DATA:SEL? ").int().escape(",").int().build(),
+
+        CmdBuilder("clear_buffer").escape("TRAC:CLE").build(),
+        CmdBuilder("set_buffer_source").escape("TRAC:FEED ").arg("SENS|CALC|NONE").build(),
+        CmdBuilder("set_buffer_control_mode").escape("TRAC:FEED:CONT ").arg("NEV|NEXT|ALW").build(),
+        CmdBuilder("get_buffer_status").escape("TRAC:FREE?").build(),
+        CmdBuilder("get_buffer_readings", arg_sep="").escape("TRAC:DATA?").int().escape(",").int().build(),
         CmdBuilder("set_buffer_size").escape("TRAC:POIN ").int().build(),
         CmdBuilder("get_buffer_size").escape("TRAC:POIN?").build(),
-        CmdBuilder("set_time_stamp_format").escape("TRAC:TST:FORM ").arg("ABS|DELT").build(),
-        CmdBuilder("get_time_stamp_format").escape("TRAC:TST:FORM?").build(),
-        CmdBuilder("get_delay_state").escape("TRIG:DEL:AUTO?").build(),
-        CmdBuilder("set_delay_state").escape("TRIG:DEL:AUTO ").arg("OFF|ON").build(),
-        CmdBuilder("set_init_state").escape("INIT:CONT ").arg("OFF|ON").build(),
-        CmdBuilder("get_init_state").escape("INIT:CONT?").build(),
-        CmdBuilder("set_sample_count").escape("SAMP:COUN ").int().build(),
-        CmdBuilder("get_sample_count").escape("SAMP:COUN?").build(),
-        CmdBuilder("set_source").escape("TRIG:SOUR ").arg("IMM|TIM|MAN|BUS|EXT").build(),
-        CmdBuilder("set_data_elements").escape("FORM:ELEM READ, CHAN, UNIT, TST").build(),
-        CmdBuilder("set_auto_range_status", arg_sep="").escape("FRES:RANG:AUTO ").arg("OFF|ON").build(),
-        CmdBuilder("get_auto_range_status").escape("FRES:RANG:AUTO?").build(),
-        CmdBuilder("set_resistance_digits", arg_sep="").escape(":FRES:DIG ").int().escape(", (@").
-            int().escape(":").int().escape(")").build(),
-        CmdBuilder("set_resistance_rate").escape(":FRES:NPLC ").float().build(),
-        CmdBuilder("set_scan_state").escape("ROUT:SCAN:LSEL ").arg("INT|NONE").build(),
-        CmdBuilder("get_scan_state").escape("ROUT:SCAN:LSEL").build(),
-        CmdBuilder("set_scan_channels", arg_sep="").escape("ROUT:SCAN (@").int().escape(":").int().escape(
+
+        CmdBuilder("get_delay").escape("TRIG:DEL?").build(),
+        CmdBuilder("set_delay").escape("TRIG:DEL ").float().build(),
+
+
+        CmdBuilder("set_continuous_init_state").escape("INIT:CONT ").arg("OFF|ON").build(),
+        CmdBuilder("get_continuous_init_state").escape("INIT:CONT?").build(),
+
+        CmdBuilder("set_event_control_source").escape("TRIG:SOUR ").arg("HOLD|IMM|MAN|BUS|TLIN|EXT|TIM").build(),
+        CmdBuilder("get_event_control_source").escape("TRIG:SOUR?").build(),
+
+        CmdBuilder("set_readback_elements").escape("FORM:ELEM READ, CHAN, UNIT, TIME").build(),
+        CmdBuilder("get_readback_elements").escape("FORM:ELEM?").build(),
+
+        CmdBuilder("set_unit_range").arg("VOLT:AC|VOLT:DC|RES|FRES|CURR:AC|CURR:DC").escape(":RANG ").int().build(),
+        CmdBuilder("get_unit_range").arg("VOLT:AC|VOLT:DC|RES|FRES|CURR:AC|CURR:DC").escape(":RANG?").build(),
+
+        CmdBuilder("set_unit_auto_range_status").arg("VOLT:AC|VOLT:DC|RES|FRES|CURR:AC|CURR:DC")\
+                   .escape(":RANG:AUTO ").arg("0|1|ONCE").build(),
+        CmdBuilder("get_unit_auto_range_status").arg("VOLT:AC|VOLT:DC|RES|FRES|CURR:AC|CURR:DC")\
+            .escape(":RANG:AUTO?").build(),
+
+        CmdBuilder("set_unit_resolution").arg("VOLT:AC|VOLT:DC|RES|FRES|CURR:AC|CURR:DC")\
+            .escape("DIG ").arg("4|5|6|7|8|9|DEF|MIN|MAX").build(),
+
+        CmdBuilder("set_unit_rate").arg("VOLT:AC|VOLT:DC|RES|FRES|CURR:AC|CURR:DC")\
+            .escape(":NPLC ").arg("%f|DEF|MIN|MAX").build(),
+
+        CmdBuilder("set_scan_state").escape("ROUT:SCAN:LSEL ").arg("INT|EXT|RAT|DELT|NONE").build(),
+        CmdBuilder("get_scan_state").escape("ROUT:SCAN:LSEL?").build(),
+
+        CmdBuilder("set_channels_to_scan", arg_sep="").escape("ROUT:SCAN (@").int().escape(":").int().escape(
             ")").build(),
-        CmdBuilder("get_scan_channels").escape("ROUT:SCAN?").build()
+        CmdBuilder("get_channels_to_scan").escape("ROUT:SCAN?").build()
     }
 
     def handle_error(self, request, error):

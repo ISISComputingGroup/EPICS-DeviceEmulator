@@ -1,5 +1,5 @@
-MEASUREMENT_TYPE = {0: "VOLT:DC", 1: "VOLT:AC", 2: "CURR:DC", 3: "CURR:AC", 4: "RES", 5: "FRES", 6: "CONT",
-                    7: "FREQ", 8: "PER"}
+MEASUREMENT_TYPE = {0: "VOLT:DC", 1: "VOLT:AC", 2: "RES", 3: "FRES", 4: "CURR:DC", 5: "CURR:AC",
+                    6: "FREQ", 7: "TEMP"}
 BUFFER_SOURCE = {0: "SENS", 1: "CALC", 2: "NONE"}
 BUFFER_CONTROL_MODE = {0: "NEXT", 1: "ALW", 2: "NEV"}
 TIMESTAMP_FORMAT = {0: "ABS", 1: "DELT"}
