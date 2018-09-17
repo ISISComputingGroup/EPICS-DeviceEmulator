@@ -23,9 +23,11 @@ class Keithley2700StreamInterface(StreamInterface):
         CmdBuilder("get_measurement").escape(":FUNC?").build(),
         CmdBuilder("set_buffer_feed").escape("TRAC:FEED ").arg("SENS|CALC|NONE").build(),
         CmdBuilder("set_buffer_control").escape("TRAC:FEED:CONT ").arg("NEV|NEXT|ALW").build(),
+
         CmdBuilder("set_buffer_state").escape("TRAC:CLE:AUTO ").arg("OFF|ON").build(),
         CmdBuilder("get_buffer_state").escape("TRAC:CLE:AUTO?").build(),
         CmdBuilder("get_next_buffer_location").escape("TRAC:NEXT?").build(),
+
         CmdBuilder("get_buffer_stats").escape("TRAC:FREE?").build(),
         CmdBuilder("get_readings_range",  arg_sep="").escape("TRAC:DATA:SEL? ").int().escape(",").int().build(),
         CmdBuilder("set_buffer_size").escape("TRAC:POIN ").int().build(),

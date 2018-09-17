@@ -13,21 +13,20 @@ class Keithley_2001StreamInterface(StreamInterface):
         CmdBuilder("get_idn").escape("*IDN?").build(),
         CmdBuilder("empty_error_queue").escape(":SYST:CLE").build(),
 
-        CmdBuilder("set_measurement").escape(":FUNC '").arg(
-            "VOLT:DC|VOLT:AC|CURR:DC|CURR:AC|RES|FRES||FREQ|TEMP").escape("'").build(),
+        CmdBuilder("set_measurement").escape(":FUNC ").arg(
+            "VOLT:DC|VOLT:AC|CURR:DC|CURR:AC|RES|FRES||FREQ|TEMP").build(),
         CmdBuilder("get_measurement").escape(":FUNC?").build(),
 
         CmdBuilder("clear_buffer").escape("TRAC:CLE").build(),
         CmdBuilder("set_buffer_source").escape("TRAC:FEED ").arg("SENS|CALC|NONE").build(),
         CmdBuilder("set_buffer_control_mode").escape("TRAC:FEED:CONT ").arg("NEV|NEXT|ALW").build(),
         CmdBuilder("get_buffer_status").escape("TRAC:FREE?").build(),
-        CmdBuilder("get_buffer_readings", arg_sep="").escape("TRAC:DATA?").int().escape(",").int().build(),
+        CmdBuilder("get_buffer_readings").escape("TRAC:DATA?").int().escape(",").int().build(),
         CmdBuilder("set_buffer_size").escape("TRAC:POIN ").int().build(),
         CmdBuilder("get_buffer_size").escape("TRAC:POIN?").build(),
 
         CmdBuilder("get_delay").escape("TRIG:DEL?").build(),
         CmdBuilder("set_delay").escape("TRIG:DEL ").float().build(),
-
 
         CmdBuilder("set_continuous_init_state").escape("INIT:CONT ").arg("OFF|ON").build(),
         CmdBuilder("get_continuous_init_state").escape("INIT:CONT?").build(),
@@ -41,15 +40,15 @@ class Keithley_2001StreamInterface(StreamInterface):
         CmdBuilder("set_unit_range").arg("VOLT:AC|VOLT:DC|RES|FRES|CURR:AC|CURR:DC").escape(":RANG ").int().build(),
         CmdBuilder("get_unit_range").arg("VOLT:AC|VOLT:DC|RES|FRES|CURR:AC|CURR:DC").escape(":RANG?").build(),
 
-        CmdBuilder("set_unit_auto_range_status").arg("VOLT:AC|VOLT:DC|RES|FRES|CURR:AC|CURR:DC")\
-                   .escape(":RANG:AUTO ").arg("0|1|ONCE").build(),
-        CmdBuilder("get_unit_auto_range_status").arg("VOLT:AC|VOLT:DC|RES|FRES|CURR:AC|CURR:DC")\
+        CmdBuilder("set_unit_auto_range_status").arg("VOLT:AC|VOLT:DC|RES|FRES|CURR:AC|CURR:DC")
+            .escape(":RANG:AUTO ").arg("0|1|ONCE").build(),
+        CmdBuilder("get_unit_auto_range_status").arg("VOLT:AC|VOLT:DC|RES|FRES|CURR:AC|CURR:DC")
             .escape(":RANG:AUTO?").build(),
 
-        CmdBuilder("set_unit_resolution").arg("VOLT:AC|VOLT:DC|RES|FRES|CURR:AC|CURR:DC")\
+        CmdBuilder("set_unit_resolution").arg("VOLT:AC|VOLT:DC|RES|FRES|CURR:AC|CURR:DC")
             .escape("DIG ").arg("4|5|6|7|8|9|DEF|MIN|MAX").build(),
 
-        CmdBuilder("set_unit_rate").arg("VOLT:AC|VOLT:DC|RES|FRES|CURR:AC|CURR:DC")\
+        CmdBuilder("set_unit_rate").arg("VOLT:AC|VOLT:DC|RES|FRES|CURR:AC|CURR:DC")
             .escape(":NPLC ").arg("%f|DEF|MIN|MAX").build(),
 
         CmdBuilder("set_scan_state").escape("ROUT:SCAN:LSEL ").arg("INT|EXT|RAT|DELT|NONE").build(),
@@ -57,14 +56,16 @@ class Keithley_2001StreamInterface(StreamInterface):
 
         CmdBuilder("set_channels_to_scan", arg_sep="").escape("ROUT:SCAN (@").int().escape(":").int().escape(
             ")").build(),
-        CmdBuilder("get_channels_to_scan").escape("ROUT:SCAN?").build()
+        CmdBuilder("get_channels_to_scan").escape("ROUT:SCAN?").build(),
+
+        CmdBuilder("abort").escape("ABOR").build()
     }
 
     def handle_error(self, request, error):
         self.log.error("An error occurred at request {}: {}".format(repr(request), repr(error)))
         print("An error occurred at request {}: {}".format(repr(request),repr(error)))
 
-    def bool_onoff_value(self, string_value):
+    def bool_on_off_value(self, string_value):
         if string_value not in ["ON", "OFF"]:
             raise ValueError("Invalid on/off value!")
         else:
@@ -73,7 +74,7 @@ class Keithley_2001StreamInterface(StreamInterface):
             else:
                 return False
 
-    def enum_onoff_value(self, bool_value):
+    def enum_on_off_value(self, bool_value):
         if bool_value not in [True, False]:
             raise ValueError("Invalid on/off value!")
         else:
@@ -85,7 +86,7 @@ class Keithley_2001StreamInterface(StreamInterface):
     def get_idn(self):
         return self._device.idn
 
-    def empty_queue(self):
+    def empty_error_queue(self):
         self.log.info("Error log emptied")
 
     def clear_buffer(self):
@@ -100,45 +101,30 @@ class Keithley_2001StreamInterface(StreamInterface):
     def get_measurement(self):
         return "\"{}\"".format(MEASUREMENT_TYPE[self._device.measurement])
 
-    def set_buffer_feed(self, feed):
+    def set_buffer_source(self, feed):
         if feed in BUFFER_SOURCE.values():
             self._device.buffer_feed = BUFFER_SOURCE.keys()[BUFFER_SOURCE.values().index(feed)]
         else:
             raise ValueError("Invalid feed source value!")
 
-    def set_buffer_control(self, control):
+    def set_buffer_control_mode(self, control):
         if control in BUFFER_SOURCE.values():
             self._device.buffer_control = BUFFER_CONTROL_MODE.keys()[BUFFER_CONTROL_MODE.values().index(control)]
         else:
             raise ValueError("Invalid buffer control source value!")
 
-    def set_buffer_state(self, state):
-        self._device.buffer_autoclear_on = state
-
-    def get_buffer_state(self):
-        return self.bool_onoff_value(self._device.buffer_autoclear_on)
-
-    def get_next_buffer_location(self):
-        """
-
-        :return: String-formatted integer of the next buffer location to retrieve
-        """
-        self._device.next_buffer_location = self._device.current_buffer_loc + 5
-        if self._device.next_buffer_location >= len(self._device.buffer_full):
-            self._device.next_buffer_location -= len(self._device.buffer_full)
-            self._device.current_buffer_loc = 0
-        return "{}".format(self._device.next_buffer_location)
-
-    def get_buffer_stats(self):
+    def get_buffer_status(self):
         """
         :return: String containing number of bytes available, and number of bytes used
         """
         return "{}, {}".format(str(self._device.bytes_available), str(self._device.bytes_used))
 
-    def get_readings_range(self, start, count):
+    def get_buffer_readings(self):
         """
         :param count: Number of buffer values to retrieve
         :return: String value of readings from buffer
+
+        Rewrite this!!!!!!!
         """
         self._device.buffer_range_readings = ""
         for i in range(int(count)):
