@@ -71,7 +71,7 @@ class IndfurnStreamInterface(StreamInterface):
         err_string = "command was: {}, error was: {}: {}\n".format(request, error.__class__.__name__, error)
         print(err_string)
         self.log.error(err_string)
-        return err_string
+        return "<Unsupported command"
 
     def get_pid_mode(self):
         return "<pidMode {}".format("a" if self.device.pid_mode_automatic else "m")
