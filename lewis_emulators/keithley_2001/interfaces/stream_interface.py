@@ -10,9 +10,12 @@ class Keithley2001StreamInterface(StreamInterface):
 
     commands = {
         CmdBuilder("get_idn").escape("*IDN?").build(),
-        CmdBuilder("reset").escape("*RST").build(),
+        CmdBuilder("reset_device").escape("*RST").build(),
+        CmdBuilder("clear_buffer").escape(":DATA:CLE").build(),
+
         CmdBuilder("get_elements").escape(":FORM:ELEM?").build(),
         CmdBuilder("set_elements").escape(":FORM:ELEM ").string().build()
+
     }
 
     def handle_error(self, request, error):
@@ -47,8 +50,14 @@ class Keithley2001StreamInterface(StreamInterface):
                 self.log.error("Tried to set {} which is not a valid reading element.".format(element))
                 print("Tried to set {} which is not a valid reading element.".format(element))
 
-    def reset(self):
+    def reset_device(self):
         """
         Resets device.
         """
         self._device.reset_device()
+
+    def clear_buffer(self):
+        """
+        Clears the buffer.
+        """
+        self._device.clear_buffer()

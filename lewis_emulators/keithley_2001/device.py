@@ -9,6 +9,7 @@ class SimulatedKeithley2001(StateMachineDevice):
     Simulated Keithley2700 Multimeter
     """
     number_of_times_reset = 0
+    number_of_times_buffer_has_been_cleared = 0
 
     def _initialize_data(self):
         """
@@ -18,6 +19,7 @@ class SimulatedKeithley2001(StateMachineDevice):
         self.elements = {
             "READ": False, "CHAN": False, "RNUM": False, "UNIT": False, "TIME": False, "STAT": False
         }
+        self._buffer = []
 
     def _get_state_handlers(self):
         return {
@@ -36,3 +38,7 @@ class SimulatedKeithley2001(StateMachineDevice):
         """
         self._initialize_data()
         SimulatedKeithley2001.number_of_times_reset += 1
+
+    def clear_buffer(self):
+        self._buffer = []
+        SimulatedKeithley2001.number_of_times_buffer_has_been_cleared += 1
