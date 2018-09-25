@@ -8,15 +8,18 @@ class Keithley2001StreamInterface(StreamInterface):
     out_terminator = in_terminator
 
     commands = {
-        CmdBuilder("get_idn").escape("*IDN?").build(),
-        CmdBuilder("reset_device").escape("*RST").build(),
-        CmdBuilder("clear_buffer").escape(":DATA:CLE").build(),
+        CmdBuilder("get_idn").escape("*IDN?").endOfString().build(),
+        CmdBuilder("reset_device").escape("*RST").endOfString().build(),
+        CmdBuilder("clear_buffer").escape(":DATA:CLE").endOfString().build(),
 
-        CmdBuilder("set_buffer_source").escape(":DATA:FEED ").arg("NONE|SENS1|CALC1").build(),
-        CmdBuilder("get_buffer_source").escape(":DATA:FEED?").build(),
+        CmdBuilder("set_buffer_source").escape(":DATA:FEED ").arg("NONE|SENS1|CALC1").endOfString().build(),
+        CmdBuilder("get_buffer_source").escape(":DATA:FEED?").endOfString().build(),
 
-        CmdBuilder("get_elements").escape(":FORM:ELEM?").build(),
-        CmdBuilder("set_elements").escape(":FORM:ELEM ").string().build()
+        CmdBuilder("set_buffer_mode").escape(":DATA:FEED:CONT ").arg("NEV|NEXT|ALW|PRET").endOfString().build(),
+        CmdBuilder("get_buffer_mode").escape(":DATA:FEED:CONT?").endOfString().build(),
+
+        CmdBuilder("get_elements").escape(":FORM:ELEM?").endOfString().build(),
+        CmdBuilder("set_elements").escape(":FORM:ELEM ").string().endOfString().build()
     }
 
     def handle_error(self, request, error):
@@ -74,3 +77,15 @@ class Keithley2001StreamInterface(StreamInterface):
         Gets the buffer source.
         """
         return self._device.buffer.source
+
+    def set_buffer_mode(self, mode):
+        """
+        Sets the buffer mode.
+        """
+        self._device.buffer.mode = mode
+
+    def get_buffer_mode(self):
+        """
+        Gets the buffer mode.
+        """
+        return self._device.buffer.mode
