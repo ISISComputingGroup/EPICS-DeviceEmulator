@@ -1,7 +1,6 @@
 from lewis.adapters.stream import StreamInterface, has_log
 from lewis_emulators.utils.command_builder import CmdBuilder
 
-
 @has_log
 class Keithley2001StreamInterface(StreamInterface):
 
@@ -13,9 +12,11 @@ class Keithley2001StreamInterface(StreamInterface):
         CmdBuilder("reset_device").escape("*RST").build(),
         CmdBuilder("clear_buffer").escape(":DATA:CLE").build(),
 
+        CmdBuilder("set_buffer_source").escape(":TRACe:FEED ").arg("NONE|SENS1|CALC1").build(),
+        CmdBuilder("get_buffer_source").escape(":TRACe:FEED?").build(),
+
         CmdBuilder("get_elements").escape(":FORM:ELEM?").build(),
         CmdBuilder("set_elements").escape(":FORM:ELEM ").string().build()
-
     }
 
     def handle_error(self, request, error):
@@ -60,4 +61,16 @@ class Keithley2001StreamInterface(StreamInterface):
         """
         Clears the buffer.
         """
-        self._device.clear_buffer()
+        self._device.buffer.clear_buffer()
+
+    def set_buffer_source(self, source):
+        """
+        Sets the buffer source.
+        """
+        self._device.buffer.source = source
+
+    def get_buffer_source(self):
+        """
+        Gets the buffer source.
+        """
+        return self._device.buffer.source
