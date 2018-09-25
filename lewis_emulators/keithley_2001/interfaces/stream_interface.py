@@ -21,6 +21,9 @@ class Keithley2001StreamInterface(StreamInterface):
         CmdBuilder("set_buffer_egroup").escape(":DATA:EGR ").arg("FULL|COMP").eos().build(),
         CmdBuilder("get_buffer_egroup").escape(":DATA:EGR?").eos().build(),
 
+        CmdBuilder("set_continuous_scanning_status").escape(":INIT:CONT ").arg("OFF|ON").eos().build(),
+        CmdBuilder("get_continuous_scanning_status").escape(":INIT:CONT?").eos().build(),
+
         CmdBuilder("set_buffer_size").escape(":DATA:POIN ").int().eos().build(),
         CmdBuilder("get_buffer_size").escape(":DATA:POIN?").eos().build(),
 
@@ -119,3 +122,22 @@ class Keithley2001StreamInterface(StreamInterface):
         Gets the buffer element group.
         """
         return self._device.buffer.egroup
+
+    def set_continuous_scanning_status(self, value):
+        """
+        Sets continuous scanning status to ON or OFF.
+
+        Thus is called continuous initialization mode in the Keithley 2001 manual.
+
+        Args:
+            value (string): ON or OFF.
+        """
+        self._device.continuous_scanning_status = value
+
+    def get_continuous_scanning_status(self):
+        """
+        Gets the continuous scanning status.
+
+        Thus is the continuous initialization mode in the Keithley 2001 manual.
+        """
+        return self._device.continuous_scanning_status
