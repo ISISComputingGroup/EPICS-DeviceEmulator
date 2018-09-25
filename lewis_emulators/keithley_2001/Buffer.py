@@ -2,15 +2,15 @@ from enum import Enum
 
 
 class Buffer(object):
-    number_of_times_buffer_cleared = 0
 
     def __init__(self):
         self._buffer = []
         self._source = Source.NONE
+        self.number_of_times_buffer_cleared = 0
 
     def clear_buffer(self):
         self._buffer = []
-        Buffer.number_of_times_buffer_cleared += 1
+        self.number_of_times_buffer_cleared += 1
 
     @property
     def source(self):

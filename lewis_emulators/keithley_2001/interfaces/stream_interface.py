@@ -12,8 +12,8 @@ class Keithley2001StreamInterface(StreamInterface):
         CmdBuilder("reset_device").escape("*RST").build(),
         CmdBuilder("clear_buffer").escape(":DATA:CLE").build(),
 
-        CmdBuilder("set_buffer_source").escape(":TRACe:FEED ").arg("NONE|SENS1|CALC1").build(),
-        CmdBuilder("get_buffer_source").escape(":TRACe:FEED?").build(),
+        CmdBuilder("set_buffer_source").escape(":DATA:FEED ").arg("NONE|SENS1|CALC1").build(),
+        CmdBuilder("get_buffer_source").escape(":DATA:FEED?").build(),
 
         CmdBuilder("get_elements").escape(":FORM:ELEM?").build(),
         CmdBuilder("set_elements").escape(":FORM:ELEM ").string().build()
@@ -39,7 +39,7 @@ class Keithley2001StreamInterface(StreamInterface):
         Sets the elements a reading has.
 
         Args:
-            string: String of comma separated elements of a reading. Valid elemetns are:
+            string: String of comma separated elements of a reading. Valid elements are:
                 READ, CHAN, RNUM, UNIT, TIME, STAT.
         """
         elements = {element.strip().upper() for element in string.split(",")}
