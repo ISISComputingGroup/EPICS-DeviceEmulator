@@ -18,6 +18,9 @@ class Keithley2001StreamInterface(StreamInterface):
         CmdBuilder("set_buffer_mode").escape(":DATA:FEED:CONT ").arg("NEV|NEXT|ALW|PRET").eos().build(),
         CmdBuilder("get_buffer_mode").escape(":DATA:FEED:CONT?").eos().build(),
 
+        CmdBuilder("set_buffer_egroup").escape(":DATA:EGR ").arg("FULL|COMP").eos().build(),
+        CmdBuilder("get_buffer_egroup").escape(":DATA:EGR?").eos().build(),
+
         CmdBuilder("set_buffer_size").escape(":DATA:POIN ").int().eos().build(),
         CmdBuilder("get_buffer_size").escape(":DATA:POIN?").eos().build(),
 
@@ -104,3 +107,15 @@ class Keithley2001StreamInterface(StreamInterface):
         Gets the buffer mode.
         """
         return self._device.buffer.size
+
+    def set_buffer_egroup(self, egroup):
+        """
+        Sets the buffer element group.
+        """
+        self._device.buffer.egroup = egroup
+
+    def get_buffer_egroup(self):
+        """
+        Gets the buffer element group.
+        """
+        return self._device.buffer.egroup

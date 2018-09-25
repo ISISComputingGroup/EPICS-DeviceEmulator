@@ -9,6 +9,7 @@ class Buffer(object):
         self._source = Source.NONE
         self._mode = Mode.NEV
         self.number_of_times_buffer_cleared = 0
+        self._egroup = Egroup.FULL
 
     def clear_buffer(self):
         self._buffer = []
@@ -47,6 +48,17 @@ class Buffer(object):
         else:
             raise ValueError("{} is not a valid buffer size.".format(size))
 
+    @property
+    def egroup(self):
+        return self._egroup.name
+
+    @egroup.setter
+    def egroup(self, egroup):
+        try:
+            self._egroup = Egroup[egroup]
+        except KeyError:
+            raise ValueError("{} is not a valid buffer element group.".format(egroup))
+
 
 class Source(Enum):
     NONE = 0
@@ -59,3 +71,8 @@ class Mode(Enum):
     NEXT = 1
     ALW = 2
     PRET = 3
+
+
+class Egroup(Enum):
+    FULL = 0
+    COMP = 1
