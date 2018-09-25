@@ -8,18 +8,21 @@ class Keithley2001StreamInterface(StreamInterface):
     out_terminator = in_terminator
 
     commands = {
-        CmdBuilder("get_idn").escape("*IDN?").endOfString().build(),
-        CmdBuilder("reset_device").escape("*RST").endOfString().build(),
-        CmdBuilder("clear_buffer").escape(":DATA:CLE").endOfString().build(),
+        CmdBuilder("get_idn").escape("*IDN?").eos().build(),
+        CmdBuilder("reset_device").escape("*RST").eos().build(),
+        CmdBuilder("clear_buffer").escape(":DATA:CLE").eos().build(),
 
-        CmdBuilder("set_buffer_source").escape(":DATA:FEED ").arg("NONE|SENS1|CALC1").endOfString().build(),
-        CmdBuilder("get_buffer_source").escape(":DATA:FEED?").endOfString().build(),
+        CmdBuilder("set_buffer_source").escape(":DATA:FEED ").arg("NONE|SENS1|CALC1").eos().build(),
+        CmdBuilder("get_buffer_source").escape(":DATA:FEED?").eos().build(),
 
-        CmdBuilder("set_buffer_mode").escape(":DATA:FEED:CONT ").arg("NEV|NEXT|ALW|PRET").endOfString().build(),
-        CmdBuilder("get_buffer_mode").escape(":DATA:FEED:CONT?").endOfString().build(),
+        CmdBuilder("set_buffer_mode").escape(":DATA:FEED:CONT ").arg("NEV|NEXT|ALW|PRET").eos().build(),
+        CmdBuilder("get_buffer_mode").escape(":DATA:FEED:CONT?").eos().build(),
 
-        CmdBuilder("get_elements").escape(":FORM:ELEM?").endOfString().build(),
-        CmdBuilder("set_elements").escape(":FORM:ELEM ").string().endOfString().build()
+        CmdBuilder("set_buffer_size").escape(":DATA:POIN ").int().eos().build(),
+        CmdBuilder("get_buffer_size").escape(":DATA:POIN?").eos().build(),
+
+        CmdBuilder("get_elements").escape(":FORM:ELEM?").eos().build(),
+        CmdBuilder("set_elements").escape(":FORM:ELEM ").string().eos().build()
     }
 
     def handle_error(self, request, error):
@@ -89,3 +92,15 @@ class Keithley2001StreamInterface(StreamInterface):
         Gets the buffer mode.
         """
         return self._device.buffer.mode
+
+    def set_buffer_size(self, size):
+        """
+        Sets the buffer mode.
+        """
+        self._device.buffer.size = int(size)
+
+    def get_buffer_size(self):
+        """
+        Gets the buffer mode.
+        """
+        return self._device.buffer.size

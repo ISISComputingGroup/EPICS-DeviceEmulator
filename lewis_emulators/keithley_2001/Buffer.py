@@ -5,6 +5,7 @@ class Buffer(object):
 
     def __init__(self):
         self._buffer = []
+        self._size = 100
         self._source = Source.NONE
         self._mode = Mode.NEV
         self.number_of_times_buffer_cleared = 0
@@ -35,6 +36,17 @@ class Buffer(object):
         except KeyError:
             raise ValueError("{} is not a valid buffer mode.".format(mode))
 
+    @property
+    def size(self):
+        return self._size
+
+    @size.setter
+    def size(self, size):
+        if 2 <= size <= 404:
+            self._size = size
+        else:
+            raise ValueError("{} is not a valid buffer size.".format(size))
+
 
 class Source(Enum):
     NONE = 0
@@ -47,4 +59,3 @@ class Mode(Enum):
     NEXT = 1
     ALW = 2
     PRET = 3
-
