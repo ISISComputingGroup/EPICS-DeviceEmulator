@@ -1,7 +1,7 @@
 from collections import OrderedDict
 from states import DefaultState
 from lewis.devices import StateMachineDevice
-from utils import Channel, ContScanningStatus
+from utils import ContScanningStatus, Channel
 from Buffer import Buffer
 
 
@@ -21,6 +21,17 @@ class SimulatedKeithley2001(StateMachineDevice):
         }
         self.buffer = Buffer()
         self._continuous_scanning_status = ContScanningStatus.OFF
+        self._channels = {
+            1: Channel(1),
+            2: Channel(2),
+            3: Channel(3),
+            4: Channel(4),
+            6: Channel(6),
+            7: Channel(7),
+            8: Channel(8),
+            9: Channel(9)
+        }
+        self.closed_channel = None
 
     def _get_state_handlers(self):
         return {
@@ -57,3 +68,31 @@ class SimulatedKeithley2001(StateMachineDevice):
             self._continuous_scanning_status = ContScanningStatus[value]
         except KeyError:
             raise ValueError("{} is not a valid argument.".format(value))
+
+    def set_channel_value_via_the_backdoor(self, channel, value):
+        """
+        Sets a channel value using Lewis backdoor.
+
+        rgs:
+            channel (int): Channel number 1,2,3,4,6,7,8, or 9.
+            value (float): Value to set the channel to
+        """
+        self._channels[channel].reading = value
+
+    def close_channel(self, channel):
+        channel = int(channel)
+        try:
+            if self.closed_channel != channel:
+                if self.closed_channel is not None:
+                    self._channels[self.closed_channel].close = False
+                self._channels[channel].close = True
+                self.closed_channel = channel
+        except KeyError:
+            raise ValueError("Channel {} is not a valid channel".format(channel))
+
+    @property
+    def channel(self):
+        """
+        Returns closed channel Channel object.
+        """
+        return self._channels[self.closed_channel]

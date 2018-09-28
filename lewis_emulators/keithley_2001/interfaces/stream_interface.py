@@ -28,7 +28,10 @@ class Keithley2001StreamInterface(StreamInterface):
         CmdBuilder("get_buffer_size").escape(":DATA:POIN?").eos().build(),
 
         CmdBuilder("get_elements").escape(":FORM:ELEM?").eos().build(),
-        CmdBuilder("set_elements").escape(":FORM:ELEM ").string().eos().build()
+        CmdBuilder("set_elements").escape(":FORM:ELEM ").string().eos().build(),
+
+        CmdBuilder("close_channel").escape(":ROUT:CLOS (@").int().escape(")").eos().build(),
+        CmdBuilder("read_single_channel").escape(":FETC?").eos().build()
     }
 
     def handle_error(self, request, error):
@@ -141,3 +144,25 @@ class Keithley2001StreamInterface(StreamInterface):
         Thus is the continuous initialization mode in the Keithley 2001 manual.
         """
         return self._device.continuous_scanning_status
+
+    def close_channel(self, channel):
+        """
+        Sets the single channel to read from.
+
+        Args:
+            channel (int): Channel number to open
+        """
+        self._device.close_channel(channel)
+
+    def read_single_channel(self):
+        channel_data = []
+        channel = self._device.channel
+
+        if self._device.elements["READ"]:
+            channel_data.append("{:.7E}".format(channel.reading))
+        if self._device.elements["UNIT"] and self._device.elements["READ"]:
+            channel_data.append("{}".format(channel.unit.name))
+        if self._device.elements["CHAN"]:
+            channel_data.append(",{}INTCHAN".format(channel.channel))
+
+        return "".join(channel_data)
