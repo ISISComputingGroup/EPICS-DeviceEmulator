@@ -29,6 +29,7 @@ class Keithley2001StreamInterface(StreamInterface):
         CmdBuilder("get_scan_count").escape(":ARM:LAY2:COUN?").eos().build(),
         CmdBuilder("get_scan_trigger").escape(":ARM:LAY2:SOUR?").eos().build(),
 
+
         # Single channel read
         CmdBuilder("close_channel").escape(":ROUT:CLOS (@").int().escape(")").eos().build(),
         CmdBuilder("read_single_channel").escape(":ABOR;:FETC?").eos().build(),
@@ -37,11 +38,14 @@ class Keithley2001StreamInterface(StreamInterface):
         CmdBuilder("set_buffer_mode").escape(":DATA:FEED:CONT ").arg("NEV|NEXT|ALW|PRET").eos().build(),
         CmdBuilder("get_buffer_mode").escape(":DATA:FEED:CONT?").eos().build(),
 
-        CmdBuilder("set_buffer_size").escape(":DATA:POIN ").int().eos().build(),
-        CmdBuilder("get_buffer_size").escape(":DATA:POIN?").eos().build(),
-        CmdBuilder("clear_buffer").escape(":DATA:CLE").eos().build()
+        CmdBuilder("clear_buffer").escape(":DATA:CLE").eos().build(),
 
         # Setting up a scan
+        CmdBuilder("set_measurement_scan_count").escape(":TRIG:COUN ").int().eos().build(),
+        CmdBuilder("get_measurement_scan_count").escape(":TRIG:COUN?").eos().build(),
+
+        CmdBuilder("set_buffer_size").escape(":DATA:POIN ").int().eos().build(),
+        CmdBuilder("get_buffer_size").escape(":DATA:POIN?").eos().build()
 
     }
 
@@ -230,7 +234,7 @@ class Keithley2001StreamInterface(StreamInterface):
         Args:
             value (int): Number of times to scan.
         """
-        self._device.scan_count = value
+        self._device.scan_count = int(value)
 
     def get_scan_count(self):
         """
@@ -250,3 +254,21 @@ class Keithley2001StreamInterface(StreamInterface):
         """
 
         return self._device.scan_trigger_type
+
+    def set_measurement_scan_count(self, value):
+        """
+        Sets the measurement scan count.
+
+        Args:
+            value (int): Number of times to trigger measurements.
+        """
+        self._device.measurement_scan_count = int(value)
+
+    def get_measurement_scan_count(self):
+        """
+        Gets the measurement scan count.
+
+        Returns:
+            value (int): Number of times to trigger measurements
+        """
+        return str(self._device.measurement_scan_count)

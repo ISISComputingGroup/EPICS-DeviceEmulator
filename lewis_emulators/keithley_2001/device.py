@@ -25,6 +25,7 @@ class SimulatedKeithley2001(StateMachineDevice):
 
         self.scan_count = 0
         self._scan_trigger_type = ScanTrigger.IMM
+        self.measurement_scan_count = 0
 
         self.continuous_initialisation_status = False
         self._channels = {
