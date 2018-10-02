@@ -1,37 +1,45 @@
 from lewis.adapters.stream import StreamInterface, has_log
 from lewis_emulators.utils.command_builder import CmdBuilder
 
+
 @has_log
 class Keithley2001StreamInterface(StreamInterface):
 
-    in_terminator = "\n"
-    out_terminator = in_terminator
+    in_terminator = "\r\n"
+    out_terminator = "\n"
 
     commands = {
+        # Commands used on setup
         CmdBuilder("get_idn").escape("*IDN?").eos().build(),
         CmdBuilder("reset_device").escape("*RST").eos().build(),
-        CmdBuilder("clear_buffer").escape(":DATA:CLE").eos().build(),
-
         CmdBuilder("set_buffer_source").escape(":DATA:FEED ").arg("NONE|SENS1|CALC1").eos().build(),
         CmdBuilder("get_buffer_source").escape(":DATA:FEED?").eos().build(),
+        CmdBuilder("set_buffer_egroup").escape(":DATA:EGR ").arg("FULL|COMP").eos().build(),
+        CmdBuilder("get_buffer_egroup").escape(":DATA:EGR?").eos().build(),
+        CmdBuilder("set_continuous_scanning_status").escape(":INIT:CONT ").arg("OFF|ON").eos().build(),
+        CmdBuilder("get_continuous_scanning_status").escape(":INIT:CONT?").eos().build(),
+        CmdBuilder("get_elements").escape(":FORM:ELEM?").eos().build(),
+        CmdBuilder("set_elements").escape(":FORM:ELEM ").string().eos().build(),
+        CmdBuilder("get_measurement_status").escape(":STAT:MEAS:ENAB?").eos().build(),
+        CmdBuilder("set_buffer_full_status").escape(":STAT:MEAS:ENAB 512").eos().build(),
+        CmdBuilder("get_service_request_status").escape("*SRE?").eos().build(),
+        CmdBuilder("set_measure_summary_status").escape("*SRE 1").eos().build(),
+        CmdBuilder("reset_and_clear_status_registers").escape(":STAT:PRES; *CLS").eos().build(),
 
+        # Single channel read
+        CmdBuilder("close_channel").escape(":ROUT:CLOS (@").int().escape(")").eos().build(),
+        CmdBuilder("read_single_channel").escape(":ABOR;:FETC?").eos().build(),
+
+        # Reading from the buffer
         CmdBuilder("set_buffer_mode").escape(":DATA:FEED:CONT ").arg("NEV|NEXT|ALW|PRET").eos().build(),
         CmdBuilder("get_buffer_mode").escape(":DATA:FEED:CONT?").eos().build(),
 
-        CmdBuilder("set_buffer_egroup").escape(":DATA:EGR ").arg("FULL|COMP").eos().build(),
-        CmdBuilder("get_buffer_egroup").escape(":DATA:EGR?").eos().build(),
-
-        CmdBuilder("set_continuous_scanning_status").escape(":INIT:CONT ").arg("OFF|ON").eos().build(),
-        CmdBuilder("get_continuous_scanning_status").escape(":INIT:CONT?").eos().build(),
-
         CmdBuilder("set_buffer_size").escape(":DATA:POIN ").int().eos().build(),
         CmdBuilder("get_buffer_size").escape(":DATA:POIN?").eos().build(),
+        CmdBuilder("clear_buffer").escape(":DATA:CLE").eos().build()
 
-        CmdBuilder("get_elements").escape(":FORM:ELEM?").eos().build(),
-        CmdBuilder("set_elements").escape(":FORM:ELEM ").string().eos().build(),
+        # Setting up a scan
 
-        CmdBuilder("close_channel").escape(":ROUT:CLOS (@").int().escape(")").eos().build(),
-        CmdBuilder("read_single_channel").escape(":FETC?").eos().build()
     }
 
     def handle_error(self, request, error):
@@ -135,7 +143,12 @@ class Keithley2001StreamInterface(StreamInterface):
         Args:
             value (string): ON or OFF.
         """
-        self._device.continuous_scanning_status = value
+        if value.upper() == "ON":
+            self._device.continuous_initialisation_status = True
+        elif value.upper() == "OFF":
+            self._device.continuous_initialisation_status = False
+        else:
+            raise ValueError("Not a valid continuous initialisation mode")
 
     def get_continuous_scanning_status(self):
         """
@@ -143,7 +156,12 @@ class Keithley2001StreamInterface(StreamInterface):
 
         Thus is the continuous initialization mode in the Keithley 2001 manual.
         """
-        return self._device.continuous_scanning_status
+        return_string = "OFF"
+
+        if self._device.continuous_initialisation_status:
+            return_string = "ON"
+
+        return return_string
 
     def close_channel(self, channel):
         """
@@ -166,3 +184,26 @@ class Keithley2001StreamInterface(StreamInterface):
             channel_data.append(",{}INTCHAN".format(channel.channel))
 
         return "".join(channel_data)
+
+    def get_measurement_status(self):
+        status = 0
+        if self._device.status_register.buffer_full:
+            status += 512
+
+        return str(status)
+
+    def set_buffer_full_status(self):
+        self._device.status_register.buffer_full = True
+
+    def set_measure_summary_status(self):
+        self._device.status_register.measurement_summary_status = True
+
+    def get_service_request_status(self):
+        status = 0
+        if self._device.status_register.measurement_summary_status:
+            status += 1
+
+        return str(status)
+
+    def reset_and_clear_status_registers(self):
+        self._device.status_register.reset_and_clear()

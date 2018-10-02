@@ -9,9 +9,17 @@ class Channel(object):
         self.close = False
 
 
-class ContScanningStatus(Enum):
-    OFF = 0
-    ON = 1
+class StatusRegister(object):
+
+    def __init__(self):
+        self.buffer_full = False
+        self.measurement_summary_status = False
+        self.number_of_times_reset_and_cleared = 0
+
+    def reset_and_clear(self):
+        self.buffer_full = False
+        self.measurement_summary_status = False
+        self.number_of_times_reset_and_cleared += 1
 
 
 class Unit(Enum):

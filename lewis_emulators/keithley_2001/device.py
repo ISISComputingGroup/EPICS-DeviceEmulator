@@ -1,8 +1,8 @@
 from collections import OrderedDict
 from states import DefaultState
 from lewis.devices import StateMachineDevice
-from utils import ContScanningStatus, Channel
-from Buffer import Buffer
+from utils import Channel, StatusRegister
+from buffer import Buffer
 
 
 class SimulatedKeithley2001(StateMachineDevice):
@@ -19,8 +19,11 @@ class SimulatedKeithley2001(StateMachineDevice):
         self.elements = {
             "READ": False, "CHAN": False, "RNUM": False, "UNIT": False, "TIME": False, "STAT": False
         }
+
         self.buffer = Buffer()
-        self._continuous_scanning_status = ContScanningStatus.OFF
+        self.status_register = StatusRegister()
+
+        self.continuous_initialisation_status = False
         self._channels = {
             1: Channel(1),
             2: Channel(2),
@@ -47,27 +50,51 @@ class SimulatedKeithley2001(StateMachineDevice):
     def reset_device(self):
         """
         Resets device to initialized state.
+
+        This does not reset the buffer or status register.
         """
+
         for element in self.elements:
             self.elements[element] = False
+
+        self.continuous_initialisation_status = False
+
+        self._channels = {
+            1: Channel(1),
+            2: Channel(2),
+            3: Channel(3),
+            4: Channel(4),
+            6: Channel(6),
+            7: Channel(7),
+            8: Channel(8),
+            9: Channel(9)
+        }
+        self.closed_channel = None
+
         SimulatedKeithley2001.number_of_times_reset += 1
 
-    def get_number_of_times_buffer_has_been_cleared(self):
+    def get_number_of_times_buffer_has_been_cleared_via_the_backdoor(self):
+        """
+        Gets the number of times the buffer has been cleared.
+        Only called via the backdoor.
+
+        Returns:
+            int: Number of times the buffer has been cleared.
+        """
+
         return self.buffer.number_of_times_buffer_cleared
 
-    @property
-    def continuous_scanning_status(self):
+    def get_number_of_times_status_register_has_been_reset_and_cleared_via_the_backdoor(self):
         """
-        Returns status of continuous initialization mode.
-        """
-        return self._continuous_scanning_status.name
+       Gets the number of times the status register has been reset and cleared.
 
-    @continuous_scanning_status.setter
-    def continuous_scanning_status(self, value):
-        try:
-            self._continuous_scanning_status = ContScanningStatus[value]
-        except KeyError:
-            raise ValueError("{} is not a valid argument.".format(value))
+       Only called via the backdoor.
+
+       Returns:
+           int: Number of times the status register has been reset and cleared.
+       """
+
+        return self.status_register.number_of_times_reset_and_cleared
 
     def set_channel_value_via_the_backdoor(self, channel, value):
         """
@@ -80,6 +107,17 @@ class SimulatedKeithley2001(StateMachineDevice):
         self._channels[channel].reading = value
 
     def close_channel(self, channel):
+        """
+        Closes channel to read from and opens the previously closed channel.
+
+        Args:
+            channel (int): Channel number to close.
+                Valid channels are 1,2,3,4,6,7,8,9.
+
+        Raises:
+            ValueError if channel is not a valid channel.
+        """
+
         channel = int(channel)
         try:
             if self.closed_channel != channel:
@@ -95,4 +133,5 @@ class SimulatedKeithley2001(StateMachineDevice):
         """
         Returns closed channel Channel object.
         """
+
         return self._channels[self.closed_channel]
