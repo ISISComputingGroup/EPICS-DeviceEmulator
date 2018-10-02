@@ -25,6 +25,8 @@ class Keithley2001StreamInterface(StreamInterface):
         CmdBuilder("get_service_request_status").escape("*SRE?").eos().build(),
         CmdBuilder("set_measure_summary_status").escape("*SRE 1").eos().build(),
         CmdBuilder("reset_and_clear_status_registers").escape(":STAT:PRES; *CLS").eos().build(),
+        CmdBuilder("set_scan_count").escape(":ARM:LAY2:COUN ").int().eos().build(),
+        CmdBuilder("get_scan_count").escape(":ARM:LAY2:COUN?").eos().build(),
 
         # Single channel read
         CmdBuilder("close_channel").escape(":ROUT:CLOS (@").int().escape(")").eos().build(),
@@ -47,6 +49,13 @@ class Keithley2001StreamInterface(StreamInterface):
         print("An error occurred at request {}: {}".format(repr(request), repr(error)))
 
     def get_idn(self):
+        """
+        Returns the devices IDN string.
+
+        Returns:
+            string: The device's IDN.
+        """
+
         return self._device.idn
 
     def get_elements(self):
@@ -185,18 +194,18 @@ class Keithley2001StreamInterface(StreamInterface):
 
         return "".join(channel_data)
 
+    def set_buffer_full_status(self):
+        self._device.status_register.buffer_full = True
+
+    def set_measure_summary_status(self):
+        self._device.status_register.measurement_summary_status = True
+
     def get_measurement_status(self):
         status = 0
         if self._device.status_register.buffer_full:
             status += 512
 
         return str(status)
-
-    def set_buffer_full_status(self):
-        self._device.status_register.buffer_full = True
-
-    def set_measure_summary_status(self):
-        self._device.status_register.measurement_summary_status = True
 
     def get_service_request_status(self):
         status = 0
@@ -205,5 +214,28 @@ class Keithley2001StreamInterface(StreamInterface):
 
         return str(status)
 
+
     def reset_and_clear_status_registers(self):
+        """
+        Resets and clears the status registers of the device.
+        """
+
         self._device.status_register.reset_and_clear()
+
+    def set_scan_count(self, value):
+        """
+        Sets the scan count.
+
+        Args:
+            value (int): Number of times to scan.
+        """
+        self._device.scan_count = value
+
+    def get_scan_count(self):
+        """
+        Returns the number of times the device is set to scan.
+
+        Returns:
+            string: Number of times the device is set to scan.
+        """
+        return str(self._device.scan_count)

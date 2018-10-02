@@ -23,6 +23,8 @@ class SimulatedKeithley2001(StateMachineDevice):
         self.buffer = Buffer()
         self.status_register = StatusRegister()
 
+        self.scan_count = 0
+
         self.continuous_initialisation_status = False
         self._channels = {
             1: Channel(1),
