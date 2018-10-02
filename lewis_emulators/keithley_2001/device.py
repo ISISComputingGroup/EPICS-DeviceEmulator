@@ -1,7 +1,7 @@
 from collections import OrderedDict
 from states import DefaultState
 from lewis.devices import StateMachineDevice
-from utils import Channel, StatusRegister
+from utils import Channel, StatusRegister, ScanTrigger
 from buffer import Buffer
 
 
@@ -24,6 +24,7 @@ class SimulatedKeithley2001(StateMachineDevice):
         self.status_register = StatusRegister()
 
         self.scan_count = 0
+        self._scan_trigger_type = ScanTrigger.IMM
 
         self.continuous_initialisation_status = False
         self._channels = {
@@ -72,6 +73,7 @@ class SimulatedKeithley2001(StateMachineDevice):
             9: Channel(9)
         }
         self.closed_channel = None
+        self._scan_trigger_type = ScanTrigger.IMM
 
         SimulatedKeithley2001.number_of_times_reset += 1
 
@@ -137,3 +139,10 @@ class SimulatedKeithley2001(StateMachineDevice):
         """
 
         return self._channels[self.closed_channel]
+
+    @property
+    def scan_trigger_type(self):
+        """
+        Returns name of the scan trigger type.
+        """
+        return self._scan_trigger_type.name

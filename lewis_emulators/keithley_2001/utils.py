@@ -33,3 +33,13 @@ class Unit(Enum):
     C = 7
     F = 8
     K = 9
+
+
+class ScanTrigger(Enum):
+    IMM = 0
+    HOLD = 1
+    MAN = 2
+    BUS = 3
+    TLIN = 4
+    EXT = 5
+    TIM = 6

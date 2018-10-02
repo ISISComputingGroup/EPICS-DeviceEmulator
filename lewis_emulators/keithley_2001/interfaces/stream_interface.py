@@ -27,6 +27,7 @@ class Keithley2001StreamInterface(StreamInterface):
         CmdBuilder("reset_and_clear_status_registers").escape(":STAT:PRES; *CLS").eos().build(),
         CmdBuilder("set_scan_count").escape(":ARM:LAY2:COUN ").int().eos().build(),
         CmdBuilder("get_scan_count").escape(":ARM:LAY2:COUN?").eos().build(),
+        CmdBuilder("get_scan_trigger").escape(":ARM:LAY2:SOUR?").eos().build(),
 
         # Single channel read
         CmdBuilder("close_channel").escape(":ROUT:CLOS (@").int().escape(")").eos().build(),
@@ -239,3 +240,13 @@ class Keithley2001StreamInterface(StreamInterface):
             string: Number of times the device is set to scan.
         """
         return str(self._device.scan_count)
+
+    def get_scan_trigger(self):
+        """
+        Returns the scan trigger type.
+
+        Returns:
+            string: Scan trigger mode. One of IMM, HOLD, MAN, BUS, TLINK, EXT, TIM.
+        """
+
+        return self._device.scan_trigger_type
