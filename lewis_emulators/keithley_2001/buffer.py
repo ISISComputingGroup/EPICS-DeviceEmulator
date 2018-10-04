@@ -4,15 +4,16 @@ from enum import Enum
 class Buffer(object):
 
     def __init__(self):
-        self._buffer = []
+        self.buffer = []
         self._size = 100
         self._source = Source.NONE
         self._mode = Mode.NEV
         self.number_of_times_buffer_cleared = 0
         self._egroup = Egroup.FULL
+        self.scan_channels = None
 
     def clear_buffer(self):
-        self._buffer = []
+        self.buffer = []
         self.number_of_times_buffer_cleared += 1
 
     @property
@@ -58,6 +59,7 @@ class Buffer(object):
             self._egroup = Egroup[egroup]
         except KeyError:
             raise ValueError("{} is not a valid buffer element group.".format(egroup))
+
 
 
 class Source(Enum):

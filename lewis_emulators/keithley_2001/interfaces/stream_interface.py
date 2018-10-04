@@ -29,16 +29,21 @@ class Keithley2001StreamInterface(StreamInterface):
         CmdBuilder("get_scan_count").escape(":ARM:LAY2:COUN?").eos().build(),
         CmdBuilder("get_scan_trigger").escape(":ARM:LAY2:SOUR?").eos().build(),
 
+        # Sets channels
+        CmdBuilder("set_read_channel").escape(":ROUT:CLOS (@").int().escape(")").eos().build(),
+        CmdBuilder("set_scan_channels").escape(":ROUT:SCAN (@").arg("[0-9,]+").escape(")").eos().build(),
+        CmdBuilder("get_scan_channels").escape(":ROUT:SCAN?").eos().build(),
 
         # Single channel read
-        CmdBuilder("close_channel").escape(":ROUT:CLOS (@").int().escape(")").eos().build(),
-        CmdBuilder("read_single_channel").escape(":ABOR;:FETC?").eos().build(),
+        CmdBuilder("read_single_channel").escape(":READ?").eos().build(),
 
         # Reading from the buffer
         CmdBuilder("set_buffer_mode").escape(":DATA:FEED:CONT ").arg("NEV|NEXT|ALW|PRET").eos().build(),
         CmdBuilder("get_buffer_mode").escape(":DATA:FEED:CONT?").eos().build(),
 
         CmdBuilder("clear_buffer").escape(":DATA:CLE").eos().build(),
+        CmdBuilder("scan_channels").escape(":INIT").eos().build(),
+        CmdBuilder("get_buffer_date").escape(":DATA:DATA?").eos().build(),
 
         # Setting up a scan
         CmdBuilder("set_measurement_scan_count").escape(":TRIG:COUN ").int().eos().build(),
@@ -87,6 +92,8 @@ class Keithley2001StreamInterface(StreamInterface):
             except LookupError:
                 self.log.error("Tried to set {} which is not a valid reading element.".format(element))
                 print("Tried to set {} which is not a valid reading element.".format(element))
+
+        self._device.generate_readback_format()
 
     def reset_device(self):
         """
@@ -177,14 +184,43 @@ class Keithley2001StreamInterface(StreamInterface):
 
         return return_string
 
-    def close_channel(self, channel):
+    def set_read_channel(self, channel):
         """
-        Sets the single channel to read from.
+        Sets the channels to read from in single read mode.
 
         Args:
-            channel (int): Channel number to open
+            channel string): String representation of a channel number between 1 and 10.
         """
-        self._device.close_channel(channel)
+        self._device.close_channel(int(channel))
+
+    def set_scan_channels(self, channels):
+        """
+        Sets the channels to scan.
+
+        Args:
+            channels (string): Comma separated list of channel number to read from.
+        """
+        channels = channels.split(",")
+        self._device.buffer.scan_channels = channels
+
+    def get_scan_channels(self):
+        """
+        Returns the channels set to scan.
+
+        Returns:
+            string: comman separated list of channels set to scan
+        """
+
+        return "(@" + ",".join(self._device.buffer.scan_channels) + ")"
+
+    def get_closed_channel(self):
+        """
+        Gets the closed channel.
+
+        Returns:
+            int: Closed channel number
+        """
+        return str(self._device.close_channel)
 
     def read_single_channel(self):
         channel_data = []
@@ -195,7 +231,7 @@ class Keithley2001StreamInterface(StreamInterface):
         if self._device.elements["UNIT"] and self._device.elements["READ"]:
             channel_data.append("{}".format(channel.unit.name))
         if self._device.elements["CHAN"]:
-            channel_data.append(",{}INTCHAN".format(channel.channel))
+            channel_data.append(",{:02d}INTCHAN".format(channel.channel))
 
         return "".join(channel_data)
 
@@ -218,7 +254,6 @@ class Keithley2001StreamInterface(StreamInterface):
             status += 1
 
         return str(status)
-
 
     def reset_and_clear_status_registers(self):
         """
@@ -272,3 +307,20 @@ class Keithley2001StreamInterface(StreamInterface):
             value (int): Number of times to trigger measurements
         """
         return str(self._device.measurement_scan_count)
+
+    def scan_channels(self):
+        """
+        Sets the device to scan.
+
+        """
+        self._device.scan_channels()
+
+    def get_buffer_date(self):
+        """
+        Returns the buffer data.
+
+        Returns:
+            list of strings: List of readings from channels.
+
+        """
+        return ",".join(self._device.buffer.buffer)

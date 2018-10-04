@@ -1,7 +1,7 @@
 from collections import OrderedDict
 from states import DefaultState
 from lewis.devices import StateMachineDevice
-from utils import Channel, StatusRegister, ScanTrigger
+from utils import Channel, StatusRegister, ScanTrigger, ReadStatus
 from buffer import Buffer
 
 
@@ -11,6 +11,7 @@ class SimulatedKeithley2001(StateMachineDevice):
     """
     number_of_times_reset = 0
 
+
     def _initialize_data(self):
         """
         Initialize all of the device's attributes.
@@ -19,6 +20,7 @@ class SimulatedKeithley2001(StateMachineDevice):
         self.elements = {
             "READ": False, "CHAN": False, "RNUM": False, "UNIT": False, "TIME": False, "STAT": False
         }
+        self._channel_readback_format = None
 
         self.buffer = Buffer()
         self.status_register = StatusRegister()
@@ -33,10 +35,12 @@ class SimulatedKeithley2001(StateMachineDevice):
             2: Channel(2),
             3: Channel(3),
             4: Channel(4),
+            5: Channel(5),
             6: Channel(6),
             7: Channel(7),
             8: Channel(8),
-            9: Channel(9)
+            9: Channel(9),
+            10: Channel(10)
         }
         self.closed_channel = None
 
@@ -68,15 +72,35 @@ class SimulatedKeithley2001(StateMachineDevice):
             2: Channel(2),
             3: Channel(3),
             4: Channel(4),
+            5: Channel(5),
             6: Channel(6),
             7: Channel(7),
             8: Channel(8),
-            9: Channel(9)
+            9: Channel(9),
+            10: Channel(10)
         }
         self.closed_channel = None
         self._scan_trigger_type = ScanTrigger.IMM
 
         SimulatedKeithley2001.number_of_times_reset += 1
+
+        self._channel_readback_format = None
+
+    def generate_readback_format(self):
+        """
+        Generates the readback format to read from channels.
+        """
+        readback_elements = []
+
+        if self.elements["READ"]:
+            readback_elements.append("{:.7E}")
+        if self.elements["UNIT"] and self.elements["READ"]:
+            readback_elements.append("{}")
+        if self.elements["CHAN"]:
+            readback_elements.append(",{:02d}INTCHAN")
+
+        self._channel_readback_format = "".join(readback_elements)
+
 
     def get_number_of_times_buffer_has_been_cleared_via_the_backdoor(self):
         """
@@ -117,7 +141,7 @@ class SimulatedKeithley2001(StateMachineDevice):
 
         Args:
             channel (int): Channel number to close.
-                Valid channels are 1,2,3,4,6,7,8,9.
+                Valid channels are 1,2,3,4,5,6,7,8,9,10.
 
         Raises:
             ValueError if channel is not a valid channel.
@@ -138,7 +162,6 @@ class SimulatedKeithley2001(StateMachineDevice):
         """
         Returns closed channel Channel object.
         """
-
         return self._channels[self.closed_channel]
 
     @property
@@ -147,3 +170,14 @@ class SimulatedKeithley2001(StateMachineDevice):
         Returns name of the scan trigger type.
         """
         return self._scan_trigger_type.name
+
+    def scan_channels(self):
+        if self._channel_readback_format is None:
+            self.generate_readback_format()
+
+        for channel_to_scan in self.buffer.scan_channels:
+            channel = self._channels[int(channel_to_scan)]
+            self.buffer.buffer.append(
+                self._channel_readback_format.format(
+                    channel.reading, channel.unit.name, channel.channel)
+            )

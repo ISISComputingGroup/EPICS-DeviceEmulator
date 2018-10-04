@@ -43,3 +43,8 @@ class ScanTrigger(Enum):
     TLIN = 4
     EXT = 5
     TIM = 6
+
+
+class ReadStatus(Enum):
+    SINGLE = 0
+    MULIT = 1
