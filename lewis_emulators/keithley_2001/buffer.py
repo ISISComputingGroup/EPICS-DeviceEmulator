@@ -61,7 +61,6 @@ class Buffer(object):
             raise ValueError("{} is not a valid buffer element group.".format(egroup))
 
 
-
 class Source(Enum):
     NONE = 0
     SENS1 = 1

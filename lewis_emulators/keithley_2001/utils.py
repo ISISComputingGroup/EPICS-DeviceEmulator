@@ -5,7 +5,7 @@ class Channel(object):
     def __init__(self, channel):
         self.channel = channel
         self.reading = 0
-        self.unit = Unit.VDC
+        self.reading_units = Unit.VDC
         self.close = False
 
 
@@ -48,3 +48,8 @@ class ScanTrigger(Enum):
 class ReadStatus(Enum):
     SINGLE = 0
     MULIT = 1
+
+class ReadStatus(Enum):
+    N = 0
+    O = 1
+    R = 2

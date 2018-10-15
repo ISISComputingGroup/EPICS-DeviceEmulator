@@ -8,6 +8,8 @@ class Keithley2001StreamInterface(StreamInterface):
     in_terminator = "\r\n"
     out_terminator = "\n"
 
+    _channel_readback_format = None
+
     commands = {
         # Commands used on setup
         CmdBuilder("get_idn").escape("*IDN?").eos().build(),
@@ -93,7 +95,25 @@ class Keithley2001StreamInterface(StreamInterface):
                 self.log.error("Tried to set {} which is not a valid reading element.".format(element))
                 print("Tried to set {} which is not a valid reading element.".format(element))
 
-        self._device.generate_readback_format()
+        self._generate_readback_format()
+
+    def _generate_readback_format(self):
+        """
+        Generates the readback format for buffer readings.
+        """
+        readback_elements = []
+
+        if self._device.elements["READ"]:
+            readback_elements.append("{:.7E}")
+            if self._device.elements["UNIT"]:
+                readback_elements.append("{}")
+
+        if self._device.elements["CHAN"]:
+            readback_elements.append(",{:02d}")
+            if self._device.elements["UNIT"]:
+                readback_elements.append("INTCHAN")
+
+        self._channel_readback_format = "".join(readback_elements)
 
     def reset_device(self):
         """
@@ -223,17 +243,15 @@ class Keithley2001StreamInterface(StreamInterface):
         return str(self._device.close_channel)
 
     def read_single_channel(self):
-        channel_data = []
-        channel = self._device.channel
+        """
+        Takes a single reading from the closed channel on the device.
 
-        if self._device.elements["READ"]:
-            channel_data.append("{:.7E}".format(channel.reading))
-        if self._device.elements["UNIT"] and self._device.elements["READ"]:
-            channel_data.append("{}".format(channel.unit.name))
-        if self._device.elements["CHAN"]:
-            channel_data.append(",{:02d}INTCHAN".format(channel.channel))
+        Returns:
+            string: Formatted string of channel data.
+        """
+        channel_data = self._device.take_single_reading()
 
-        return "".join(channel_data)
+        return "".join(self._format_buffer_readings(channel_data))
 
     def set_buffer_full_status(self):
         self._device.status_register.buffer_full = True
@@ -321,6 +339,29 @@ class Keithley2001StreamInterface(StreamInterface):
 
         Returns:
             list of strings: List of readings from channels.
-
         """
-        return ",".join(self._device.buffer.buffer)
+
+        return ",".join(map(self._format_buffer_readings, self._device.buffer.buffer))
+
+    def _format_buffer_readings(self, reading):
+        """
+        Formats a reading.
+
+        Args:
+            reading: dictionary with keys
+                "READ", "READ_UNIT", "CHAN"
+
+        Returns:
+            string: Buffer reading formatted depending on elements
+        """
+        formatted_buffer_reading = []
+
+        if self._device.elements["READ"]:
+            formatted_buffer_reading.append(reading["READ"])
+            if self._device.elements["UNIT"]:
+                formatted_buffer_reading.append(reading["READ_UNIT"])
+
+        if self._device.elements["CHAN"]:
+            formatted_buffer_reading.append(reading["CHAN"])
+
+        return self._channel_readback_format.format(*formatted_buffer_reading)
