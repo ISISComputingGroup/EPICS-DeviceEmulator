@@ -85,39 +85,6 @@ class SimulatedKeithley2001(StateMachineDevice):
 
         SimulatedKeithley2001.number_of_times_device_has_been_reset += 1
 
-    def get_number_of_times_buffer_has_been_cleared_via_the_backdoor(self):
-        """
-        Gets the number of times the buffer has been cleared.
-        Only called via the backdoor.
-
-        Returns:
-            int: Number of times the buffer has been cleared.
-        """
-
-        return self.buffer.number_of_times_buffer_cleared
-
-    def get_number_of_times_status_register_has_been_reset_and_cleared_via_the_backdoor(self):
-        """
-       Gets the number of times the status register has been reset and cleared.
-
-       Only called via the backdoor.
-
-       Returns:
-           int: Number of times the status register has been reset and cleared.
-       """
-
-        return self.status_register.number_of_times_reset_and_cleared
-
-    def set_channel_value_via_the_backdoor(self, channel, value):
-        """
-        Sets a channel value using Lewis backdoor.
-
-        rgs:
-            channel (int): Channel number 1,2,3,4,6,7,8, or 9.
-            value (float): Value to set the channel to
-        """
-        self._channels[channel].reading = value
-
     def close_channel(self, channel):
         """
         Closes channel to read from and opens the previously closed channel.
@@ -180,3 +147,37 @@ class SimulatedKeithley2001(StateMachineDevice):
                 "CHAN": channel.channel,
                 "READ_UNIT": channel.reading_units.name
             })
+
+    # Backdoor functions
+    def get_number_of_times_buffer_has_been_cleared_via_the_backdoor(self):
+        """
+        Gets the number of times the buffer has been cleared.
+        Only called via the backdoor.
+
+        Returns:
+            int: Number of times the buffer has been cleared.
+        """
+
+        return self.buffer.number_of_times_buffer_cleared
+
+    def get_number_of_times_status_register_has_been_reset_and_cleared_via_the_backdoor(self):
+        """
+       Gets the number of times the status register has been reset and cleared.
+
+       Only called via the backdoor.
+
+       Returns:
+           int: Number of times the status register has been reset and cleared.
+       """
+
+        return self.status_register.number_of_times_reset_and_cleared
+
+    def set_channel_value_via_the_backdoor(self, channel, value):
+        """
+        Sets a channel value using Lewis backdoor.
+
+        rgs:
+            channel (int): Channel number 1,2,3,4,6,7,8, or 9.
+            value (float): Value to set the channel to
+        """
+        self._channels[channel].reading = value
