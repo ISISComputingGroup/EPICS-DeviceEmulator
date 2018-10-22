@@ -50,7 +50,11 @@ class Keithley2001StreamInterface(StreamInterface):
         CmdBuilder("set_buffer_size").escape(":DATA:POIN ").int().eos().build(),
         CmdBuilder("get_buffer_size").escape(":DATA:POIN?").eos().build(),
         CmdBuilder("set_scan_channels").escape(":ROUT:SCAN (@").arg("[0-9,]+").escape(")").eos().build(),
-        CmdBuilder("get_scan_channels").escape(":ROUT:SCAN?").eos().build()
+        CmdBuilder("get_scan_channels").escape(":ROUT:SCAN?").eos().build(),
+
+        # Error handling
+        CmdBuilder("get_error").escape(":SYST:ERR?").eos().build(),
+        CmdBuilder("clear_error").escape(":SYST:CLE").eos().build()
     }
 
     def handle_error(self, request, error):
@@ -377,3 +381,21 @@ class Keithley2001StreamInterface(StreamInterface):
             formatted_buffer_reading.append(reading["CHAN"])
 
         return self._channel_readback_format.format(*formatted_buffer_reading)
+
+    def get_error(self):
+        """
+        Returns the error code and message.
+
+        Returns:
+            (string): Returns the error string formed of
+                error code, error message.
+        """
+
+        return ",".join(["{}".format(self._device.error[0]), self._device.error[1]])
+
+    def clear_error(self):
+        """
+        Clear the devices errors.
+        """
+
+        self._device.clear_error()

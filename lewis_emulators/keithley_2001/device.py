@@ -44,6 +44,7 @@ class SimulatedKeithley2001(StateMachineDevice):
             10: Channel(10)
         }
         self.closed_channel = None
+        self._error = [0, "No errors"]
 
     def _get_state_handlers(self):
         return {
@@ -82,6 +83,7 @@ class SimulatedKeithley2001(StateMachineDevice):
         }
         self.closed_channel = None
         self._scan_trigger_type = ScanTrigger.IMM
+        self.clear_error()
 
         SimulatedKeithley2001.number_of_times_device_has_been_reset += 1
 
@@ -148,6 +150,12 @@ class SimulatedKeithley2001(StateMachineDevice):
                 "READ_UNIT": channel.reading_units.name
             })
 
+    def clear_error(self):
+        """
+        Clears any error
+        """
+        self.error = [0, "No errors"]
+
     # Backdoor functions
     def get_number_of_times_buffer_has_been_cleared_via_the_backdoor(self):
         """
@@ -181,3 +189,16 @@ class SimulatedKeithley2001(StateMachineDevice):
             value (float): Value to set the channel to
         """
         self._channels[channel].reading = value
+
+    def set_error_via_the_backdoor(self, error_code, error_message):
+        """
+        Sets an error via the using Lewis backdoor..
+
+        Args:
+            error_code:
+            error_message:
+
+        Returns:
+
+        """
+        self.error = [error_code, error_message]
