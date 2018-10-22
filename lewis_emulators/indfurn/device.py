@@ -32,7 +32,7 @@ class SimulatedIndfurn(StateMachineDevice):
         self.hf_on = False
 
         self.psu_overtemp, self.psu_overvolt = False, False
-        self.cooling_water_flow = True
+        self.cooling_water_flow = 100
 
     def _get_state_handlers(self):
         return {'default': DefaultState()}
@@ -42,3 +42,6 @@ class SimulatedIndfurn(StateMachineDevice):
 
     def _get_transition_handlers(self):
         return OrderedDict([])
+
+    def is_cooling_water_flow_ok(self):
+        return self.cooling_water_flow >= 100
