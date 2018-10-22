@@ -1,9 +1,8 @@
 from collections import OrderedDict
 from states import DefaultState
 from lewis.devices import StateMachineDevice
-from utils import Channel, StatusRegister, ScanTrigger, ReadStatus
+from utils import Channel, StatusRegister, ScanTrigger
 from buffer import Buffer
-from timeit import default_timer as timer
 
 
 class SimulatedKeithley2001(StateMachineDevice):
@@ -44,7 +43,7 @@ class SimulatedKeithley2001(StateMachineDevice):
             10: Channel(10)
         }
         self.closed_channel = None
-        self._error = [0, "No errors"]
+        self._error = [0, "No Error"]
 
     def _get_state_handlers(self):
         return {
@@ -154,7 +153,7 @@ class SimulatedKeithley2001(StateMachineDevice):
         """
         Clears any error
         """
-        self.error = [0, "No errors"]
+        self._error = [0, "No Error"]
 
     # Backdoor functions
     def get_number_of_times_buffer_has_been_cleared_via_the_backdoor(self):
@@ -192,13 +191,24 @@ class SimulatedKeithley2001(StateMachineDevice):
 
     def set_error_via_the_backdoor(self, error_code, error_message):
         """
-        Sets an error via the using Lewis backdoor..
+        Sets an error via the using Lewis backdoor.
 
         Args:
-            error_code:
-            error_message:
+            error_code (string): error code number
+            error_message (string): error message
 
         Returns:
 
         """
-        self.error = [error_code, error_message]
+        self._error = [int(error_code), error_message]
+
+    @property
+    def error(self):
+        """
+        Returns the current error status.
+
+        Returns:
+            list [int, string]: list of integer error code and error message.
+        """
+
+        return self._error

@@ -48,8 +48,3 @@ class ScanTrigger(Enum):
 class ReadStatus(Enum):
     SINGLE = 0
     MULIT = 1
-
-class ReadStatus(Enum):
-    N = 0
-    O = 1
-    R = 2
