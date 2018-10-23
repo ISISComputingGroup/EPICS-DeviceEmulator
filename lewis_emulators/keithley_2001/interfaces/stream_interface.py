@@ -1,8 +1,7 @@
-from lewis.adapters.stream import StreamInterface, has_log
+from lewis.adapters.stream import StreamInterface
 from lewis_emulators.utils.command_builder import CmdBuilder
 
 
-@has_log
 class Keithley2001StreamInterface(StreamInterface):
 
     in_terminator = "\r\n"
