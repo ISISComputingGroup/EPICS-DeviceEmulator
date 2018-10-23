@@ -43,7 +43,7 @@ class SimulatedKeithley2001(StateMachineDevice):
             10: Channel(10)
         }
         self.closed_channel = None
-        self._error = [0, "No Error"]
+        self._error = [0, "No error"]
 
     def _get_state_handlers(self):
         return {
@@ -153,7 +153,7 @@ class SimulatedKeithley2001(StateMachineDevice):
         """
         Clears any error
         """
-        self._error = [0, "No Error"]
+        self._error = [0, "No error"]
 
     # Backdoor functions
     def get_number_of_times_buffer_has_been_cleared_via_the_backdoor(self):
