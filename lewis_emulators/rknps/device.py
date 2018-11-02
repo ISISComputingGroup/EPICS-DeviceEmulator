@@ -19,7 +19,7 @@ class PowerSupply(object):
         self.interlock_active = True
 
 
-ADDRESSES = ["001", "002"]
+ADDRESSES = ["001", "002", "003", "004"]
 
 
 @has_log
