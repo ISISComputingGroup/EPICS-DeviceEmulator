@@ -9,7 +9,8 @@ class SimulatedWbvalve(StateMachineDevice):
         """
         Initialize all of the device's attributes.
         """
-        pass
+        self.wb_position = 1
+        self.connected = True
 
     def _get_state_handlers(self):
         return {
@@ -22,4 +23,7 @@ class SimulatedWbvalve(StateMachineDevice):
     def _get_transition_handlers(self):
         return OrderedDict([
         ])
+
+    def reset(self):
+        self._initialize_data()
 
