@@ -9,7 +9,9 @@ class SimulatedKnr1050(StateMachineDevice):
         """
         Initialize all of the device's attributes.
         """
-        pass
+        self.connected = True
+        self.is_stopped = False
+
 
     def _get_state_handlers(self):
         return {
@@ -22,4 +24,3 @@ class SimulatedKnr1050(StateMachineDevice):
     def _get_transition_handlers(self):
         return OrderedDict([
         ])
-
