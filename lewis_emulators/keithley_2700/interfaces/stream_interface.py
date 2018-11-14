@@ -1,3 +1,5 @@
+import traceback
+
 from lewis.adapters.stream import StreamInterface
 from lewis_emulators.utils.command_builder import CmdBuilder
 from lewis.core.logging import has_log
@@ -8,70 +10,68 @@ BUFFER_SOURCE = {0: "SENS", 1: "CALC", 2: "NONE"}
 BUFFER_CONTROL_MODE = {0: "NEXT", 1: "ALW", 2: "NEV"}
 TIMESTAMP_FORMAT = {0: "ABS", 1: "DELT"}
 CONTROL_SOURCE = {0: "IMM", 1: "TIM", 2: "MAN", 3: "BUS", 4: "EXT"}
-SCAN_STATE = {0: "INT", 1: "NONE"}
+SCAN_STATE = {0: "INT", 1: "NONE", 2: "TODO: FIGURE THIS OUT"}
+
 
 @has_log
 class Keithley2700StreamInterface(StreamInterface):
     in_terminator = "\r\n"
     out_terminator = "\r\n"
     commands = {
-        CmdBuilder("get_idn").escape("*IDN?").build(),
-        CmdBuilder("empty_queue").escape(":SYST:CLE").build(),
-        CmdBuilder("clear_buffer").escape("TRAC:CLE").build(),
-        CmdBuilder("set_measurement").escape(":FUNC '").arg("VOLT:DC|VOLT:AC|CURR:DC|CURR:AC|RES|FRES|CONT|FREQ|PER")
-            .escape("'").build(),
-        CmdBuilder("get_measurement").escape(":FUNC?").build(),
-        CmdBuilder("set_buffer_feed").escape("TRAC:FEED ").arg("SENS|CALC|NONE").build(),
-        CmdBuilder("set_buffer_control").escape("TRAC:FEED:CONT ").arg("NEV|NEXT|ALW").build(),
-        CmdBuilder("set_buffer_state").escape("TRAC:CLE:AUTO ").arg("OFF|ON").build(),
-        CmdBuilder("get_buffer_state").escape("TRAC:CLE:AUTO?").build(),
-        CmdBuilder("get_next_buffer_location").escape("TRAC:NEXT?").build(),
-        CmdBuilder("get_buffer_stats").escape("TRAC:FREE?").build(),
-        CmdBuilder("get_readings_range",  arg_sep="").escape("TRAC:DATA:SEL? ").int().escape(",").int().build(),
-        CmdBuilder("set_buffer_size").escape("TRAC:POIN ").int().build(),
-        CmdBuilder("get_buffer_size").escape("TRAC:POIN?").build(),
-        CmdBuilder("set_time_stamp_format").escape("TRAC:TST:FORM ").arg("ABS|DELT").build(),
-        CmdBuilder("get_time_stamp_format").escape("TRAC:TST:FORM?").build(),
-        CmdBuilder("get_delay_state").escape("TRIG:DEL:AUTO?").build(),
-        CmdBuilder("set_delay_state").escape("TRIG:DEL:AUTO ").arg("OFF|ON").build(),
-        CmdBuilder("set_init_state").escape("INIT:CONT ").arg("OFF|ON").build(),
-        CmdBuilder("get_init_state").escape("INIT:CONT?").build(),
-        CmdBuilder("set_sample_count").escape("SAMP:COUN ").int().build(),
-        CmdBuilder("get_sample_count").escape("SAMP:COUN?").build(),
-        CmdBuilder("set_source").escape("TRIG:SOUR ").arg("IMM|TIM|MAN|BUS|EXT").build(),
-        CmdBuilder("set_data_elements").escape("FORM:ELEM READ, CHAN, TST").build(),
-        CmdBuilder("set_auto_range_status", arg_sep="").escape("FRES:RANG:AUTO ").arg("OFF|ON").build(),
-        CmdBuilder("get_auto_range_status").escape("FRES:RANG:AUTO?").build(),
+        CmdBuilder("get_idn").escape("*IDN?").eos().build(),
+        CmdBuilder("empty_queue").escape(":SYST:CLE").eos().build(),
+        CmdBuilder("clear_buffer").escape("TRAC:CLE").eos().build(),
+        CmdBuilder("set_measurement").escape(":FUNC '").eos().
+        arg("VOLT:DC|VOLT:AC|CURR:DC|CURR:AC|RES|FRES|CONT|FREQ|PER")
+        .escape("'").eos().build(),
+        CmdBuilder("get_measurement").escape(":FUNC?").eos().build(),
+        CmdBuilder("set_buffer_feed").escape("TRAC:FEED ").arg("SENS|CALC|NONE").eos().build(),
+        CmdBuilder("set_buffer_control").escape("TRAC:FEED:CONT ").arg("NEV|NEXT|ALW").eos().build(),
+        CmdBuilder("set_buffer_state").escape("TRAC:CLE:AUTO ").arg("OFF|ON").eos().build(),
+        CmdBuilder("get_buffer_state").escape("TRAC:CLE:AUTO?").eos().build(),
+        CmdBuilder("get_next_buffer_location").escape("TRAC:NEXT?").eos().build(),
+        CmdBuilder("get_buffer_stats").escape("TRAC:FREE?").eos().build(),
+        CmdBuilder("get_readings_from_range",  arg_sep="").escape("TRAC:DATA:SEL? ").int().escape(",").int().eos().
+        build(),
+        CmdBuilder("set_buffer_size").escape("TRAC:POIN ").int().eos().build(),
+        CmdBuilder("get_buffer_size").escape("TRAC:POIN?").eos().build(),
+        CmdBuilder("set_time_stamp_format").escape("TRAC:TST:FORM ").arg("ABS|DELT").eos().build(),
+        CmdBuilder("get_time_stamp_format").escape("TRAC:TST:FORM?").eos().build(),
+        CmdBuilder("get_delay_state").escape("TRIG:DEL:AUTO?").eos().build(),
+        CmdBuilder("set_delay_state").escape("TRIG:DEL:AUTO ").arg("OFF|ON").eos().build(),
+        CmdBuilder("set_init_state").escape("INIT:CONT ").arg("OFF|ON").eos().build(),
+        CmdBuilder("get_init_state").escape("INIT:CONT?").eos().build(),
+        CmdBuilder("set_sample_count").escape("SAMP:COUN ").int().eos().build(),
+        CmdBuilder("get_sample_count").escape("SAMP:COUN?").eos().build(),
+        CmdBuilder("set_source").escape("TRIG:SOUR ").arg("IMM|TIM|MAN|BUS|EXT").eos().build(),
+        CmdBuilder("set_data_elements").escape("FORM:ELEM READ, CHAN, TST").eos().build(),
+        CmdBuilder("set_auto_range_status", arg_sep="").escape("FRES:RANG:AUTO ").arg("OFF|ON").eos().build(),
+        CmdBuilder("get_auto_range_status").escape("FRES:RANG:AUTO?").eos().build(),
         CmdBuilder("set_resistance_digits", arg_sep="").escape(":FRES:DIG ").int().escape(", (@").
-        int().escape(":").int().escape(")").build(),
-        CmdBuilder("set_resistance_rate").escape(":FRES:NPLC ").float().build(),
-        CmdBuilder("set_scan_state").escape("ROUT:SCAN:LSEL ").arg("INT|NONE").build(),
-        CmdBuilder("get_scan_state").escape("ROUT:SCAN:LSEL").build(),
-        CmdBuilder("set_scan_channels", arg_sep="").escape("ROUT:SCAN (@").int().escape(":").int().escape(")").build(),
-        CmdBuilder("get_scan_channels").escape("ROUT:SCAN?").build()
+        int().escape(":").int().escape(")").eos().build(),
+        CmdBuilder("set_resistance_rate").escape(":FRES:NPLC ").float().eos().build(),
+        CmdBuilder("set_scan_state").escape("ROUT:SCAN:LSEL ").arg("INT|NONE").eos().build(),
+        CmdBuilder("get_scan_state").escape("ROUT:SCAN:LSEL?").eos().build(),
+        CmdBuilder("set_scan_channels", arg_sep="").escape("ROUT:SCAN (@").int().escape(":").int().escape(")").eos().
+        build(),
+        CmdBuilder("get_scan_channels").escape("ROUT:SCAN?").eos().build()
     }
 
     def handle_error(self, request, error):
         self.log.error("An error occurred at request" + repr(request) + ": " + repr(error))
+        self.log.error(traceback.format_exc())
         print("An error occurred at request" + repr(request) + ": " + repr(error))
 
     def bool_onoff_value(self, string_value):
         if string_value not in ["ON", "OFF"]:
             raise ValueError("Invalid on/off value!")
-        else:
-            if string_value == "ON":
-                return True
-            else:
-                return False
+        return string_value == "ON"
 
     def enum_onoff_value(self, bool_value):
         if bool_value not in [True, False]:
             raise ValueError("Invalid on/off value!")
         else:
-            if bool_value:
-                return 1
-            else:
-                return 0
+            return int(bool_value)
 
     def get_idn(self):
         return self._device.idn
@@ -80,7 +80,7 @@ class Keithley2700StreamInterface(StreamInterface):
         self.log.info("Error log emptied")
 
     def clear_buffer(self):
-        self._device.buffer = ""
+        self._device.clear_buffer()
 
     def set_measurement(self, measurement):
         if measurement in MEASUREMENT_TYPE.values():
@@ -98,7 +98,7 @@ class Keithley2700StreamInterface(StreamInterface):
             raise ValueError("Invalid feed source value!")
 
     def set_buffer_control(self, control):
-        if control in BUFFER_SOURCE.values():
+        if control in BUFFER_CONTROL_MODE.values():
             self._device.buffer_control = BUFFER_CONTROL_MODE.keys()[BUFFER_CONTROL_MODE.values().index(control)]
         else:
             raise ValueError("Invalid buffer control source value!")
@@ -107,18 +107,15 @@ class Keithley2700StreamInterface(StreamInterface):
         self._device.buffer_autoclear_on = state
 
     def get_buffer_state(self):
-        return self.bool_onoff_value(self._device.buffer_autoclear_on)
+        return "{}".format("ON" if self._device.buffer_autoclear_on else "OFF")
 
     def get_next_buffer_location(self):
         """
-
         :return: String-formatted integer of the next buffer location to retrieve
         """
-        self._device.next_buffer_location = self._device.current_buffer_loc + 5
-        if self._device.next_buffer_location >= len(self._device.buffer_full):
-            self._device.next_buffer_location -= len(self._device.buffer_full)
-            self._device.current_buffer_loc = 0
-        return "{}".format(self._device.next_buffer_location)
+        next_location = len(self._device.buffer)
+        self.log.info("Next buffer location: {}".format(next_location))
+        return "{}".format(next_location)
 
     def get_buffer_stats(self):
         """
@@ -126,22 +123,22 @@ class Keithley2700StreamInterface(StreamInterface):
         """
         return "{}, {}".format(str(self._device.bytes_available), str(self._device.bytes_used))
 
-    def get_readings_range(self, start, count):
+    def get_readings_from_range(self, start, end):
         """
-        :param count: Number of buffer values to retrieve
+        :param start: Start location in buffer
+        :param end: Index of final buffer value to retrieve
         :return: String value of readings from buffer
         """
-        self._device.buffer_range_readings = ""
-        for i in range(int(count)):
-            if int(self._device.current_buffer_loc) >= len(self._device.buffer_full):
-                self._device.next_buffer_location = len(self._device.buffer_full) - self._device.current_buffer_loc + i
-                self._device.current_buffer_loc = 0
-                self._device.fill_buffer()
-            else:
-                next_reading = str(self._device.buffer_full[int(self._device.current_buffer_loc)])
-                self._device.current_buffer_loc += 1
-                self._device.buffer_range_readings += next_reading
-        return self._device.buffer_range_readings
+
+        chunks = []
+        start, end = int(start), int(end)
+        for buffer_location in range(start, end + 1):
+            chunks.append("{},{},{}".format(self._device.buffer[buffer_location].reading,
+                                            self._device.buffer[buffer_location].timestamp,
+                                            self._device.buffer[buffer_location].channel))
+
+        self.log.info("Returned readings: {}".format("No readings" if (len(chunks) == 0) else ",".join(chunks)))
+        return ", ".join(chunks)
 
     def set_buffer_size(self, size):
         self._device.buffer_size = size
@@ -149,9 +146,9 @@ class Keithley2700StreamInterface(StreamInterface):
     def get_buffer_size(self):
         return self._device.buffer_size
 
-    def set_time_stamp_format(self, format):
-        if format in TIMESTAMP_FORMAT.values():
-            self._device.time_stamp_format = TIMESTAMP_FORMAT.keys()[TIMESTAMP_FORMAT.values().index(format)]
+    def set_time_stamp_format(self, timestamp_format):
+        if timestamp_format in TIMESTAMP_FORMAT.values():
+            self._device.time_stamp_format = TIMESTAMP_FORMAT.keys()[TIMESTAMP_FORMAT.values().index(timestamp_format)]
         else:
             raise ValueError("Invalid timestamp format value")
 
