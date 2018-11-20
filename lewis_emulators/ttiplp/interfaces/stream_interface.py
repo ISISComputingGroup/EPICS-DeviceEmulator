@@ -39,12 +39,8 @@ class TtiplpStreamInterface(StreamInterface):
         return self.device.ident
 
     def set_volt_sp(self, _, volt_sp):
-        self.device.volt_sp = float(volt_sp)
-        if float(volt_sp)>float(self.device.overvolt):
-            self.device.output=0
-            self.device.volt=0
-            self.device.current=0
-        #self.device.volt = float(volt_sp)
+        self.device.set_volt_sp(float(volt_sp))
+
 
     def get_volt_sp(self,_):
         return "V1 {:.3f}".format(self.device.volt_sp)

@@ -32,4 +32,10 @@ class SimulatedTtiplp(StateMachineDevice):
     def _get_transition_handlers(self):
         return OrderedDict([
         ])
+        
+    def set_volt_sp(self, volt_sp):
+        if float(volt_sp)>float(self.overvolt):
+            self.output=0
+            self.volt=0
+            self.curr=0
 
