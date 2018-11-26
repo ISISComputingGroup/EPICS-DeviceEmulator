@@ -111,21 +111,21 @@ class CmdBuilder(object):
             self.arg(".{{{}}}".format(length))
         return self
 
-    def float(self):
+    def float(self, mapping=float):
         """
         Add a float argument.
 
         :return: builder
         """
-        return self.arg(r"[+-]?\d+\.?\d*", float)
+        return self.arg(r"[+-]?\d+\.?\d*", mapping)
 
-    def digit(self):
+    def digit(self, mapping=int):
         """
         Add a single digit argument.
 
         :return: builder
         """
-        return self.arg(r"\d", int)
+        return self.arg(r"\d", mapping)
 
     def char(self, not_chars=None):
         """
@@ -141,13 +141,13 @@ class CmdBuilder(object):
             return self.arg(r".")
         return self.arg("[^{}]".format("".join(not_chars)))
 
-    def int(self):
+    def int(self, mapping=int):
         """
         Add an integer argument.
 
         :return: builder
         """
-        return self.arg(r"[+-]?\d+", int)
+        return self.arg(r"[+-]?\d+", mapping)
 
     def any(self):
         """
