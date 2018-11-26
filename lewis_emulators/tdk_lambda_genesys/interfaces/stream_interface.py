@@ -35,7 +35,7 @@ class TDKLambdaGenesysStreamInterface(StreamInterface):
     @conditional_reply("comms_initialized")
     def write_voltage(self, v):
         self._device.setpoint_voltage = v
-        return "VOLTAGE SET TO: " + v
+        return "VOLTAGE SET TO: {}".format(v)
 
     @conditional_reply("comms_initialized")
     def read_current(self):
@@ -48,7 +48,7 @@ class TDKLambdaGenesysStreamInterface(StreamInterface):
     @conditional_reply("comms_initialized")
     def write_current(self, c):
         self._device.setpoint_current = c
-        return "VOLTAGE SET TO: " + c
+        return "VOLTAGE SET TO: {}".format(c)
 
     @conditional_reply("comms_initialized")
     def read_power(self):
@@ -57,7 +57,7 @@ class TDKLambdaGenesysStreamInterface(StreamInterface):
     @conditional_reply("comms_initialized")
     def write_power(self, p):
         self._device.powerstate = p
-        return "POWER SET TO " + p
+        return "POWER SET TO {}".format(p)
 
     @conditional_reply("comms_initialized")
     def remote(self):

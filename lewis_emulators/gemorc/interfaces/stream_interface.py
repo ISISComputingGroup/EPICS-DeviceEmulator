@@ -93,7 +93,7 @@ class GemorcStreamInterface(StreamInterface):
         Args:
             offset: Datum offset in centi-degrees
         """
-        self.device.set_offset(int(offset))
+        self.device.set_offset(offset)
         return "OK"
 
     def set_acceleration(self, acceleration):
@@ -103,7 +103,7 @@ class GemorcStreamInterface(StreamInterface):
         Args:
             acceleration: Rate of acceleration in centi-degrees per second^2
         """
-        self.device.set_acceleration(int(acceleration))
+        self.device.set_acceleration(acceleration)
         return "OK"
 
     def set_speed(self, speed):
@@ -113,7 +113,7 @@ class GemorcStreamInterface(StreamInterface):
         Args:
             speed: Speed in centi-degrees per second
         """
-        self.device.set_speed(int(speed))
+        self.device.set_speed(speed)
         return "OK"
 
     def get_status(self):
