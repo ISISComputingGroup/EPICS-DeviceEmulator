@@ -40,6 +40,7 @@ class CmdBuilder(object):
         self._target_method = target_method
         self._arg_sep = arg_sep
         self._current_sep = ""
+        self.argument_mappings = []
         if ignore is None or ignore == "":
             self._ignore = ""
         else:
@@ -85,15 +86,17 @@ class CmdBuilder(object):
         self._add_to_regex(" " + wildchard, False)
         return self
 
-    def arg(self, arg_regex):
+    def arg(self, arg_regex, argument_mapping=str):
         """
         Add an argument to the command.
 
         :param arg_regex: regex for the argument (capture group will be added)
+        :param argument_mapping: the type mapping for the argument (default is str)
         :return: builder
         """
         self._add_to_regex(self._current_sep + "(" + arg_regex + ")", True)
         self._current_sep = self._arg_sep
+        self.argument_mappings.append(argument_mapping)
         return self
 
     def string(self, length=None):
@@ -105,7 +108,7 @@ class CmdBuilder(object):
         if length is None:
             self.arg(".+")
         else:
-            self.arg(".{{{}}}".format(length))
+            self.arg(".{{{}}}".format(length), str)
         return self
 
     def float(self):
@@ -114,7 +117,7 @@ class CmdBuilder(object):
 
         :return: builder
         """
-        return self.arg(r"[+-]?\d+\.?\d*")
+        return self.arg(r"[+-]?\d+\.?\d*", float)
 
     def digit(self):
         """
@@ -136,7 +139,7 @@ class CmdBuilder(object):
         """
         if not_chars is None:
             return self.arg(r".")
-        return self.arg("[^{}]".format("".join(not_chars)))
+        return self.arg("[^{}]".format("".join(not_chars)), str)
 
     def int(self):
         """
@@ -144,7 +147,7 @@ class CmdBuilder(object):
 
         :return: builder
         """
-        return self.arg(r"[+-]?\d+")
+        return self.arg(r"[+-]?\d+", int)
 
     def any(self):
         """
@@ -166,7 +169,7 @@ class CmdBuilder(object):
         :param kwargs: key word arguments to pass to Cmd constructor
         :return: Cmd object
         """
-        return Cmd(self._target_method, self._reg_ex, *args, **kwargs)
+        return Cmd(self._target_method, self._reg_ex, argument_mappings=self.argument_mappings, *args, **kwargs)
 
     def add_ascii_character(self, char_number):
         """
