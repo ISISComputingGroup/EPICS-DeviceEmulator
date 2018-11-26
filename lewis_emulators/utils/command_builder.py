@@ -108,7 +108,7 @@ class CmdBuilder(object):
         if length is None:
             self.arg(".+")
         else:
-            self.arg(".{{{}}}".format(length), str)
+            self.arg(".{{{}}}".format(length))
         return self
 
     def float(self):
@@ -125,7 +125,7 @@ class CmdBuilder(object):
 
         :return: builder
         """
-        return self.arg(r"\d")
+        return self.arg(r"\d", int)
 
     def char(self, not_chars=None):
         """
@@ -139,7 +139,7 @@ class CmdBuilder(object):
         """
         if not_chars is None:
             return self.arg(r".")
-        return self.arg("[^{}]".format("".join(not_chars)), str)
+        return self.arg("[^{}]".format("".join(not_chars)))
 
     def int(self):
         """
