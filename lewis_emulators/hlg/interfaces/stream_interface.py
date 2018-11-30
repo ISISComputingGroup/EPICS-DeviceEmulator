@@ -49,15 +49,14 @@ class HlgStreamInterface(StreamInterface):
         Returns: confirmation message
 
         """
-        verbosity_as_int = int(verbosity)
-        if verbosity_as_int not in [0, 1]:
-            raise AssertionError("Verbosity must be 0 or 1 was '{0}'".format(verbosity))
-        self._device.verbosity = verbosity_as_int
-        if verbosity_as_int == 0:
+        if verbosity not in [0, 1]:
+            raise AssertionError("Verbosity must be 0 or 1 was '{}'".format(verbosity))
+        self._device.verbosity = verbosity
+        if verbosity == 0:
             out_verbose = "Normal"
         else:
             out_verbose = "labVIEW"
-        return self._format_output("CV{0}".format(verbosity_as_int), "Verbose=", out_verbose)
+        return self._format_output("CV{0}".format(verbosity), "Verbose=", out_verbose)
 
     def set_prefix(self, prefix):
         """
@@ -68,11 +67,10 @@ class HlgStreamInterface(StreamInterface):
         Returns: confirmation message
 
         """
-        prefix_as_int = int(prefix)
-        if not 0 <= prefix_as_int < len(PREFIXES):
+        if not 0 <= prefix < len(PREFIXES):
             raise AssertionError("Prefix must be between 0 and {1} '{0}'".format(prefix, len(PREFIXES)))
-        self._device.prefix = prefix_as_int
-        return self._format_output("CP{0}".format(prefix_as_int), "Verbose=", prefix)
+        self._device.prefix = prefix
+        return self._format_output("CP{0}".format(prefix), "Verbose=", str(prefix))
 
     def get_level(self):
 

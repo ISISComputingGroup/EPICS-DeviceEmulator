@@ -56,7 +56,7 @@ class FZJDDFCHStreamInterface(StreamInterface):
         if self._device.disconnected:
             return None
         if self._device.error_on_set_frequency is None:
-            self._device.frequency_setpoint = int(frequency) * self._device.frequency_reference
+            self._device.frequency_setpoint = frequency * self._device.frequency_reference
             reply = "{chopper_name}OK".format(chopper_name=chopper_name)
         else:
             reply = "ERROR;{}".format(self._device.error_on_set_frequency)
@@ -79,7 +79,7 @@ class FZJDDFCHStreamInterface(StreamInterface):
         if self._device.disconnected:
             return None
         if self._device.error_on_set_phase is None:
-            self._device.phase_setpoint = float(phase)
+            self._device.phase_setpoint = phase
             reply = "{chopper_name}OK".format(chopper_name=chopper_name)
         else:
             reply = "ERROR;{}".format(self._device.error_on_set_phase)

@@ -199,8 +199,6 @@ class SimulatedSp2XX(StateMachineDevice):
         Returns:
             True if the diameter has been set and False otherwise.
         """
-        value = float(value)
-
         if value >= 100 or value < 0.01:
             return False
         else:

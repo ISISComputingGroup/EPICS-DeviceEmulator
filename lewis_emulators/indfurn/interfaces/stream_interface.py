@@ -99,28 +99,28 @@ class IndfurnStreamInterface(StreamInterface):
         return "<pidsp {:.2f}".format(self.device.setpoint)
 
     def set_setpoint(self, sp):
-        self.device.setpoint = float(sp)
+        self.device.setpoint = sp
         return "<ack"
 
     def get_psu_voltage(self):
         return "<powv {:.2f}".format(self.device.psu_voltage)
 
     def set_psu_voltage(self, voltage):
-        self.device.psu_voltage = float(voltage)
+        self.device.psu_voltage = voltage
         return "<ack"
 
     def get_psu_current(self):
         return "<powa {:.2f}".format(self.device.psu_current)
 
     def set_psu_current(self, current):
-        self.device.psu_current = float(current)
+        self.device.psu_current = current
         return "<ack"
 
     def get_output(self):
         return "<pidoutm {:.2f}".format(self.device.output)
 
     def set_output(self, output):
-        self.device.output = float(output)
+        self.device.output = output
         return "<ack"
 
     def get_thermocouple_temperature(self):
@@ -139,24 +139,24 @@ class IndfurnStreamInterface(StreamInterface):
         return "<pidtu {:.2f} {:.2f} {:.2f}".format(self.device.p, self.device.i, self.device.d)
 
     def set_pid_params(self, p, i, d):
-        self.device.p = float(p)
-        self.device.i = float(i)
-        self.device.d = float(d)
+        self.device.p = p
+        self.device.i = i
+        self.device.d = d
         return "<ack"
 
     def get_pid_limits(self):
         return "<PID out limit min max:  {:.2f} {:.2f}".format(self.device.pid_lower_limit, self.device.pid_upper_limit)
 
     def set_pid_limits(self, pid_lower_limit, pid_upper_limit):
-        self.device.pid_lower_limit = float(pid_lower_limit)
-        self.device.pid_upper_limit = float(pid_upper_limit)
+        self.device.pid_lower_limit = pid_lower_limit
+        self.device.pid_upper_limit = pid_upper_limit
         return "<ack"
 
     def get_sample_time(self):
         return "<pidst {:d}".format(self.device.sample_time)
 
     def set_sample_time(self, sample_time):
-        self.device.sample_time = int(sample_time)
+        self.device.sample_time = sample_time
         return "<ack"
 
     def get_psu_direction(self):

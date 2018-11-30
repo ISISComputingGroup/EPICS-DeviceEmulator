@@ -44,7 +44,7 @@ class CommonStreamInterface(object):
 
     @conditional_reply("comms_initialized")
     def set_current(self, value):
-        self.device.current = int(value)
+        self.device.current = value
 
     @conditional_reply("comms_initialized")
     def get_voltage(self):
