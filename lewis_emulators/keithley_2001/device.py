@@ -123,7 +123,7 @@ class SimulatedKeithley2001(StateMachineDevice):
         return {
             "READ": channel.reading,
             "CHAN": channel.channel,
-            "READ_UNIT": channel.reading_units.name
+            "READ_UNIT": channel.reading_units
             }
 
     @property
@@ -146,7 +146,7 @@ class SimulatedKeithley2001(StateMachineDevice):
             self.buffer.buffer.append({
                 "READ": channel.reading,
                 "CHAN": channel.channel,
-                "READ_UNIT": channel.reading_units.name
+                "READ_UNIT": channel.reading_units
             })
 
     def clear_error(self):
@@ -179,15 +179,18 @@ class SimulatedKeithley2001(StateMachineDevice):
 
         return self.status_register.number_of_times_reset_and_cleared
 
-    def set_channel_value_via_the_backdoor(self, channel, value):
+    def set_channel_value_via_the_backdoor(self, channel, value, reading_unit):
         """
         Sets a channel value using Lewis backdoor.
 
         rgs:
             channel (int): Channel number 1,2,3,4,6,7,8, or 9.
             value (float): Value to set the channel to
+            reading_unit (string): Reading unit to set.
         """
         self._channels[channel].reading = value
+        self._channels[channel].reading_units = reading_unit
+
 
     def set_error_via_the_backdoor(self, error_code, error_message):
         """
