@@ -1,7 +1,6 @@
 from lewis.adapters.stream import StreamInterface, Cmd
 from lewis.core.logging import has_log
 from lewis_emulators.utils.command_builder import CmdBuilder
-from random import random as rnd
 
 @has_log
 class TtiplpStreamInterface(StreamInterface):
@@ -34,66 +33,44 @@ class TtiplpStreamInterface(StreamInterface):
         print(err_string)
         self.log.error(err_string)
         return err_string
-        
+
     def ident(self):
         return self.device.ident
+
+    def get_volt(self,_):
+        self.device.get_volt()
+        return "{:.4f}V".format(self.device.volt)
+
+    def get_curr(self,_):
+        self.device.get_curr()
+        return "{:.4f}A".format(self.device.curr)
 
     def set_volt_sp(self, _, volt_sp):
         self.device.set_volt_sp(float(volt_sp))
 
-
     def get_volt_sp(self,_):
         return "V1 {:.3f}".format(self.device.volt_sp)
-        
-    def get_volt(self,_):
-        if self.device.output==1:
-            self.device.volt=self.device.volt_sp+((rnd()-0.5)/1000)
-        else:
-            self.device.volt=((rnd()-0.5)/1000)
-        return "{:.4f}V".format(self.device.volt)
-        
-    def set_curr_sp(self,_, curr_sp):
-        self.device.curr_sp = float(curr_sp)
-        if float(curr_sp)>float(self.device.overcurr):
-            self.device.output=0
-            self.device.volt=0
-            self.device.current=0
+
+    def set_curr_sp(self, _, curr_sp):
+        self.device.set_curr_sp(float(curr_sp))
 
     def get_curr_sp(self,_):
         return "I1 {:.4f}".format(self.device.curr_sp)
-                
-    def get_curr(self,_):
-        if self.device.output==1:
-            self.device.curr=self.device.curr_sp+((rnd()-0.5)/1000)
-        else:
-            self.device.curr=((rnd()-0.5)/1000)
-        return "{:.4f}A".format(self.device.curr)
-    
+
+    def set_output(self,_,output):
+        self.device.set_output(output)
+
     def get_output(self,_):
         return "{:.0f}".format(self.device.output)
-        
-    def set_output(self,_,output):
-        if ((self.device.volt_sp<=self.device.overvolt) and (self.device.curr_sp<=self.device.overcurr) and int(output)==1):
-            self.device.output = 1
-        else:
-            self.device.output = 0
-    
-    def set_overvolt(self,_,overvolt):
-        self.device.overvolt = float(overvolt)
-        if float(overvolt)<self.device.volt_sp:
-            self.device.volt=0
-            self.device.curr=0
-            self.device.output=0
-        
+
+    def set_overvolt(self, _, overvolt):
+        self.device.set_overvolt(float(overvolt))
+
     def get_overvolt(self,_):
         return "{:.3f}".format(self.device.overvolt)
 
-    def set_overcurr(self,_,overcurr):
-        self.device.overcurr = float(overcurr)
-        if float(overcurr)<self.device.curr_sp:
-            self.device.volt=0
-            self.device.curr=0
-            self.device.output=0
-        
+    def set_overcurr(self, _, overcurr):
+        self.device.set_overcurr(float(overcurr))
+
     def get_overcurr(self,_):
         return "{:.4f}".format(self.device.overcurr)
