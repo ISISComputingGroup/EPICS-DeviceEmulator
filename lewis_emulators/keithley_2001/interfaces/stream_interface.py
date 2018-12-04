@@ -53,8 +53,7 @@ class Keithley2001StreamInterface(StreamInterface):
         CmdBuilder("get_scan_channels").escape(":ROUT:SCAN?").eos().build(),
 
         # Error handling
-        CmdBuilder("get_error").escape(":SYST:ERR?").eos().build(),
-        CmdBuilder("clear_error").escape(":SYST:CLE").eos().build()
+        CmdBuilder("get_error").escape(":SYST:ERR?").eos().build()
     }
 
     def handle_error(self, request, error):
@@ -148,6 +147,8 @@ class Keithley2001StreamInterface(StreamInterface):
         """
         Sets the buffer element group.
         """
+        self._device.number_of_times_ioc_has_been_reset += 1
+
         self._device.buffer.egroup = egroup
 
     @conditional_reply("_connected")
@@ -426,11 +427,3 @@ class Keithley2001StreamInterface(StreamInterface):
         """
 
         return ",".join(["{}".format(self._device.error[0]), self._device.error[1]])
-
-    @conditional_reply("_connected")
-    def clear_error(self):
-        """
-        Clear the devices errors.
-        """
-
-        self._device.clear_error()

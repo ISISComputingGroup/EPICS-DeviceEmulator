@@ -44,6 +44,7 @@ class SimulatedKeithley2001(StateMachineDevice):
         }
         self.closed_channel = None
         self._error = [0, "No error"]
+        self.number_of_times_ioc_has_been_reset = 0
 
 
     def _get_state_handlers(self):
@@ -83,7 +84,7 @@ class SimulatedKeithley2001(StateMachineDevice):
         }
         self.closed_channel = None
         self._scan_trigger_type = ScanTrigger.IMM
-        self.clear_error()
+        self._clear_error()
 
         SimulatedKeithley2001.number_of_times_device_has_been_reset += 1
 
@@ -150,11 +151,34 @@ class SimulatedKeithley2001(StateMachineDevice):
                 "READ_UNIT": channel.reading_units
             })
 
-    def clear_error(self):
+    @property
+    def error(self):
+        """
+        Returns the current error status.
+
+        Returns:
+            list [int, string]: list of integer error code and error message.
+        """
+
+        return self._error
+
+    def _clear_error(self):
         """
         Clears any error
         """
         self._error = [0, "No error"]
+
+    def connect(self):
+        """
+        Connects the device.
+        """
+        self._connected = True
+
+    def disconnect(self):
+        """
+        Disconnects the device.
+        """
+        self._connected = False
 
     # Backdoor functions
     def get_number_of_times_buffer_has_been_cleared_via_the_backdoor(self):
@@ -192,7 +216,6 @@ class SimulatedKeithley2001(StateMachineDevice):
         self._channels[channel].reading = value
         self._channels[channel].reading_units = reading_unit
 
-
     def set_error_via_the_backdoor(self, error_code, error_message):
         """
         Sets an error via the using Lewis backdoor.
@@ -200,31 +223,17 @@ class SimulatedKeithley2001(StateMachineDevice):
         Args:
             error_code (string): error code number
             error_message (string): error message
-
-        Returns:
-
         """
         self._error = [int(error_code), error_message]
 
-    @property
-    def error(self):
+
+    def get_how_many_times_ioc_has_been_reset_via_the_backdoor(self):
         """
-        Returns the current error status.
+        Gets the number of times the ioc has been reset.
+
+        Only called via the backdoor.
 
         Returns:
-            list [int, string]: list of integer error code and error message.
+            int: Number of times the ioc has been reset
         """
-
-        return self._error
-
-    def connect(self):
-        """
-        Connects the device.
-        """
-        self._connected = True
-
-    def disconnect(self):
-        """
-        Disconnects the device.
-        """
-        self._connected = False
+        return self.number_of_times_ioc_has_been_reset
