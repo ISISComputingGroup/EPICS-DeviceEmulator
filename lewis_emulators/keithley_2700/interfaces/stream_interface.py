@@ -10,7 +10,7 @@ BUFFER_SOURCE = {0: "SENS", 1: "CALC", 2: "NONE"}
 BUFFER_CONTROL_MODE = {0: "NEXT", 1: "ALW", 2: "NEV"}
 TIMESTAMP_FORMAT = {0: "ABS", 1: "DELT"}
 CONTROL_SOURCE = {0: "IMM", 1: "TIM", 2: "MAN", 3: "BUS", 4: "EXT"}
-SCAN_STATE = {0: "INT", 1: "NONE", 2: "TODO: FIGURE THIS OUT"}
+SCAN_STATE = {0: "INT", 1: "NONE"}
 
 
 @has_log
@@ -21,9 +21,9 @@ class Keithley2700StreamInterface(StreamInterface):
         CmdBuilder("get_idn").escape("*IDN?").eos().build(),
         CmdBuilder("empty_queue").escape(":SYST:CLE").eos().build(),
         CmdBuilder("clear_buffer").escape("TRAC:CLE").eos().build(),
-        CmdBuilder("set_measurement").escape(":FUNC '").eos().
+        CmdBuilder("set_measurement").escape(":FUNC '").
         arg("VOLT:DC|VOLT:AC|CURR:DC|CURR:AC|RES|FRES|CONT|FREQ|PER")
-        .escape("'").eos().build(),
+        .escape("', (@").regex("[+-]?\d+").escape(":").regex("[+-]?\d+").escape(")").eos().build(),
         CmdBuilder("get_measurement").escape(":FUNC?").eos().build(),
         CmdBuilder("set_buffer_feed").escape("TRAC:FEED ").arg("SENS|CALC|NONE").eos().build(),
         CmdBuilder("set_buffer_control").escape("TRAC:FEED:CONT ").arg("NEV|NEXT|ALW").eos().build(),
@@ -31,8 +31,7 @@ class Keithley2700StreamInterface(StreamInterface):
         CmdBuilder("get_buffer_state").escape("TRAC:CLE:AUTO?").eos().build(),
         CmdBuilder("get_next_buffer_location").escape("TRAC:NEXT?").eos().build(),
         CmdBuilder("get_buffer_stats").escape("TRAC:FREE?").eos().build(),
-        CmdBuilder("get_readings_from_range",  arg_sep="").escape("TRAC:DATA:SEL? ").int().escape(",").int().eos().
-        build(),
+        CmdBuilder("get_readings",  arg_sep="").escape("TRAC:DATA:SEL? ").int().escape(",").int().eos().build(),
         CmdBuilder("set_buffer_size").escape("TRAC:POIN ").int().eos().build(),
         CmdBuilder("get_buffer_size").escape("TRAC:POIN?").eos().build(),
         CmdBuilder("set_time_stamp_format").escape("TRAC:TST:FORM ").arg("ABS|DELT").eos().build(),
@@ -113,7 +112,7 @@ class Keithley2700StreamInterface(StreamInterface):
         """
         :return: String-formatted integer of the next buffer location to retrieve
         """
-        next_location = len(self._device.buffer)
+        next_location = self._device.get_next_buffer_location()
         self.log.info("Next buffer location: {}".format(next_location))
         return "{}".format(next_location)
 
@@ -123,16 +122,16 @@ class Keithley2700StreamInterface(StreamInterface):
         """
         return "{}, {}".format(str(self._device.bytes_available), str(self._device.bytes_used))
 
-    def get_readings_from_range(self, start, end):
+    def get_readings(self, start, count):
         """
         :param start: Start location in buffer
-        :param end: Index of final buffer value to retrieve
+        :param count:number of readings to retrieve
         :return: String value of readings from buffer
         """
 
         chunks = []
-        start, end = int(start), int(end)
-        for buffer_location in range(start, end + 1):
+        start, count = int(start), int(count)
+        for buffer_location in range(start, start + count):
             chunks.append("{},{},{}".format(self._device.buffer[buffer_location].reading,
                                             self._device.buffer[buffer_location].timestamp,
                                             self._device.buffer[buffer_location].channel))
@@ -141,7 +140,7 @@ class Keithley2700StreamInterface(StreamInterface):
         return ", ".join(chunks)
 
     def set_buffer_size(self, size):
-        self._device.buffer_size = size
+        self._device.buffer_size = int(size)
 
     def get_buffer_size(self):
         return self._device.buffer_size
