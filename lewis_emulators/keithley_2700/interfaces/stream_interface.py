@@ -189,6 +189,8 @@ class Keithley2700StreamInterface(StreamInterface):
 
     def set_resistance_digits(self, digit, start, end):
             self._device.measurement_digits = digit
+            self._device.scan_channel_start = start
+            self._device.scan_channel_end = end
 
     def set_resistance_rate(self, rate):
         self._device.nplc = rate

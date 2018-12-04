@@ -43,10 +43,10 @@ class SimulatedKeithley2700(StateMachineDevice):
         self.buffer_feed = 0                # source of readings (SENSe | CALCulate | NONE)
         self.buffer_control = 0             # buffer control (NEXT | ALWays | NEVer)
         self.buffer_autoclear_on = False    # when false, new readings appended to old readings in buffer
-        self.next_buffer_location = 0      # index of next free buffer location
+        self.next_buffer_location = 0       # index of next free buffer location
         self.bytes_used = 0                 # bytes used in buffer 
         self.bytes_available = 0            # bytes free in buffer
-        self.buffer_size = 55000            # size of buffer which holds read data 
+        self.buffer_size = 1000             # size of buffer which holds read data default 1000
         self.time_stamp_format = 0          # sets format for timestamps (ABSolute | DELta)
         self.auto_delay_on = True           # auto delay based on voltage range
         self.init_state_on = False          # initiation from idle state
@@ -56,7 +56,7 @@ class SimulatedKeithley2700(StateMachineDevice):
         self.auto_range_on = True           # auto voltage range
         self.measurement_digits = 6         # precision of measurements taken 
         self.nplc = 5.0                     # plc rate
-        self.scan_state_status = 2          # ROUTe:SCAN:LSELect 1 for INTernal (enable scan) 0 for NONE (disable)
+        self.scan_state_status = 0          # ROUTe:SCAN:LSELect 1 for INTernal (enable scan) 0 for NONE (disable)
         self.scan_channel_start = 101       # starting channel in list to be scanned
         self.scan_channel_end = 210         # end channel in list to be scanned 
         self.buffer_count = 10              # Number of samples to return. see $(P)COUNT in keithley_2700.db
@@ -70,7 +70,7 @@ class SimulatedKeithley2700(StateMachineDevice):
         for i in range(201, 210+1):
             self.channels[str(i)] = Channel()
 
-        self.fill_buffer()
+        # self.fill_buffer()
 
     def generate_channel_values(self):
         """
@@ -89,8 +89,14 @@ class SimulatedKeithley2700(StateMachineDevice):
             timestamp += 0.05
             reading += 20
 
+    def get_next_buffer_location(self):
+        if not self.is_buffer_full():
+            return len(self.buffer)
+        else:
+            return 0  # Buffer full so next loc is 0 after a clear
+
     def is_buffer_full(self):
-        return len(self.buffer) >= self.buffer_size
+        return len(self.buffer) >= (self.buffer_size - 1)  # -1 because buffer is 0 indexed
 
     def fill_buffer(self):
         """
@@ -107,22 +113,21 @@ class SimulatedKeithley2700(StateMachineDevice):
                 if self.is_buffer_full():
                     break
 
-        # # If we reach the end of the channel readings, create a new set of channel readings to fill buffer with
-        # if chan_index == len(self.channels):
-        #     self.generate_channel_values()
-        #     chan_index = 0
-        #
-        # chan_index += 1
-
     def insert_mock_data(self, data):
         """
         Allows the insertion of specific, defined readings into the buffer
         :param data: a list containing string representations of buffer readings
         """
+        self.log.info("buff:next  ===================== {} =====================".format(len(self.buffer)))
         self.log.info("Inserting mock data into buffer: {}".format(data))
         for item in data:
             reading, timestamp, channel = item.split(",")
+            if not self.is_buffer_full():
+                pass
+            elif self.is_buffer_full() and self.buffer_autoclear_on:
+                self.clear_buffer()
             self.buffer.append(BufferReading(reading, timestamp, channel))
+        self.log.info("buff:next ================== {} =====================".format(len(self.buffer)))
 
     def check_buffer_data(self):
         """
