@@ -11,11 +11,11 @@ class SimulatedKeithley2001(StateMachineDevice):
     """
     number_of_times_device_has_been_reset = 0
 
-
     def _initialize_data(self):
         """
         Initialize all of the device's attributes.
         """
+        self.connect()
         self.idn = "KEITHLEY INSTRUMENTS INC.,MODEL 2001,4301578,B17  /A02  "
         self.elements = {
             "READ": False, "CHAN": False, "RNUM": False, "UNIT": False, "TIME": False, "STAT": False
@@ -44,6 +44,7 @@ class SimulatedKeithley2001(StateMachineDevice):
         }
         self.closed_channel = None
         self._error = [0, "No error"]
+
 
     def _get_state_handlers(self):
         return {
@@ -215,3 +216,15 @@ class SimulatedKeithley2001(StateMachineDevice):
         """
 
         return self._error
+
+    def connect(self):
+        """
+        Connects the device.
+        """
+        self._connected = True
+
+    def disconnect(self):
+        """
+        Disconnects the device.
+        """
+        self._connected = False
