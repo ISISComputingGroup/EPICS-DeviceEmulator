@@ -162,7 +162,7 @@ class SimulatedKeithley2001(StateMachineDevice):
 
         return self._error
 
-    def _clear_error(self):
+    def clear_error(self):
         """
         Clears any error
         """
