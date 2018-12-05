@@ -204,6 +204,15 @@ class SimulatedKeithley2001(StateMachineDevice):
 
         return self.status_register.number_of_times_reset_and_cleared
 
+    def set_number_of_times_status_register_has_been_reset_and_cleared_via_the_backdoor(self, value):
+        """
+       Sets the number of times the status register has been reset and cleared.
+
+       Only called via the backdoor.
+       """
+
+        self.status_register.number_of_times_reset_and_cleared = int(value)
+
     def set_channel_value_via_the_backdoor(self, channel, value, reading_unit):
         """
         Sets a channel value using Lewis backdoor.
@@ -226,7 +235,6 @@ class SimulatedKeithley2001(StateMachineDevice):
         """
         self._error = [int(error_code), error_message]
 
-
     def get_how_many_times_ioc_has_been_reset_via_the_backdoor(self):
         """
         Gets the number of times the ioc has been reset.
@@ -237,3 +245,11 @@ class SimulatedKeithley2001(StateMachineDevice):
             int: Number of times the ioc has been reset
         """
         return self.number_of_times_ioc_has_been_reset
+
+    def set_how_many_times_ioc_has_been_reset_via_the_backdoor(self, value):
+        """
+        Sets the number of times the ioc has been reset.
+
+        Only called via the backdoor.
+        """
+        self.number_of_times_ioc_has_been_reset = int(value)
