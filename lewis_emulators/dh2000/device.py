@@ -66,7 +66,7 @@ class SimulatedDh2000(StateMachineDevice):
         Sets the interlock triggered status
 
         Returns:
-            value: Bool, set to True to trigger the interlock
+            None
 
         """
         self._interlock_triggered = value
