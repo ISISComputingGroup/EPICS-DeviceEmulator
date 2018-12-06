@@ -1,4 +1,4 @@
-from lewis.adapters.stream import StreamInterface, Cmd
+from lewis.adapters.stream import StreamInterface
 from lewis_emulators.utils.command_builder import CmdBuilder
 from lewis.core.logging import has_log
 
@@ -10,6 +10,7 @@ class Dh2000StreamInterface(StreamInterface):
     commands = {
         CmdBuilder("get_status").escape("&STS!").eos().build(),
         CmdBuilder("close_shutter").escape("&CLOSEA!").eos().build(),
+        CmdBuilder("open_shutter").escape("&OPENA!").eos().build(),
     }
 
     in_terminator = "\r"
@@ -33,6 +34,10 @@ class Dh2000StreamInterface(StreamInterface):
 
     def close_shutter(self):
         self._device.shutter_is_open = False
+        return self.ACK
+
+    def open_shutter(self):
+        self._device.shutter_is_open = True
         return self.ACK
 
     def get_status(self):
