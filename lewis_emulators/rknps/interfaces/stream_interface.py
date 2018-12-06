@@ -18,15 +18,15 @@ class RknpsStreamInterface(StreamInterface):
         CmdBuilder("set_current").escape("WA ").int().eos().build(),
         CmdBuilder("get_ra").escape("RA").eos().build(),
 
-        CmdBuilder("set_power").regex("(F|N)").eos().build(),
+        CmdBuilder("set_power").arg("F|N").eos().build(),
         CmdBuilder("reset").escape("RS").eos().build(),
         CmdBuilder("get_status").escape("S1").eos().build(),
 
         CmdBuilder("get_pol").escape("PO").eos().build(),
-        CmdBuilder("set_pol").escape("PO ").regex("(\+|-)").eos().build(),
+        CmdBuilder("set_pol").escape("PO ").arg("\+|-").eos().build(),
 
         CmdBuilder("get_cmd").escape("CMD").eos().build(),
-        CmdBuilder("set_cmd").regex("(LOC|REM)").eos().build(),
+        CmdBuilder("set_cmd").arg("LOC|REM").eos().build(),
 
         CmdBuilder("get_adr").escape("ADR").eos().build(),
         CmdBuilder("set_adr").escape("ADR ").any().eos().build(),
