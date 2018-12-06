@@ -1,7 +1,17 @@
-from states import DefaultState
+from states import InitializingState, OffState, IdleState, RunState, HoldState, PurgeState, StandbyState
 from lewis.devices import StateMachineDevice
 from collections import OrderedDict
-from enum import Enum
+import time
+
+states = OrderedDict([
+    ('SYS_ST_INITIALIZING', InitializingState()),
+    ('SYS_ST_OFF', OffState()),
+    ('SYS_ST_IDLE', IdleState()),
+    ('SYS_ST_RUN', RunState()),
+    ('SYS_ST_HOLD', HoldState()),
+    ('SYS_ST_PURGE', PurgeState()),
+    ('SYS_ST_STANDBY', StandbyState())])
+
 
 class SimulatedKnr1050(StateMachineDevice):
 
@@ -9,43 +19,54 @@ class SimulatedKnr1050(StateMachineDevice):
         """
         Initialize all of the device's attributes.
         """
-        self.connected = True
-
-        self.current_instrument_state = 0
-        self.instrument_state = ('SYS_ST_INITIALIZING',
-                                 'SYS_ST_OFF',
-                                 'SYS_ST_IDLE',
-                                 'SYS_ST_RUN',
-                                 'SYS_ST_HOLD',
-                                 'SYS_ST_PURGE',
-                                 'SYS_ST_STANDBY')
-
-        self.is_stopped = False
+        self.pump_on = False
         self.keep_last_values = False
-        self.ramp_status = False
+        self.ramp = False
+        self.hold = False
+        self.standby = False
+        self.initializing = False
+        self.remote = False
 
+        self.pressure = 0
         self.pressure_limit_low = 0
-        self.pressure_limit_high = 100
+        self.pressure_limit_high = 0
+        self.flow_rate = 0.01
+        self.current_flow_rate = 0.0
 
-        self.flow_rate = 0
+        self.concentrations = [100, 0, 0, 0]
 
-        self.concentration_A = 0
-        self.concentration_B = 0
-        self.concentration_C = 0
-        self.concentration_D = 0
+        self.curr_program_run_time = False
 
+    def reset(self):
+        self._initialize_data()
+
+    @property
+    def time_stamp(self):
+        """
+        Returns:
+            (int) current time in ms
+        """
+        return int(round(time.time() * 1000))
+
+    @property
+    def state_num(self):
+        return states.keys().index(self.state)
+
+    @property
+    def state(self):
+        return self._csm.state
 
     def _get_state_handlers(self):
-        return {
-            'default': DefaultState(),
-        }
+        return states
 
     def _get_initial_state(self):
-        return 'default'
+        return 'SYS_ST_OFF'
 
     def _get_transition_handlers(self):
         return OrderedDict([
+            (('SYS_ST_INITIALIZING', 'SYS_ST_IDLE'), lambda: self.initializing is False),
+            (('SYS_ST_RUN', 'SYS_ST_OFF'), lambda: self.pump_on is False),
+            (('SYS_ST_OFF', 'SYS_ST_RUN'), lambda: self.pump_on and self.keep_last_values is True),
+            (('SYS_ST_RUN', 'SYS_ST_HOLD'), lambda: self.hold is True),
+            (('SYS_ST_RUN', 'SYS_ST_STANDBY'), lambda: self.standby is True)
         ])
-
-    def get_instrument_state_str(self, current_instrument_state):
-        return self.instrument_state[current_instrument_state]
