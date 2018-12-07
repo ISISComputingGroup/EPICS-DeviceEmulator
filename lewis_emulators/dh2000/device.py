@@ -12,6 +12,7 @@ class SimulatedDh2000(StateMachineDevice):
 
         self._shutter_is_open = False
         self._interlock_triggered = False
+        self.is_disconnected = False
         pass
 
     def _get_state_handlers(self):

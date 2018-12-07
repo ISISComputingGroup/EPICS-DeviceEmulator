@@ -11,6 +11,7 @@ class Dh2000StreamInterface(StreamInterface):
         CmdBuilder("get_status").escape("&STS!").eos().build(),
         CmdBuilder("close_shutter").escape("&CLOSEA!").eos().build(),
         CmdBuilder("open_shutter").escape("&OPENA!").eos().build(),
+        CmdBuilder("invalid_command").eos().build(),
     }
 
     in_terminator = "\r"
@@ -32,22 +33,38 @@ class Dh2000StreamInterface(StreamInterface):
 
         print("An error occurred at request {}: {}".format(request, error))
 
+    def invalid_command(self):
+        if self._device.is_disconnected:
+            return None
+        else:
+            return "&NAC!{}&TYPERR!".format(self.out_terminator)
+
     def close_shutter(self):
         self._device.shutter_is_open = False
-        return self.ACK
+
+        if self._device.is_disconnected:
+            return None
+        else:
+            return self.ACK
 
     def open_shutter(self):
         self._device.shutter_is_open = True
-        return self.ACK
+
+        if self._device.is_disconnected:
+            return None
+        else:
+            return self.ACK
 
     def get_status(self):
         shutter = self._device.shutter_is_open
         interlock = self._device.interlock_is_triggered
 
         status_string = "{ACK}&A{shutter},I{intlock}!".format(ACK=self.ACK, shutter=int(shutter), intlock=int(interlock))
-        self.log.info(status_string)
 
-        return status_string
+        if self._device.is_disconnected:
+            return None
+        else:
+            return status_string
 
     def catch_all(self):
         pass
