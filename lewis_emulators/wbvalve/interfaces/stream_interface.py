@@ -16,8 +16,8 @@ class WbvalveStreamInterface(StreamInterface):
 
         super(WbvalveStreamInterface, self).__init__()
         self.commands = {
-            CmdBuilder(self.get_position).escape("st").build(),
-            CmdBuilder(self.set_position).escape("wb").int().escape("on").build()
+            CmdBuilder(self.get_position).escape("st").eos().build(),
+            CmdBuilder(self.set_position).escape("wb").int().escape("on").eos().build()
         }
 
     def handle_error(self, request, error):
