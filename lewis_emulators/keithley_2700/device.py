@@ -70,8 +70,6 @@ class SimulatedKeithley2700(StateMachineDevice):
         for i in range(201, 210+1):
             self.channels[str(i)] = Channel()
 
-        # self.fill_buffer()
-
     def generate_channel_values(self):
         """
         Creates a selection of channel resistance reading values
@@ -96,7 +94,7 @@ class SimulatedKeithley2700(StateMachineDevice):
             return 0  # Buffer full so next loc is 0 after a clear
 
     def is_buffer_full(self):
-        return len(self.buffer) >= (self.buffer_size - 1)  # -1 because buffer is 0 indexed
+        return len(self.buffer) >= self.buffer_size  # -1 because buffer is 0 indexed
 
     def fill_buffer(self):
         """
@@ -118,7 +116,6 @@ class SimulatedKeithley2700(StateMachineDevice):
         Allows the insertion of specific, defined readings into the buffer
         :param data: a list containing string representations of buffer readings
         """
-        self.log.info("buff:next  ===================== {} =====================".format(len(self.buffer)))
         self.log.info("Inserting mock data into buffer: {}".format(data))
         for item in data:
             reading, timestamp, channel = item.split(",")
@@ -127,14 +124,14 @@ class SimulatedKeithley2700(StateMachineDevice):
             elif self.is_buffer_full() and self.buffer_autoclear_on:
                 self.clear_buffer()
             self.buffer.append(BufferReading(reading, timestamp, channel))
-        self.log.info("buff:next ================== {} =====================".format(len(self.buffer)))
 
     def check_buffer_data(self):
         """
         Gets values contained in self.buffer
         :return: List of comma separated string representations of readings in the buffer
         """
-        return [",".join((reading.reading, reading.timestamp, reading.channel)).encode("utf-8") for reading in self.buffer]
+        return [",".join((reading.reading, reading.timestamp, reading.channel))
+                .encode("utf-8") for reading in self.buffer]
 
     def clear_buffer(self):
         """
