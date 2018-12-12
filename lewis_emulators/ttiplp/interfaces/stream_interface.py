@@ -38,12 +38,12 @@ class TtiplpStreamInterface(StreamInterface):
         return self.device.ident
 
     def get_volt(self,_):
-        self.device.get_volt()
-        return "{:.4f}V".format(self.device.volt)
+        volt=self.device.get_volt()
+        return "{:.4f}V".format(volt)
 
     def get_curr(self,_):
-        self.device.get_curr()
-        return "{:.4f}A".format(self.device.curr)
+        curr=self.device.get_curr()
+        return "{:.4f}A".format(curr)
 
     def set_volt_sp(self, _, volt_sp):
         self.device.set_volt_sp(float(volt_sp))

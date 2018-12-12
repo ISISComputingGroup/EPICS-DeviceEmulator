@@ -38,12 +38,14 @@ class SimulatedTtiplp(StateMachineDevice):
             self.volt=self.volt_sp+((rnd()-0.5)/1000)
         else:
             self.volt=((rnd()-0.5)/1000)
+        return self.volt    
 
     def get_curr(self):
         if self.output==1:
             self.curr=self.curr_sp+((rnd()-0.5)/1000)
         else:
             self.curr=((rnd()-0.5)/1000)
+        return self.curr    
 
     def set_volt_sp(self, volt_sp):
         self.volt_sp = float(volt_sp)
