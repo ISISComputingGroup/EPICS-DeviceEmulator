@@ -3,6 +3,7 @@ from states import DefaultState
 from lewis.devices import StateMachineDevice
 
 
+
 class SimulatedDh2000(StateMachineDevice):
 
     def _initialize_data(self):
@@ -12,8 +13,7 @@ class SimulatedDh2000(StateMachineDevice):
 
         self._shutter_is_open = False
         self._interlock_triggered = False
-        self.is_disconnected = False
-        pass
+        self.is_connected = True
 
     def _get_state_handlers(self):
         return {

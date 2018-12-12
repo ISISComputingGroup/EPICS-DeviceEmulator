@@ -1,6 +1,7 @@
 from lewis.adapters.stream import StreamInterface
 from lewis_emulators.utils.command_builder import CmdBuilder
 from lewis.core.logging import has_log
+from lewis_emulators.utils.replies import conditional_reply
 
 
 @has_log
@@ -33,38 +34,27 @@ class Dh2000StreamInterface(StreamInterface):
 
         print("An error occurred at request {}: {}".format(request, error))
 
+    @conditional_reply("is_connected")
     def invalid_command(self):
-        if self._device.is_disconnected:
-            return None
-        else:
-            return "&NAC!{}&TYPERR!".format(self.out_terminator)
+        return "&NAC!{}&TYPERR!".format(self.out_terminator)
 
+    @conditional_reply("is_connected")
     def close_shutter(self):
         self._device.shutter_is_open = False
 
-        if self._device.is_disconnected:
-            return None
-        else:
-            return self.ACK
+        return self.ACK
 
+    @conditional_reply("is_connected")
     def open_shutter(self):
         self._device.shutter_is_open = True
 
-        if self._device.is_disconnected:
-            return None
-        else:
-            return self.ACK
+        return self.ACK
 
+    @conditional_reply("is_connected")
     def get_status(self):
         shutter = self._device.shutter_is_open
         interlock = self._device.interlock_is_triggered
 
         status_string = "{ACK}&A{shutter},I{intlock}!".format(ACK=self.ACK, shutter=int(shutter), intlock=int(interlock))
 
-        if self._device.is_disconnected:
-            return None
-        else:
-            return status_string
-
-    def catch_all(self):
-        pass
+        return status_string
