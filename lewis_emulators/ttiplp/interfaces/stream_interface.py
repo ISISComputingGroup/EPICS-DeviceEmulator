@@ -1,8 +1,7 @@
-from lewis.adapters.stream import StreamInterface, Cmd
-from lewis.core.logging import has_log
+from lewis.adapters.stream import StreamInterface
 from lewis_emulators.utils.command_builder import CmdBuilder
 
-@has_log
+
 class TtiplpStreamInterface(StreamInterface):
 
     # Commands that we expect via serial during normal operation
@@ -24,9 +23,6 @@ class TtiplpStreamInterface(StreamInterface):
     
     in_terminator = "\n"
     out_terminator = "\r\n"
-
-#    def catch_all(self):
-#        pass
 
     def handle_error(self, request, error):
         err_string = "command was: {}, error was: {}: {}\n".format(request, error.__class__.__name__, error)
