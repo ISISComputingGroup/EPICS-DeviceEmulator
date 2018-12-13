@@ -19,9 +19,10 @@ class SimulatedKnr1050(StateMachineDevice):
         """
         Initialize all of the device's attributes.
         """
+        self.connected = True
+
         self.pump_on = False
         self.keep_last_values = False
-        self.ramp = False
         self.hold = False
         self.standby = False
         self.initializing = False
@@ -29,7 +30,7 @@ class SimulatedKnr1050(StateMachineDevice):
 
         self.pressure = 0
         self.pressure_limit_low = 0
-        self.pressure_limit_high = 0
+        self.pressure_limit_high = 100
         self.flow_rate = 0.01
         self.current_flow_rate = 0.0
 
@@ -66,7 +67,7 @@ class SimulatedKnr1050(StateMachineDevice):
         return OrderedDict([
             (('SYS_ST_INITIALIZING', 'SYS_ST_IDLE'), lambda: self.initializing is False),
             (('SYS_ST_RUN', 'SYS_ST_OFF'), lambda: self.pump_on is False),
-            (('SYS_ST_OFF', 'SYS_ST_RUN'), lambda: self.pump_on and self.keep_last_values is True),
+            (('SYS_ST_OFF', 'SYS_ST_RUN'), lambda: self.pump_on is True),
             (('SYS_ST_RUN', 'SYS_ST_HOLD'), lambda: self.hold is True),
             (('SYS_ST_RUN', 'SYS_ST_STANDBY'), lambda: self.standby is True)
         ])

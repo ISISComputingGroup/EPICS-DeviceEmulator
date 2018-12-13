@@ -19,7 +19,7 @@ class Knr1050StreamInterface(StreamInterface):
         # Commands that we expect via serial during normal operation
         self.commands = {
             CmdBuilder(self.get_status).escape("STATUS?").build(),
-            CmdBuilder(self.ramp).escape("RAMP:0,").float().escape(",").int().escape(",").int().escape(",").int().escape(",").int().build(),
+            CmdBuilder(self.start_pump).escape("RAMP:0,").float().escape(",").int().escape(",").int().escape(",").int().escape(",").int().build(),
             CmdBuilder(self.stop_pump).escape("STOP:1,0").build(),
             CmdBuilder(self.stop_klv).escape("STOP:2").build(),
             CmdBuilder(self.get_pressure_limits).escape("PLIM?").build(),
@@ -38,7 +38,8 @@ class Knr1050StreamInterface(StreamInterface):
         """
         self.log.error("An error occurred at request " + repr(request) + ": " + repr(error))
 
-    def ramp(self, flow_rate, a, b, c, d):
+    @if_connected
+    def start_pump(self, flow_rate, a, b, c, d):
         """
         Executes ramp starting from current execution time.
         Args:
@@ -54,17 +55,16 @@ class Knr1050StreamInterface(StreamInterface):
         self.device.pressure = int(self.device.pressure_limit_high) - int(self.device.pressure_limit_low) // 2
         self.device.concentrations = [int(a), int(b), int(c), int(d)]
 
-        self.device.ramp = True
         self.device.pump_on = True
 
         self.stop_klv()
         return 'OK'
 
+    @if_connected
     def stop_pump(self):
         """
         Stop mode: Stop time table and data acquisition.
         """
-        self.device.ramp = False
         self.device.pump_on = False
         self.device.keep_last_values = False
 
@@ -72,6 +72,7 @@ class Knr1050StreamInterface(StreamInterface):
         self.device.pressure = 0
         return 'OK'
 
+    @if_connected
     def stop_klv(self):
         """
         Stop mode: Keep last values.
@@ -79,9 +80,11 @@ class Knr1050StreamInterface(StreamInterface):
         self.device.keep_last_values = True
         return 'OK'
 
+    @if_connected
     def get_pressure_limits(self):
         return "PLIM:{},{}".format(self.device.pressure_limit_low, self.device.pressure_limit_high)
 
+    @if_connected
     def set_pressure_limits(self, low, high):
         """
         Set the pressure limits on the device
@@ -92,10 +95,11 @@ class Knr1050StreamInterface(StreamInterface):
         Returns:
             'OK' (str) : Device confirmation
         """
-        self.device.pressure_limit_low = low
-        self.device.pressure_limit_high = high
+        self.device.pressure_limit_low = int(low)
+        self.device.pressure_limit_high = int(high)
         return 'OK'
 
+    @if_connected
     def get_status(self):
         return_params = [self.device.time_stamp, self.device.state_num, 1 if self.device.curr_program_run_time else "",
                          self.device.current_flow_rate]
@@ -103,13 +107,16 @@ class Knr1050StreamInterface(StreamInterface):
         return_params.append(self.device.pressure)
         return "STATUS:{},{},0,{},{},{},{},{},{},0,0,0,0,0,0,0,0,{},0,0".format(*return_params)
 
+    @if_connected
     def get_remote_mode(self):
         return "REMOTE:{}".format(1 if self.device.remote else 0)
 
+    @if_connected
     def set_remote_mode(self):
         self.device.remote = True
         return "OK"
 
+    @if_connected
     def set_local_mode(self):
         self.device.remote = False
         return "OK"
