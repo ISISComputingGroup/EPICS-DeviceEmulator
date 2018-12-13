@@ -6,6 +6,7 @@ import six
 
 from lewis.core.logging import has_log
 from lewis_emulators.utils.command_builder import CmdBuilder
+from lewis_emulators.utils.replies import conditional_reply
 
 
 @has_log
@@ -20,7 +21,6 @@ class CommonStreamInterface(object):
 
     commands = [
         CmdBuilder("get_voltage").escape("AD 2").eos().build(),
-        CmdBuilder("unlock").escape("UNLOCK").eos().build(),
         CmdBuilder("set_polarity").arg("\+|\-").eos().build(),
         CmdBuilder("get_polarity").escape("PO").eos().build(),
         CmdBuilder("set_power_off").escape("F").eos().build(),
@@ -38,30 +38,38 @@ class CommonStreamInterface(object):
         """
         self.log.error("An error occurred at request " + repr(request) + ": " + repr(error))
 
+    @conditional_reply("comms_initialized")
     def get_current(self):
         return int(round(self.device.current))
 
+    @conditional_reply("comms_initialized")
     def set_current(self, value):
-        self.device.current = int(value)
+        self.device.current = value
 
+    @conditional_reply("comms_initialized")
     def get_voltage(self):
         return int(round(self.device.voltage))
 
+    @conditional_reply("comms_initialized")
     def unlock(self):
         """
         Unlock the device. Implementation could be put in in future.
         """
 
+    @conditional_reply("comms_initialized")
     def get_polarity(self):
         return "-" if self.device.negative_polarity else "+"
 
+    @conditional_reply("comms_initialized")
     def set_polarity(self, polarity):
         assert polarity in ["+", "-"]
         self.device.negative_polarity = polarity == "-"
 
+    @conditional_reply("comms_initialized")
     def set_power_off(self):
         self.device.power = False
 
+    @conditional_reply("comms_initialized")
     def set_power_on(self):
         self.device.power = True
 
@@ -70,3 +78,9 @@ class CommonStreamInterface(object):
         """
         Respond to the get_status command.
         """
+
+    def init_comms(self):
+        """
+        Initialize comms of device
+        """
+        self.device.comms_initialized = True

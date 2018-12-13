@@ -4,6 +4,24 @@ from lewis.core.logging import has_log
 from lewis.devices import StateMachineDevice
 from .states import DefaultState
 
+
+class PowerSupply(object):
+    """
+    Class representing a single power supply within a chain.
+    """
+    def __init__(self):
+        self.curr = 0
+        self.curr_setpoint = 0
+        self.volt = 0
+        self.is_in_remote_mode = True
+        self.pol_positive = True
+        self.power_on = True
+        self.interlock_active = True
+
+
+ADDRESSES = ["001", "002", "003", "004"]
+
+
 @has_log
 class SimulatedRknps(StateMachineDevice):
     """
@@ -11,20 +29,12 @@ class SimulatedRknps(StateMachineDevice):
     """
 
     def _initialize_data(self):
-        """
-        Sets the initial state of the device.
-        """
-        self._active_adr = "001"
-        self._adr = {"001":"001","002":"002"}
-        self._ra = {"001":123456,"002":456789}
-        self._curr = {"001":123456,"002":456789}
-        self._volt = {"001":10,"002":20}
-        self._cmd  = {"001":"REM","002":"LOC"}
-        self._pol = {"001":"+", "002":"-"}
-        self._status = {
-            "001":["."]*24,
-            "002":["."]*24}
-        self._set_curr = {"001":123456,"002":456789}
+
+        self._address = ADDRESSES[0]  # Default to first address.
+
+        self._psus = {}
+        for address in ADDRESSES:
+            self._psus[address] = PowerSupply()
 
     def _get_state_handlers(self):
         """
@@ -44,83 +54,103 @@ class SimulatedRknps(StateMachineDevice):
         """
         return OrderedDict()
 
-    @property
-    def adr(self):
+    def get_adr(self):
         """
         Gets the most recently assigned address.
 
         Returns: a string address.
         """
-        return self._adr[self._active_adr]
+        return self._address
 
-    @property
-    def ra(self):
+    def set_adr(self, address):
         """
-        Gets the RA for the active address.
-
-        Returns: unsigned absolute value of the current setpoint.
+        Assign a new address. This is how the driver accesses different power supplies on the chain.
         """
-        return self._ra[self._active_adr]
+        if address not in ADDRESSES:
+            raise ValueError("Can not switch to that address - not in known addresses")
+        self._address = address
 
-    @property
-    def ad_curr(self):
+    def _currently_addressed_psu(self):
         """
-            Gets an AD for the active address.
+        Gets the currently addressed power supply
 
-            Returns: value of the output current.
+        Returns (PowerSupply) the currently addressed power supply
         """
-        return int(self._curr[self._active_adr])
+        return self._psus[self._address]
 
-    @property
-    def ad_volt(self):
+    def get_current(self):
         """
-            Gets an AD for the active address.
+        Gets the actual value of the output current for the currently addressed power supply.
 
-            Returns: value of the output voltage.
+        Returns: the current
         """
-        return int(self._volt[self._active_adr])
+        return self._currently_addressed_psu().curr
 
-    @property
-    def cmd(self):
+    def get_voltage(self):
         """
-        Gets the value of the local/remote status.
+        Gets the voltage of the currently addressed power supply.
 
-        Returns: the LOC/REM status of the device.
+        Returns: the voltage
         """
-        return self._cmd[self._active_adr]
+        return self._currently_addressed_psu().volt
 
-    @property
-    def pol(self):
+    def is_in_remote_mode(self):
         """
-        Gets the value of the polarity.
+        Gets whether the currently addressed power supply is in remote mode
 
-        Returns: the polarity of the device.
+        Returns: True if the power supply is in remote mode, False otherwise
         """
-        return self._pol[self._active_adr]
+        return self._currently_addressed_psu().is_in_remote_mode
 
-    @property
-    def status(self):
+    def set_in_remote_mode(self, in_remote):
         """
-        Gets the status.
+        Sets the control mode of the currently addressed supply.
 
-        The status is a 24 character string, with . and ! relating to the value of the associated item.
-        In order to allow for easier alteration of the status, it is stored as a list and joined at this point.
-
-        Returns: the status as a string.
+        Args:
+            in_remote: True to set to remote mode, False otherwise
         """
-        return ''.join(self._status[self._active_adr])
+
+    def is_polarity_positive(self):
+        """
+        Gets the value of the polarity of the currently addressed power supply.
+
+        Returns: True if the polarity is positive, False otherwise
+        """
+        return self._currently_addressed_psu().pol_positive
+
+    def set_polarity(self, is_polarity_positive):
+        """
+        Sets the polarity of the currently addressed power supply
+
+        Args:
+            is_polarity_positive: True to set positive polarity, False to set negative polarity
+        """
+        self._currently_addressed_psu().pol_positive = is_polarity_positive
+
+    def is_power_on(self):
+        """
+        Gets whether the currently addressed power supply is ON or OFF
+
+        Returns: True if the power supply is on, False otherwise
+        """
+        return self._currently_addressed_psu().power_on
+
+    def is_interlock_active(self):
+        """
+        Gets whether the currently addressed power supply's interlock is active
+
+        Returns: True if the interlock is active, False otherwise
+        """
+        return self._currently_addressed_psu().interlock_active
 
     def set_power(self, power):
         """
         Call the appropriate routine for on or off.
 
         Args:
-            power: turn the power oN or ofF.
+            power: True to turn power on, False to turn power off
         """
-        if power == "F":
-            self.off()
-        elif power == "N":
-            self.on()
+        self._currently_addressed_psu().power_on = power
 
     def set_interlock(self, ilk):
         """
@@ -129,30 +159,31 @@ class SimulatedRknps(StateMachineDevice):
         This is a backdoor routine, and not accessed from the IOC.
 
         Args:
-            ilk: whether the interlocks should be active or inactive.
+            ilk: True to activate interlocks, False to deactivate
         """
-        if ilk == "active":
-            self._status[self._active_adr][9] = "!"
-            self.off()
-        elif ilk == "inactive":
-            self._status[self._active_adr][9] = "."
+        self._currently_addressed_psu().interlock_active = ilk
+        if ilk:
+            self.set_power(False)
 
-    def set_both_interlocks(self, ilk):
+    def set_all_interlocks(self, ilk):
         """
-        Set whether the interlocks are active or not.
-
-        This is a backdoor routine, and not accessed from the IOC.
-        This specific version is for use with the IOC test framework.
+        Set the interlocks of ALL power supplies. This is only ever called via the lewis backdoor.
 
         Args:
-            ilk: whether the interlocks should be active or inactive.
+            ilk: True to activate interlocks, False to deactivate
         """
-        original_active_address = self._active_adr
-        self._active_adr = "001"
-        self.set_interlock(ilk)
-        self._active_adr = "002"
-        self.set_interlock(ilk)
-        self._active_adr = original_active_address
+        for address in ADDRESSES:
+            self._psus[address].interlock_active = ilk
+
+    def set_all_volt_values(self, val):
+        """
+        Set the voltages of ALL power supplies. This is only ever called via the lewis backdoor.
+
+        Args:
+            val: The value to set the voltages to.
+        """
+        for address in ADDRESSES:
+            self._psus[address].volt = float(val)
 
     def set_current(self, current):
         """
@@ -164,59 +195,18 @@ class SimulatedRknps(StateMachineDevice):
         Args:
             current: The current to set
         """
-        current_to_use = current/1000
-        self.set_current_values(current_to_use)
-        self._set_curr[self._active_adr] = current_to_use
+        current_to_use = abs(current / 1000.)
+
+        self.set_polarity(current >= 0)
+
+        self._currently_addressed_psu().curr = current_to_use
+        self._currently_addressed_psu().curr_setpoint = current_to_use
+
+        self._currently_addressed_psu().volt = current_to_use  # Assume volt == curr
 
     def reset(self):
         """
         Reset the device to the standard off configuration.
         """
-        current_to_use = 0
-        self.set_current_values(current_to_use)
-        self.off()
-
-    def on(self):
-        """
-        Turn the device on.
-
-        Set the currents to the last set value.
-        Update the status to on.
-        """
-        current_to_use = self._set_curr[self._active_adr]
-        self.set_current_values(current_to_use)
-        self._status[self._active_adr][0] = "."
-
-    def set_current_values(self, current_to_use):
-        """
-        Set all the appropriate current readback and polarity values to a given value.
-
-        Args:
-            current_to_use: The current to be set.
-        """
-        if current_to_use < 0:
-            self._pol[self._active_adr] = "-"
-        else:
-            self._pol[self._active_adr] = "+"
-        self._ra[self._active_adr] = abs(current_to_use)
-        self._curr[self._active_adr] = current_to_use
-        self._volt[self._active_adr] = current_to_use
-
-    def off(self):
-        """
-        Turn the device off.
-        """
-        self.set_current_values(0)
-        self._status[self._active_adr][0] = "!"
-
-    def set_both_volt_values(self, volt):
-        """
-        Update the voltage value of both devices.
-
-        This is used only for testing via the backdoor.
-
-        Args:
-            volt: the voltage value to set.
-        """
-        for PSU in self._volt.keys():
-            self._volt[PSU] = float(volt)
+        self.set_current(0)
+        self.set_power(False)
