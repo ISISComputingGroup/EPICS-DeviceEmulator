@@ -66,8 +66,8 @@ class SimulatedKnr1050(StateMachineDevice):
     def _get_transition_handlers(self):
         return OrderedDict([
             (('SYS_ST_INITIALIZING', 'SYS_ST_IDLE'), lambda: self.initializing is False),
-            (('SYS_ST_RUN', 'SYS_ST_OFF'), lambda: self.pump_on is False),
-            (('SYS_ST_OFF', 'SYS_ST_RUN'), lambda: self.pump_on is True),
+            (('SYS_ST_IDLE', 'SYS_ST_OFF'), lambda: self.pump_on is False),
+            (('SYS_ST_OFF', 'SYS_ST_IDLE'), lambda: self.pump_on is True),
             (('SYS_ST_RUN', 'SYS_ST_HOLD'), lambda: self.hold is True),
             (('SYS_ST_RUN', 'SYS_ST_STANDBY'), lambda: self.standby is True)
         ])

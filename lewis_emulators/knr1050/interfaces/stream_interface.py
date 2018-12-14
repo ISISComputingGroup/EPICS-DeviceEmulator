@@ -19,7 +19,7 @@ class Knr1050StreamInterface(StreamInterface):
         # Commands that we expect via serial during normal operation
         self.commands = {
             CmdBuilder(self.get_status).escape("STATUS?").build(),
-            CmdBuilder(self.start_pump).escape("RAMP:0,").float().escape(",").int().escape(",").int().escape(",").int().escape(",").int().build(),
+            CmdBuilder(self.start_pump).escape("RAMP:0,").int().escape(",").int().escape(",").int().escape(",").int().escape(",").int().build(),
             CmdBuilder(self.stop_pump).escape("STOP:1,0").build(),
             CmdBuilder(self.stop_klv).escape("STOP:2").build(),
             CmdBuilder(self.get_pressure_limits).escape("PLIM?").build(),
