@@ -137,8 +137,8 @@ class SimulatedKeithley2700(StateMachineDevice):
         """
         Clears all buffer entries
         """
-        self.log.info("=== Cleared Buffer ===")
         self.buffer = []
+        self.log.info("=== Cleared Buffer ===")
 
     def set_channel_param(self, index, param, value):
         """
