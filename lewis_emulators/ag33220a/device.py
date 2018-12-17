@@ -5,6 +5,7 @@ class SimulatedAG33220A(Device):
     """
     Simulated AG33220A
     """
+    connected = True
 
     # Constants
     AMP_MIN = 0.01

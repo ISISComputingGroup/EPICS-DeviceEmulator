@@ -1,6 +1,8 @@
 from lewis.adapters.stream import StreamInterface
 from lewis_emulators.utils.command_builder import CmdBuilder
+from lewis_emulators.utils.replies import conditional_reply
 
+if_connected = conditional_reply("connected")
 
 class EurothermStreamInterface(StreamInterface):
     """
@@ -39,54 +41,63 @@ class EurothermStreamInterface(StreamInterface):
         """
         self.log.error("An error occurred at request " + repr(request) + ": " + repr(error))
 
+    @if_connected
     def get_proportional(self):
         """
         TODO: Get the proportional of the device's PID values
         """
         return "\x02XP0"
 
+    @if_connected
     def get_integral(self):
         """
         TODO: Get the integral of the device's PID values
         """
         return "\x02TI0"
 
+    @if_connected
     def get_derivative(self):
         """
         TODO: Get the derivative of the device's PID values
         """
         return "\x02TD0"
 
+    @if_connected
     def get_output(self):
         """
         TODO: Get the output of the device
         """
         return "\x02OP0"
 
+    @if_connected
     def get_highlim(self):
         """
         TODO: Get the high limit of the device
         """
         return "\x02HS0"
 
+    @if_connected
     def get_lowlim(self):
         """
         TODO: Get the low limit of the device
         """
         return "\x02LS0"
 
+    @if_connected
     def get_max_output(self):
         """
         TODO: Get the max output of the device
         """
         return "\x02HO0"
 
+    @if_connected
     def get_autotune(self):
         """
         TODO: Get the max output of the device
         """
         return "\x02AT0"
 
+    @if_connected
     def get_current_temperature(self):
         """
         Get the current temperature of the device.
@@ -95,6 +106,7 @@ class EurothermStreamInterface(StreamInterface):
         """
         return "\x02PV{}".format(self._device.current_temperature)
 
+    @if_connected
     def get_ramp_setpoint(self):
         """
         Get the set point temperature.
@@ -103,6 +115,7 @@ class EurothermStreamInterface(StreamInterface):
         """
         return "\x02SP{}".format(self._device.ramp_setpoint_temperature)
 
+    @if_connected
     def set_ramp_setpoint(self, temperature, _):
         """
         Set the set point temperature.

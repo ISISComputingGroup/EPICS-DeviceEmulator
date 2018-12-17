@@ -1,7 +1,10 @@
 from lewis.adapters.stream import StreamInterface, Cmd
+from lewis_emulators.utils.replies import conditional_reply
 import traceback
 
 NUM_MIN_MAX = "([\-0-9.]+|MAX|MIN)"
+
+if_connected = conditional_reply("connected")
 
 
 class AG33220AStreamInterface(StreamInterface):
@@ -36,60 +39,79 @@ class AG33220AStreamInterface(StreamInterface):
         value = float('%s' % float('%.4g' % float(value)))
         return "{:+.13E}".format(value)
 
+    @if_connected
     def get_amplitude(self):
         return self.float_output(self._device.amplitude)
 
+    @if_connected
     def set_amplitude(self, new_amplitude):
         self._device.set_new_amplitude(new_amplitude)
 
+    @if_connected
     def get_frequency(self):
         return self.float_output(self._device.frequency)
 
+    @if_connected
     def set_frequency(self, new_frequency):
         self._device.set_new_frequency(new_frequency)
 
+    @if_connected
     def get_offset(self):
         return self.float_output(self._device.offset)
 
+    @if_connected
     def set_offset(self, new_offset):
         self._device.set_offs_and_update_voltage(new_offset)
 
+    @if_connected
     def get_units(self):
         return self._device.units
 
+    @if_connected
     def set_units(self, new_units):
         self._device.units = new_units
 
+    @if_connected
     def get_function(self):
         return self._device.function
 
+    @if_connected
     def set_function(self, new_function):
         self._device.set_function(new_function)
 
+    @if_connected
     def get_output(self):
         return self._device.get_output()
 
+    @if_connected
     def set_output(self, new_output):
         self._device.output = new_output
 
+    @if_connected
     def get_idn(self):
         return self._device.idn
 
+    @if_connected
     def get_voltage_high(self):
         return self.float_output(self._device.voltage_high)
 
+    @if_connected
     def set_voltage_high(self, new_voltage_high):
         self._device.set_new_voltage_high(new_voltage_high)
 
+    @if_connected
     def get_voltage_low(self):
         return self.float_output(self._device.voltage_low)
 
+    @if_connected
     def set_voltage_low(self, new_voltage_low):
         self._device.set_new_voltage_low(new_voltage_low)
 
+    @if_connected
     def get_voltage_range_auto(self):
         return self._device.get_range_auto()
 
+    @if_connected
     def set_voltage_range_auto(self, range_auto):
         self._device.range_auto = range_auto
 
