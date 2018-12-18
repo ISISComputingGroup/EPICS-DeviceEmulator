@@ -111,43 +111,57 @@ class CmdBuilder(object):
             self.arg(".{{{}}}".format(length))
         return self
 
-    def float(self, mapping=float):
+    def float(self, mapping=float, ignore=False):
         """
         Add a float argument.
 
-        :return: builder
-        """
-        return self.arg(r"[+-]?\d+\.?\d*", mapping)
+        Args:
+            mapping: The type to cast the response to (default: float)
+            ignore: True to match with a float but ignore the returned value (default: False)
 
-    def digit(self, mapping=int):
+        Returns: builder
+        """
+        regex = r"[+-]?\d+\.?\d*"
+        return self.regex(regex) if ignore else self.arg(regex, mapping)
+
+    def digit(self, mapping=int, ignore=False):
         """
         Add a single digit argument.
 
-        :return: builder
-        """
-        return self.arg(r"\d", mapping)
+        Args:
+            mapping: The type to cast the response to (default: int)
+            ignore: True to match with a digit but ignore the returned value (default: False)
 
-    def char(self, not_chars=None):
+        Returns: builder
+        """
+        return self.regex(r"\d") if ignore else self.arg(r"\d", mapping)
+
+    def char(self, not_chars=None, ignore=False):
         """
         Add a single character argument.
 
         Args:
             not_chars: characters that the character can not be; None for can be anything
+            ignore: True to match with a char but ignore the returned value (default: False)
 
         Returns: builder
 
         """
-        if not_chars is None:
-            return self.arg(r".")
-        return self.arg("[^{}]".format("".join(not_chars)))
+        regex = r"." if not_chars is None else "[^{}]".format("".join(not_chars))
+        return self.regex(regex) if ignore else self.arg(regex)
 
-    def int(self, mapping=int):
+    def int(self, mapping=int, ignore=False):
         """
         Add an integer argument.
 
-        :return: builder
+        Args:
+            mapping: The type to cast the response to (default: int)
+            ignore: True to match with a int but ignore the returned value (default: False)
+
+        Returns: builder
         """
-        return self.arg(r"[+-]?\d+", mapping)
+        regex = r"[+-]?\d+"
+        return self.regex(regex)if ignore else self.arg(regex, mapping)
 
     def any(self):
         """
