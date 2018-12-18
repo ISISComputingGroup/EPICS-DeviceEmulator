@@ -14,12 +14,12 @@ class Ilm200StreamInterface(StreamInterface):
         super(Ilm200StreamInterface, self).__init__()
         # All commands preceded by "@i" where i is the ISOBUS address. Has no impact on emulator so is ignored.
         self.commands = {
-            CmdBuilder(Ilm200StreamInterface.get_version).escape("@").int().escape("V").build(),
-            CmdBuilder(self.get_status).escape("@").int().escape("X").build(),
-            CmdBuilder(self.get_level).escape("@").int().escape("R").int().build(),
-            CmdBuilder(self.set_rate_slow).escape("@").int().escape("S").int().build(),
-            CmdBuilder(self.set_rate_fast).escape("@").int().escape("T").int().build(),
-            CmdBuilder(Ilm200StreamInterface.set_remote_unlocked).escape("@").int().escape("C3").build(),
+            CmdBuilder(Ilm200StreamInterface.get_version).escape("@").int(ignore=True).escape("V").build(),
+            CmdBuilder(self.get_status).escape("@").int(ignore=True).escape("X").build(),
+            CmdBuilder(self.get_level).escape("@").int(ignore=True).escape("R").int().build(),
+            CmdBuilder(self.set_rate_slow).escape("@").int(ignore=True).escape("S").int().build(),
+            CmdBuilder(self.set_rate_fast).escape("@").int(ignore=True).escape("T").int().build(),
+            CmdBuilder(Ilm200StreamInterface.set_remote_unlocked).escape("@").int(ignore=True).escape("C3").build(),
         }
 
     def handle_error(self, request, error):
@@ -27,22 +27,22 @@ class Ilm200StreamInterface(StreamInterface):
         return str(error)
 
     @staticmethod
-    def get_version(_):
+    def get_version():
         return "VILM200_EMULATED"
 
     @staticmethod
-    def set_remote_unlocked(_):
+    def set_remote_unlocked():
         return "C"  # Does nothing in emulator land
 
-    def set_rate_slow(self, _, channel):
+    def set_rate_slow(self, channel):
         self._device.set_fill_rate(channel=int(channel), fast=False)
         return "S"
 
-    def set_rate_fast(self, _, channel):
+    def set_rate_fast(self, channel):
         self._device.set_fill_rate(channel=int(channel), fast=True)
         return "T"
 
-    def get_level(self, _, channel):
+    def get_level(self, channel):
         return "R{}".format(int(self._device.get_level(channel=int(channel))*10))
 
     def _get_channel_status(self, channel_number):
@@ -67,7 +67,7 @@ class Ilm200StreamInterface(StreamInterface):
     def _get_logic_status():
         return 0  # Describes the state of the ILM relay. Not currently used in IOC
 
-    def get_status(self, _):
+    def get_status(self):
         d = self._device
         # "XabcSuuvvwwRxyz" : Described fully in ILM 200 manual section 8.2
         status_string = "X{ch1_type:01d}{ch2_type:01d}{ch3_type:01d}S{ch1_status:02x}{ch2_status:02x}"\
