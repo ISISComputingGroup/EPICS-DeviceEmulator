@@ -9,9 +9,6 @@ from lewis.devices import StateMachineDevice
 MAX_READ = 1500
 MIN_READ = 1000
 
-NORMAL_MODE = 0
-BUFFER_CONTROL_MODE = 1
-
 
 class Channel(object):
     def __init__(self):
@@ -60,8 +57,6 @@ class SimulatedKeithley2700(StateMachineDevice):
         self.scan_channel_start = 101       # starting channel in list to be scanned
         self.scan_channel_end = 210         # end channel in list to be scanned 
         self.buffer_count = 10              # Number of samples to return. see $(P)COUNT in keithley_2700.db
-
-        self.control_mode = NORMAL_MODE          # Control mode allows tests to control buffer contents
 
         # Create channels from 101-110 and 201 - 210
         self.channels = {}
