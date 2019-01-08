@@ -3,7 +3,7 @@ A fluent command builder for lewis.
 """
 
 import re
-from lewis.adapters.stream import Cmd
+from lewis.adapters.stream import Cmd, regex
 
 from lewis_emulators.utils.constants import STX, ACK, EOT, ETX, ENQ
 
@@ -75,14 +75,14 @@ class CmdBuilder(object):
         """
         Add a regex for any number of spaces
         Args:
-            at_least_one: true there must be at least one space; false there can be any nnumber including zero
+            at_least_one: true there must be at least one space; false there can be any number including zero
 
         Returns: builder
 
         """
-        wildchard = "*" if at_least_one else "+"
+        wildcard = "+" if at_least_one else "*"
 
-        self._add_to_regex(" " + wildchard, False)
+        self._add_to_regex(" " + wildcard, False)
         return self
 
     def arg(self, arg_regex):
@@ -158,15 +158,21 @@ class CmdBuilder(object):
         self._reg_ex += "$"
         return self
 
-    def build(self, *args, **kwargs):
+    def build(self, ignore_case=False, *args, **kwargs):
         """
         Builds the CMd object based on the target and regular expression.
 
+        :param ignore_case: boolean allows case insensitive regex
         :param args: arguments to pass to Cmd constructor
         :param kwargs: key word arguments to pass to Cmd constructor
         :return: Cmd object
         """
-        return Cmd(self._target_method, self._reg_ex, *args, **kwargs)
+        if ignore_case:
+            pattern = regex(self._reg_ex)
+            pattern.compiled_pattern = re.compile(self._reg_ex, re.IGNORECASE)
+            return Cmd(self._target_method, pattern, *args, **kwargs)
+        else:
+            return Cmd(self._target_method, *args, **kwargs)
 
     def add_ascii_character(self, char_number):
         """
