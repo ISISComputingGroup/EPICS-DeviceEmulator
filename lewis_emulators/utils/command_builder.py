@@ -29,13 +29,14 @@ class CmdBuilder(object):
     >>> CmdBuilder("set_pres").escape("pres?").enq().build()
     """
 
-    def __init__(self, target_method, arg_sep="", ignore=""):
+    def __init__(self, target_method, arg_sep="", ignore="", ignore_case=False):
         """
         Create a builder. Use build to create the final object
 
         :param target_method: name of the method target to call when the reg ex matches
         :param arg_sep: separators between arguments which are next to each other
         :param ignore: set of characters to ignore between text and arguments
+        :param ignore_case: ignore the case when matching command
         """
         self._target_method = target_method
         self._arg_sep = arg_sep
@@ -45,6 +46,8 @@ class CmdBuilder(object):
         else:
             self._ignore = "[{0}]*".format(ignore)
         self._reg_ex = self._ignore
+
+        self._ignore_case = ignore_case
 
     def _add_to_regex(self, regex, is_arg):
         self._reg_ex += regex + self._ignore
@@ -158,21 +161,20 @@ class CmdBuilder(object):
         self._reg_ex += "$"
         return self
 
-    def build(self, ignore_case=False, *args, **kwargs):
+    def build(self, *args, **kwargs):
         """
         Builds the CMd object based on the target and regular expression.
 
-        :param ignore_case: boolean allows case insensitive regex
         :param args: arguments to pass to Cmd constructor
         :param kwargs: key word arguments to pass to Cmd constructor
         :return: Cmd object
         """
-        if ignore_case:
+        if self._ignore_case:
             pattern = regex(self._reg_ex)
             pattern.compiled_pattern = re.compile(self._reg_ex, re.IGNORECASE)
-            return Cmd(self._target_method, pattern, *args, **kwargs)
         else:
-            return Cmd(self._target_method, *args, **kwargs)
+            pattern = self._reg_ex
+        return Cmd(self._target_method, pattern, *args, **kwargs)
 
     def add_ascii_character(self, char_number):
         """
