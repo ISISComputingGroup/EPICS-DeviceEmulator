@@ -10,6 +10,7 @@ class PowerSupply(object):
     Class representing a single power supply within a chain.
     """
     def __init__(self):
+
         self.curr = 0
         self.curr_setpoint = 0
         self.volt = 0
@@ -27,9 +28,9 @@ class SimulatedRknps(StateMachineDevice):
     """
     Simulated Danfysik type controller used in multi-drop mode on RIKEN beamlines.
     """
-
     def _initialize_data(self):
 
+        self.connected = True
         self._address = ADDRESSES[0]  # Default to first address.
 
         self._psus = {}

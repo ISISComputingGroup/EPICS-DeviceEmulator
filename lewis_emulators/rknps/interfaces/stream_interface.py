@@ -2,6 +2,9 @@ from lewis.adapters.stream import StreamInterface, Cmd
 from lewis.core.logging import has_log
 from lewis_emulators.utils.command_builder import CmdBuilder
 
+from lewis_emulators.utils.replies import conditional_reply
+
+if_connected = conditional_reply("connected")
 
 @has_log
 class RknpsStreamInterface(StreamInterface):
@@ -45,6 +48,7 @@ class RknpsStreamInterface(StreamInterface):
         self.log.error(err)
         return err
 
+    @if_connected
     def set_adr(self, address):
         """
         Sets the active address.
@@ -54,6 +58,7 @@ class RknpsStreamInterface(StreamInterface):
         """
         self._device.set_adr(address)
 
+    @if_connected
     def get_adr(self):
         """
         Gets the active address.
@@ -62,6 +67,7 @@ class RknpsStreamInterface(StreamInterface):
         """
         return "{}".format(self._device.get_adr())
 
+    @if_connected
     def get_ra(self):
         """
         Gets the value for RA.
@@ -70,18 +76,21 @@ class RknpsStreamInterface(StreamInterface):
         """
         return "{}".format(self._device.get_current())
 
+    @if_connected
     def get_voltage(self):
         """
         Gets the voltage of the power supply.
         """
         return "{}".format(self._device.get_voltage())
 
+    @if_connected
     def get_current(self):
         """
         Gets the current of the power supply.
         """
         return "{}".format(self._device.get_current())
 
+    @if_connected
     def get_cmd(self):
         """
         Check whether the device is in Local/Remote mode.
@@ -90,6 +99,7 @@ class RknpsStreamInterface(StreamInterface):
         """
         return "REM" if self.device.is_in_remote_mode() else "LOC"
 
+    @if_connected
     def set_cmd(self, cmd):
         """
         Sets the active address to be in local or remote mode.
@@ -104,6 +114,7 @@ class RknpsStreamInterface(StreamInterface):
         else:
             raise ValueError("Invalid argument to set_cmd")
 
+    @if_connected
     def get_pol(self):
         """
         Get the polarity of the device.
@@ -112,6 +123,7 @@ class RknpsStreamInterface(StreamInterface):
         """
         return "+" if self._device.is_polarity_positive() else "-"
 
+    @if_connected
     def set_pol(self, pol):
         """
         Set the polarity of the device.
@@ -126,6 +138,7 @@ class RknpsStreamInterface(StreamInterface):
         else:
             raise ValueError("Invalid argument to set_polarity")
 
+    @if_connected
     def get_status(self):
         """
         Get the status of the device.
@@ -136,6 +149,7 @@ class RknpsStreamInterface(StreamInterface):
         interlock = "!" if self._device.is_interlock_active() else "."
         return "{}........{}..............".format(power, interlock)
 
+    @if_connected
     def set_power(self, power):
         """
         Turn the output power of the PSU on or off.
@@ -150,6 +164,7 @@ class RknpsStreamInterface(StreamInterface):
         else:
             raise ValueError("Invalid argument to set_power")
 
+    @if_connected
     def set_current(self, value):
         """
         Set a value for the appropriate DA.
@@ -161,6 +176,7 @@ class RknpsStreamInterface(StreamInterface):
         """
         self._device.set_current(float(value))
 
+    @if_connected
     def reset(self):
         """
         Reset the device, turn it off and set all values to 0.
