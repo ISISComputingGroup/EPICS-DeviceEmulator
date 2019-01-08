@@ -8,6 +8,7 @@ from lewis_emulators.utils.command_builder import CmdBuilder
 from lewis_emulators.utils.replies import conditional_reply
 from .dfkps_base import CommonStreamInterface
 
+
 __all__ = ["Danfysik8800StreamInterface"]
 
 

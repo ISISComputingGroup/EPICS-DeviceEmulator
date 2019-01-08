@@ -8,6 +8,7 @@ from lewis.core.logging import has_log
 from lewis_emulators.utils.command_builder import CmdBuilder
 from lewis_emulators.utils.replies import conditional_reply
 
+if_available = conditional_reply("device_available")
 
 @has_log
 @six.add_metaclass(abc.ABCMeta)
@@ -78,7 +79,7 @@ class CommonStreamInterface(object):
         """
         Respond to the get_status command.
         """
-
+    @if_available
     def init_comms(self):
         """
         Initialize comms of device
