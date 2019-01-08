@@ -15,9 +15,12 @@ SCAN_STATE = {0: "INT", 1: "NONE"}
 
 @has_log
 class Keithley2700StreamInterface(StreamInterface):
-    in_terminator = "\r\n"
-    out_terminator = "\r\n"
+    in_terminator = "\r"
+    out_terminator = "\r"
     commands = {
+        # get_multicmds splits commands by ';' if multiple command strings are received
+        CmdBuilder("get_multicmds", arg_sep="").arg("[^;]*").escape(";").arg(".*").build(),
+
         CmdBuilder("get_idn").escape("*IDN?").eos().build(),
         CmdBuilder("empty_queue").escape(":SYST:CLE").eos().build(),
         CmdBuilder("clear_buffer").escape("TRAC:CLE").eos().build(),
@@ -43,7 +46,7 @@ class Keithley2700StreamInterface(StreamInterface):
         CmdBuilder("set_sample_count").escape("SAMP:COUN ").int().eos().build(),
         CmdBuilder("get_sample_count").escape("SAMP:COUN?").eos().build(),
         CmdBuilder("set_source").escape("TRIG:SOUR ").arg("IMM|TIM|MAN|BUS|EXT").eos().build(),
-        CmdBuilder("set_data_elements").escape("FORM:ELEM READ, CHAN, TST").eos().build(),
+        CmdBuilder("set_data_elements").escape("FORM:ELEM READ,").spaces(at_least_one=False).escape("CHAN,").spaces(at_least_one=False).escape("TST").spaces(at_least_one=False).eos().build(),
         CmdBuilder("set_auto_range_status", arg_sep="").escape("FRES:RANG:AUTO ").arg("OFF|ON").eos().build(),
         CmdBuilder("get_auto_range_status").escape("FRES:RANG:AUTO?").eos().build(),
         CmdBuilder("set_resistance_digits", arg_sep="").escape(":FRES:DIG ").int().escape(", (@").
@@ -59,7 +62,7 @@ class Keithley2700StreamInterface(StreamInterface):
     def handle_error(self, request, error):
         self.log.error("An error occurred at request" + repr(request) + ": " + repr(error))
         self.log.error(traceback.format_exc())
-        print("An error occurred at request" + repr(request) + ": " + repr(error))
+        print("An error occurred at request '" + repr(request) + "': '" + repr(error) + "'")
 
     def bool_onoff_value(self, string_value):
         if string_value not in ["ON", "OFF"]:
@@ -210,3 +213,23 @@ class Keithley2700StreamInterface(StreamInterface):
     def set_scan_channels(self, start, end):
         self._device.scan_channel_start = start
         self._device.scan_channel_end = end
+
+    def get_multicmds(self, command, other_commands):
+        """
+             As the protocol file sends multiple commands (set Channel; request channel PV),
+             these methods split up the commands and process both.
+        """
+        replies = []
+        for cmd_to_find in [command, other_commands]:
+            if cmd_to_find != "":
+                self.log.info("Processing {} from combined command".format(cmd_to_find))
+                reply = self._process_part_command(cmd_to_find)
+                if reply is not None:
+                    replies.append(self._process_part_command(cmd_to_find))
+        return self.out_terminator.join(replies)
+
+    def _process_part_command(self, cmd_to_find):
+        for cmd in self.bound_commands:
+            if cmd.can_process(cmd_to_find):
+                return cmd.process_request(cmd_to_find)
+        self.log.info("Error, unable to find command: '{}'".format(cmd_to_find))
