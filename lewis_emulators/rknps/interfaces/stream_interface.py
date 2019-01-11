@@ -74,21 +74,21 @@ class RknpsStreamInterface(StreamInterface):
 
         Returns: a number in 10e-4 Amps.
         """
-        return "{}".format(self._device.get_current())
+        return "{:d}".format(int(self._device.get_current()))
 
     @if_connected
     def get_voltage(self):
         """
         Gets the voltage of the power supply.
         """
-        return "{}".format(self._device.get_voltage())
+        return "{:d}".format(int(self._device.get_voltage()))
 
     @if_connected
     def get_current(self):
         """
         Gets the current of the power supply.
         """
-        return "{}".format(self._device.get_current())
+        return "{:d}".format(int(self._device.get_current()))
 
     @if_connected
     def get_cmd(self):
