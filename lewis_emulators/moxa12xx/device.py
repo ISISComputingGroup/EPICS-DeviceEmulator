@@ -60,3 +60,28 @@ class SimulatedMoxa1210(StateMachineDevice):
         """
         self.interface.di.set(addr, value)
 
+    def set_ir(self, addr, value):
+        """
+        Sets floating point values to the input registers.
+        Args:
+            addr: Integer, starting address of the values to be set
+            value: List, containing the values to be written to the register
+
+        Returns:
+            None
+
+        """
+        self.interface.ir.set(addr, value)
+
+    def get_ir(self, addr, count):
+        """
+        Sets floating point values to the input registers.
+        Args:
+            addr: Integer, starting address of the values to be set
+            count: Integer, the number of contiguous values to get from the modbus register
+
+        Returns:
+            None
+
+        """
+        self.interface.ir.get(addr, count)
