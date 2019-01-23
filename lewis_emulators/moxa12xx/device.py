@@ -3,6 +3,7 @@ from lewis.devices import StateMachineDevice
 from states import DefaultState
 from lewis.core.logging import has_log
 
+import struct
 
 @has_log
 class SimulatedMoxa1210(StateMachineDevice):
@@ -62,7 +63,7 @@ class SimulatedMoxa1210(StateMachineDevice):
 
     def set_ir(self, addr, value):
         """
-        Sets floating point values to the input registers.
+        Set value(s) on the input registers.
         Args:
             addr: Integer, starting address of the values to be set
             value: List, containing the values to be written to the register
@@ -75,7 +76,7 @@ class SimulatedMoxa1210(StateMachineDevice):
 
     def get_ir(self, addr, count):
         """
-        Sets floating point values to the input registers.
+        Get value(s) from the input registers.
         Args:
             addr: Integer, starting address of the values to be set
             count: Integer, the number of contiguous values to get from the modbus register
@@ -85,3 +86,43 @@ class SimulatedMoxa1210(StateMachineDevice):
 
         """
         self.interface.ir.get(addr, count)
+
+    def set_1240_voltage(self, addr, value):
+        """
+        Writes to an input register data a voltage encoded like a moxa e1240 voltage/current logger
+
+        The voltage range for an e1240 is a 0 - 10 V. This is linearly encoded in a 16-bit int, so 0=0V and 2**16=10V
+
+        Args:
+            addr: Integer, The address to write the value to
+            value: Float, The desired voltage to be written to the input register
+
+        Returns:
+
+        """
+
+        if value > 10.0:
+            raw_val = 2**16
+        elif value < 0.0:
+            raw_val = 0
+        else:
+            raw_val = int(float(value) * 2**16 / 10.0)
+
+        self.interface.ir.set(addr, (raw_val, ))
+
+    def set_value_on_device(self, addr, value):
+        """
+        Sets a floating point value to an input register
+
+        Args:
+            addr: Integer, the address of the register to be written to
+            value: Float, the value to be written.
+
+        Returns:
+            None
+
+        """
+
+        integer_representation = struct.unpack('>HH', struct.pack('<f', value))
+
+        self.interface.ir.set(addr, integer_representation)

@@ -34,7 +34,30 @@ class Moxa1240ModbusInterface(ModbusInterface):
 
     di = ModbusBasicDataBank(False, last_addr=0x10)
     co = di
-    ir = ModbusBasicDataBank(10, last_addr=0x80)
+    ir = ModbusBasicDataBank(0, last_addr=0x8)
+    hr = ir
+
+    @ModbusInterface.device.setter
+    def device(self, new_device):
+        """
+        Overrides base implementation to give attached device a reference to self
+        Required to allow communications between the interface and device
+        """
+        ModbusInterface.device.fset(self, new_device)
+        self.device.interface = self
+
+
+@has_log
+class Moxa1262ModbusInterface(ModbusInterface):
+    """
+    Creates modbus data registers for a Moxa e1240 and makes them available to the lewis device.
+    """
+
+    protocol = "MOXA_1262"
+
+    di = ModbusBasicDataBank(0)
+    co = di
+    ir = ModbusBasicDataBank(10, start_addr=0x810)
     hr = ir
 
     @ModbusInterface.device.setter
