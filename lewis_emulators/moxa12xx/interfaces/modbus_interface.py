@@ -57,7 +57,7 @@ class Moxa1262ModbusInterface(ModbusInterface):
 
     di = ModbusBasicDataBank(0)
     co = di
-    ir = ModbusBasicDataBank(10, start_addr=0x810)
+    ir = ModbusBasicDataBank(1, start_addr=0x810)
     hr = ir
 
     @ModbusInterface.device.setter

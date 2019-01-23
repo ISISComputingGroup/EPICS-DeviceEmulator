@@ -110,19 +110,21 @@ class SimulatedMoxa1210(StateMachineDevice):
 
         self.interface.ir.set(addr, (raw_val, ))
 
-    def set_value_on_device(self, addr, value):
+    def set_1262_temperature(self, addr, value):
         """
-        Sets a floating point value to an input register
+        Encodes the requested temperature as two 16-bit integers and writes these to input registers like a moxa e1262
+
+        Follows this stack overflow answer: https://stackoverflow.com/a/35603706
 
         Args:
-            addr: Integer, the address of the register to be written to
-            value: Float, the value to be written.
+            addr: The input register to write the first word of the temperature in. The second word will be written to addr+1
+            value: Float, the desired temperature to be written to the input registers
 
         Returns:
             None
 
         """
 
-        integer_representation = struct.unpack('>HH', struct.pack('<f', value))
+        integer_representation = struct.unpack('<HH', struct.pack('<f', value))
 
         self.interface.ir.set(addr, integer_representation)
