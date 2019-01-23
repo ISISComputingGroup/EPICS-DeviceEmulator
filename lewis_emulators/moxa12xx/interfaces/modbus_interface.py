@@ -24,6 +24,7 @@ class Moxa1210ModbusInterface(ModbusInterface):
         ModbusInterface.device.fset(self, new_device)
         self.device.interface = self
 
+
 @has_log
 class Moxa1240ModbusInterface(ModbusInterface):
     """
