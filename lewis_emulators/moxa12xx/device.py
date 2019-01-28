@@ -101,20 +101,24 @@ class SimulatedMoxa1210(StateMachineDevice):
 
         """
 
-        if value > 10.0:
-            raw_val = 2**16
-        elif value < 0.0:
+        max_16_bit_value = 2**16
+        max_voltage_range = 10.0
+        min_voltage_range = 0.0
+
+        if value > max_voltage_range:
+            raw_val = max_16_bit_value
+        elif value < min_voltage_range:
             raw_val = 0
         else:
-            raw_val = int(float(value) * 2**16 / 10.0)
+            raw_val = int(float(value) * max_16_bit_value / max_voltage_range)
 
         self.interface.ir.set(addr, (raw_val, ))
 
     def set_1262_temperature(self, addr, value):
         """
-        Encodes the requested temperature as two 16-bit integers and writes these to input registers like a moxa e1262
+        Encodes the requested temperature as two 16-bit integer words and writes to input registers like a moxa e1262
 
-        Follows this stack overflow answer: https://stackoverflow.com/a/35603706
+        Follows these stack overflow answers: https://stackoverflow.com/a/35603706, https://stackoverflow.com/a/45354944
 
         Args:
             addr: The input register to write the first word of the temperature in. The second word will be written to addr+1
@@ -125,6 +129,11 @@ class SimulatedMoxa1210(StateMachineDevice):
 
         """
 
-        integer_representation = struct.unpack('<HH', struct.pack('<f', value))
+        # Convert floating point number to binary representation string
+        binary_representation = struct.pack('<f', value)
 
-        self.interface.ir.set(addr, integer_representation)
+        # Represent the binary as two unsigned int 'words' (H is unsigned int)
+        word1, word2 = struct.unpack('<HH', binary_representation)
+
+        # Write to device
+        self.interface.ir.set(addr, (word1, word2))
