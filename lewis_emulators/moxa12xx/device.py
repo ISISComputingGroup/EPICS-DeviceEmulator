@@ -5,6 +5,7 @@ from lewis.core.logging import has_log
 
 import struct
 
+
 @has_log
 class SimulatedMoxa1210(StateMachineDevice):
     """
@@ -101,7 +102,7 @@ class SimulatedMoxa1210(StateMachineDevice):
 
         """
 
-        max_16_bit_value = 2**16
+        max_16_bit_value = 2**16 - 1
         max_voltage_range = 10.0
         min_voltage_range = 0.0
 
