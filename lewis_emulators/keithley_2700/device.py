@@ -1,6 +1,4 @@
 from collections import OrderedDict
-import random
-from enum import Enum
 from lewis.core.logging import has_log
 from .states import DefaultState
 from lewis.devices import StateMachineDevice
@@ -65,23 +63,6 @@ class SimulatedKeithley2700(StateMachineDevice):
         for i in range(201, 210+1):
             self.channels[str(i)] = Channel()
 
-    def generate_channel_values(self):
-        """
-        Creates a selection of channel resistance reading values
-        :return:
-        """
-        # Find current highest timestamp
-        timestamp = max(c.timestamp for c in self.channels.values())
-        reading = max(c.reading for c in self.channels.values())
-
-        for channel in self.channels.values():
-            if reading not in range(MIN_READ, MAX_READ):
-                reading = MIN_READ
-            channel.reading = reading
-            channel.timestamp = timestamp
-            timestamp += 0.05
-            reading += 20
-
     def get_next_buffer_location(self):
         if not self.is_buffer_full():
             return len(self.buffer)
@@ -91,21 +72,6 @@ class SimulatedKeithley2700(StateMachineDevice):
     def is_buffer_full(self):
         return len(self.buffer) >= self.buffer_size  # -1 because buffer is 0 indexed
 
-    def fill_buffer(self):
-        """
-        Creates a new set of channel reading values and fills the buffer
-        with these readings.
-        The buffer values are then parsed by the IOC into the appropriate channel PVs.
-        """
-        self.generate_channel_values()
-
-        while not self.is_buffer_full():
-            for chan, buffer_reading in self.channels.items():
-                self.buffer.append(BufferReading(buffer_reading.reading, buffer_reading.timestamp, chan))
-
-                if self.is_buffer_full():
-                    break
-
     def insert_mock_data(self, data):
         """
         Allows the insertion of specific, defined readings into the buffer
@@ -114,9 +80,7 @@ class SimulatedKeithley2700(StateMachineDevice):
         self.log.info("Inserting mock data into buffer: {}".format(data))
         for item in data:
             reading, timestamp, channel = item.split(",")
-            if not self.is_buffer_full():
-                pass
-            elif self.is_buffer_full() and self.buffer_autoclear_on:
+            if self.is_buffer_full() and self.buffer_autoclear_on:
                 self.clear_buffer()
             self.buffer.append(BufferReading(reading, timestamp, channel))
 
@@ -134,24 +98,6 @@ class SimulatedKeithley2700(StateMachineDevice):
         """
         self.buffer = []
         self.log.info("=== Cleared Buffer ===")
-
-    def set_channel_param(self, index, param, value):
-        """
-        Sets Attribute for Channel Instance within self.channels list
-        :param index: (Integer) position in list
-        :param param: Attribute
-        :param value: Attribute Value
-        """
-        setattr(self.channels[int(index)], str(param), value)
-
-    def get_channel_param(self, index, param):
-        """
-        Gets Attribute for Channel Instance within self.channels list
-        :param index: (Integer) position in list
-        :param param: Attribute
-        :return: Channel parameter (int or double)
-        """
-        return getattr(self.channels[int(index)], str(param))
 
     def _get_state_handlers(self):
         """

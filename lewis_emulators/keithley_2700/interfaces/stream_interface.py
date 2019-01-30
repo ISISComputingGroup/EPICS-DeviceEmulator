@@ -19,47 +19,137 @@ class Keithley2700StreamInterface(StreamInterface):
     out_terminator = "\r"
     commands = {
         # get_multicmds splits commands by ';' if multiple command strings are received
-        CmdBuilder("get_multicmds", arg_sep="", ignore_case=True).arg("[^;]*").escape(";").arg(".*").build(),
+        CmdBuilder("get_multicmds", arg_sep="", ignore_case=True).get_multicommands(";")
+                                                                 .build(),
 
-        CmdBuilder("get_idn", ignore_case=True).escape("*IDN?").eos().build(),
-        CmdBuilder("empty_queue", ignore_case=True).escape(":SYST:CLE").eos().build(),
-        CmdBuilder("clear_buffer", ignore_case=True).escape("TRAC:CLE").eos().build(),
-        CmdBuilder("set_measurement", ignore_case=True).escape(":FUNC '").
-        arg("VOLT:DC|VOLT:AC|CURR:DC|CURR:AC|RES|FRES|CONT|FREQ|PER")
-        .escape("', (@").regex("[+-]?\d+").escape(":").regex("[+-]?\d+").escape(")").eos().build(),
-        CmdBuilder("get_measurement", ignore_case=True).escape(":FUNC?").eos().build(),
-        CmdBuilder("set_buffer_feed", ignore_case=True).escape("TRAC:FEED ").arg("SENS|CALC|NONE").eos().build(),
-        CmdBuilder("set_buffer_control", ignore_case=True).escape("TRAC:FEED:CONT ").arg("NEV|NEXT|ALW").eos().build(),
-        CmdBuilder("set_buffer_state", ignore_case=True).escape("TRAC:CLE:AUTO ").arg("OFF|ON").eos().build(),
-        CmdBuilder("get_buffer_state", ignore_case=True).escape("TRAC:CLE:AUTO?").eos().build(),
-        CmdBuilder("get_next_buffer_location", ignore_case=True).escape("TRAC:NEXT?").eos().build(),
-        CmdBuilder("get_buffer_stats", ignore_case=True).escape("TRAC:FREE?").eos().build(),
-        CmdBuilder("get_readings",  arg_sep="", ignore_case=True).escape("TRAC:DATA:SEL? ").int().escape(",").int().
-        eos().build(),
-        CmdBuilder("set_buffer_size", ignore_case=True).escape("TRAC:POIN ").int().eos().build(),
-        CmdBuilder("get_buffer_size", ignore_case=True).escape("TRAC:POIN?").eos().build(),
-        CmdBuilder("set_time_stamp_format", ignore_case=True).escape("TRAC:TST:FORM ").arg("ABS|DELT").eos().build(),
-        CmdBuilder("get_time_stamp_format", ignore_case=True).escape("TRAC:TST:FORM?").eos().build(),
-        CmdBuilder("get_delay_state", ignore_case=True).escape("TRIG:DEL:AUTO?").eos().build(),
-        CmdBuilder("set_delay_state", ignore_case=True).escape("TRIG:DEL:AUTO ").arg("OFF|ON").eos().build(),
-        CmdBuilder("set_init_state", ignore_case=True).escape("INIT:CONT ").arg("OFF|ON").eos().build(),
-        CmdBuilder("get_init_state", ignore_case=True).escape("INIT:CONT?").eos().build(),
-        CmdBuilder("set_sample_count", ignore_case=True).escape("SAMP:COUN ").int().eos().build(),
-        CmdBuilder("get_sample_count", ignore_case=True).escape("SAMP:COUN?").eos().build(),
-        CmdBuilder("set_source", ignore_case=True).escape("TRIG:SOUR ").arg("IMM|TIM|MAN|BUS|EXT").eos().build(),
-        CmdBuilder("set_data_elements", ignore_case=True).escape("FORM:ELEM READ,").spaces(at_least_one=False).
-        escape("CHAN,").spaces(at_least_one=False).escape("TST").spaces(at_least_one=False).eos().build(),
-        CmdBuilder("set_auto_range_status", arg_sep="", ignore_case=True).escape("FRES:RANG:AUTO ").arg("OFF|ON").eos().
-        build(),
-        CmdBuilder("get_auto_range_status", ignore_case=True).escape("FRES:RANG:AUTO?").eos().build(),
-        CmdBuilder("set_resistance_digits", arg_sep="", ignore_case=True).escape(":FRES:DIG ").int().escape(", (@").
-        int().escape(":").int().escape(")").eos().build(),
-        CmdBuilder("set_resistance_rate", ignore_case=True).escape(":FRES:NPLC ").float().eos().build(),
-        CmdBuilder("set_scan_state", ignore_case=True).escape("ROUT:SCAN:LSEL ").arg("INT|NONE").eos().build(),
-        CmdBuilder("get_scan_state", ignore_case=True).escape("ROUT:SCAN:LSEL?").eos().build(),
-        CmdBuilder("set_scan_channels", arg_sep="", ignore_case=True).escape("ROUT:SCAN (@").int().escape(":").int().
-        escape(")").eos().build(),
-        CmdBuilder("get_scan_channels", ignore_case=True).escape("ROUT:SCAN?").eos().build()
+        # Extra split on newline to make compatible with VI
+        CmdBuilder("get_multicmds", arg_sep="", ignore_case=True).get_multicommands("\n")
+                                                                 .build(),
+
+        CmdBuilder("get_idn", ignore_case=True).escape("*IDN?")
+                                               .eos().build(),
+
+        CmdBuilder("empty_queue", ignore_case=True).escape(":SYST:CLE")
+                                                   .eos().build(),
+
+        CmdBuilder("clear_buffer", ignore_case=True).escape("TRAC:CLE")
+                                                    .eos().build(),
+
+        CmdBuilder("set_measurement", ignore_case=True).escape(":FUNC ")
+                                                       .regex("(?:\'|\")")
+                                                       .arg("VOLT:DC|VOLT:AC|CURR:DC|CURR:AC|RES|FRES|CONT|FREQ|PER")
+                                                       .spaces(at_least_one=False).regex("(?:\'|\")")
+                                                       .spaces(at_least_one=False).escape(",")
+                                                       .spaces(at_least_one=False).escape("(@101:210)")
+                                                       .eos().build(),
+
+        CmdBuilder("get_measurement", ignore_case=True).escape(":FUNC?")
+                                                       .eos().build(),
+
+        CmdBuilder("set_buffer_feed", ignore_case=True).escape("TRAC:FEED ")
+                                                       .arg("SENS|CALC|NONE")
+                                                       .eos().build(),
+
+        CmdBuilder("set_buffer_control", ignore_case=True).escape("TRAC:FEED:CONT ")
+                                                          .arg("NEV|NEXT|ALW")
+                                                          .eos().build(),
+
+        CmdBuilder("set_buffer_state", ignore_case=True).escape("TRAC:CLE:AUTO ")
+                                                        .arg("OFF|ON")
+                                                        .eos().build(),
+
+        CmdBuilder("get_buffer_state", ignore_case=True).escape("TRAC:CLE:AUTO?")
+                                                        .eos().build(),
+
+        CmdBuilder("get_next_buffer_location", ignore_case=True).escape("TRAC:NEXT?")
+                                                                .eos().build(),
+
+        CmdBuilder("get_buffer_stats", ignore_case=True).escape("TRAC:FREE?")
+                                                        .eos().build(),
+
+        CmdBuilder("get_readings",  arg_sep="", ignore_case=True).escape("TRAC:DATA:SEL? ")
+                                                                 .int().escape(",").int()
+                                                                 .eos().build(),
+
+        CmdBuilder("set_buffer_size", ignore_case=True).escape("TRAC:POIN ")
+                                                       .int()
+                                                       .eos().build(),
+
+        CmdBuilder("get_buffer_size", ignore_case=True).escape("TRAC:POIN?")
+                                                       .eos().build(),
+
+        CmdBuilder("set_time_stamp_format", ignore_case=True).escape("TRAC:TST:FORM ")
+                                                             .arg("ABS|DELT")
+                                                             .eos().build(),
+
+        CmdBuilder("get_time_stamp_format", ignore_case=True).escape("TRAC:TST:FORM?")
+                                                             .eos().build(),
+
+        CmdBuilder("get_delay_state", ignore_case=True).escape("TRIG:DEL:AUTO?")
+                                                       .eos().build(),
+
+        CmdBuilder("set_delay_state", ignore_case=True).escape("TRIG:DEL:AUTO ")
+                                                       .arg("OFF|ON")
+                                                       .eos().build(),
+
+        CmdBuilder("set_init_state", ignore_case=True).escape("INIT:CONT ")
+                                                      .arg("OFF|ON")
+                                                      .eos().build(),
+
+        CmdBuilder("get_init_state", ignore_case=True).escape("INIT:CONT?")
+                                                      .eos().build(),
+
+        CmdBuilder("set_sample_count", ignore_case=True).escape("SAMP:COUN ")
+                                                        .int()
+                                                        .eos().build(),
+
+        CmdBuilder("get_sample_count", ignore_case=True).escape("SAMP:COUN?")
+                                                        .eos().build(),
+
+        CmdBuilder("set_source", ignore_case=True).escape("TRIG:SOUR ")
+                                                  .arg("IMM|TIM|MAN|BUS|EXT")
+                                                  .eos().build(),
+
+        CmdBuilder("set_data_elements", ignore_case=True).escape("FORM:ELEM READ,")
+                                                         .spaces(at_least_one=False)
+                                                         .escape("CHAN,").spaces(at_least_one=False)
+                                                         .escape("TST").spaces(at_least_one=False)
+                                                         .eos().build(),
+
+        CmdBuilder("set_auto_range_status", arg_sep="", ignore_case=True).optional(":").escape("FRES:RANG:AUTO ")
+                                                                         .arg("OFF|ON").spaces(at_least_one=False)
+                                                                         .optional(",").spaces(at_least_one=False)
+                                                                         .optional("(@101:210)")
+                                                                         .eos().build(),
+
+        CmdBuilder("get_auto_range_status", ignore_case=True).optional(":").escape("FRES:RANG:AUTO?")
+                                                             .eos().build(),
+
+        CmdBuilder("set_resistance_digits", arg_sep="", ignore_case=True).optional(";").escape(":FRES:DIG ")
+                                                                         .int().spaces(at_least_one=False)
+                                                                         .escape(", (@")
+                                                                         .int().escape(":").int()
+                                                                         .escape(")")
+                                                                         .eos().build(),
+
+        CmdBuilder("set_resistance_rate", ignore_case=True).optional(";").escape(":FRES:NPLC ")
+                                                           .float().optional("E+0")
+                                                           .eos().build(),
+
+        CmdBuilder("set_scan_state", ignore_case=True).escape("ROUT:SCAN:LSEL ")
+                                                      .arg("INT|NONE")
+                                                      .eos().build(),
+
+        CmdBuilder("get_scan_state", ignore_case=True).escape("ROUT:SCAN:LSEL?")
+                                                      .eos().build(),
+
+        CmdBuilder("set_scan_channels", arg_sep="", ignore_case=True).escape("ROUT:SCAN (@")
+                                                                     .int().escape(":").int()
+                                                                     .escape(")")
+                                                                     .eos().build(),
+
+        CmdBuilder("get_scan_channels", ignore_case=True).escape("ROUT:SCAN?")
+                                                         .eos().build(),
     }
 
     def handle_error(self, request, error):
@@ -219,8 +309,8 @@ class Keithley2700StreamInterface(StreamInterface):
 
     def get_multicmds(self, command, other_commands):
         """
-             As the protocol file sends multiple commands (set Channel; request channel PV),
-             these methods split up the commands and process both.
+             Added specifically to support use of the VI with the emulator, as the VI sends multiple commands
+             in one go, separated by semicolons.
         """
         replies = []
         for cmd_to_find in [command, other_commands]:
