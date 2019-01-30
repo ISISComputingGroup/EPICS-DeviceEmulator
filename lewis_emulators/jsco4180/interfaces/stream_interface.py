@@ -35,7 +35,7 @@ class Jsco4180StreamInterface(StreamInterface):
             CmdBuilder(self.get_composition_b).escape("compb load p").eos().build(),
             CmdBuilder(self.get_composition_c).escape("compc load p").eos().build(),
             CmdBuilder(self.get_composition_d).escape("compd load p").eos().build(),
-            CmdBuilder(self.set_composition).float().escape(" ").float().escape(" ").float().escape(" comp set").build(),
+            CmdBuilder(self.set_composition).float().escape(" ").float().escape(" ").float().escape(" ").float().escape(" comp set").build(),
             CmdBuilder(self.get_error).escape("trouble load p").eos().build(),
             CmdBuilder(self.set_error).escape("0 trouble set").build(),
             CmdBuilder(self.set_pump).int().escape(" pump set").eos().build(),
@@ -157,7 +157,7 @@ class Jsco4180StreamInterface(StreamInterface):
         return self.device.composition_D
 
     @if_connected
-    def set_composition(self, a, b, c):
+    def set_composition(self, ramptime, a, b, c):
         self.device.composition_A = a
         self.device.composition_B = b
         self.device.composition_C = c
