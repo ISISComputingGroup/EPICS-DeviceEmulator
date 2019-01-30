@@ -54,6 +54,15 @@ class CmdBuilder(object):
         if not is_arg:
             self._current_sep = ""
 
+    def optional(self, text):
+        """
+        Add some escaped text which does not necessarily need to be there. For commands with optional parameters
+        :param text: Text to add
+        :return: builder
+        """
+        self._add_to_regex("(?:" + re.escape(text) + ")?", False)
+        return self
+
     def escape(self, text):
         """
         Add some text to the regex which is escaped.
@@ -233,4 +242,15 @@ class CmdBuilder(object):
         :return: builder
         """
         self._reg_ex += "$"
+        return self
+
+    def get_multicommands(self, command_separator):
+        """
+        Allows emulator to split multiple commands separated by a defined command separator, e.g. ";".
+        Must be accompanied by stream device methods. See Keithley 2700 for examples
+
+        :param command_separator: Character(s) that separate commands
+        :return: builder
+        """
+        self.arg("[^" + re.escape(command_separator) + "]*").escape(command_separator).arg(".*")
         return self
