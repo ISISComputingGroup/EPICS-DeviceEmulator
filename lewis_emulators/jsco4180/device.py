@@ -17,11 +17,11 @@ class SimulatedJsco4180(StateMachineDevice):
         self.pressure_max = 400
         self.pressure_min = 1
 
-        # Composition gradients A, B, C, D
-        self.composition_A = 100.0
-        self.composition_B = 0.0
-        self.composition_C = 0.0
-        self.composition_D = 0.0
+        # Composition components A, B, C, D
+        self.component_A = 100.0
+        self.component_B = 0.0
+        self.component_C = 0.0
+        self.component_D = 0.0
 
         self.pump_mode = "Off"
 
