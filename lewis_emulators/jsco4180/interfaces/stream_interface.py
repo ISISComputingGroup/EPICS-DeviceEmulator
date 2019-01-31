@@ -31,11 +31,12 @@ class Jsco4180StreamInterface(StreamInterface):
             CmdBuilder(self.set_file_open).int().escape(" openfile").build(),
             CmdBuilder(self.set_file_close).escape("closefile").build(),
             CmdBuilder(self.get_program_runtime).escape("current_time load p").eos().build(),
-            CmdBuilder(self.get_composition_a).escape("compa load p").eos().build(),
-            CmdBuilder(self.get_composition_b).escape("compb load p").eos().build(),
-            CmdBuilder(self.get_composition_c).escape("compc load p").eos().build(),
-            CmdBuilder(self.get_composition_d).escape("compd load p").eos().build(),
-            CmdBuilder(self.set_composition).float().escape(" ").float().escape(" ").float().escape(" ").float().escape(" comp set").build(),
+            CmdBuilder(self.get_component_a).escape("compa load p").eos().build(),
+            CmdBuilder(self.get_component_b).escape("compb load p").eos().build(),
+            CmdBuilder(self.get_component_c).escape("compc load p").eos().build(),
+            CmdBuilder(self.get_component_d).escape("compd load p").eos().build(),
+            CmdBuilder(self.set_composition).float().escape(" ").float().escape(" ").float().escape(" ").float()
+                                            .escape(" comp set").build(),
             CmdBuilder(self.get_error).escape("trouble load p").eos().build(),
             CmdBuilder(self.set_error).escape("0 trouble set").build(),
             CmdBuilder(self.set_pump).int().escape(" pump set").eos().build(),
@@ -141,27 +142,27 @@ class Jsco4180StreamInterface(StreamInterface):
         return self.device.program_runtime
 
     @if_connected
-    def get_composition_a(self):
-        return self.device.composition_A
+    def get_component_a(self):
+        return self.device.component_A
 
     @if_connected
-    def get_composition_b(self):
-        return self.device.composition_B
+    def get_component_b(self):
+        return self.device.component_B
 
     @if_connected
-    def get_composition_c(self):
-        return self.device.composition_C
+    def get_component_c(self):
+        return self.device.component_C
 
     @if_connected
-    def get_composition_d(self):
-        return self.device.composition_D
+    def get_component_d(self):
+        return self.device.component_D
 
     @if_connected
     def set_composition(self, ramptime, a, b, c):
-        self.device.composition_A = a
-        self.device.composition_B = b
-        self.device.composition_C = c
-        self.device.composition_D = 100 - (a + b + c)
+        self.device.component_A = a
+        self.device.component_B = b
+        self.device.component_C = c
+        self.device.component_D = 100 - (a + b + c)
         return self.out_terminator
 
     @if_connected
