@@ -6,11 +6,12 @@ from lewis_emulators.utils.replies import conditional_reply
 
 if_connected = conditional_reply("connected")
 
+
 @has_log
 class WbvalveStreamInterface(StreamInterface):
 
-    in_terminator = '\n'
-    out_terminator = '\n'
+    in_terminator = '\r\n'
+    out_terminator = '\r\n'
 
     def __init__(self):
 
