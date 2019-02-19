@@ -14,7 +14,7 @@ class MezfliprStreamInterface(StreamInterface):
     """
 
     in_terminator = ""
-    out_terminator = ""
+    out_terminator = ":"
 
     commands = {
         CmdBuilder("get_idn").escape("*IDN?").eos().build(),
