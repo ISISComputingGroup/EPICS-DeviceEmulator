@@ -157,7 +157,7 @@ class SignalServer(object):
                     if "?" in str(data):
                         client.send(("file_a "+str(self.parent.filename_A)+":").encode('utf-8'))
                     else:
-                        data = str(data,'utf-8').replace(" ","")
+                        data = str(data).encode('utf-8').replace(" ","")
                         self.fn_a.emit(data.replace("file_a",""))
                         client.send("file_a:".encode('utf-8'))
                 if data and "toggle" in str(data):
@@ -189,6 +189,8 @@ class SignalServer(object):
                 #return True
             except BaseException:
                 #client.shutdown(socket.SHUT_RDWR)
+                import traceback
+                traceback.print_exc()
                 client.close()
                 return False
                 

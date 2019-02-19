@@ -28,7 +28,7 @@ sys.modules["flippr_3"] = fake_flippr_module
 
 class _UpdatedValue(object):
     """
-    This class fake-implements the interface of a pyqtsignal.
+    This class fake-implements the interface of pyqtsignal (emit()) and the "parent" object (value())
     """
     def __init__(self, init_val):
         self._val = init_val
@@ -39,8 +39,15 @@ class _UpdatedValue(object):
     def emit(self, value):
         self._val = value
 
+    def __str__(self):
+        return str(self._val)
+
 
 class _Parent(object):
+    """
+    Fake "parent" object. I don't know what type this is meant to have, but all that it actually requires is some
+    member attributes which have a .value() method.
+    """
     def __init__(self):
         self.comp_spin_P = _UpdatedValue(0)
         self.comp_spin_A = _UpdatedValue(0)
