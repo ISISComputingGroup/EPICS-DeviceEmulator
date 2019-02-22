@@ -1,3 +1,15 @@
+#
+#
+# Note: This is the control code for the Mezei flipper, provided by the instrument scientists.
+# The only modifications made from the original are:
+# - str("something", "utf-8") -> str("something").encode("utf-8") for python 2 compatibility
+# - print exceptions when they are triggered in the command-line interface
+#
+# These minimal changes mean that we can use this as an emulator, using the exact communication code that the
+# actual flipper uses.
+#
+
+
 from DAQTasks_2flippers import *  # pylint: disable=W0614
 from flippr_3 import *  # pylint: disable=W0614
 from PyQt5 import QtWidgets, QtCore, QtNetwork
