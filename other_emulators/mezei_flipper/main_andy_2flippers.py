@@ -150,7 +150,7 @@ class SignalServer(object):
                     if "?" in str(data):
                         client.send(("file_p "+str(self.parent.filename_P)+":").encode('utf-8'))
                     else:
-                        data = str(data,'utf-8').replace(" ","")
+                        data = str(data).encode("utf-8").replace(" ","")
                         self.fn_p.emit(data.replace("file_p",""))
                         client.send("file_p:".encode('utf-8'))
                 if data and "file_a" in str(data):
