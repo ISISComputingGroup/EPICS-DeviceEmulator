@@ -9,7 +9,9 @@ class SimulatedKnrk6(StateMachineDevice):
         """
         Initialize all of the device's attributes.
         """
-        pass
+        self.connected = True
+        self.position = 1  # Home position
+        self.valve_type = 'VALVE 6'
 
     def _get_state_handlers(self):
         return {
@@ -23,3 +25,5 @@ class SimulatedKnrk6(StateMachineDevice):
         return OrderedDict([
         ])
 
+    def reset(self):
+        self._initialize_data()
