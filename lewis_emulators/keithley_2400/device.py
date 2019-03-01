@@ -118,7 +118,7 @@ class SimulatedKeithley2400(StateMachineDevice):
 
         if self._resistance_mode == ResistanceMode.MANUAL:
             # Restrict the current if we're in current compliance mode. Similarly for voltage
-            if new_current < self.current_compliance or self._source_mode == SourceMode.VOLTAGE:
+            if new_current < self._current_compliance or self._source_mode == SourceMode.VOLTAGE:
                 self.current = new_current
             if new_voltage < self._voltage_compliance or self._source_mode == SourceMode.CURRENT:
                 self.voltage = new_voltage
