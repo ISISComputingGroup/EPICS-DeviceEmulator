@@ -46,6 +46,8 @@ class SimulatedIndfurn(StateMachineDevice):
 
         self.sample_holder_material = SampleHolderMaterials.ALUMINIUM
 
+        self.thermocouple_1_fault, self.thermocouple_2_fault = 0, 0
+
     def _get_state_handlers(self):
         return {'default': DefaultState()}
 

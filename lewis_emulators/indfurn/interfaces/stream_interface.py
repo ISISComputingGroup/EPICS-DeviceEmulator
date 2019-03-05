@@ -83,6 +83,11 @@ class IndfurnStreamInterface(StreamInterface):
 
         CmdBuilder("get_sample_holder_material").escape("?sHold").eos().build(),
         CmdBuilder("set_sample_holder_material").escape(">sHold ").string().eos().build(),
+
+        CmdBuilder("get_tc_fault").escape("?faultTC").eos().build(),
+        CmdBuilder("get_tc2_fault").escape("?fltTC2").eos().build(),
+
+
     }
 
     in_terminator = "\r\n"
@@ -276,3 +281,9 @@ class IndfurnStreamInterface(StreamInterface):
             return "<ack"
         except KeyError:
             return "<nak"
+
+    def get_tc_fault(self):
+        return "<faulttc {}".format(self.device.thermocouple_1_fault)
+
+    def get_tc2_fault(self):
+        return "<faulttc2 {}".format(self.device.thermocouple_2_fault)
