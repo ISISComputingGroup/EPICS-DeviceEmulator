@@ -3,6 +3,16 @@ from states import DefaultState
 from lewis.devices import StateMachineDevice
 
 
+class SampleHolderMaterials(object):
+    ALUMINIUM = 0
+    GLASSY_CARBON = 1
+    GRAPHITE = 2
+    QUARTZ = 3
+    SINGLE_CRYSTAL_SAPPHIRE = 4
+    STEEL = 5
+    VANADIUM = 6
+
+
 class SimulatedIndfurn(StateMachineDevice):
 
     def _initialize_data(self):
@@ -28,11 +38,15 @@ class SimulatedIndfurn(StateMachineDevice):
 
         self.remote_mode = True
         self.power_supply_on = True
-        self.power_supply_fan_on = True
+        self.sample_area_led_on = True
         self.hf_on = False
 
         self.psu_overtemp, self.psu_overvolt = False, False
         self.cooling_water_flow = 100
+
+        self.sample_holder_material = SampleHolderMaterials.ALUMINIUM
+
+        self.thermocouple_1_fault, self.thermocouple_2_fault = 0, 0
 
     def _get_state_handlers(self):
         return {'default': DefaultState()}

@@ -1,7 +1,19 @@
 from lewis.adapters.stream import StreamInterface
 from lewis.core.logging import has_log
 
+from lewis_emulators.indfurn.device import SampleHolderMaterials
 from lewis_emulators.utils.command_builder import CmdBuilder
+
+
+SAMPLE_HOLDER_MATERIALS = {
+    "aluminium": SampleHolderMaterials.ALUMINIUM,
+    "glassy_carbon": SampleHolderMaterials.GLASSY_CARBON,
+    "graphite": SampleHolderMaterials.GRAPHITE,
+    "quartz": SampleHolderMaterials.QUARTZ,
+    "single_crystal_sapphire": SampleHolderMaterials.SINGLE_CRYSTAL_SAPPHIRE,
+    "steel": SampleHolderMaterials.STEEL,
+    "vanadium": SampleHolderMaterials.VANADIUM,
+}
 
 
 @has_log
@@ -23,6 +35,7 @@ class IndfurnStreamInterface(StreamInterface):
         CmdBuilder("set_output").escape(">pidOUTM ").float().eos().build(),
 
         CmdBuilder("get_thermocouple_temperature").escape("?tempTC").eos().build(),
+        CmdBuilder("get_thermocouple2_temperature").escape("?tmpTC2").eos().build(),
         CmdBuilder("get_pipe_temperature").escape("?tempP").eos().build(),
         CmdBuilder("get_capacitor_bank_temperature").escape("?tempC").eos().build(),
         CmdBuilder("get_fet_temperature").escape("?tempS").eos().build(),
@@ -47,9 +60,9 @@ class IndfurnStreamInterface(StreamInterface):
         CmdBuilder("set_psu_off").escape(">powOFF").eos().build(),
         CmdBuilder("get_psu_power").escape("?powOnOff").eos().build(),
 
-        CmdBuilder("set_psu_fan_on").escape(">fanON").eos().build(),
-        CmdBuilder("set_psu_fan_off").escape(">fanOFF").eos().build(),
-        CmdBuilder("get_fan_power").escape("?fanOnOff").eos().build(),
+        CmdBuilder("set_led_on").escape(">ledON").eos().build(),
+        CmdBuilder("set_led_off").escape(">ledOFF").eos().build(),
+        CmdBuilder("get_led").escape("?ledOnOff").eos().build(),
 
         CmdBuilder("set_hf_on").escape(">oscON").eos().build(),
         CmdBuilder("set_hf_off").escape(">oscOFF").eos().build(),
@@ -67,6 +80,14 @@ class IndfurnStreamInterface(StreamInterface):
         CmdBuilder("set_runmode_on").escape(">pidRUN").eos().build(),
         CmdBuilder("set_runmode_off").escape(">pidSTP").eos().build(),
         CmdBuilder("get_runmode").escape("?pidRUN").eos().build(),
+
+        CmdBuilder("get_sample_holder_material").escape("?sHold").eos().build(),
+        CmdBuilder("set_sample_holder_material").escape(">sHold ").string().eos().build(),
+
+        CmdBuilder("get_tc_fault").escape("?faultTC").eos().build(),
+        CmdBuilder("get_tc2_fault").escape("?fltTC2").eos().build(),
+
+
     }
 
     in_terminator = "\r\n"
@@ -125,6 +146,9 @@ class IndfurnStreamInterface(StreamInterface):
 
     def get_thermocouple_temperature(self):
         return "<temptc {:.2f}".format(self.device.setpoint)
+
+    def get_thermocouple2_temperature(self):
+        return "<temptc2 {:.2f}".format(self.device.setpoint)
 
     def get_pipe_temperature(self):
         return "<tempp {:.2f}".format(self.device.pipe_temperature)
@@ -205,12 +229,12 @@ class IndfurnStreamInterface(StreamInterface):
         self.device.power_supply_on = False
         return "<ack"
 
-    def set_psu_fan_on(self):
-        self.device.power_supply_fan_on = True
+    def set_led_on(self):
+        self.device.sample_area_led_on = True
         return "<ack"
 
-    def set_psu_fan_off(self):
-        self.device.power_supply_fan_on = False
+    def set_led_off(self):
+        self.device.sample_area_led_on = False
         return "<ack"
 
     def set_hf_on(self):
@@ -238,8 +262,28 @@ class IndfurnStreamInterface(StreamInterface):
     def get_psu_power(self):
         return "<{}".format("on" if self.device.power_supply_on else "off")
 
-    def get_fan_power(self):
-        return "<{}".format("on" if self.device.power_supply_fan_on else "off")
+    def get_led(self):
+        return "<{}".format("on" if self.device.sample_area_led_on else "off")
 
     def get_hf_power(self):
         return "<{}".format("on" if self.device.hf_on else "off")
+
+    def get_sample_holder_material(self):
+        for k, v in SAMPLE_HOLDER_MATERIALS.items():
+            if v == self.device.sample_holder_material:
+                return "<{}".format(k)
+        else:
+            return "<nak"
+
+    def set_sample_holder_material(self, material):
+        try:
+            self.device.sample_holder_material = SAMPLE_HOLDER_MATERIALS[material]
+            return "<ack"
+        except KeyError:
+            return "<nak"
+
+    def get_tc_fault(self):
+        return "<faulttc {}".format(self.device.thermocouple_1_fault)
+
+    def get_tc2_fault(self):
+        return "<faulttc2 {}".format(self.device.thermocouple_2_fault)
