@@ -1,6 +1,10 @@
 from lewis.adapters.stream import StreamInterface, Cmd
 
 from lewis_emulators.utils.command_builder import CmdBuilder
+from lewis_emulators.utils.replies import conditional_reply
+
+if_connected = conditional_reply('connected')
+if_input_error = conditional_reply('input_correct', "ER,OF,00")
 
 
 class KeylkgStreamInterface(StreamInterface):
@@ -22,6 +26,7 @@ class KeylkgStreamInterface(StreamInterface):
             CmdBuilder(self.get_value_output).escape("M").int().eos().build(),
         }
 
+    @if_connected
     def get_value_output(self, output):
         # Example numbers to measure
         if output == 0:
@@ -31,6 +36,7 @@ class KeylkgStreamInterface(StreamInterface):
         elif output == 2:
             return "M2,{0}".format(self.device.output2_value)
 
+    @if_connected
     def set_measurement_mode(self, head, function):
         if head == 1:
             self.device.head1_measurement_mode = function
@@ -38,12 +44,15 @@ class KeylkgStreamInterface(StreamInterface):
             self.device.head2_measurement_mode = function
         return "SW,HB"
 
+    @if_connected
     def get_measurement_mode(self, head):
         if head == 1:
             return "SR,HB,1,{0}".format(self.device.head1_measurement_mode)
         elif head == 2:
             return "SR,HB,2,{0}".format(self.device.head2_measurement_mode)
 
+    @if_connected
+    @if_input_error
     def set_offset(self, output, offset_value):
         if output == 0:
             self.device.output1_offset = offset_value
@@ -54,20 +63,24 @@ class KeylkgStreamInterface(StreamInterface):
             self.device.output2_offset = offset_value
         return "SW,OF"
 
+    @if_connected
     def get_offset(self, output):
         if output == 1:
             return "SR,OF,1,{0}".format(self.device.output1_offset)
         elif output == 2:
             return "SR,OF,2,{0}".format(self.device.output2_offset)
 
+    @if_connected
     def set_communication_mode(self):
-        self.device.mode = "COMMUNICATION"
+        self.device.mode = "SET-UP"
         return "Q0"
 
+    @if_connected
     def set_normal_mode(self):
-        self.device.mode = "NORMAL"
+        self.device.mode = "MEASURE"
         return "R0"
 
+    @if_connected
     def reset_measurement_mode(self, output):
         if output == 1:
             self.device.output1_value = 0.0

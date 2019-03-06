@@ -1,6 +1,6 @@
 import math
 import random
-import time
+
 from collections import OrderedDict
 from states import DefaultState
 from lewis.devices import StateMachineDevice
@@ -12,7 +12,10 @@ class SimulatedKeylkg(StateMachineDevice):
         """
         Initialize all of the device's attributes.
         """
-        self.mode = "NORMAL"
+        self.connected = True
+        self.input_correct = True
+
+        self.mode = "MEASURE"
         self.out_number = 0
 
         self.output1_offset = 0.0
@@ -21,13 +24,14 @@ class SimulatedKeylkg(StateMachineDevice):
         self.head1_measurement_mode = 0
         self.head1_measurement_mode = 0
 
+    # Generate random measurement data
     @property
     def output1_value(self):
-        return float(math.sin(random.randint(0, 10))) - self.output2_offset
+        return round(float(math.sin(random.randint(0, 10))) - self.output1_offset, 4)
 
     @property
     def output2_value(self):
-        return float(math.sin(random.randint(0, 10))) - self.output2_offset
+        return round(float(math.sin(random.randint(0, 10))) - self.output2_offset, 4)
 
     def _get_state_handlers(self):
         return {
