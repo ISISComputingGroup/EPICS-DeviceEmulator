@@ -59,7 +59,7 @@ class _Parent(object):
         self.DeltaT_A = _UpdatedValue(0)
         self.filename_P = _UpdatedValue("C:\\file_p.txt")
         self.filename_A = _UpdatedValue("C:\\file_a.txt")
-        self.running = _UpdatedValue(True)
+        self.running = _UpdatedValue(0)
 
 
 from main_andy_2flippers import SignalServer
