@@ -10,6 +10,8 @@ class SimulatedKnrk6(StateMachineDevice):
         Initialize all of the device's attributes.
         """
         self.connected = True
+        self.input_correct = True
+
         self.position = 1  # Home position
         self.valve_type = 'VALVE 6'
 

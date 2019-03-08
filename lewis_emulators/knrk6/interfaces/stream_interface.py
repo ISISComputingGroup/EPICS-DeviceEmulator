@@ -4,6 +4,7 @@ from lewis_emulators.utils.command_builder import CmdBuilder
 from lewis_emulators.utils.replies import conditional_reply
 
 if_connected = conditional_reply('connected')
+if_input_error = conditional_reply('input_correct', "E2")
 
 
 class Knrk6StreamInterface(StreamInterface):
@@ -30,6 +31,7 @@ class Knrk6StreamInterface(StreamInterface):
         return self.device.position
 
     @if_connected
+    @if_input_error
     def set_position(self, position):
         self.device.position = position
         return "OK"
