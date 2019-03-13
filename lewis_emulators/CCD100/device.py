@@ -7,6 +7,7 @@ from collections import OrderedDict
 class SimulatedCCD100(StateMachineDevice):
 
     def _initialize_data(self):
+        self.connected = True
         self.address = "a"
         self.setpoint = 0.00
         self.units = ""

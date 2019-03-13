@@ -59,7 +59,7 @@ class Sp2XXStreamInterface(StreamInterface):
             CmdBuilder(self.get_diameter).escape("dia?").eos().build(),
             CmdBuilder(self.set_diameter).escape("dia ").float().eos().build(),
             CmdBuilder(
-                self.set_volume_or_rate).arg("vol|rate").char().escape(" ").float().escape(" ").string().eos().build(),
+                self.set_volume_or_rate).arg("vol|rate").char().escape(" ").float(str).escape(" ").string().eos().build(),
             CmdBuilder(self.get_volume_or_rate).arg("vol|rate").char().escape("?").eos().build()
         }
 

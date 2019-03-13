@@ -1,13 +1,14 @@
 import six
 
 
-def conditional_reply(property_name):
+def conditional_reply(property_name, reply=None):
     """
     Decorator that executes the command and replies if the device has a member called 'property name' and it is True in
     a boolean context
 
     Args:
         property_name: The name of the property to look for on the device
+        reply (str): Desired output reply string when condition is false
 
     Returns:
        The function returns as normal if property is true. The command is not executed and there is no reply if
@@ -36,7 +37,7 @@ def conditional_reply(property_name):
 
             try:
                 do_reply = getattr(device, property_name)
-                return func(self, *args, **kwargs) if do_reply else None
+                return func(self, *args, **kwargs) if do_reply else reply
             except AttributeError:
                 raise AttributeError(
                     "Expected device to contain an attribute called '{}' but it wasn't found.".format(property_name))

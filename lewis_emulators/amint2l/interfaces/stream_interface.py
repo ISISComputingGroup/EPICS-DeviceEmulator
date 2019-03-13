@@ -6,7 +6,9 @@ from lewis.adapters.stream import StreamInterface
 from lewis.core.logging import has_log
 
 from lewis_emulators.utils.command_builder import CmdBuilder
+from lewis_emulators.utils.replies import conditional_reply
 
+if_connected = conditional_reply("connected")
 
 @has_log
 class Amint2lStreamInterface(StreamInterface):
@@ -24,6 +26,7 @@ class Amint2lStreamInterface(StreamInterface):
             CmdBuilder(self.get_pressure).stx().arg("[A-Fa-f0-9]+").escape("r").build()
         }
 
+    @if_connected
     def handle_error(self, request, error):
         """
         If command is not recognised print and error
@@ -35,6 +38,7 @@ class Amint2lStreamInterface(StreamInterface):
         """
         self.log.error("An error occurred at request " + repr(request) + ": " + repr(error))
 
+    @if_connected
     def get_pressure(self, address):
 
         """

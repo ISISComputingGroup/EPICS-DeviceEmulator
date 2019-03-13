@@ -13,6 +13,8 @@ class SimulatedEurotherm(StateMachineDevice):
         """
         Sets the initial state of the device.
         """
+        self.connected = True
+
         self._current_temperature = 0.0
         self._setpoint_temperature = 0.0
         self._ramp_setpoint_temperature = 0.0

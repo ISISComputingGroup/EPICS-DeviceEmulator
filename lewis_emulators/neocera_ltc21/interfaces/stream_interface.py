@@ -74,7 +74,7 @@ class NeoceraStreamInterface(StreamInterface):
             return "{0:8f}{1:1s}".format(device_value, unit)
 
         except (IndexError, ValueError, TypeError):
-            print "Error: invalid sensor number requested '{0}'".format(item_number)
+            print("Error: invalid sensor number requested '{0}'".format(item_number))
             self._device.error = NeoceraDeviceErrors(NeoceraDeviceErrors.BAD_PARAMETER)
             return ""
 
@@ -99,7 +99,7 @@ class NeoceraStreamInterface(StreamInterface):
 
             self._device.setpoints[output_index] = setpoint
         except (IndexError, ValueError, TypeError):
-            print "Error: invalid output number, '{0}', or setpoint value, '{1}'".format(output_number, value)
+            print("Error: invalid output number, '{0}', or setpoint value, '{1}'".format(output_number, value))
             self._device.error = NeoceraDeviceErrors(NeoceraDeviceErrors.BAD_PARAMETER)
             return ""
 
@@ -127,7 +127,7 @@ class NeoceraStreamInterface(StreamInterface):
             return output_config
 
         except (IndexError, ValueError, TypeError):
-            print "Error: invalid output number, '{0}'".format(output_number)
+            print("Error: invalid output number, '{0}'".format(output_number))
             device.error = NeoceraDeviceErrors(NeoceraDeviceErrors.BAD_PARAMETER)
             return ""
 
@@ -168,8 +168,8 @@ class NeoceraStreamInterface(StreamInterface):
             self._device.control[output_index] = control_type
 
         except (IndexError, ValueError, TypeError):
-            print "Error: invalid control type number for output {output}, '{0}'".format(
-                control_type_number, output=output_index)
+            print("Error: invalid control type number for output {output}, '{0}'".format(
+                control_type_number, output=output_index))
             device.error = NeoceraDeviceErrors(NeoceraDeviceErrors.BAD_PARAMETER)
 
     def get_heater(self):
@@ -206,7 +206,7 @@ class NeoceraStreamInterface(StreamInterface):
                 return "{pid_output};{gain:f};{offset:f}".format(pid_output=pid_output, **device.pid[output_index])
 
         except (IndexError, ValueError, TypeError):
-            print "Error: invalid output number, '{output}'".format(output=output_number)
+            print("Error: invalid output number, '{output}'".format(output=output_number))
             device.error = NeoceraDeviceErrors(NeoceraDeviceErrors.BAD_PARAMETER)
 
     def set_pid_heater(self, p, i, d, fixed_power, limit):
@@ -229,7 +229,7 @@ class NeoceraStreamInterface(StreamInterface):
             pid_settings["limit"] = limit_as_float
 
         except (IndexError, ValueError, TypeError):
-            print "Error: in pid settings for heater"
+            print("Error: in pid settings for heater")
             self._device.error = NeoceraDeviceErrors(NeoceraDeviceErrors.BAD_PARAMETER)
 
     def set_pid_analog(self, p, i, d, fixed_power, gain, offset):
@@ -251,7 +251,7 @@ class NeoceraStreamInterface(StreamInterface):
             pid_settings["offset"] = float(offset)
 
         except (IndexError, ValueError, TypeError):
-            print "Error: in pid settings for analog"
+            print("Error: in pid settings for analog")
             self._device.error = NeoceraDeviceErrors(NeoceraDeviceErrors.BAD_PARAMETER)
 
     def _set_pid(self, p, i, d, fixed_power, pid_settings):
