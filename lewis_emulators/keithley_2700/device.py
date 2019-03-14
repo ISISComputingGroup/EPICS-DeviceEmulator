@@ -23,12 +23,15 @@ class SimulatedKeithley2700(StateMachineDevice):
 
     def _initialize_data(self):
         """
-        Initialize all of the device's attributes.
+        Initialize the device's attributes necessary for testing.
         """
         self.idn = "KEITHLEY"               # Device name 
         self.buffer = []                    # The buffer in which samples are stored
         self.buffer_autoclear_on = False    # when false, new readings appended to old readings in buffer
         self.buffer_size = 1000             # size of buffer which holds read data default 1000
+        # The below attributes are not used but are needed for the stream interface
+        self.bytes_available = 0
+        self.bytes_used = 0
 
     def get_next_buffer_location(self):
         if not self.is_buffer_full():
