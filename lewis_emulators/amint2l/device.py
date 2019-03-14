@@ -13,6 +13,7 @@ class SimulatedAmint2l(StateMachineDevice):
         """
         Sets the initial state of the device.
         """
+        self.connected = True
         self.pressure = 2.0
         self.address = "AB"
 

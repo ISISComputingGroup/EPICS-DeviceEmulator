@@ -13,6 +13,8 @@ class SimulatedCybaman(StateMachineDevice):
         """
         Sets the initial state of the device.
         """
+        self.connected = True
+
         self.a_setpoint = 0
         self.b_setpoint = 0
         self.c_setpoint = 0

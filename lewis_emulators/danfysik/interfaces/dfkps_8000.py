@@ -10,7 +10,6 @@ from .dfkps_base import CommonStreamInterface
 
 __all__ = ["Danfysik8000StreamInterface"]
 
-
 @has_log
 class Danfysik8000StreamInterface(CommonStreamInterface, StreamInterface):
     """

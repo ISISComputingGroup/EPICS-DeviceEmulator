@@ -17,11 +17,14 @@ class SimulatedDanfysik(StateMachineDevice):
     """
     Simulated Danfysik.
     """
-
+    
     def _initialize_data(self):
         """
         Sets the initial state of the device.
         """
+        self.comms_initialized = False
+        self.device_available = True
+
         self.field = 0
         self.field_sp = 0
 
@@ -34,8 +37,6 @@ class SimulatedDanfysik(StateMachineDevice):
 
         # Use a list of active interlocks because each danfysik has different sets of interlocks which can be enabled.
         self.active_interlocks = []
-
-        self.comms_initialized = False
 
     def enable_interlock(self, name):
         """

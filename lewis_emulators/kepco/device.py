@@ -2,6 +2,7 @@ from lewis.devices import StateMachineDevice
 from collections import OrderedDict
 from .states import DefaultState
 
+
 class SimulatedKepco(StateMachineDevice):
     """
     Simulated Kepco
@@ -18,6 +19,7 @@ class SimulatedKepco(StateMachineDevice):
         self._output_mode = 0
         self._output_status = 0
         self._idn = "000000000000000000000000000000000000000"
+        self.connected = True
 
     def _get_state_handlers(self):
         """
@@ -137,3 +139,6 @@ class SimulatedKepco(StateMachineDevice):
         :param status: set Output status
         """
         self._output_status = status
+
+    def reset(self):
+        self._initialize_data()

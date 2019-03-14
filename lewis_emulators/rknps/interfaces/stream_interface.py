@@ -1,6 +1,10 @@
 from lewis.adapters.stream import StreamInterface, Cmd
 from lewis.core.logging import has_log
+from lewis_emulators.utils.command_builder import CmdBuilder
 
+from lewis_emulators.utils.replies import conditional_reply
+
+if_connected = conditional_reply("connected")
 
 @has_log
 class RknpsStreamInterface(StreamInterface):
@@ -12,18 +16,23 @@ class RknpsStreamInterface(StreamInterface):
     out_terminator = "\n\r"
 
     commands = {
-        Cmd("set_adr", "^ADR (001|002)$"),
-        Cmd("get_adr", "^ADR$"),
-        Cmd("get_ra", "^RA$"),
-        Cmd("get_adc", "^AD (\d)"),
-        Cmd("get_cmd", "^CMD$"),
-        Cmd("set_cmd", "^(LOC|REM)$"),
-        Cmd("get_pol", "^PO$"),
-        Cmd("set_pol", "^(\+|-)$"),
-        Cmd("get_status", "^S1$"),
-        Cmd("set_power", "^(F|N)$"),
-        Cmd("set_da", "^DA (\d) (-?\d+)$"),
-        Cmd("reset", "^RS$")
+        CmdBuilder("get_voltage").escape("AD 2").eos().build(),
+        CmdBuilder("get_current").escape("AD 8").eos().build(),
+        CmdBuilder("set_current").escape("WA ").int().eos().build(),
+        CmdBuilder("get_ra").escape("RA").eos().build(),
+
+        CmdBuilder("set_power").arg("F|N").eos().build(),
+        CmdBuilder("reset").escape("RS").eos().build(),
+        CmdBuilder("get_status").escape("S1").eos().build(),
+
+        CmdBuilder("get_pol").escape("PO").eos().build(),
+        CmdBuilder("set_pol").escape("PO ").arg("\+|-").eos().build(),
+
+        CmdBuilder("get_cmd").escape("CMD").eos().build(),
+        CmdBuilder("set_cmd").arg("LOC|REM").eos().build(),
+
+        CmdBuilder("get_adr").escape("ADR").eos().build(),
+        CmdBuilder("set_adr").escape("ADR ").any().eos().build(),
     }
 
     def handle_error(self, request, error):
@@ -34,8 +43,12 @@ class RknpsStreamInterface(StreamInterface):
             request: requested string.
             error: problem.
         """
-        print "An error occurred at request " + repr(request) + ": " + repr(error)
+        err = "An error occurred at request '{}': {}".format(request, error)
+        print(err)
+        self.log.error(err)
+        return err
 
+    @if_connected
     def set_adr(self, address):
         """
         Sets the active address.
@@ -43,51 +56,50 @@ class RknpsStreamInterface(StreamInterface):
         Args:
             address: The address to use for the following commands.
         """
-        self._device._active_adr = address
+        self._device.set_adr(address)
 
+    @if_connected
     def get_adr(self):
         """
         Gets the active address.
 
         Returns: a string address.
         """
-        return "{0}".format(self._device.adr)
+        return "{}".format(self._device.get_adr())
 
+    @if_connected
     def get_ra(self):
         """
         Gets the value for RA.
 
         Returns: a number in 10e-4 Amps.
         """
-        return "{0}".format(self._device.ra)
+        return "{:d}".format(int(self._device.get_current()))
 
-    def get_adc(self, channel):
+    @if_connected
+    def get_voltage(self):
         """
-        Get the value for the specified AD.
-
-        Uses the default channels of 0 for current and 8 for voltage.
-
-        Args:
-            channel: The AD to return.
-
-        Returns: a number in either 10e-4 Amps, or in Volts.
+        Gets the voltage of the power supply.
         """
-        if channel == "2":
-            # Channel 2 is the AD for the voltage
-            return "{0}".format(self._device.ad_volt)
-        elif channel == "8":
-            # Channel 8 is the AD for the current
-            return "{0}".format(self._device.ad_curr)
-        # All other channels are not considered under the requirements of this emulator
+        return "{:d}".format(int(self._device.get_voltage()))
 
+    @if_connected
+    def get_current(self):
+        """
+        Gets the current of the power supply.
+        """
+        return "{:d}".format(int(self._device.get_current()))
+
+    @if_connected
     def get_cmd(self):
         """
         Check whether the device is in Local/Remote mode.
 
         Returns: LOC for local mode, REM for remote mode.
         """
-        return "{0}".format(self._device.cmd)
+        return "REM" if self.device.is_in_remote_mode() else "LOC"
 
+    @if_connected
     def set_cmd(self, cmd):
         """
         Sets the active address to be in local or remote mode.
@@ -95,16 +107,23 @@ class RknpsStreamInterface(StreamInterface):
         Args:
             cmd: The mode to set.
         """
-        self._device._cmd[self._device._active_adr] = cmd
+        if cmd == "REM":
+            self._device.set_in_remote_mode(True)
+        elif cmd == "LOC":
+            self._device.set_in_remote_mode(False)
+        else:
+            raise ValueError("Invalid argument to set_cmd")
 
+    @if_connected
     def get_pol(self):
         """
         Get the polarity of the device.
 
         Returns: The polarity as +/-.
         """
-        return "{0}".format(self._device.pol)
+        return "+" if self._device.is_polarity_positive() else "-"
 
+    @if_connected
     def set_pol(self, pol):
         """
         Set the polarity of the device.
@@ -112,16 +131,25 @@ class RknpsStreamInterface(StreamInterface):
         Args:
             pol: The polarity to set.
         """
-        self._device._pol[self._device._active_adr] = pol
+        if pol == "+":
+            self._device.set_polarity(True)
+        elif pol == "-":
+            self._device.set_polarity(False)
+        else:
+            raise ValueError("Invalid argument to set_polarity")
 
+    @if_connected
     def get_status(self):
         """
         Get the status of the device.
 
         Returns: A character string for the status.
         """
-        return "{0}".format(self._device.status)
+        power = "." if self._device.is_power_on() else "!"
+        interlock = "!" if self._device.is_interlock_active() else "."
+        return "{}........{}..............".format(power, interlock)
 
+    @if_connected
     def set_power(self, power):
         """
         Turn the output power of the PSU on or off.
@@ -129,23 +157,26 @@ class RknpsStreamInterface(StreamInterface):
         Args:
             power: Whether to turn the PSU oN or ofF.
         """
-        self._device.set_power(power)
+        if power == "N":
+            self._device.set_power(True)
+        elif power == "F":
+            self._device.set_power(False)
+        else:
+            raise ValueError("Invalid argument to set_power")
 
-    def set_da(self, channel, value):
+    @if_connected
+    def set_current(self, value):
         """
         Set a value for the appropriate DA.
 
         Considers only the channel for current.
 
         Args:
-            channel: The DA to apply the value to.
             value: The value to apply.
         """
-        if channel == "0":
-            # Channel 0 is the DA for the current
-            self._device.set_current(int(value))
-        # All other channels are not considered under the requirements of this emulator
+        self._device.set_current(float(value))
 
+    @if_connected
     def reset(self):
         """
         Reset the device, turn it off and set all values to 0.
