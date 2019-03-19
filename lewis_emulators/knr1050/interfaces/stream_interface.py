@@ -5,6 +5,7 @@ from lewis_emulators.utils.replies import conditional_reply
 from lewis_emulators.utils.command_builder import CmdBuilder
 
 if_connected = conditional_reply('connected')
+if_input_error = conditional_reply('input_correct', "ERROR:20,Instrument in standalone mode")
 
 
 @has_log
@@ -18,16 +19,22 @@ class Knr1050StreamInterface(StreamInterface):
         super(Knr1050StreamInterface, self).__init__()
         # Commands that we expect via serial during normal operation
         self.commands = {
-            CmdBuilder(self.get_status).escape("STATUS?").build(),
-            CmdBuilder(self.start_pump).escape("RAMP:0,").int().escape(",").int().escape(",").int().escape(",").int().escape(",").int().build(),
-            CmdBuilder(self.stop_pump).escape("STOP:1,0").build(),
-            CmdBuilder(self.stop_klv).escape("STOP:2").build(),
-            CmdBuilder(self.get_pressure_limits).escape("PLIM?").build(),
-            CmdBuilder(self.set_pressure_limits).escape("PLIM:").int().escape(",").int().build(),
-            CmdBuilder(self.get_remote_mode).escape("REMOTE?").build(),
+            CmdBuilder(self.get_status).escape("STATUS?").eos().build(),
+            CmdBuilder(self.start_pump).escape("RAMP:0,").int().escape(",").int().escape(",").int().escape(",").int()
+                                                         .escape(",").int().eos().build(),
+            CmdBuilder(self.stop_pump).escape("STOP:1,0").eos().build(),
+            CmdBuilder(self.stop_klv).escape("STOP:2").eos().build(),
+            CmdBuilder(self.get_pressure_limits).escape("PLIM?").eos().build(),
+            CmdBuilder(self.set_pressure_limits).escape("PLIM:").int().escape(",").int().eos().build(),
+            CmdBuilder(self.get_remote_mode).escape("REMOTE?").eos().build(),
             CmdBuilder(self.set_remote_mode).escape("REMOTE").eos().build(),
-            CmdBuilder(self.set_local_mode).escape("LOCAL").build()
+            CmdBuilder(self.set_local_mode).escape("LOCAL").eos().build(),
+            CmdBuilder(self.set_error).escape("ERROR:").int().escape(",").string().eos().build(),
         }
+
+    def set_error(self, error_number, error_string):
+        self.device.error_string = "ERROR{0},{1}".format(error_number, error_string)
+        return
 
     def handle_error(self, request, error):
         """
@@ -81,6 +88,7 @@ class Knr1050StreamInterface(StreamInterface):
         return 'OK'
 
     @if_connected
+    @if_input_error
     def get_pressure_limits(self):
         return "PLIM:{},{}".format(self.device.pressure_limit_low, self.device.pressure_limit_high)
 
