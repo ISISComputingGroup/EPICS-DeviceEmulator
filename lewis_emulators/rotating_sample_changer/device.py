@@ -1,9 +1,11 @@
+from lewis.core.logging import has_log
 from lewis.devices import StateMachineDevice
 from lewis.core.statemachine import State
-from states import MovingState, Errors
+from states import MovingState, Errors, SampleDroppedState
 from collections import OrderedDict
 
 
+@has_log
 class SimulatedSampleChanger(StateMachineDevice):
     MIN_CAROUSEL = 1
     MAX_CAROUSEL = 20
@@ -17,13 +19,15 @@ class SimulatedSampleChanger(StateMachineDevice):
         self.car_target = -1
         self.arm_lowered = False
         self.current_err = Errors.NO_ERR
+        self._drop_sample_on_next_move = False
 
     def _get_state_handlers(self):
         return {
             'init': State(),
             'initialising': MovingState(),
             'idle': State(),
-            'car_moving': MovingState()
+            'car_moving': MovingState(),
+            'sample_dropped': SampleDroppedState(),
         }
 
     def _get_initial_state(self):
@@ -33,8 +37,11 @@ class SimulatedSampleChanger(StateMachineDevice):
         return OrderedDict([
             (('init', 'initialising'), lambda: self.car_target > 0),
             (('initialising', 'idle'), lambda: self.car_pos == 1),
-            (('idle', 'car_moving'), lambda: self.car_target != self.car_pos),
-            (('car_moving', 'idle'), lambda: self.car_pos == self.car_target)])
+            (('idle', 'car_moving'), lambda: self.car_target != self.car_pos and not self.drop_sample_on_next_move),
+            (('idle', 'sample_dropped'), lambda: self.car_target != self.car_pos and self.drop_sample_on_next_move),
+            (('car_moving', 'idle'), lambda: self.car_pos == self.car_target),
+            (('sample_dropped', 'idle'), lambda: self.car_target != self.car_pos),
+        ])
 
     def is_car_at_one(self):
         return self.car_pos == self.MIN_CAROUSEL
@@ -96,3 +103,11 @@ class SimulatedSampleChanger(StateMachineDevice):
         self.car_target = self.MIN_CAROUSEL
         self.current_err = Errors.NO_ERR
         return Errors.NO_ERR
+
+    @property
+    def drop_sample_on_next_move(self):
+        return self._drop_sample_on_next_move
+
+    @drop_sample_on_next_move.setter
+    def drop_sample_on_next_move(self, value):
+        self._drop_sample_on_next_move = (bool(value) or value == "True")
