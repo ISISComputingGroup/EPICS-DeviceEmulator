@@ -22,6 +22,13 @@ class SimulatedLakeshore340(StateMachineDevice):
 
         self.p, self.i, self.d = 0, 0, 0
 
+        self.pid_mode = 1
+        self.loop_on = True
+
+        self.max_temp = 0
+        self.heater_output = 0
+        self.heater_range = 0
+
     def _get_state_handlers(self):
         return {'default': DefaultState()}
 
