@@ -55,6 +55,6 @@ class Dh2000StreamInterface(StreamInterface):
         shutter = self._device.shutter_is_open
         interlock = self._device.interlock_is_triggered
 
-        status_string = "{ACK}\n&A{shutter},&B0,I{intlock}!".format(ACK=self.ACK, shutter=int(shutter), intlock=int(interlock))
+        status_string = "{ACK}\n&A{shutter},B0,I{intlock}!".format(ACK=self.ACK, shutter=int(shutter), intlock=int(interlock))
 
         return status_string
