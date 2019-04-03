@@ -9,7 +9,13 @@ class SimulatedChtobisr(StateMachineDevice):
         """
         Initialize all of the device's attributes.
         """
-        pass
+
+        self.id = "Coherent OBIS Laser Remote - EMULATOR"
+        self.status = 00000000
+        self.faults = 00000000
+        self.interlock = "OFF"
+
+        self.connected = True
 
     def _get_state_handlers(self):
         return {
@@ -22,4 +28,3 @@ class SimulatedChtobisr(StateMachineDevice):
     def _get_transition_handlers(self):
         return OrderedDict([
         ])
-
