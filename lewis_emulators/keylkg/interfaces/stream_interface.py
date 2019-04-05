@@ -16,15 +16,28 @@ class KeylkgStreamInterface(StreamInterface):
         super(KeylkgStreamInterface, self).__init__()
         # Commands that we expect via serial during normal operation
         self.commands = {
-            CmdBuilder(self.set_communication_mode).escape("Q0").build(),
+            CmdBuilder(self.set_communication_mode).escape("Q0").eos().build(),
             CmdBuilder(self.set_normal_mode).escape("R0").build(),
-            CmdBuilder(self.reset_measurement_mode).escape("VR,").int().eos().build(),
-            CmdBuilder(self.set_offset).escape("SW,OF,").int().escape(",").float().build(),
+            CmdBuilder(self.set_offset).escape("SW,OF,").int().escape(",").float().eos().build(),
             CmdBuilder(self.get_offset).escape("SR,OF,").float().eos().build(),
-            CmdBuilder(self.set_measurement_mode).escape("SW,HB,").int().escape(",").int().build(),
+            CmdBuilder(self.set_measurement_mode).escape("SW,HB,").int().escape(",").int().eos().build(),
             CmdBuilder(self.get_measurement_mode).escape("SR,HB,").int().eos().build(),
             CmdBuilder(self.get_value_output).escape("M").int().eos().build(),
+            CmdBuilder(self.reset_output).escape("VR,").int().eos().build(),
         }
+
+    @if_connected
+    def reset_output(self, output):
+        if output == 0:
+            self.device.output1_raw_value = 0.0000
+            self.device.output2_raw_value = 0.0000
+            return "VR"
+        elif output == 1:
+            self.device.output1_raw_value = 0.0000
+            return "VR"
+        elif output == 2:
+            self.device.output2_raw_value = 0.0000
+            return "VR"
 
     @if_connected
     def get_value_output(self, output):
@@ -79,11 +92,3 @@ class KeylkgStreamInterface(StreamInterface):
     def set_normal_mode(self):
         self.device.mode = "MEASURE"
         return "R0"
-
-    @if_connected
-    def reset_measurement_mode(self, output):
-        if output == 1:
-            self.device.output1_value = 0.0
-        elif output == 2:
-            self.device.output2_value = 0.0
-        return "VR"

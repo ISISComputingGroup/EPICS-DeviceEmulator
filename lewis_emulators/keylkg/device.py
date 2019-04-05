@@ -16,10 +16,11 @@ class SimulatedKeylkg(StateMachineDevice):
         self.input_correct = True
 
         self.mode = "MEASURE"
-        self.out_number = 0
 
         self.output1_offset = 0.0
         self.output2_offset = 0.0
+        self.output1_raw_value = 0.0
+        self.output2_raw_value = 0.0
 
         self.head1_measurement_mode = 0
         self.head1_measurement_mode = 0
@@ -27,11 +28,11 @@ class SimulatedKeylkg(StateMachineDevice):
     # Generate random measurement data
     @property
     def output1_value(self):
-        return round(float(math.sin(random.randint(0, 10))) - self.output1_offset, 4)
+        return round(self.output1_raw_value - self.output1_offset, 4)
 
     @property
     def output2_value(self):
-        return round(float(math.sin(random.randint(0, 10))) - self.output2_offset, 4)
+        return round(self.output2_raw_value - self.output2_offset, 4)
 
     def _get_state_handlers(self):
         return {
