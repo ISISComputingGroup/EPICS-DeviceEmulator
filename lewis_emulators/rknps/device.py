@@ -19,6 +19,25 @@ class PowerSupply(object):
         self.power_on = True
         self.interlock_active = True
 
+        # Interlocks
+        self.POLNORM = True
+        self.REGTRANSF = True
+        self.TRANS = True
+        self.ILK = True
+        self.DCOC = True
+        self.DCOLOAD = True
+        self.REGMOD = True
+        self.PREREG = True
+        self.PHAS = True
+        self.MPSWATER = True
+        self.EARTHLEAK = True
+        self.THERMAL = True
+        self.MPSTEMP = True
+        self.DOOR = True
+        self.MAGWATER = True
+        self.MAGTEMP = True
+        self.MPSREADY = True
+
 
 ADDRESSES = ["001", "002", "003", "004"]
 
@@ -211,3 +230,386 @@ class SimulatedRknps(StateMachineDevice):
         """
         self.set_current(0)
         self.set_power(False)
+
+    @property
+    def interlock_TRANS(self):
+        """
+        Returns transistor fault interlock
+
+        Returns:
+            interlock_status: Boolean, the current status of the interlock
+        """
+
+        self.log.info('getting trans value {} PSU {}'.format(self._currently_addressed_psu().TRANS, self.get_adr()))
+
+        return self._currently_addressed_psu().TRANS
+
+#    @interlock_TRANS.setter
+#    def interlock_TRANS(self, value):
+#        """
+#        Sets transistor fault interlock
+#
+#        Args:
+#            interlock_status: Boolean, True for interlock triggered
+#        Returns:
+#            None
+#        """
+#
+#        self.log.info('setting trans to {} on {}'.format(value, self.get_adr()))
+#
+#        self._currently_addressed_psu().TRANS = value
+
+    def set_TRANS(self, value, ADDR):
+        """
+        Sets transistor fault interlock for PSU at address ADDR
+
+        Args:
+            value: Boolean, True for interlock triggered
+            ADDR: String, Address of PSU (e.g. 001)
+        Returns:
+            None
+        """
+
+        self.log.info('setting trans to {} on {}'.format(value, self.get_adr()))
+        self.set_adr(ADDR)
+
+        self._currently_addressed_psu().TRANS = value
+
+
+    @property
+    def interlock_DCOC(self):
+        """
+        Returns DC overcurrent interlock
+
+        Returns:
+            interlock_status: Boolean, the current status of the interlock
+        """
+
+        return self._currently_addressed_psu().DCOC
+
+    def set_DCOC(self, value, ADDR):
+        """
+        Sets DC overcurrent interlock
+
+        Args:
+            value: Boolean, True for interlock triggered
+            ADDR: String, Address of PSU (e.g. 001)
+        Returns:
+            None
+        """
+
+        self.set_adr(ADDR)
+
+        self._currently_addressed_psu().DCOC = value
+
+    @property
+    def interlock_DCOLOAD(self):
+        """
+        Returns DC overload interlock
+
+        Returns:
+            interlock_status: Boolean, the current status of the interlock
+        """
+
+        return self._currently_addressed_psu().DCOLOAD
+
+    def set_DCOLOAD(self, value, ADDR):
+        """
+        Sets DC overload interlock
+
+        Args:
+            value: Boolean, True for interlock triggered
+            ADDR: String, Address of PSU (e.g. 001)
+        Returns:
+            None
+        """
+
+        self.set_adr(ADDR)
+
+        self._currently_addressed_psu().DCOLOAD = value
+
+    @property
+    def interlock_REGMOD(self):
+        """
+        Returns Regulation mode failure interlock
+
+        Returns:
+            interlock_status: Boolean, the current status of the interlock
+        """
+
+        return self._currently_addressed_psu().REGMOD
+
+    def set_REGMOD(self, value, ADDR):
+        """
+        Sets Regulation mode failure interlock
+
+        Args:
+            value: Boolean, True for interlock triggered
+            ADDR: String, Address of PSU (e.g. 001)
+        Returns:
+            None
+        """
+
+        self.set_adr(ADDR)
+
+        self._currently_addressed_psu().REGMOD = value
+
+    @property
+    def interlock_PREREG(self):
+        """
+        Returns preregulator interlock
+
+        Returns:
+            interlock_status: Boolean, the current status of the interlock
+        """
+
+        return self._currently_addressed_psu().PREREG
+
+    def set_PREREG(self, value, ADDR):
+        """
+        Sets preregulator interlock
+
+        Args:
+            value: Boolean, True for interlock triggered
+            ADDR: String, Address of PSU (e.g. 001)
+        Returns:
+            None
+        """
+
+        self.set_adr(ADDR)
+
+        self._currently_addressed_psu().PREREG = value
+
+    @property
+    def interlock_PHAS(self):
+        """
+        Returns Phase failure interlock
+
+        Returns:
+            interlock_status: Boolean, the current status of the interlock
+        """
+
+        return self._currently_addressed_psu().PHAS
+
+    def set_PHAS(self, value, ADDR):
+        """
+        Sets phase failure interlock
+
+        Args:
+            value: Boolean, True for interlock triggered
+            ADDR: String, Address of PSU (e.g. 001)
+        Returns:
+            None
+        """
+
+        self.set_adr(ADDR)
+
+        self._currently_addressed_psu().PHAS = value
+
+    @property
+    def interlock_MPSWATER(self):
+        """
+        Returns MPS water flow interlock
+
+        Returns:
+            interlock_status: Boolean, the current status of the interlock
+        """
+
+        return self._currently_addressed_psu().MPSWATER
+
+    def set_MPSWATER(self, value, ADDR):
+        """
+        Sets MPS water flow interlock
+
+        Args:
+            value: Boolean, True for interlock triggered
+            ADDR: String, Address of PSU (e.g. 001)
+        Returns:
+            None
+        """
+
+        self.set_adr(ADDR)
+
+        self._currently_addressed_psu().MPSWATER = value
+
+    @property
+    def interlock_EARTHLEAK(self):
+        """
+        Returns earth leak interlock
+
+        Returns:
+            interlock_status: Boolean, the current status of the interlock
+        """
+
+        return self._currently_addressed_psu().EARTHLEAK
+
+    def set_EARTHLEAK(self, value, ADDR):
+        """
+        Sets earth leak interlock
+
+        Args:
+            value: Boolean, True for interlock triggered
+            ADDR: String, Address of PSU (e.g. 001)
+        Returns:
+            None
+        """
+
+        self.set_adr(ADDR)
+
+        self._currently_addressed_psu().EARTHLEAK = value
+
+    @property
+    def interlock_THERMAL(self):
+        """
+        Returns Thermal breaker interlock
+
+        Returns:
+            interlock_status: Boolean, the current status of the interlock
+        """
+
+        return self._currently_addressed_psu().THERMAL
+
+    def set_THERMAL(self, value, ADDR):
+        """
+        Sets Thermal breaker interlock
+
+        Args:
+            value: Boolean, True for interlock triggered
+            ADDR: String, Address of PSU (e.g. 001)
+        Returns:
+            None
+        """
+
+        self.set_adr(ADDR)
+
+        self._currently_addressed_psu().THERMAL = value
+
+    @property
+    def interlock_MPSTEMP(self):
+        """
+        Returns MPS over temperature interlock
+
+        Returns:
+            interlock_status: Boolean, the current status of the interlock
+        """
+
+        return self._currently_addressed_psu().MPSTEMP
+
+    def set_MPSTEMP(self, value, ADDR):
+        """
+        Sets MPS over temperature interlock
+
+        Args:
+            value: Boolean, True for interlock triggered
+            ADDR: String, Address of PSU (e.g. 001)
+        Returns:
+            None
+        """
+
+        self.set_adr(ADDR)
+
+        self._currently_addressed_psu().MPSTEMP = value
+
+    @property
+    def interlock_DOOR(self):
+        """
+        Returns panic button/door interlock
+
+        Returns:
+            interlock_status: Boolean, the current status of the interlock
+        """
+
+        return self._currently_addressed_psu().DOOR
+
+    def set_DOOR(self, value, ADDR):
+        """
+        Sets panic button/door interlock
+
+        Args:
+            value: Boolean, True for interlock triggered
+            ADDR: String, Address of PSU (e.g. 001)
+        Returns:
+            None
+        """
+
+        self.set_adr(ADDR)
+
+        self._currently_addressed_psu().DOOR = value
+
+    @property
+    def interlock_MAGWATER(self):
+        """
+        Returns manget water interlock
+
+        Returns:
+            interlock_status: Boolean, the current status of the interlock
+        """
+
+        return self._currently_addressed_psu().MAGWATER
+
+    def set_MAGWATER(self, value, ADDR):
+        """
+        Sets manget water interlock
+
+        Args:
+            value: Boolean, True for interlock triggered
+            ADDR: String, Address of PSU (e.g. 001)
+        Returns:
+            None
+        """
+
+        self.set_adr(ADDR)
+
+        self._currently_addressed_psu().MAGWATER = value
+
+    @property
+    def interlock_MAGTEMP(self):
+        """
+        Returns magnet temperature interlock
+
+        Returns:
+            interlock_status: Boolean, the current status of the interlock
+        """
+
+        return self._currently_addressed_psu().MAGTEMP
+
+    def set_MAGTEMP(self, value, ADDR):
+        """
+        Sets magnet temperature interlock
+
+        Args:
+            value: Boolean, True for interlock triggered
+            ADDR: String, Address of PSU (e.g. 001)
+        Returns:
+            None
+        """
+
+        self.set_adr(ADDR)
+
+        self._currently_addressed_psu().MAGTEMP = value
+
+    @property
+    def interlock_MPSREADY(self):
+        """
+        Returns MPS not ready interlock
+
+        Returns:
+            interlock_status: Boolean, the current status of the interlock
+        """
+
+        return self._currently_addressed_psu().MPSREADY
+
+    def set_MPSREADY(self, value, ADDR):
+        """
+        Sets MPS not ready interlock
+
+        Args:
+            value: Boolean, True for interlock triggered
+            ADDR: String, Address of PSU (e.g. 001)
+        Returns:
+            None
+        """
+
+        self.set_adr(ADDR)
+
+        self._currently_addressed_psu().MPSREADY = value
