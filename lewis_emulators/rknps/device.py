@@ -240,9 +240,11 @@ class SimulatedRknps(StateMachineDevice):
             interlock_status: Boolean, the current status of the interlock
         """
 
-        self.log.info('getting trans value {} PSU {}'.format(self._currently_addressed_psu().TRANS, self.get_adr()))
+        interlock_status = self._currently_addressed_psu().TRANS
 
-        return self._currently_addressed_psu().TRANS
+        self.log.info('getting trans value {} PSU {}'.format(interlock_status, self.get_adr()))
+
+        return interlock_status
 
 #    @interlock_TRANS.setter
 #    def interlock_TRANS(self, value):
