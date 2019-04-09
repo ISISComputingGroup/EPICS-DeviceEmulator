@@ -1,14 +1,19 @@
 from collections import OrderedDict
-import random
 from lewis.core.logging import has_log
 from .states import DefaultState
 from lewis.devices import StateMachineDevice
 
-class Channel(object):
-    def __init__(self, channel):
+
+MAX_READ = 1500
+MIN_READ = 1000
+
+
+class BufferReading(object):
+    def __init__(self, reading, timestamp, channel):
+        self.reading = reading
+        self.timestamp = timestamp
         self.channel = channel
-        self.reading = 0
-        self.timestamp = 0
+
 
 @has_log
 class SimulatedKeithley2700(StateMachineDevice):
@@ -18,95 +23,51 @@ class SimulatedKeithley2700(StateMachineDevice):
 
     def _initialize_data(self):
         """
-        Initialize all of the device's attributes.
+        Initialize the device's attributes necessary for testing.
         """
-        self.idn = "KEITHLEY"
-        self.buffer_full = []
-        self.buffer_range_readings = ""
-        self.measurement = 0
-        self.buffer_feed = 0
-        self.buffer_control = 0
-        self.buffer_autoclear_on = False
-        self.next_buffer_location = 0
-        self.bytes_used = 0
+        self.idn = "KEITHLEY"               # Device name 
+        self.buffer = []                    # The buffer in which samples are stored
+        self.buffer_autoclear_on = False    # when false, new readings appended to old readings in buffer
+        self.buffer_size = 1000             # size of buffer which holds read data default 1000
+        # The below attributes are not used but are needed for the stream interface
         self.bytes_available = 0
-        self.buffer_size = 55000
-        self.time_stamp_format = 0
-        self.auto_delay_on = True
-        self.init_state_on = False
-        self.sample_count = 1
-        self.source = 4
-        self.data_elements = ""
-        self.auto_range_on = True
-        self.measurement_digits = 6
-        self.nplc = 5.0
-        self.scan_state_status = 2
-        self.scan_channel_start = 101
-        self.scan_channel_end = 210
-        self.buffer_count = 10
-        self.current_buffer_loc = 0
+        self.bytes_used = 0
 
-        # Create channels from 101-110 and 201 - 210
-        self.channels = []
-        for i in range(1, 11):
-            self.channels.append(Channel(str(100+i)))
-            self.channels.append(Channel(str(200+i)))
-        self.generate_channel_values()
-        self.fill_buffer()
+    def get_next_buffer_location(self):
+        if not self.is_buffer_full():
+            return len(self.buffer)
+        else:
+            return 0  # Buffer full so next loc is 0 after a clear
 
-    def generate_channel_values(self):
-        """
-        Creates a random selection of channel resistance reading values
-        :return:
-        """
-        timestamp = 0
-        # Find current highest timestamp
-        timestamp = max(t.timestamp for t in self.channels)
+    def is_buffer_full(self):
+        return len(self.buffer) >= self.buffer_size  # -1 because buffer is 0 indexed
 
-        for channel in self.channels:
-            channel.reading = random.uniform(1000.0, 1500.0)
-            channel.timestamp = timestamp
-            timestamp += 0.005
+    def insert_mock_data(self, data):
+        """
+        Allows the insertion of specific, defined readings into the buffer
+        :param data: a list containing string representations of buffer readings
+        """
+        self.log.info("Inserting mock data into buffer: {}".format(data))
+        for item in data:
+            reading, timestamp, channel = item.split(",")
+            if self.is_buffer_full() and self.buffer_autoclear_on:
+                self.clear_buffer()
+            self.buffer.append(BufferReading(reading, timestamp, channel))
 
-    def fill_buffer(self):
+    def check_buffer_data(self):
         """
-        Creates a new set of channel reading values and fills the buffer
-        with these readings.
-        The buffer values are then parsed by the IOC into the appropriate channel PVs.
+        Gets values contained in self.buffer
+        :return: List of comma separated string representations of readings in the buffer
         """
-        chan_index = 0
-        self.buffer_full = []
-        self.generate_channel_values()
-        self.current_buffer_loc = 0
-        self.next_buffer_location = 0
-        for buffer_index in range(self.buffer_size):
-            # If we reach the end of the channel readings, create a new set of channel readings to fill buffer with
-            if chan_index == len(self.channels):
-                self.generate_channel_values()
-                chan_index = 0
-            channel_string = "{},{},{},".format(self.channels[chan_index].reading,
-                                                self.channels[chan_index].timestamp,
-                                                self.channels[chan_index].channel)
-            self.buffer_full.append(channel_string)
-            chan_index += 1
+        return [",".join((reading.reading, reading.timestamp, reading.channel))
+                .encode("utf-8") for reading in self.buffer]
 
-    def set_channel_param(self, index, param, value):
+    def clear_buffer(self):
         """
-        Sets Attribute for Channel Instance within self.channels list
-        :param index: (Integer) position in list
-        :param param: Attribute
-        :param value: Attribute Value
+        Clears all buffer entries
         """
-        setattr(self.channels[int(index)], str(param), value)
-
-    def get_channel_param(self, index, param):
-        """
-        Gets Attribute for Channel Instance within self.channels list
-        :param index: (Integer) position in list
-        :param param: Attribute
-        :return: Channel parameter (int or double)
-        """
-        return getattr(self.channels[int(index)], str(param))
+        self.buffer = []
+        self.log.info("=== Cleared Buffer ===")
 
     def _get_state_handlers(self):
         """

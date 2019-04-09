@@ -3,7 +3,7 @@ A fluent command builder for lewis.
 """
 
 import re
-from lewis.adapters.stream import Cmd
+from lewis.adapters.stream import Cmd, regex
 
 from lewis_emulators.utils.constants import STX, ACK, EOT, ETX, ENQ
 
@@ -29,13 +29,14 @@ class CmdBuilder(object):
     >>> CmdBuilder("set_pres").escape("pres?").enq().build()
     """
 
-    def __init__(self, target_method, arg_sep="", ignore=""):
+    def __init__(self, target_method, arg_sep="", ignore="", ignore_case=False):
         """
         Create a builder. Use build to create the final object
 
         :param target_method: name of the method target to call when the reg ex matches
         :param arg_sep: separators between arguments which are next to each other
         :param ignore: set of characters to ignore between text and arguments
+        :param ignore_case: ignore the case when matching command
         """
         self._target_method = target_method
         self._arg_sep = arg_sep
@@ -47,10 +48,21 @@ class CmdBuilder(object):
             self._ignore = "[{0}]*".format(ignore)
         self._reg_ex = self._ignore
 
+        self._ignore_case = ignore_case
+
     def _add_to_regex(self, regex, is_arg):
         self._reg_ex += regex + self._ignore
         if not is_arg:
             self._current_sep = ""
+
+    def optional(self, text):
+        """
+        Add some escaped text which does not necessarily need to be there. For commands with optional parameters
+        :param text: Text to add
+        :return: builder
+        """
+        self._add_to_regex("(?:" + re.escape(text) + ")?", False)
+        return self
 
     def escape(self, text):
         """
@@ -76,14 +88,14 @@ class CmdBuilder(object):
         """
         Add a regex for any number of spaces
         Args:
-            at_least_one: true there must be at least one space; false there can be any nnumber including zero
+            at_least_one: true there must be at least one space; false there can be any number including zero
 
         Returns: builder
 
         """
-        wildchard = "*" if at_least_one else "+"
+        wildcard = "+" if at_least_one else "*"
 
-        self._add_to_regex(" " + wildchard, False)
+        self._add_to_regex(" " + wildcard, False)
         return self
 
     def arg(self, arg_regex, argument_mapping=str):
@@ -183,7 +195,12 @@ class CmdBuilder(object):
         :param kwargs: key word arguments to pass to Cmd constructor
         :return: Cmd object
         """
-        return Cmd(self._target_method, self._reg_ex, argument_mappings=self.argument_mappings, *args, **kwargs)
+        if self._ignore_case:
+            pattern = regex(self._reg_ex)
+            pattern.compiled_pattern = re.compile(self._reg_ex, re.IGNORECASE)
+        else:
+            pattern = self._reg_ex
+        return Cmd(self._target_method, pattern, *args, **kwargs)
 
     def add_ascii_character(self, char_number):
         """
@@ -242,4 +259,15 @@ class CmdBuilder(object):
         :return: builder
         """
         self._reg_ex += "$"
+        return self
+
+    def get_multicommands(self, command_separator):
+        """
+        Allows emulator to split multiple commands separated by a defined command separator, e.g. ";".
+        Must be accompanied by stream device methods. See Keithley 2700 for examples
+
+        :param command_separator: Character(s) that separate commands
+        :return: builder
+        """
+        self.arg("[^" + re.escape(command_separator) + "]*").escape(command_separator).arg(".*")
         return self
