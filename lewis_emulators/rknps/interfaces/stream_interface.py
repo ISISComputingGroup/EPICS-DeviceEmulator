@@ -7,6 +7,7 @@ from lewis_emulators.utils.replies import conditional_reply
 if_connected = conditional_reply("connected")
 
 ILK_STRING = {True: "!", False: "."}
+PWR_STRING = {True: ".", False: "!"}
 
 @has_log
 class RknpsStreamInterface(StreamInterface):
@@ -140,7 +141,7 @@ class RknpsStreamInterface(StreamInterface):
         else:
             raise ValueError("Invalid argument to set_polarity")
 
-    #@if_connected
+    @if_connected
     def get_status(self):
         """
         Get the status of the device.
@@ -154,7 +155,7 @@ class RknpsStreamInterface(StreamInterface):
 
         device = self._device
 
-        self.log.info('trans string = '+ILK_STRING[device.interlock_TRANS])
+        self.log.info('trans string = '+ILK_STRING[device.get_TRANS()])
 
         #self.log.info("{}........{}..............".format(power, interlock))
         status = ("{POWER}.!.....{TRANS}{ILK}{DCOC}{DCOLOAD}{REGMOD}{PREREG}{PHAS}"
@@ -162,22 +163,22 @@ class RknpsStreamInterface(StreamInterface):
                   "{MPSREADY}.").format(
                                         # ILK_STRING[device.POLNORM_OK],
                                         # ILK_STRING[device.REGTRANSF_OK],
-                                        POWER=ILK_STRING[device.is_power_on()],
-                                        TRANS=ILK_STRING[device.interlock_TRANS],
-                                        ILK=ILK_STRING[False],
-                                        DCOC=ILK_STRING[device.interlock_DCOC],
-                                        DCOLOAD=ILK_STRING[device.interlock_DCOLOAD],
-                                        REGMOD=ILK_STRING[device.interlock_REGMOD],
-                                        PREREG=ILK_STRING[device.interlock_PREREG],
-                                        PHAS=ILK_STRING[device.interlock_PHAS],
-                                        MPSWATER=ILK_STRING[device.interlock_MPSWATER],
-                                        EARTHLEAK=ILK_STRING[device.interlock_EARTHLEAK],
-                                        THERMAL=ILK_STRING[device.interlock_THERMAL],
-                                        MPSTEMP=ILK_STRING[device.interlock_MPSTEMP],
-                                        DOOR=ILK_STRING[device.interlock_DOOR],
-                                        MAGWATER=ILK_STRING[device.interlock_MAGWATER],
-                                        MAGTEMP=ILK_STRING[device.interlock_MAGTEMP],
-                                        MPSREADY=ILK_STRING[device.interlock_MPSREADY]
+                                        POWER=PWR_STRING[device.is_power_on()],
+                                        TRANS=ILK_STRING[device.get_TRANS()],
+                                        ILK=ILK_STRING[device.is_interlock_active()],
+                                        DCOC=ILK_STRING[device.get_DCOC()],
+                                        DCOLOAD=ILK_STRING[device.get_DCOLOAD()],
+                                        REGMOD=ILK_STRING[device.get_REGMOD()],
+                                        PREREG=ILK_STRING[device.get_PREREG()],
+                                        PHAS=ILK_STRING[device.get_PHAS()],
+                                        MPSWATER=ILK_STRING[device.get_MPSWATER()],
+                                        EARTHLEAK=ILK_STRING[device.get_EARTHLEAK()],
+                                        THERMAL=ILK_STRING[device.get_THERMAL()],
+                                        MPSTEMP=ILK_STRING[device.get_MPSTEMP()],
+                                        DOOR=ILK_STRING[device.get_DOOR()],
+                                        MAGWATER=ILK_STRING[device.get_MAGWATER()],
+                                        MAGTEMP=ILK_STRING[device.get_MAGTEMP()],
+                                        MPSREADY=ILK_STRING[device.get_MPSREADY()]
                                         )
 
         # return "{}........{}..............".format(power, interlock)

@@ -21,7 +21,6 @@ class PowerSupply(object):
 
         # Interlocks
         self.POLNORM = True
-        self.REGTRANSF = True
         self.TRANS = True
         self.ILK = True
         self.DCOC = True
@@ -231,14 +230,19 @@ class SimulatedRknps(StateMachineDevice):
         self.set_current(0)
         self.set_power(False)
 
-    @property
-    def interlock_TRANS(self):
+    def get_TRANS(self, ADDR=None):
         """
         Returns transistor fault interlock
 
+        Args:
+            ADDR: String, optional.
+            The address of the PSU (e.g. 001). If None (default) the currently addressed PSU is used
         Returns:
             interlock_status: Boolean, the current status of the interlock
         """
+
+        if ADDR is not None:
+            self.set_adr(ADDR)
 
         interlock_status = self._currently_addressed_psu().TRANS
 
@@ -277,15 +281,19 @@ class SimulatedRknps(StateMachineDevice):
 
         self._currently_addressed_psu().TRANS = value
 
-
-    @property
-    def interlock_DCOC(self):
+    def get_DCOC(self, ADDR=None):
         """
         Returns DC overcurrent interlock
 
+        Args:
+            ADDR: String, optional.
+            The address of the PSU (e.g. 001). If None (default) the currently addressed PSU is used
         Returns:
             interlock_status: Boolean, the current status of the interlock
         """
+
+        if ADDR is not None:
+            self.set_adr(ADDR)        
 
         return self._currently_addressed_psu().DCOC
 
@@ -304,14 +312,19 @@ class SimulatedRknps(StateMachineDevice):
 
         self._currently_addressed_psu().DCOC = value
 
-    @property
-    def interlock_DCOLOAD(self):
+    def get_DCOLOAD(self, ADDR=None):
         """
         Returns DC overload interlock
 
+        Args:
+            ADDR: String, optional.
+            The address of the PSU (e.g. 001). If None (default) the currently addressed PSU is used
         Returns:
             interlock_status: Boolean, the current status of the interlock
         """
+
+        if ADDR is not None:
+            self.set_adr(ADDR)
 
         return self._currently_addressed_psu().DCOLOAD
 
@@ -330,14 +343,19 @@ class SimulatedRknps(StateMachineDevice):
 
         self._currently_addressed_psu().DCOLOAD = value
 
-    @property
-    def interlock_REGMOD(self):
+    def get_REGMOD(self, ADDR=None):
         """
         Returns Regulation mode failure interlock
 
+        Args:
+            ADDR: String, optional.
+            The address of the PSU (e.g. 001). If None (default) the currently addressed PSU is used
         Returns:
             interlock_status: Boolean, the current status of the interlock
         """
+
+        if ADDR is not None:
+            self.set_adr(ADDR)
 
         return self._currently_addressed_psu().REGMOD
 
@@ -356,14 +374,19 @@ class SimulatedRknps(StateMachineDevice):
 
         self._currently_addressed_psu().REGMOD = value
 
-    @property
-    def interlock_PREREG(self):
+    def get_PREREG(self, ADDR=None):
         """
         Returns preregulator interlock
 
+        Args:
+            ADDR: String, optional.
+            The address of the PSU (e.g. 001). If None (default) the currently addressed PSU is used
         Returns:
             interlock_status: Boolean, the current status of the interlock
         """
+
+        if ADDR is not None:
+            self.set_adr(ADDR)
 
         return self._currently_addressed_psu().PREREG
 
@@ -382,14 +405,19 @@ class SimulatedRknps(StateMachineDevice):
 
         self._currently_addressed_psu().PREREG = value
 
-    @property
-    def interlock_PHAS(self):
+    def get_PHAS(self, ADDR=None):
         """
         Returns Phase failure interlock
 
+        Args:
+            ADDR: String, optional.
+            The address of the PSU (e.g. 001). If None (default) the currently addressed PSU is used
         Returns:
             interlock_status: Boolean, the current status of the interlock
         """
+
+        if ADDR is not None:
+            self.set_adr(ADDR)
 
         return self._currently_addressed_psu().PHAS
 
@@ -408,14 +436,19 @@ class SimulatedRknps(StateMachineDevice):
 
         self._currently_addressed_psu().PHAS = value
 
-    @property
-    def interlock_MPSWATER(self):
+    def get_MPSWATER(self, ADDR=None):
         """
         Returns MPS water flow interlock
 
+        Args:
+            ADDR: String, optional.
+            The address of the PSU (e.g. 001). If None (default) the currently addressed PSU is used
         Returns:
             interlock_status: Boolean, the current status of the interlock
         """
+
+        if ADDR is not None:
+            self.set_adr(ADDR)
 
         return self._currently_addressed_psu().MPSWATER
 
@@ -434,14 +467,19 @@ class SimulatedRknps(StateMachineDevice):
 
         self._currently_addressed_psu().MPSWATER = value
 
-    @property
-    def interlock_EARTHLEAK(self):
+    def get_EARTHLEAK(self, ADDR=None):
         """
         Returns earth leak interlock
 
+        Args:
+            ADDR: String, optional.
+            The address of the PSU (e.g. 001). If None (default) the currently addressed PSU is used
         Returns:
             interlock_status: Boolean, the current status of the interlock
         """
+
+        if ADDR is not None:
+            self.set_adr(ADDR)
 
         return self._currently_addressed_psu().EARTHLEAK
 
@@ -460,14 +498,19 @@ class SimulatedRknps(StateMachineDevice):
 
         self._currently_addressed_psu().EARTHLEAK = value
 
-    @property
-    def interlock_THERMAL(self):
+    def get_THERMAL(self, ADDR=None):
         """
         Returns Thermal breaker interlock
 
+        Args:
+            ADDR: String, optional.
+            The address of the PSU (e.g. 001). If None (default) the currently addressed PSU is used
         Returns:
             interlock_status: Boolean, the current status of the interlock
         """
+
+        if ADDR is not None:
+            self.set_adr(ADDR)
 
         return self._currently_addressed_psu().THERMAL
 
@@ -486,14 +529,19 @@ class SimulatedRknps(StateMachineDevice):
 
         self._currently_addressed_psu().THERMAL = value
 
-    @property
-    def interlock_MPSTEMP(self):
+    def get_MPSTEMP(self, ADDR=None):
         """
         Returns MPS over temperature interlock
 
+        Args:
+            ADDR: String, optional.
+            The address of the PSU (e.g. 001). If None (default) the currently addressed PSU is used
         Returns:
             interlock_status: Boolean, the current status of the interlock
         """
+
+        if ADDR is not None:
+            self.set_adr(ADDR)
 
         return self._currently_addressed_psu().MPSTEMP
 
@@ -512,14 +560,19 @@ class SimulatedRknps(StateMachineDevice):
 
         self._currently_addressed_psu().MPSTEMP = value
 
-    @property
-    def interlock_DOOR(self):
+    def get_DOOR(self, ADDR=None):
         """
         Returns panic button/door interlock
 
+        Args:
+            ADDR: String, optional.
+            The address of the PSU (e.g. 001). If None (default) the currently addressed PSU is used
         Returns:
             interlock_status: Boolean, the current status of the interlock
         """
+
+        if ADDR is not None:
+            self.set_adr(ADDR)
 
         return self._currently_addressed_psu().DOOR
 
@@ -538,14 +591,19 @@ class SimulatedRknps(StateMachineDevice):
 
         self._currently_addressed_psu().DOOR = value
 
-    @property
-    def interlock_MAGWATER(self):
+    def get_MAGWATER(self, ADDR=None):
         """
         Returns manget water interlock
 
+        Args:
+            ADDR: String, optional.
+            The address of the PSU (e.g. 001). If None (default) the currently addressed PSU is used
         Returns:
             interlock_status: Boolean, the current status of the interlock
         """
+
+        if ADDR is not None:
+            self.set_adr(ADDR)
 
         return self._currently_addressed_psu().MAGWATER
 
@@ -564,14 +622,19 @@ class SimulatedRknps(StateMachineDevice):
 
         self._currently_addressed_psu().MAGWATER = value
 
-    @property
-    def interlock_MAGTEMP(self):
+    def get_MAGTEMP(self, ADDR=None):
         """
         Returns magnet temperature interlock
 
+        Args:
+            ADDR: String, optional.
+            The address of the PSU (e.g. 001). If None (default) the currently addressed PSU is used
         Returns:
             interlock_status: Boolean, the current status of the interlock
         """
+
+        if ADDR is not None:
+            self.set_adr(ADDR)
 
         return self._currently_addressed_psu().MAGTEMP
 
@@ -590,14 +653,19 @@ class SimulatedRknps(StateMachineDevice):
 
         self._currently_addressed_psu().MAGTEMP = value
 
-    @property
-    def interlock_MPSREADY(self):
+    def get_MPSREADY(self, ADDR=None):
         """
         Returns MPS not ready interlock
 
+        Args:
+            ADDR: String, optional.
+            The address of the PSU (e.g. 001). If None (default) the currently addressed PSU is used
         Returns:
             interlock_status: Boolean, the current status of the interlock
         """
+
+        if ADDR is not None:
+            self.set_adr(ADDR)
 
         return self._currently_addressed_psu().MPSREADY
 
