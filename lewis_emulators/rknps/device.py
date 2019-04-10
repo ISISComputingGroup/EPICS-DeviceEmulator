@@ -250,21 +250,6 @@ class SimulatedRknps(StateMachineDevice):
 
         return interlock_status
 
-#    @interlock_TRANS.setter
-#    def interlock_TRANS(self, value):
-#        """
-#        Sets transistor fault interlock
-#
-#        Args:
-#            interlock_status: Boolean, True for interlock triggered
-#        Returns:
-#            None
-#        """
-#
-#        self.log.info('setting trans to {} on {}'.format(value, self.get_adr()))
-#
-#        self._currently_addressed_psu().TRANS = value
-
     def set_TRANS(self, value, ADDR):
         """
         Sets transistor fault interlock for PSU at address ADDR

@@ -150,14 +150,7 @@ class RknpsStreamInterface(StreamInterface):
 
         Returns: A character string for the status.
         """
-        power = "." if self._device.is_power_on() else "!"
-        #self.log.info(power)
-        #self.log.info(self._device.is_power_on())
-        interlock = "!" if self._device.is_interlock_active() else "."
-
         device = self._device
-
-        self.log.info('trans string = '+ILK_STRING[device.get_TRANS()])
 
         status = ("{POWER}.!.....{TRANS}{ILK}{DCOC}{DCOLOAD}{REGMOD}{PREREG}{PHAS}"
                   "{MPSWATER}{EARTHLEAK}{THERMAL}{MPSTEMP}{DOOR}{MAGWATER}{MAGTEMP}"
@@ -180,9 +173,6 @@ class RknpsStreamInterface(StreamInterface):
                                         MPSREADY=ILK_STRING[device.get_MPSREADY()]
                                         )
 
-        # return "{}........{}..............".format(power, interlock)
-        # status = "!........!.............."
-        self.log.info(status)
         return status
 
     @if_connected
