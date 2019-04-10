@@ -24,7 +24,7 @@ class PowerSupply(object):
         self.TRANS = True
         self.ILK = True
         self.DCOC = True
-        self.DCOLOAD = True
+        self.DCOL = True
         self.REGMOD = True
         self.PREREG = True
         self.PHAS = True
@@ -312,7 +312,7 @@ class SimulatedRknps(StateMachineDevice):
 
         self._currently_addressed_psu().DCOC = value
 
-    def get_DCOLOAD(self, ADDR=None):
+    def get_DCOL(self, ADDR=None):
         """
         Returns DC overload interlock
 
@@ -326,9 +326,9 @@ class SimulatedRknps(StateMachineDevice):
         if ADDR is not None:
             self.set_adr(ADDR)
 
-        return self._currently_addressed_psu().DCOLOAD
+        return self._currently_addressed_psu().DCOL
 
-    def set_DCOLOAD(self, value, ADDR):
+    def set_DCOL(self, value, ADDR):
         """
         Sets DC overload interlock
 
@@ -341,7 +341,7 @@ class SimulatedRknps(StateMachineDevice):
 
         self.set_adr(ADDR)
 
-        self._currently_addressed_psu().DCOLOAD = value
+        self._currently_addressed_psu().DCOL = value
 
     def get_REGMOD(self, ADDR=None):
         """

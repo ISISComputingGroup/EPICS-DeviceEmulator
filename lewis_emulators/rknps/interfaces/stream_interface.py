@@ -141,6 +141,8 @@ class RknpsStreamInterface(StreamInterface):
         else:
             raise ValueError("Invalid argument to set_polarity")
 
+        return pol
+
     @if_connected
     def get_status(self):
         """
@@ -157,17 +159,14 @@ class RknpsStreamInterface(StreamInterface):
 
         self.log.info('trans string = '+ILK_STRING[device.get_TRANS()])
 
-        #self.log.info("{}........{}..............".format(power, interlock))
         status = ("{POWER}.!.....{TRANS}{ILK}{DCOC}{DCOLOAD}{REGMOD}{PREREG}{PHAS}"
                   "{MPSWATER}{EARTHLEAK}{THERMAL}{MPSTEMP}{DOOR}{MAGWATER}{MAGTEMP}"
                   "{MPSREADY}.").format(
-                                        # ILK_STRING[device.POLNORM_OK],
-                                        # ILK_STRING[device.REGTRANSF_OK],
                                         POWER=PWR_STRING[device.is_power_on()],
                                         TRANS=ILK_STRING[device.get_TRANS()],
                                         ILK=ILK_STRING[device.is_interlock_active()],
                                         DCOC=ILK_STRING[device.get_DCOC()],
-                                        DCOLOAD=ILK_STRING[device.get_DCOLOAD()],
+                                        DCOLOAD=ILK_STRING[device.get_DCOL()],
                                         REGMOD=ILK_STRING[device.get_REGMOD()],
                                         PREREG=ILK_STRING[device.get_PREREG()],
                                         PHAS=ILK_STRING[device.get_PHAS()],
@@ -196,8 +195,10 @@ class RknpsStreamInterface(StreamInterface):
         """
         if power == "N":
             self._device.set_power(True)
+            self.log.info('PWR ON')
         elif power == "F":
             self._device.set_power(False)
+            self.log.info('PWR OFF')
         else:
             raise ValueError("Invalid argument to set_power")
 
