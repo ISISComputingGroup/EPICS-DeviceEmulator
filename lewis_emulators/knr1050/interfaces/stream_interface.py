@@ -29,10 +29,10 @@ class Knr1050StreamInterface(StreamInterface):
             CmdBuilder(self.get_remote_mode).escape("REMOTE?").eos().build(),
             CmdBuilder(self.set_remote_mode).escape("REMOTE").eos().build(),
             CmdBuilder(self.set_local_mode).escape("LOCAL").eos().build(),
-            CmdBuilder(self.set_error).escape("ERROR:").int().escape(",").string().eos().build(),
+            CmdBuilder(self.error).escape("ERROR:").int().escape(",").string().eos().build(),
         }
 
-    def set_error(self, error_number, error_string):
+    def error(self, error_number, error_string):
         self.device.error_string = "ERROR{0},{1}".format(error_number, error_string)
         return
 
