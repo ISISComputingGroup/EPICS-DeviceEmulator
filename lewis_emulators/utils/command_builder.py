@@ -200,7 +200,7 @@ class CmdBuilder(object):
             pattern.compiled_pattern = re.compile(self._reg_ex, re.IGNORECASE)
         else:
             pattern = self._reg_ex
-        return Cmd(self._target_method, pattern, *args, **kwargs)
+        return Cmd(self._target_method, pattern, argument_mappings=self.argument_mappings, *args, **kwargs)
 
     def add_ascii_character(self, char_number):
         """
