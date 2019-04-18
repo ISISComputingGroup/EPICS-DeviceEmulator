@@ -4,13 +4,13 @@ from collections import OrderedDict
 import time
 
 states = OrderedDict([
-    ('SYS_ST_INITIALIZING', InitializingState()),
-    ('SYS_ST_OFF', OffState()),
-    ('SYS_ST_IDLE', IdleState()),
-    ('SYS_ST_RUN', RunState()),
-    ('SYS_ST_HOLD', HoldState()),
-    ('SYS_ST_PURGE', PurgeState()),
-    ('SYS_ST_STANDBY', StandbyState())])
+    ('INITIALIZING', InitializingState()),
+    ('OFF', OffState()),
+    ('IDLE', IdleState()),
+    ('RUN', RunState()),
+    ('HOLD', HoldState()),
+    ('PURGE', PurgeState()),
+    ('STANDBY', StandbyState())])
 
 
 class SimulatedKnr1050(StateMachineDevice):
@@ -20,6 +20,7 @@ class SimulatedKnr1050(StateMachineDevice):
         Initialize all of the device's attributes.
         """
         self.connected = True
+        self.input_correct = True
 
         self.pump_on = False
         self.keep_last_values = False
@@ -37,6 +38,7 @@ class SimulatedKnr1050(StateMachineDevice):
         self.concentrations = [100, 0, 0, 0]
 
         self.curr_program_run_time = False
+        self.error_string = ""
 
     def reset(self):
         self._initialize_data()
@@ -61,13 +63,13 @@ class SimulatedKnr1050(StateMachineDevice):
         return states
 
     def _get_initial_state(self):
-        return 'SYS_ST_OFF'
+        return 'OFF'
 
     def _get_transition_handlers(self):
         return OrderedDict([
-            (('SYS_ST_INITIALIZING', 'SYS_ST_IDLE'), lambda: self.initializing is False),
-            (('SYS_ST_IDLE', 'SYS_ST_OFF'), lambda: self.pump_on is False),
-            (('SYS_ST_OFF', 'SYS_ST_IDLE'), lambda: self.pump_on is True),
-            (('SYS_ST_RUN', 'SYS_ST_HOLD'), lambda: self.hold is True),
-            (('SYS_ST_RUN', 'SYS_ST_STANDBY'), lambda: self.standby is True)
+            (('INITIALIZING', 'IDLE'), lambda: self.initializing is False),
+            (('IDLE', 'OFF'), lambda: self.pump_on is False),
+            (('OFF', 'IDLE'), lambda: self.pump_on is True),
+            (('RUN', 'HOLD'), lambda: self.hold is True),
+            (('RUN', 'STANDBY'), lambda: self.standby is True)
         ])
