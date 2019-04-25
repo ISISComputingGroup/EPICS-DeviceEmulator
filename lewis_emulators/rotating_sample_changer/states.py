@@ -2,7 +2,7 @@ from lewis.core import approaches
 from lewis.core.statemachine import State
 
 
-class Errors(object):
+class Errors():
     NO_ERR = 0
     ERR_INV_DEST = 5
     ERR_NOT_INITIALISED = 6
@@ -16,19 +16,10 @@ class MovingState(State):
         self._context.arm_lowered = False
 
     def in_state(self, dt):
-        self._context.car_pos = approaches.linear(self._context.car_pos, self._context.car_target,
-                                                  self._context.CAR_SPEED, dt)
+        old_position = self._context.car_pos
+        self._context.car_pos = approaches.linear(old_position, self._context.car_target,
+                                                   self._context.CAR_SPEED, dt)
 
     def on_exit(self, dt):
         self._context.arm_lowered = True
-
-
-class SampleDroppedState(State):
-    def on_entry(self, dt):
-        self._context.log.info("Entered sample dropped state.")
-        self._context.current_err = Errors.ERR_ARM_DROPPED
-        self._context.car_target = self._context.car_pos
-        self._context.drop_sample_on_next_move = False
-
-    def on_exit(self, dt):
-        self._context.log.info("Exited sample dropped state.")
+        
