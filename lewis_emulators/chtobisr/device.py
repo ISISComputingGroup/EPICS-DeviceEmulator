@@ -17,6 +17,9 @@ class SimulatedChtobisr(StateMachineDevice):
 
         self.connected = True
 
+    def reset(self):
+        self._initialize_data()
+
     def _get_state_handlers(self):
         return {
             'default': DefaultState(),

@@ -13,11 +13,11 @@ class ChtobisrStreamInterface(StreamInterface):
     """
 
     commands = {
-        CmdBuilder("get_id").escape("*IDN?").build()
+        CmdBuilder("get_id").escape("*IDN?").build(),
+        CmdBuilder("set_reset").escape("*RST").build(),
+        CmdBuilder("get_interlock").escape("SYSTEM:LOCK?").build()
         #CmdBuilder("get_status").escape("SYSTEM:STATUS?").build(),
         #CmdBuilder("get_faults").escape("SYSTEM:FAULT?").build(),
-        #CmdBuilder("get_interlock").escape("SYSTEM:LOCK?").build(),
-        #CmdBuilder("set_reset").escape("*RST").build()
     }
 
     in_terminator = "\r\n"
@@ -44,5 +44,26 @@ class ChtobisrStreamInterface(StreamInterface):
         :return:  Device ID string
         """
 
-        device = self._device
-        return "{}".format(device.id)
+        return "{}".format(self._device.id)
+
+    @conditional_reply("connected")
+    def set_reset(self):
+
+        """
+        Resets the device
+
+        :return:  none
+        """
+
+        self._device.reset()
+
+    @conditional_reply("connected")
+    def get_interlock(self):
+
+        """
+        Gets the device interlock status
+
+        :return: Interlock status
+        """
+
+        return "{}".format(self._device.interlock)
