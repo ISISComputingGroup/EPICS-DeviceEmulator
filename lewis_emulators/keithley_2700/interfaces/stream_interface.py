@@ -202,7 +202,7 @@ class Keithley2700StreamInterface(StreamInterface):
         self._device.buffer_autoclear_on = state
 
     def get_buffer_state(self):
-        return "{}".format("ON" if self._device.buffer_autoclear_on else "OFF")
+        return "{}".format(1 if self._device.buffer_autoclear_on else 0)
 
     def get_next_buffer_location(self):
         """
