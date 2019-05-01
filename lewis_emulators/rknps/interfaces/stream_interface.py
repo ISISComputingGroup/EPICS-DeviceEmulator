@@ -6,6 +6,9 @@ from lewis_emulators.utils.replies import conditional_reply
 
 if_connected = conditional_reply("connected")
 
+ILK_STRING = {True: "!", False: "."}
+PWR_STRING = {True: ".", False: "!"}
+
 @has_log
 class RknpsStreamInterface(StreamInterface):
     """
@@ -138,6 +141,8 @@ class RknpsStreamInterface(StreamInterface):
         else:
             raise ValueError("Invalid argument to set_polarity")
 
+        return pol
+
     @if_connected
     def get_status(self):
         """
@@ -145,9 +150,30 @@ class RknpsStreamInterface(StreamInterface):
 
         Returns: A character string for the status.
         """
-        power = "." if self._device.is_power_on() else "!"
-        interlock = "!" if self._device.is_interlock_active() else "."
-        return "{}........{}..............".format(power, interlock)
+        device = self._device
+
+        status = ("{POWER}.!.....{TRANS}{ILK}{DCOC}{DCOLOAD}{REGMOD}{PREREG}{PHAS}"
+                  "{MPSWATER}{EARTHLEAK}{THERMAL}{MPSTEMP}{DOOR}{MAGWATER}{MAGTEMP}"
+                  "{MPSREADY}.").format(
+                                        POWER=PWR_STRING[device.is_power_on()],
+                                        TRANS=ILK_STRING[device.get_TRANS()],
+                                        ILK=ILK_STRING[device.is_interlock_active()],
+                                        DCOC=ILK_STRING[device.get_DCOC()],
+                                        DCOLOAD=ILK_STRING[device.get_DCOL()],
+                                        REGMOD=ILK_STRING[device.get_REGMOD()],
+                                        PREREG=ILK_STRING[device.get_PREREG()],
+                                        PHAS=ILK_STRING[device.get_PHAS()],
+                                        MPSWATER=ILK_STRING[device.get_MPSWATER()],
+                                        EARTHLEAK=ILK_STRING[device.get_EARTHLEAK()],
+                                        THERMAL=ILK_STRING[device.get_THERMAL()],
+                                        MPSTEMP=ILK_STRING[device.get_MPSTEMP()],
+                                        DOOR=ILK_STRING[device.get_DOOR()],
+                                        MAGWATER=ILK_STRING[device.get_MAGWATER()],
+                                        MAGTEMP=ILK_STRING[device.get_MAGTEMP()],
+                                        MPSREADY=ILK_STRING[device.get_MPSREADY()]
+                                        )
+
+        return status
 
     @if_connected
     def set_power(self, power):
@@ -159,8 +185,10 @@ class RknpsStreamInterface(StreamInterface):
         """
         if power == "N":
             self._device.set_power(True)
+            self.log.info('PWR ON')
         elif power == "F":
             self._device.set_power(False)
+            self.log.info('PWR OFF')
         else:
             raise ValueError("Invalid argument to set_power")
 
