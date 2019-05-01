@@ -6,6 +6,7 @@ from lewis_emulators.utils.replies import conditional_reply
 if_connected = conditional_reply('connected')
 if_input_error = conditional_reply('input_correct', "%%[Error:file open error]%%")
 
+
 class Jsco4180StreamInterface(StreamInterface):
 
     in_terminator = '\r\n'
@@ -52,6 +53,7 @@ class Jsco4180StreamInterface(StreamInterface):
             self.device.pump_mode = "Off"
             self.device.flowrate = 0.000
             self.device.pressure = 0
+            self.device.program_runtime = 0
             return self.out_terminator
         elif mode == 6:
             # Pump on
@@ -139,6 +141,8 @@ class Jsco4180StreamInterface(StreamInterface):
 
     @if_connected
     def get_program_runtime(self):
+        if self.device.pump_mode == 'Timed':
+            self.device.program_runtime += 1
         return self.device.program_runtime
 
     @if_connected
