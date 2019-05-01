@@ -177,6 +177,7 @@ class SimulatedChtobisr(StateMachineDevice):
             fault_code += 0x00020000
         if self.faults["field_calibration"]:
             fault_code += 0x00040000
+        # ...
         if self.faults["over_power"]:
             fault_code += 0x00100000
 
