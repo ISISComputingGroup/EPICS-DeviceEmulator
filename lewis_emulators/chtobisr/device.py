@@ -32,7 +32,7 @@ class SimulatedChtobisr(StateMachineDevice):
             "external_operating_mode": False,
             "field_calibration": False,
             "laser_power_voltage": False,
-
+            # ...
             "controller_standby": False,
             "controller_interlock": False,
             "controller_enumeration": False,
@@ -62,12 +62,24 @@ class SimulatedChtobisr(StateMachineDevice):
             "startup_fault": False,
             "watchdog_timer_reset": False,
             "field_calibration": False,
-            
+            # ...
             "over_power": False,
-            
+            # ...
             "controller_checksum": False,
             "controller_status": False,
         }
+
+    @has_log
+    def backdoor_set_interlock(self, value):
+        """
+            Sets interlock via backdoor
+        :param value: ON or OFF
+        :return: none
+        """
+        try:
+            self.interlock = value
+        except KeyError:
+            self.log.error("An error occurred: " + KeyError.message)
 
     def reset(self):
         """
