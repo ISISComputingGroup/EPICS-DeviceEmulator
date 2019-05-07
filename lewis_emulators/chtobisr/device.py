@@ -14,9 +14,9 @@ class SimulatedChtobisr(StateMachineDevice):
             Initialize all of the device's attributes.
         """
 
-        self.id = "Coherent OBIS Laser Remote - EMULATOR"
-        self.interlock = "OFF"
         self.connected = True
+        self.id = "Coherent OBIS Laser Remote - EMULATOR"
+        self.interlock = "OFF"  # "OFF" -> OPEN, "ON" -> CLOSED
 
         self.status = {
             "laser_fault": False,
@@ -73,7 +73,7 @@ class SimulatedChtobisr(StateMachineDevice):
     def backdoor_set_interlock(self, value):
         """
             Sets interlock via backdoor
-        :param value: ON or OFF
+        :param value: "ON" or "OFF"
         :return: none
         """
         try:
