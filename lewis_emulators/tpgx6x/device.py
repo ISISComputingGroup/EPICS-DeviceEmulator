@@ -4,7 +4,7 @@ from lewis.devices import StateMachineDevice
 from .states import DefaultState
 
 
-class SimulatedTpg26x(StateMachineDevice):
+class SimulatedTpgx6x(StateMachineDevice):
     """
     Simulated TPG26x.
     """
