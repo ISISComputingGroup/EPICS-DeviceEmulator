@@ -82,8 +82,8 @@ class TpgStreamInterfaceBase(object):
 
         Returns: a string with pressure and error codes
         """
-        return "{0},{1},{2},{3}{}".format(self._device.error1, self._device.pressure1, self._device.error2,
-                                          self._device.pressure2, self.output_terminator())
+        return "{},{},{},{}{}".format(self._device.error1, self._device.pressure1, self._device.error2,
+                                      self._device.pressure2, self.output_terminator())
 
     def get_units(self):
         """
@@ -121,11 +121,13 @@ class Tpg36xStreamInterface(TpgStreamInterfaceBase, StreamInterface):
 
 class Tpg26xStreamInterface(TpgStreamInterfaceBase, StreamInterface):
     protocol = 'tpg26x'
-    in_terminator = ""
-    out_terminator = ""
+
+    in_terminator = "\r\n"
+    out_terminator = "\r\n"
 
     def acknowledgement(self):
         return "{}".format(ACK)
 
+    # No "additional" terminator (just uses the lewis one defined above).
     def output_terminator(self):
         return ""
