@@ -17,8 +17,8 @@ class Danfysik8500StreamInterface(CommonStreamInterface, StreamInterface):
     Stream interface for a Danfysik model 8500.
     """
 
-    in_terminator = "\r\n"
-    out_terminator = "\r\n"
+    in_terminator = "\r"
+    out_terminator = "\n\r"
 
     protocol = 'model8500'
 
@@ -30,7 +30,8 @@ class Danfysik8500StreamInterface(CommonStreamInterface, StreamInterface):
         CmdBuilder("get_current").escape("AD 8").eos().build(),
         CmdBuilder("set_address").escape("ADR ").int().eos().build(),
         CmdBuilder("get_address").escape("ADR").eos().build(),
-        CmdBuilder("init_comms").escape("REM").build(),
+        CmdBuilder("init_comms").escape("REM").eos().build(),
+        CmdBuilder("init_comms").escape("UNLOCK").eos().build(),
     ]
 
     @conditional_reply("device_available")
