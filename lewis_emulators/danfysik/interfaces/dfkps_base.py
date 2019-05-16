@@ -39,16 +39,24 @@ class CommonStreamInterface(object):
         """
         self.log.error("An error occurred at request " + repr(request) + ": " + repr(error))
 
+    @conditional_reply("device_available")
     @conditional_reply("comms_initialized")
     def get_current(self):
+        string = 'Retreiving current {} {}'.format(int(round(self.device.current)), self.device.comms_initialized)
+        self.log.info(string)
+        #self.log.info('retreiving current ', int(round(self.device.current)), self.device.comms_initialized)
         return int(round(self.device.current))
 
     @conditional_reply("comms_initialized")
     def set_current(self, value):
         self.device.current = value
 
+    @conditional_reply("device_available")
     @conditional_reply("comms_initialized")
     def get_voltage(self):
+        #self.log.info('retreiving voltage ', str(int(round(self.device.voltage))), str(self.device.comms_initialized))
+        string = 'Retreiving voltage {} {}'.format(int(round(self.device.voltage)), self.device.device_available)
+        self.log.info(string)
         return int(round(self.device.voltage))
 
     @conditional_reply("comms_initialized")
@@ -68,10 +76,12 @@ class CommonStreamInterface(object):
 
     @conditional_reply("comms_initialized")
     def set_power_off(self):
+        self.log.info('power off')
         self.device.power = False
 
     @conditional_reply("comms_initialized")
     def set_power_on(self):
+        self.log.info('power on')
         self.device.power = True
 
     @abc.abstractmethod
@@ -84,4 +94,5 @@ class CommonStreamInterface(object):
         """
         Initialize comms of device
         """
+        self.log.info('initialised comms')
         self.device.comms_initialized = True
