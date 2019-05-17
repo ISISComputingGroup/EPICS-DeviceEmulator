@@ -77,13 +77,10 @@ class Danfysik8500StreamInterface(CommonStreamInterface, StreamInterface):
 
         assert len(response) == 24, "length should have been 24 but was {}".format(len(response))
 
-        self.log.info(self.device.device_available)
-
         return response
 
     def set_address(self, value):
         self.device.set_address(value)
-        self.log.info(repr(self.device))
 
     @conditional_reply("comms_initialized")
     def get_address(self):

@@ -42,9 +42,6 @@ class CommonStreamInterface(object):
     @conditional_reply("device_available")
     @conditional_reply("comms_initialized")
     def get_current(self):
-        string = 'Retreiving current {} {}'.format(int(round(self.device.current)), self.device.comms_initialized)
-        self.log.info(string)
-        #self.log.info('retreiving current ', int(round(self.device.current)), self.device.comms_initialized)
         return int(round(self.device.current))
 
     @conditional_reply("comms_initialized")
@@ -54,9 +51,6 @@ class CommonStreamInterface(object):
     @conditional_reply("device_available")
     @conditional_reply("comms_initialized")
     def get_voltage(self):
-        #self.log.info('retreiving voltage ', str(int(round(self.device.voltage))), str(self.device.comms_initialized))
-        string = 'Retreiving voltage {} {}'.format(int(round(self.device.voltage)), self.device.device_available)
-        self.log.info(string)
         return int(round(self.device.voltage))
 
     @conditional_reply("comms_initialized")
@@ -94,5 +88,4 @@ class CommonStreamInterface(object):
         """
         Initialize comms of device
         """
-        self.log.info('initialised comms')
         self.device.comms_initialized = True
