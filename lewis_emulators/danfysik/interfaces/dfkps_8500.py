@@ -32,6 +32,7 @@ class Danfysik8500StreamInterface(CommonStreamInterface, StreamInterface):
         CmdBuilder("get_address").escape("ADR").eos().build(),
         CmdBuilder("init_comms").escape("REM").eos().build(),
         CmdBuilder("init_comms").escape("UNLOCK").eos().build(),
+        CmdBuilder("set_polarity").escape("PO ").arg("\+|\-").eos().build(),
     ]
 
     @conditional_reply("device_available")

@@ -70,12 +70,10 @@ class CommonStreamInterface(object):
 
     @conditional_reply("comms_initialized")
     def set_power_off(self):
-        self.log.info('power off')
         self.device.power = False
 
     @conditional_reply("comms_initialized")
     def set_power_on(self):
-        self.log.info('power on')
         self.device.power = True
 
     @abc.abstractmethod
