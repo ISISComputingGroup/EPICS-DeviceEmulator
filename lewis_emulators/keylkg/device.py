@@ -1,9 +1,7 @@
-import math
-import random
-
 from collections import OrderedDict
 from states import DefaultState
 from lewis.devices import StateMachineDevice
+from interfaces.stream_interface import Modes
 
 
 class SimulatedKeylkg(StateMachineDevice):
@@ -15,7 +13,7 @@ class SimulatedKeylkg(StateMachineDevice):
         self.connected = True
         self.input_correct = True
 
-        self.mode = "MEASURE"
+        self.mode = Modes.SET_UP
 
         self.output1_offset = 0.0
         self.output2_offset = 0.0
@@ -24,15 +22,6 @@ class SimulatedKeylkg(StateMachineDevice):
 
         self.head1_measurement_mode = 0
         self.head1_measurement_mode = 0
-
-    # Generate random measurement data
-    @property
-    def output1_value(self):
-        return round(self.output1_raw_value - self.output1_offset, 4)
-
-    @property
-    def output2_value(self):
-        return round(self.output2_raw_value - self.output2_offset, 4)
 
     def _get_state_handlers(self):
         return {
