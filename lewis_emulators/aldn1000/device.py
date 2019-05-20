@@ -26,8 +26,9 @@ class SimulatedAldn1000(StateMachineDevice):
         self.address = 0
         self._diameter = 0.0
         self.volume = 0.0
-        self.volume_infused = 0.0
-        self.volume_withdrawn = 0.0
+        self.volume_infused = 0.0  # Cumulative infused volume
+        self.volume_withdrawn = 0.0  # Cumulative withdrawn volume
+        self.volume_dispensed = 0.0  # Dispensed volume for a single pump run
         self._direction = 'INF'
         self.rate = 0.0
         self.units = 'UM'
