@@ -62,14 +62,14 @@ class Aldn1000StreamInterface(StreamInterface):
         return '{formatted_value:.5s}'.format(formatted_value=str(float))
 
     @if_connected
+    def get_status(self, address):
+        return self.basic_set_response(address)
+
+    @if_connected
     def set_pump(self, address, action):
         self.device.address = address
         self.device.pump_on = action
         return self.basic_set_response(address)
-
-    @if_connected
-    def get_status(self, address):
-        return self.basic_get_response(address, data=self.device.state)
 
     @if_connected
     def get_diameter(self, address):
