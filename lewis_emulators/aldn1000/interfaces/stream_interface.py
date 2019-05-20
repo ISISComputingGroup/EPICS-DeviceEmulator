@@ -30,19 +30,19 @@ class Aldn1000StreamInterface(StreamInterface):
                 CmdBuilder(self.get_program_function).int().escape('FUN').eos().build(),
                 CmdBuilder(self.get_volume_dispensed).int().escape('DIS').eos().build(),
                 CmdBuilder(self.clear_volume).int().escape('CLD').arg("INF|WDR").eos().build(),
-                CmdBuilder(self.set_pump).int().arg('STP|RUN').eos().build(),
+                CmdBuilder(self.set_pump).int().arg("STP|RUN").eos().build(),
                 CmdBuilder(self.get_status).int().eos().build(),
         }
 
     @if_input_error
     def basic_get_response(self, address, data=None, units=""):
         """It is expected that data inputs will be formatted using the format_data() method"""
-        return STX + '{address:02d}{status}{data}{units}'.format(address=address, status=self.device.status,
+        return STX + '{address:02d}{status}{data}{units}'.format(address=address, status=self.device.state,
                                                                  data=data, units=units) + ETX
 
     @if_input_error
     def basic_set_response(self, address):
-        response = STX + '{:02d}{status}'.format(address, status=self.device.status) + ETX
+        response = STX + '{:02d}{status}'.format(address, status=self.device.state) + ETX
         return response
 
     @if_connected
@@ -64,22 +64,12 @@ class Aldn1000StreamInterface(StreamInterface):
     @if_connected
     def set_pump(self, address, action):
         self.device.address = address
-        self.device.pump = action
+        self.device.pump_on = action
         return self.basic_set_response(address)
 
     @if_connected
     def get_status(self, address):
-        return self.basic_get_response(address, data=self.device.status)
-
-    @if_connected
-    def set_pump_on(self, address):
-        self.device.address = address
-        self.device.pump = 'ON'
-
-    @if_connected
-    def set_pump_off(self, address):
-        self.device.address = address
-        self.device.pump = 'OFF'
+        return self.basic_get_response(address, data=self.device.state)
 
     @if_connected
     def get_diameter(self, address):

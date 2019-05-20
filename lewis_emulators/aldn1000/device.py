@@ -1,6 +1,14 @@
 from collections import OrderedDict
-from states import DefaultState
+from states import InfusingState, WithdrawingState, PumpingProgramStoppedState, PumpingProgramPausedState, PausePhaseState, UserWaitState
 from lewis.devices import StateMachineDevice
+
+states = OrderedDict([
+    ('I', InfusingState()),
+    ('W', WithdrawingState()),
+    ('S', PumpingProgramStoppedState()),
+    ('P', PumpingProgramPausedState()),
+    ('T', PausePhaseState()),
+    ('U', UserWaitState())])
 
 
 class SimulatedAldn1000(StateMachineDevice):
@@ -12,8 +20,7 @@ class SimulatedAldn1000(StateMachineDevice):
         self.connected = True
         self.input_correct = True
 
-        self.status = 'S'
-        self._pump = 'STP'
+        self._pump_on = False
         self.program_function = 'RAT'
 
         self.address = 0
@@ -25,6 +32,7 @@ class SimulatedAldn1000(StateMachineDevice):
         self.rate = 0.0
         self.units = 'UM'
         self.volume_units = 'UL'
+        self.new_action = False
 
     def clear_volume(self, volume_type):
         if volume_type == 'INF':
@@ -34,25 +42,16 @@ class SimulatedAldn1000(StateMachineDevice):
         return
 
     @property
-    def pump(self):
-        return self._pump
+    def pump_on(self):
+        return self._pump_on
 
-    @pump.setter
-    def pump(self, action):
+    @pump_on.setter
+    def pump_on(self, action):
+        self.new_action = True  # Check used for On -> Paused / Paused -> Off state transition.
         if action == 'STP':
-            self._pump = 'STP'
-            if self.status == 'P':  # Currently paused
-                self.status = 'S'  # Stop
-            elif self.status == 'S':
-                pass
-            else:
-                self.status = 'P'  # Pause
+            self._pump_on = False
         elif action == 'RUN':
-            self._pump = 'RUN'
-            if self.direction == 'Infusing':
-                self.status = 'I'
-            else:
-                self.status = 'W'
+            self._pump_on = True
         else:
             print('An error occurred while trying to start/stop the pump')
 
@@ -85,15 +84,24 @@ class SimulatedAldn1000(StateMachineDevice):
     def reset(self):
         self._initialize_data()
 
+    @property
+    def state(self):
+        return self._csm.state
+
     def _get_state_handlers(self):
-        return {
-            'default': DefaultState(),
-        }
+        return states
 
     def _get_initial_state(self):
-        return 'default'
+        return 'S'
 
     def _get_transition_handlers(self):
         return OrderedDict([
+            (('S', 'I'), lambda: self.pump_on is True and self.direction == 'INF'),
+            (('S', 'W'), lambda: self.pump_on is True and self.direction == 'WDR'),
+            (('I', 'P'), lambda: self.pump_on is False),
+            (('W', 'P'), lambda: self.pump_on is False),
+            (('P', 'S'), lambda: self.pump_on is False and self.new_action is True),
+            (('P', 'I'), lambda: self.pump_on is True and self.direction == 'INF'),
+            (('P', 'W'), lambda: self.pump_on is True and self.direction == 'WDR'),
         ])
 
