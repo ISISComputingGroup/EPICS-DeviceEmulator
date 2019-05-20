@@ -29,22 +29,16 @@ class Aldn1000StreamInterface(StreamInterface):
                 CmdBuilder(self.set_rate).int().escape('RAT').float().string().eos().build(),
                 CmdBuilder(self.get_program_function).int().escape('FUN').eos().build(),
                 CmdBuilder(self.get_volume_dispensed).int().escape('DIS').eos().build(),
-                CmdBuilder(self.clear_volume).int().escape('CLD').string().eos().build(),
+                CmdBuilder(self.clear_volume).int().escape('CLD').arg("INF|WDR").eos().build(),
                 CmdBuilder(self.set_pump).int().arg('STP|RUN').eos().build(),
                 CmdBuilder(self.get_status).int().eos().build(),
         }
 
     @if_input_error
-    def basic_get_response(self, address, data=None, units=None):
-        # The device requires very specific formatting(0000. - 1000.) for floats, so we restrict the float output to
-        # to the first 5 characters of the float converted to a string. Hackish, but the only way we found to
-        # quickly implement this without writing our own formatter.
-        if units is not None:
-            return STX + '{address:02d}{status}{data}{units}'.format(address=address, status=self.device.status,
-                                                                     data=data, units=units) + ETX
-        else:
-            return STX + '{address:02d}{status}{data}'.format(address=address, status=self.device.status,
-                                                              data=data) + ETX
+    def basic_get_response(self, address, data=None, units=""):
+        """It is expected that data inputs will be formatted using the format_data() method"""
+        return STX + '{address:02d}{status}{data}{units}'.format(address=address, status=self.device.status,
+                                                                 data=data, units=units) + ETX
 
     @if_input_error
     def basic_set_response(self, address):
@@ -53,33 +47,29 @@ class Aldn1000StreamInterface(StreamInterface):
 
     @if_connected
     def format_data(self, float):
-        # Restrict a float to only the first 5 characters
+        """ Restrict a float to only the first 5 characters
+
+        The device requires very specific formatting (0000. to .0000) for floats, so we restrict the float output to
+        to the first 5 characters of the float converted to a string. Hackish, but the only way we found to
+        quickly implement this without writing our own formatter.
+
+            Arguments:
+                float (float): The float to be converted
+            Returns:
+                return (str): The first 5 characters of the input float.
+
+        """
         return '{formatted_value:.5s}'.format(formatted_value=str(float))
 
     @if_connected
     def set_pump(self, address, action):
         self.device.address = address
-        if action == 'STP':
-            self.device.pump = 'STP'
-            if self.device.status == 'P':  # Currently paused
-                self.device.status = 'S'  # Stop
-            elif self.device.status == 'S':
-                pass
-            else:
-                self.device.status = 'P'  # Pause
-        elif action == 'RUN':
-            self.device.pump = 'RUN'
-            if self.device.direction == 'Infusing':
-                self.device.status = 'I'
-            else:
-                self.device.status = 'W'
-        else:
-            print('An error occurred while trying to start/stop the pump')
+        self.device.pump = action
         return self.basic_set_response(address)
 
     @if_connected
     def get_status(self, address):
-        return self.basic_get_response(address, self.device.status)
+        return self.basic_get_response(address, data=self.device.status)
 
     @if_connected
     def set_pump_on(self, address):
@@ -93,25 +83,18 @@ class Aldn1000StreamInterface(StreamInterface):
 
     @if_connected
     def get_diameter(self, address):
-        return self.basic_get_response(address, self.format_data(self.device.diameter))
+        return self.basic_get_response(address, data=self.format_data(self.device.diameter))
 
     @if_connected
-    def set_diameter(self, address, diameter):
+    def set_diameter(self, address, new_diameter):
         self.device.address = address
-        self.device.diameter = diameter
-        if diameter > 14.00:
-            self.device.volume_units = 'mL'
-        else:
-            self.device.volume_units = 'uL'
+        self.device.diameter = new_diameter
         return self.basic_set_response(address)
 
     @if_connected
     def get_volume(self, address):
-        if self.device.volume_units == 'mL':
-            units = 'ML'
-        else:
-            units = 'UL'
-        return self.basic_get_response(address, self.format_data(self.device.volume), units)
+        return self.basic_get_response(address, data=self.format_data(self.device.volume),
+                                       units=self.device.volume_units)
 
     @if_connected
     def set_volume(self, address, volume):
@@ -124,22 +107,16 @@ class Aldn1000StreamInterface(StreamInterface):
         data = 'I{infused}W{withdrawn}{units}'.format(infused=self.format_data(self.device.volume_infused),
                                                       withdrawn=self.format_data(self.device.volume_withdrawn),
                                                       units=self.device.volume_units)
-        return self.basic_get_response(address, data)
+        return self.basic_get_response(address, data=data)
 
     @if_connected
     def get_direction(self, address):
         return self.basic_get_response(address, self.device.direction)
 
     @if_connected
-    def set_direction(self, address, direction):
+    def set_direction(self, address, new_direction):
         self.device.address = address
-        if direction == 'REV':  # Reverse
-            if self.device.direction == 'INF':  # Infuse
-                self.device.direction = 'WDR'  # Withdraw
-            else:
-                self.device.direction = 'INF'
-        else:
-            self.device.direction = direction
+        self.device.direction = new_direction
         return self.basic_set_response(address)
 
     @if_connected
@@ -160,7 +137,5 @@ class Aldn1000StreamInterface(StreamInterface):
     @if_connected
     def clear_volume(self, address, volume_type):
         self.device.address = address
-        if volume_type == 'INF':
-            self.device.volume_infused = 0.0
-        elif volume_type == 'WDR':
-            self.device.volume_withdrawn = 0.0
+        self.device.clear_volume(volume_type)
+        return self.basic_set_response(address)
