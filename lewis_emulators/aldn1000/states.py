@@ -4,12 +4,13 @@ from lewis.core.statemachine import State
 class InfusingState(State):
 
     def on_entry(self, dt):
-        self._context.volume_dispensed = 0.0
+        device = self._context
+        device.volume_dispensed = 0.0
 
     def in_state(self, dt):
         device = self._context
-        device.volume_infused += device.rate
-        device.volume_dispensed += device.rate
+        device.volume_infused += dt * device.rate
+        device.volume_dispensed += dt * device.rate
 
         if device.volume_dispensed >= device.volume:
             device.pump_on = "STP"
@@ -22,8 +23,8 @@ class WithdrawingState(State):
 
     def in_state(self, dt):
         device = self._context
-        device.volume_withdrawn += device.rate
-        device.volume_dispensed += device.rate
+        device.volume_withdrawn += dt * device.rate
+        device.volume_dispensed += dt * device.rate
 
         if device.volume_dispensed >= device.volume:
             device.pump_on = "STP"
