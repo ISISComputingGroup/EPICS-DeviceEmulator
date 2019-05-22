@@ -18,28 +18,31 @@ class SimulatedChtobisr(StateMachineDevice):
         self.id = "Coherent OBIS Laser Remote - EMULATOR"
         self.interlock = "OFF"  # "OFF" -> OPEN, "ON" -> CLOSED
 
+        # Dictionary of form:
+        # {status_name: [whether_in_status, return_code]}
         self.status = {
-            "laser_fault":              (False, 0x00000001),
-            "laser_emission":           (False, 0x00000002),
-            "laser_ready":              (False, 0x00000004),
-            "laser_standby":            (False, 0x00000008),
-            "cdrh_delay":               (False, 0x00000010),
-            "laser_hardware_fault":     (False, 0x00000020),
-            "laser_error":              (False, 0x00000040),
-            "laser_power_calibration":  (False, 0x00000080),
-            "laser_warm_up":            (False, 0x00000100),
-            "laser_noise":              (False, 0x00000200),
-            "external_operating_mode":  (False, 0x00000400),
-            "field_calibration":        (False, 0x00000800),
-            "laser_power_voltage":      (False, 0x00001000),
-            # ...
-            "controller_standby":       (False, 0x02000000),
-            "controller_interlock":     (False, 0x04000000),
-            "controller_enumeration":   (False, 0x08000000),
-            "controller_error":         (False, 0x10000000),
-            "controller_fault":         (False, 0x20000000),
-            "remote_active":            (False, 0x40000000),
-            "controller_indicator":     (False, 0x80000000),
+            # Laser specific status bits
+            "laser_fault":              [False, 0x00000001],
+            "laser_emission":           [False, 0x00000002],
+            "laser_ready":              [False, 0x00000004],
+            "laser_standby":            [False, 0x00000008],
+            "cdrh_delay":               [False, 0x00000010],
+            "laser_hardware_fault":     [False, 0x00000020],
+            "laser_error":              [False, 0x00000040],
+            "laser_power_calibration":  [False, 0x00000080],
+            "laser_warm_up":            [False, 0x00000100],
+            "laser_noise":              [False, 0x00000200],
+            "external_operating_mode":  [False, 0x00000400],
+            "field_calibration":        [False, 0x00000800],
+            "laser_power_voltage":      [False, 0x00001000],
+            # Controller specific status bits
+            "controller_standby":       [False, 0x02000000],
+            "controller_interlock":     [False, 0x04000000],
+            "controller_enumeration":   [False, 0x08000000],
+            "controller_error":         [False, 0x10000000],
+            "controller_fault":         [False, 0x20000000],
+            "remote_active":            [False, 0x40000000],
+            "controller_indicator":     [False, 0x80000000],
         }
         
         self.faults = {
@@ -76,10 +79,10 @@ class SimulatedChtobisr(StateMachineDevice):
         :param value: "ON" or "OFF"
         :return: none
         """
-        try:
+        if value not in ["ON", "OFF"]:
+            self.log.error("Interlock can only be set to ON or OFF")
+        else:
             self.interlock = value
-        except KeyError:
-            self.log.error("An error occurred: " + KeyError.message)
 
     def reset(self):
         """
@@ -99,50 +102,6 @@ class SimulatedChtobisr(StateMachineDevice):
         for value in self.status.values():
             if value[0]:
                 status_code += value[1]
-
-        # Laser specific status bits
-        # if self.status["laser_fault"]:
-        #     status_code += 0x00000001
-        # if self.status["laser_emission"]:
-        #     status_code += 0x00000002
-        # if self.status["laser_ready"]:
-        #     status_code += 0x00000004
-        # if self.status["laser_standby"]:
-        #     status_code += 0x00000008
-        # if self.status["cdrh_delay"]:
-        #     status_code += 0x00000010
-        # if self.status["laser_hardware_fault"]:
-        #     status_code += 0x00000020
-        # if self.status["laser_error"]:
-        #     status_code += 0x00000040
-        # if self.status["laser_power_calibration"]:
-        #     status_code += 0x00000080
-        # if self.status["laser_warm_up"]:
-        #     status_code += 0x00000100
-        # if self.status["laser_noise"]:
-        #     status_code += 0x00000200
-        # if self.status["external_operating_mode"]:
-        #     status_code += 0x00000400
-        # if self.status["field_calibration"]:
-        #     status_code += 0x00000800
-        # if self.status["laser_power_voltage"]:
-        #     status_code += 0x00001000
-
-        # Controller specific status bits
-        # if self.status["controller_standby"]:
-        #     status_code += 0x02000000
-        # if self.status["controller_interlock"]:
-        #     status_code += 0x04000000
-        # if self.status["controller_enumeration"]:
-        #     status_code += 0x08000000
-        # if self.status["controller_error"]:
-        #     status_code += 0x10000000
-        # if self.status["controller_fault"]:
-        #     status_code += 0x20000000
-        # if self.status["remote_active"]:
-        #     status_code += 0x40000000
-        # if self.status["controller_indicator"]:
-        #     status_code += 0x80000000
 
         return status_code
 
