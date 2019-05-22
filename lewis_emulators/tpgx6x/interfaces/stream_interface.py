@@ -10,7 +10,7 @@ ACK = chr(6)
 @six.add_metaclass(abc.ABCMeta)
 class TpgStreamInterfaceBase(object):
     """
-    Stream interface for the serial port
+    Stream interface for the serial port for either a TPG26x or TPG36x.
     """
 
     _last_command = None
@@ -42,7 +42,7 @@ class TpgStreamInterfaceBase(object):
         :param error: problem
         :return:
         """
-        print "An error occurred at request " + repr(request) + ": " + repr(error)
+        print("An error occurred at request " + repr(request) + ": " + repr(error))
 
     def acknowledge_pressure(self):
         """

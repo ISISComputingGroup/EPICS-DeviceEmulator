@@ -6,7 +6,7 @@ from .states import DefaultState
 
 class SimulatedTpgx6x(StateMachineDevice):
     """
-    Simulated TPG26x.
+    Simulated device for both the TPG26x and TPG36x.
     """
 
     def _initialize_data(self):
