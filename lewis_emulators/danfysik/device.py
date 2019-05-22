@@ -38,6 +38,9 @@ class SimulatedDanfysik(StateMachineDevice):
         # Use a list of active interlocks because each danfysik has different sets of interlocks which can be enabled.
         self.active_interlocks = []
 
+        self.currently_addressed_psu = 0
+        self.address = 75
+
     def enable_interlock(self, name):
         """
         Adds an interlock to the list of enabled interlock
@@ -55,6 +58,25 @@ class SimulatedDanfysik(StateMachineDevice):
         """
         if name in self.active_interlocks:
             self.active_interlocks.remove(name)
+
+    def set_address(self, value):
+        """
+        Changes the currently addressed PSU
+
+        Args:
+            value: int, the address to set the PSU to.
+        """
+
+        self.currently_addressed_psu = value
+
+        self.log.info("Address set to, {}".format(value))
+
+        if self.address != self.currently_addressed_psu:
+            self.comms_initialized = False
+            self.log.info("Device down")
+        else:
+            self.comms_initialized = True
+            self.log.info("Device up")
 
     def reset(self):
         """

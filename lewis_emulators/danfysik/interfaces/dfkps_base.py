@@ -39,6 +39,7 @@ class CommonStreamInterface(object):
         """
         self.log.error("An error occurred at request " + repr(request) + ": " + repr(error))
 
+    @conditional_reply("device_available")
     @conditional_reply("comms_initialized")
     def get_current(self):
         return int(round(self.device.current))
@@ -47,6 +48,7 @@ class CommonStreamInterface(object):
     def set_current(self, value):
         self.device.current = value
 
+    @conditional_reply("device_available")
     @conditional_reply("comms_initialized")
     def get_voltage(self):
         return int(round(self.device.voltage))
