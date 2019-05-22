@@ -1,13 +1,31 @@
+import abc
+import six
 from lewis.adapters.stream import StreamInterface
 from lewis_emulators.utils.command_builder import CmdBuilder
 
 
-class Tpg26xStreamInterface(StreamInterface):
+ACK = chr(6)
+
+
+@six.add_metaclass(abc.ABCMeta)
+class TpgStreamInterfaceBase(object):
     """
-    Stream interface for the serial port
+    Stream interface for the serial port for either a TPG26x or TPG36x.
     """
+
     _last_command = None
-    ACK = chr(6)
+
+    @abc.abstractmethod
+    def acknowledgement(self):
+        """
+        Returns a string which is the device's "acknowledgement" message.
+        """
+
+    @abc.abstractmethod
+    def output_terminator(self):
+        """
+        A terminator to add to every reply except acknowledgement messages.
+        """
 
     commands = {
         CmdBuilder("acknowledge_pressure").escape("PRX").build(),
@@ -15,9 +33,6 @@ class Tpg26xStreamInterface(StreamInterface):
         CmdBuilder("set_units").escape("UNI").arg("{0|1|2}").build(),
         CmdBuilder("handle_enquiry").enq().build()
     }
-
-    in_terminator = "\r\n"
-    out_terminator = "\r\n"
 
     def handle_error(self, request, error):
         """
@@ -27,7 +42,7 @@ class Tpg26xStreamInterface(StreamInterface):
         :param error: problem
         :return:
         """
-        print "An error occurred at request " + repr(request) + ": " + repr(error)
+        print("An error occurred at request " + repr(request) + ": " + repr(error))
 
     def acknowledge_pressure(self):
         """
@@ -36,7 +51,7 @@ class Tpg26xStreamInterface(StreamInterface):
         :return: ASCII acknowledgement character (0x6)
         """
         self._last_command = "PRX"
-        return self.ACK
+        return self.acknowledgement()
 
     def acknowledge_units(self):
         """
@@ -45,7 +60,7 @@ class Tpg26xStreamInterface(StreamInterface):
         :return: ASCII acknowledgement character (0x6)
         """
         self._last_command = "UNI"
-        return self.ACK
+        return self.acknowledgement()
 
     def handle_enquiry(self):
         """
@@ -55,11 +70,11 @@ class Tpg26xStreamInterface(StreamInterface):
         """
 
         if self._last_command == "PRX":
-            return self.get_pressure()
+            return "{}{}".format(self.get_pressure(), self.output_terminator())
         elif self._last_command == "UNI":
-            return self.get_units()
+            return "{}{}".format(self.get_units(), self.output_terminator())
         else:
-            print "Last command was unknown: " + repr(self._last_command)
+            print("Last command was unknown: " + repr(self._last_command))
 
     def get_pressure(self):
         """
@@ -67,8 +82,8 @@ class Tpg26xStreamInterface(StreamInterface):
 
         Returns: a string with pressure and error codes
         """
-        return "{0},{1},{2},{3}".format(self._device.error1, self._device.pressure1,
-                                        self._device.error2, self._device.pressure2)
+        return "{},{},{},{}{}".format(self._device.error1, self._device.pressure1, self._device.error2,
+                                      self._device.pressure2, self.output_terminator())
 
     def get_units(self):
         """
@@ -86,7 +101,33 @@ class Tpg26xStreamInterface(StreamInterface):
         """
         if self._last_command is None:
             self._last_command = "UNI"
-            return self.ACK
+            return self.acknowledgement()
 
         self._device.units = units
         self._last_command = None
+
+
+class Tpg36xStreamInterface(TpgStreamInterfaceBase, StreamInterface):
+    protocol = 'tpg36x'
+    in_terminator = ""
+    out_terminator = ""
+
+    def acknowledgement(self):
+        return "{}\r\n".format(ACK)
+
+    def output_terminator(self):
+        return "\r"
+
+
+class Tpg26xStreamInterface(TpgStreamInterfaceBase, StreamInterface):
+    protocol = 'tpg26x'
+
+    in_terminator = "\r\n"
+    out_terminator = "\r\n"
+
+    def acknowledgement(self):
+        return "{}".format(ACK)
+
+    # No "additional" terminator (just uses the lewis one defined above).
+    def output_terminator(self):
+        return ""
