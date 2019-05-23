@@ -46,8 +46,8 @@ class Lakeshore340StreamInterface(StreamInterface):
         CmdBuilder("get_heater_range").escape("RANGE?").eos().build(),
     }
 
-    in_terminator = "\n"
-    out_terminator = "\n"
+    in_terminator = "\r\n"
+    out_terminator = "\r\n"
 
     def handle_error(self, request, error):
         err_string = "command was: {}, error was: {}: {}\n".format(request, error.__class__.__name__, error)
