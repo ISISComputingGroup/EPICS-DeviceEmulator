@@ -46,30 +46,32 @@ class SimulatedChtobisr(StateMachineDevice):
         }
         
         self.faults = {
-            "base_plate_temp_fault": False,
-            "diode_temp_fault": False,
-            "internal_temp_fault": False,
-            "laser_power_supply_fault": False,
-            "i2c_error": False,
-            "over_current": False,
-            "laser_checksum_error": False,
-            "checksum_recovery": False,
-            "buffer_overflow": False,
-            "warm_up_limit_fault": False,
-            "tec_driver_error": False,
-            "ccb_error": False,
-            "diode_temp_limit_error": False,
-            "laser_ready_fault": False,
-            "photodiode_fault": False,
-            "fatal_fault": False,
-            "startup_fault": False,
-            "watchdog_timer_reset": False,
-            "field_calibration": False,
+            # Laser specific fault bits
+            "base_plate_temp_fault":    [False, 0x00000001],
+            "diode_temp_fault":         [False, 0x00000002],
+            "internal_temp_fault":      [False, 0x00000004],
+            "laser_power_supply_fault": [False, 0x00000008],
+            "i2c_error":                [False, 0x00000010],
+            "over_current":             [False, 0x00000020],
+            "laser_checksum_error":     [False, 0x00000040],
+            "checksum_recovery":        [False, 0x00000080],
+            "buffer_overflow":          [False, 0x00000100],
+            "warm_up_limit_fault":      [False, 0x00000200],
+            "tec_driver_error":         [False, 0x00000400],
+            "ccb_error":                [False, 0x00000800],
+            "diode_temp_limit_error":   [False, 0x00001000],
+            "laser_ready_fault":        [False, 0x00002000],
+            "photodiode_fault":         [False, 0x00004000],
+            "fatal_fault":              [False, 0x00008000],
+            "startup_fault":            [False, 0x00010000],
+            "watchdog_timer_reset":     [False, 0x00020000],
+            "field_calibration":        [False, 0x00040000],
             # ...
-            "over_power": False,
+            "over_power":               [False, 0x00100000],
+            # Controller specific fault bits
             # ...
-            "controller_checksum": False,
-            "controller_status": False,
+            "controller_checksum":      [False, 0x40000000],
+            "controller_status":        [False, 0x80000000],
         }
 
     @has_log
@@ -113,54 +115,9 @@ class SimulatedChtobisr(StateMachineDevice):
         """
         fault_code = 0x00000000
 
-        # Laser specific fault bits
-        if self.faults["base_plate_temp_fault"]:
-            fault_code += 0x00000001
-        if self.faults["diode_temp_fault"]:
-            fault_code += 0x00000002
-        if self.faults["internal_temp_fault"]:
-            fault_code += 0x00000004
-        if self.faults["laser_power_supply_fault"]:
-            fault_code += 0x00000008
-        if self.faults["i2c_error"]:
-            fault_code += 0x00000010
-        if self.faults["over_current"]:
-            fault_code += 0x00000020
-        if self.faults["laser_checksum_error"]:
-            fault_code += 0x00000040
-        if self.faults["checksum_recovery"]:
-            fault_code += 0x00000080
-        if self.faults["buffer_overflow"]:
-            fault_code += 0x00000100
-        if self.faults["warm_up_limit_fault"]:
-            fault_code += 0x00000200
-        if self.faults["tec_driver_error"]:
-            fault_code += 0x00000400
-        if self.faults["ccb_error"]:
-            fault_code += 0x00000800
-        if self.faults["diode_temp_limit_error"]:
-            fault_code += 0x00001000
-        if self.faults["laser_ready_fault"]:
-            fault_code += 0x00002000
-        if self.faults["photodiode_fault"]:
-            fault_code += 0x00004000
-        if self.faults["fatal_fault"]:
-            fault_code += 0x00008000
-        if self.faults["startup_fault"]:
-            fault_code += 0x00010000
-        if self.faults["watchdog_timer_reset"]:
-            fault_code += 0x00020000
-        if self.faults["field_calibration"]:
-            fault_code += 0x00040000
-        # ...
-        if self.faults["over_power"]:
-            fault_code += 0x00100000
-
-        # Controller specific fault bits
-        if self.faults["controller_checksum"]:
-            fault_code += 0x40000000
-        if self.faults["controller_status"]:
-            fault_code += 0x80000000
+        for value in self.faults.values():
+            if value[0]:
+                fault_code += value[1]
 
         return fault_code
 
@@ -186,7 +143,7 @@ class SimulatedChtobisr(StateMachineDevice):
         :return: none
         """
         try:
-            self.faults[faultname] = value
+            self.faults[faultname][0] = value
         except KeyError:
             self.log.error("An error occurred: " + KeyError.message)
 
