@@ -10,17 +10,14 @@ class SimulatedTti355(StateMachineDevice):
         """
         Initialize all of the device's attributes.
         """
-        self.ident = "THURLBY EX355P, <version>"
+        self.identity = "THURLBY EX355P, <version>"
         self.voltage = 1.00
         self.voltage_sp = 1.00
         self.current = 1.00
         self.current_sp = 1.00
         self.output_status = "OUT OFF"
-        self.output_status_sp = "OUT OFF"
-        self.output_mode = "M CC"
-        self.output_mode_sp = "M CC"
-        self.error = 0
-
+        self.output_mode = "M CV"
+        self.error = 0# "ERR {}".format(0)
         self._max_voltage = 35.0
         self._max_current = 5.0
 
@@ -44,36 +41,42 @@ class SimulatedTti355(StateMachineDevice):
             self.voltage = self.voltage_sp + random()
         else:
             self.voltage = random()
-        return self.voltage()
+        return self.voltage
     
     def set_voltage_sp(self, voltage):
         voltage = round(float(voltage), 2)
         if voltage > self._max_voltage:
-            self.error = 2
+            self.error = 2# "ERR {}".format(2)
         else:
             self.voltage_sp = voltage
 
-    
     def get_current(self):
-        pass
+        if self.output_status == "OUT ON":
+            self.current = self.current_sp + random()
+        else:
+            self.current = random()
+        return self.current
     
-    def set_current_sp(self):
-        pass
+    def set_current_sp(self, current):
+        current = round(float(current), 2)
+        print(self.current_sp)
+        if current > self._max_current:
+            self.error = 2# "ERR {}".format(2)
+            print(self.current_sp)
+        else:
+            self.current_sp = current
     
-    def set_output_status(self):
-        pass
-
+    def set_output_status(self, status):
+        if status == "ON":
+            self.output_status = "OUT ON"
+        elif status == "OFF":
+            self.output_status = "OUT OFF"
+        
     def get_output_status(self):
-        pass
-
-    def set_output_mode(self):
-        pass
+        return self.output_status
 
     def get_output_mode(self):
-        pass        
+        return self.output_mode
     
-    def get_ident(self):
-        pass
-    
-    def get_error(self):
-        pass
+    def get_error_status(self):
+        return self.error
