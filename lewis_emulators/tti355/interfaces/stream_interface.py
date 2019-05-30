@@ -14,18 +14,18 @@ class Tti355StreamInterface(StreamInterface):
         # Commands that we expect via serial during normal operation
         self.commands = {
             CmdBuilder(self.get_identity).escape("*IDN?").eos().build(),
-            
+
             CmdBuilder(self.get_voltage_sp).escape("V?").eos().build(),
             CmdBuilder(self.set_voltage_sp).escape("V ").float().eos().build(),
             CmdBuilder(self.get_voltage).escape("VO?").eos().build(),
 
             CmdBuilder(self.get_current_sp).escape("I?").eos().build(),
-            CmdBuilder(self.set_current_sp).escape("I ").float().eos().build(),
+            CmdBuilder(self.set_current_limit_sp).escape("I ").float().eos().build(),
             CmdBuilder(self.get_current).escape("IO?").eos().build(),
 
             CmdBuilder(self.get_outputstatus).escape("OUT?").eos().build(),
-            CmdBuilder(self.set_outputstatus_on).escape("ON").eos().build(),
-            CmdBuilder(self.set_outputstatus_off).escape("OFF").eos().build(),
+            CmdBuilder(self.set_outputstatus_on).escape("On").eos().build(),
+            CmdBuilder(self.set_outputstatus_off).escape("Off").eos().build(),
            
             CmdBuilder(self.get_output_mode).escape("M?").eos().build(),
             CmdBuilder(self.get_error_status).escape("ERR?").eos().build(),
@@ -54,21 +54,21 @@ class Tti355StreamInterface(StreamInterface):
         return "I{:.2f}".format(current)
     
     def get_current_sp(self):
-        return "I{:.2f}".format(self.device.current_sp)
+        return "I{:.2f}".format(self.device.current_limit_sp)
 
-    def set_current_sp(self, current_sp):
-        self.device.set_current_sp(float(current_sp))
+    def set_current_limit_sp(self, current_limit_sp):
+        self.device.set_current_limit_sp(float(current_limit_sp))
         return self.out_terminator
 
     def get_outputstatus(self):
         return self.device.get_output_status()
 
     def set_outputstatus_on(self):
-        self.device.set_output_status("ON")
+        self.device.set_output_status("On")
         return self.out_terminator
 
     def set_outputstatus_off(self):
-        self.device.set_output_status("OFF")
+        self.device.set_output_status("Off")
         return self.out_terminator
     
     def get_output_mode(self):

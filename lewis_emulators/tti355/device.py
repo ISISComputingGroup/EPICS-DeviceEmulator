@@ -14,12 +14,13 @@ class SimulatedTti355(StateMachineDevice):
         self.voltage = 1.00
         self.voltage_sp = 1.00
         self.current = 1.00
-        self.current_sp = 1.00
-        self.output_status = "OUT OFF"
+        self.current_limit_sp = 1.00
+        self.output_status = "OUT Off"
         self.output_mode = "M CV"
         self.error = "ERR {}".format(0)
         self._max_voltage = 35.0
         self._max_current = 5.0
+        self.load_resistance = self.calculate_load_resistance(self.voltage, self.current)
 
     def reset(self):
         self._initialize_data()
@@ -36,8 +37,14 @@ class SimulatedTti355(StateMachineDevice):
         return OrderedDict([
         ])
 
+    def calculate_load_resistance(self, voltage, current):
+        return voltage/current
+
+    def calculate_potential_current(self, voltage):
+        return voltage/self.load_resistance
+
     def get_voltage(self):
-        if self.output_status == "OUT ON":
+        if self.output_status == "OUT On":
             self.voltage = self.voltage_sp + ((random()-0.5)/1000)
         else:
             self.voltage = ((random()-0.5)/1000)
@@ -48,30 +55,31 @@ class SimulatedTti355(StateMachineDevice):
         if voltage > self._max_voltage:
             self.error = "ERR {}".format(2)
         else:
+            if self.calculate_potential_current(voltage) > self.get_current():
+                self.output_mode = "M CC"
             self.voltage_sp = voltage
 
     def get_current(self):
-        if self.output_status == "OUT ON":
-            self.current = self.current_sp + ((random()-0.5)/1000)
+        if self.output_status == "OUT On":
+            self.current = self.current_limit_sp + ((random()-0.5)/1000)
         else:
             self.current = ((random()-0.5)/1000)
         return self.current
     
-    def set_current_sp(self, current):
+    def set_current_limit_sp(self, current):
         current = round(float(current), 2)
-        print(self.current_sp)
         if current > self._max_current:
             self.error = "ERR {}".format(2)
-            print(self.current_sp)
         else:
-            self.current_sp = current
+            self.current_limit_sp = current
     
     def set_output_status(self, status):
-        if status == "ON":
-            self.output_status = "OUT ON"
-        elif status == "OFF":
-            self.output_status = "OUT OFF"
-        
+        if status == "On":
+            self.output_status = "OUT On"
+        elif status == "Off":
+            self.output_status = "OUT Off"
+            self.reset()
+            
     def get_output_status(self):
         return self.output_status
 
