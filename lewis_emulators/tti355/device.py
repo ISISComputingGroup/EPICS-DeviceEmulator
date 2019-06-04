@@ -10,17 +10,17 @@ class SimulatedTti355(StateMachineDevice):
         """
         Initialize all of the device's attributes.
         """
-        self.identity = "THURLBY EX355P, <version>"
-        self.voltage = 1.00
+        self.identity = "Thurlby Thandar,EL302P,0,v1.14"
+        self.voltage = 0.00
         self.voltage_sp = 1.00
-        self.current = 1.00
+        self.current = 0.00
         self.current_limit_sp = 1.00
         self.output_status = "OUT Off"
         self.output_mode = "M CV"
-        self.error = "ERR {}".format(0)
+        self.error = "ERR 0"
         self._max_voltage = 35.0
         self._max_current = 5.0
-        self.load_resistance = self.calculate_load_resistance(self.voltage, self.current)
+        self.load_resistance = 0.01
 
     def reset(self):
         self._initialize_data()
@@ -53,7 +53,7 @@ class SimulatedTti355(StateMachineDevice):
     def set_voltage_sp(self, voltage):
         voltage = round(float(voltage), 2)
         if voltage > self._max_voltage:
-            self.error = "ERR {}".format(2)
+            self.error = "ERR 2"
         else:
             if self.calculate_potential_current(voltage) > self.get_current():
                 self.output_mode = "M CC"
@@ -69,7 +69,7 @@ class SimulatedTti355(StateMachineDevice):
     def set_current_limit_sp(self, current):
         current = round(float(current), 2)
         if current > self._max_current:
-            self.error = "ERR {}".format(2)
+            self.error = "ERR 2"
         else:
             self.current_limit_sp = current
     
@@ -79,7 +79,7 @@ class SimulatedTti355(StateMachineDevice):
         elif status == "Off":
             self.output_status = "OUT Off"
             self.reset()
-            
+
     def get_output_status(self):
         return self.output_status
 
@@ -87,4 +87,11 @@ class SimulatedTti355(StateMachineDevice):
         return self.output_mode
     
     def get_error_status(self):
-        return self.error
+        if self.error == "ERR 1":
+            self.error = "ERR 0"
+            return "ERR 1"
+        elif self.error == "ERR 2":
+            self.error = "ERR 0"
+            return "ERR 2"
+        else:
+            return self.error
