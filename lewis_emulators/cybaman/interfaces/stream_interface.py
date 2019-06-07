@@ -1,7 +1,9 @@
 from lewis.adapters.stream import StreamInterface, Cmd
+from lewis_emulators.utils.replies import conditional_reply
 
 from lewis.core.logging import has_log
 
+if_connected = conditional_reply("connected")
 
 class CybamanStreamInterface(StreamInterface):
     """
@@ -44,29 +46,37 @@ class CybamanStreamInterface(StreamInterface):
         self.log.debug(error)
         return error
 
+    @if_connected
     def ignore(self):
         return ""
 
+    @if_connected
     def initialize(self):
         self._device.initialized = True
         return ""
 
+    @if_connected
     def stop(self):
         self._device.initialized = False
 
+    @if_connected
     def reset(self):
         self._device._initialize_data()
         return ""
 
+    @if_connected
     def get_a(self):
         return "{}\r".format(self._device.a*3577)
 
+    @if_connected
     def get_b(self):
         return "{}\r".format(self._device.b*3663)
 
+    @if_connected
     def get_c(self):
         return "{}\r".format(self._device.c*3663)
 
+    @if_connected
     def set_all(self, a, b, c, tm):
         self._verify_tm(a, b, c, tm)
 

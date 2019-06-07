@@ -24,8 +24,8 @@ from . import states
 
 
 class ControlModes(object):
-    EXTERNAL = 0
-    INTERNAL = 1
+    INTERNAL = 0
+    EXTERNAL = 1
 
 
 class SimulatedJulabo(StateMachineDevice):
@@ -178,8 +178,8 @@ class SimulatedJulabo(StateMachineDevice):
     def set_control_mode(self, control_mode):
         """
         Sets the control mode of the julabo.
-        :param control_mode: (int) 1 for internal control, 0 for external control
+        :param control_mode: (int) 1 for external control, 0 for internal control
         :return: Empty string
         """
-        self.control_mode = ControlModes.INTERNAL if control_mode == 1 else ControlModes.EXTERNAL
+        self.control_mode = ControlModes.EXTERNAL if control_mode == 1 else ControlModes.INTERNAL
         return ""

@@ -1,3 +1,3 @@
-from .stream_interface import FermichopperStreamInterface
+from .stream_interface_merlin import FermichopperStreamInterface
 
 __all__ = ['FermichopperStreamInterface']
