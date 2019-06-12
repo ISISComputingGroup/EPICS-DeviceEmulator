@@ -4,6 +4,21 @@ from lewis.devices import StateMachineDevice
 from lewis.core.logging import has_log
 
 
+def build_code(codes_dict):
+    """
+    Builds a code based on a codes dictionary
+    :param codes_dict: A dictionary with the code and whether it's flagged or not.
+    :return: The full code
+    """
+    code = 0x00000000
+
+    for value in codes_dict.values():
+        if value[0]:
+            code += value[1]
+
+    return code
+
+
 class SimulatedChtobisr(StateMachineDevice):
     """
         Class to simulate Coherent OBIS Laser Remote
@@ -99,13 +114,7 @@ class SimulatedChtobisr(StateMachineDevice):
 
         :return: status code
         """
-        status_code = 0x00000000
-
-        for value in self.status.values():
-            if value[0]:
-                status_code += value[1]
-
-        return status_code
+        return build_code(self.status)
 
     def build_fault_code(self):
         """"
@@ -113,13 +122,7 @@ class SimulatedChtobisr(StateMachineDevice):
 
         :return: fault code
         """
-        fault_code = 0x00000000
-
-        for value in self.faults.values():
-            if value[0]:
-                fault_code += value[1]
-
-        return fault_code
+        return build_code(self.faults)
 
     @has_log
     def backdoor_set_status(self, statusname, value):
