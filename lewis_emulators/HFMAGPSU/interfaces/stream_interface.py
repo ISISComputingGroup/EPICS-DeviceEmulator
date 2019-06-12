@@ -1,37 +1,40 @@
 from lewis.adapters.stream import StreamInterface
+from lewis.core.logging import has_log
+
 from lewis_emulators.utils.command_builder import CmdBuilder
 from datetime import datetime
 
 
+@has_log
 class HFMAGPSUStreamInterface(StreamInterface):
 
     in_terminator = "\r\n"
     out_terminator = chr(19)
 
     commands = {
-        CmdBuilder("read_direction").escape("GET SIGN").build(),
-        CmdBuilder("read_output_mode").escape("T").build(),
-        CmdBuilder("read_output").escape("GET O").build(),
-        CmdBuilder("read_heater_status").escape("HEATER").build(),
-        CmdBuilder("read_max_target").escape("GET MAX").build(),
-        CmdBuilder("read_mid_target").escape("GET MID").build(),
-        CmdBuilder("read_ramp_rate").escape("GET RATE").build(),
-        CmdBuilder("read_limit").escape("GET VL").build(),
-        CmdBuilder("read_pause").escape("P").build(),
-        CmdBuilder("read_heater_value").escape("GET H").build(),
-        CmdBuilder("read_constant").escape("GET TPA").build(),
+        CmdBuilder("read_direction").escape("GET SIGN").eos().build(),
+        CmdBuilder("read_output_mode").escape("T").eos().build(),
+        CmdBuilder("read_output").escape("GET O").eos().build(),
+        CmdBuilder("read_heater_status").escape("HEATER").eos().build(),
+        CmdBuilder("read_max_target").escape("GET MAX").eos().build(),
+        CmdBuilder("read_mid_target").escape("GET MID").eos().build(),
+        CmdBuilder("read_ramp_rate").escape("GET RATE").eos().build(),
+        CmdBuilder("read_limit").escape("GET VL").eos().build(),
+        CmdBuilder("read_pause").escape("P").eos().build(),
+        CmdBuilder("read_heater_value").escape("GET H").eos().build(),
+        CmdBuilder("read_constant").escape("GET TPA").eos().build(),
 
-        CmdBuilder("write_direction").escape("D ").arg("0|-|\+").build(),
-        CmdBuilder("write_output_mode").escape("T ").arg("OFF|ON").build(),
-        CmdBuilder("write_ramp_target").escape("RAMP ").arg("ZERO|MID|MAX").build(),
-        CmdBuilder("write_heater_status").escape("H ").arg("OFF|ON").build(),
-        CmdBuilder("write_pause").escape("P ").arg("OFF|ON").build(),
-        CmdBuilder("write_heater_value").escape("S H ").float().build(),
-        CmdBuilder("write_max_target").escape("SET MAX ").float().build(),
-        CmdBuilder("write_mid_target").escape("SET MID ").float().build(),
-        CmdBuilder("write_ramp_rate").escape("SET RAMP ").float().build(),
-        CmdBuilder("write_limit").escape("S L ").float().build(),
-        CmdBuilder("write_constant").escape("SET TPA ").float().build()
+        CmdBuilder("write_direction").escape("D ").arg("0|-|\+").eos().build(),
+        CmdBuilder("write_output_mode").escape("T ").arg("OFF|ON").eos().build(),
+        CmdBuilder("write_ramp_target").escape("RAMP ").arg("ZERO|MID|MAX").eos().build(),
+        CmdBuilder("write_heater_status").escape("H ").arg("OFF|ON").eos().build(),
+        CmdBuilder("write_pause").escape("P ").arg("OFF|ON").eos().build(),
+        CmdBuilder("write_heater_value").escape("S H ").float().eos().build(),
+        CmdBuilder("write_max_target").escape("SET MAX ").float().eos().build(),
+        CmdBuilder("write_mid_target").escape("SET MID ").float().eos().build(),
+        CmdBuilder("write_ramp_rate").escape("SET RAMP ").float().eos().build(),
+        CmdBuilder("write_limit").escape("S L ").float().eos().build(),
+        CmdBuilder("write_constant").escape("SET TPA ").float().eos().build()
     }
 
     def _create_log_message(self, pv, value, suffix=""):
@@ -158,7 +161,7 @@ class HFMAGPSUStreamInterface(StreamInterface):
                 self._create_log_message("RAMP STATUS", output)
             else:
                 output = "RAMPING FROM {:.6} TO {:.6} {} AT {:.6} A/SEC".format(self._device.output,
-                                                                    target, mode, rate)
+                                                                                target, mode, rate)
                 self._create_log_message("RAMP STATUS", output)
         else:
             raise AssertionError("Invalid arguments sent")
