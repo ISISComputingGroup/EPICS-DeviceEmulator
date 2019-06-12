@@ -25,7 +25,7 @@ class SimulatedAldn1000(StateMachineDevice):
 
         self.address = 0
         self._diameter = 0.0
-        self.volume = 0.0
+        self.volume_target = 0.0
         self.volume_infused = 0.0  # Cumulative infused volume
         self.volume_withdrawn = 0.0  # Cumulative withdrawn volume
         self.volume_dispensed = 0.0  # Dispensed volume for a single pump run
@@ -40,7 +40,20 @@ class SimulatedAldn1000(StateMachineDevice):
             self.volume_infused = 0.0
         elif volume_type == 'WDR':
             self.volume_withdrawn = 0.0
-        return
+
+    def normalised_rate(self):
+        """
+        Returns the normalises the rate to volume units per second.
+        """
+        rate = self.rate
+        if self.units[0] == 'U' and self.volume_units[0] == 'M':
+            rate /= 1000.0
+        if self.units[0] == 'M' and self.volume_units[0] == 'U':
+            rate *= 1000.0
+        rate /= 60.0  # As will at least be in minutes
+        if self.units[1] == 'H':
+            rate /= 60.0
+        return rate
 
     @property
     def pump_on(self):
@@ -101,6 +114,8 @@ class SimulatedAldn1000(StateMachineDevice):
             (('S', 'W'), lambda: self.pump_on is True and self.direction == 'WDR'),
             (('I', 'P'), lambda: self.pump_on is False),
             (('W', 'P'), lambda: self.pump_on is False),
+            (('I', 'S'), lambda: self.volume_dispensed == self.volume_target),
+            (('W', 'S'), lambda: self.volume_dispensed == self.volume_target),
             (('P', 'S'), lambda: self.pump_on is False and self.new_action is True),
             (('P', 'I'), lambda: self.pump_on is True and self.direction == 'INF'),
             (('P', 'W'), lambda: self.pump_on is True and self.direction == 'WDR'),

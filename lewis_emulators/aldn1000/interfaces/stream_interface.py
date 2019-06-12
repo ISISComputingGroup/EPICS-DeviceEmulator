@@ -42,8 +42,7 @@ class Aldn1000StreamInterface(StreamInterface):
 
     @if_input_error
     def basic_set_response(self, address):
-        response = STX + '{:02d}{status}'.format(address, status=self.device.state) + ETX
-        return response
+        return STX + '{:02d}{status}'.format(address, status=self.device.state) + ETX
 
     @if_connected
     def format_data(self, float):
@@ -83,13 +82,13 @@ class Aldn1000StreamInterface(StreamInterface):
 
     @if_connected
     def get_volume(self, address):
-        return self.basic_get_response(address, data=self.format_data(self.device.volume),
+        return self.basic_get_response(address, data=self.format_data(self.device.volume_target),
                                        units=self.device.volume_units)
 
     @if_connected
     def set_volume(self, address, volume):
         self.device.address = address
-        self.device.volume = volume
+        self.device.volume_target = volume
         return self.basic_set_response(address)
 
     @if_connected
@@ -116,8 +115,8 @@ class Aldn1000StreamInterface(StreamInterface):
     @if_connected
     def set_rate(self, address, rate, units):
         self.device.address = address
-        self.device.rate = rate
         self.device.units = units
+        self.device.rate = rate
         return self.basic_set_response(address)
 
     @if_connected
