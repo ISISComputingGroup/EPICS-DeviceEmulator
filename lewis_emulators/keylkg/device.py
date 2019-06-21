@@ -13,7 +13,7 @@ class SimulatedKeylkg(StateMachineDevice):
         self.connected = True
         self.input_correct = True
 
-        self.mode = Modes.SET_UP
+        self.mode = Modes.MEASURE
 
         self.output1_offset = 0.0
         self.output2_offset = 0.0
