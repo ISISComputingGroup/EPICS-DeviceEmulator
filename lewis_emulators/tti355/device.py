@@ -15,7 +15,7 @@ class SimulatedTti355(StateMachineDevice):
         self.voltage_sp = 1.00
         self.current = 0.00
         self.current_limit_sp = 1.00
-        self.output_status = "OUT Off"
+        self.output_status = "OUT OFF"
         self.output_mode = "M CV"
         self.error = "ERR 0"
         self._max_voltage = 35.0
@@ -44,7 +44,7 @@ class SimulatedTti355(StateMachineDevice):
         return voltage/self.load_resistance
 
     def get_voltage(self):
-        if self.output_status == "OUT On":
+        if self.output_status == "OUT ON":
             self.voltage = self.voltage_sp + ((random()-0.5)/1000)
         else:
             self.voltage = ((random()-0.5)/1000)
@@ -56,11 +56,11 @@ class SimulatedTti355(StateMachineDevice):
             self.error = "ERR 2"
         else:
             if self.calculate_potential_current(voltage) > self.get_current():
-                self.output_mode = "M CC"
+                self.output_mode = "M CI"
             self.voltage_sp = voltage
 
     def get_current(self):
-        if self.output_status == "OUT On":
+        if self.output_status == "OUT ON" and self.output_mode == "M CI":
             self.current = self.current_limit_sp + ((random()-0.5)/1000)
         else:
             self.current = ((random()-0.5)/1000)
@@ -74,10 +74,10 @@ class SimulatedTti355(StateMachineDevice):
             self.current_limit_sp = current
     
     def set_output_status(self, status):
-        if status == "On":
-            self.output_status = "OUT On"
-        elif status == "Off":
-            self.output_status = "OUT Off"
+        if status == "ON":
+            self.output_status = "OUT ON"
+        elif status == "OFF":
+            self.output_status = "OUT OFF"
             self.reset()
 
     def get_output_status(self):
