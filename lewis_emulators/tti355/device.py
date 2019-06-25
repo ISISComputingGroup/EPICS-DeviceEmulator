@@ -20,7 +20,7 @@ class SimulatedTti355(StateMachineDevice):
         self.error = "ERR 0"
         self._max_voltage = 35.0
         self._max_current = 5.0
-        self.load_resistance = 0.01
+        self.load_resistance = 10
 
     def reset(self):
         self._initialize_data()
@@ -37,15 +37,18 @@ class SimulatedTti355(StateMachineDevice):
         return OrderedDict([
         ])
 
-    def calculate_load_resistance(self, voltage, current):
-        return voltage/current
-
     def calculate_potential_current(self, voltage):
         return voltage/self.load_resistance
+    
+    def calculate_actual_voltage(self):
+        return self.get_current() * self.load_resistance
 
     def get_voltage(self):
         if self.output_status == "OUT ON":
-            self.voltage = self.voltage_sp + ((random()-0.5)/1000)
+            if self.output_mode == "M CI":
+                self.voltage = self.calculate_actual_voltage()
+            else:
+                self.voltage = self.voltage_sp + ((random()-0.5)/1000)
         else:
             self.voltage = ((random()-0.5)/1000)
         return self.voltage
@@ -55,10 +58,10 @@ class SimulatedTti355(StateMachineDevice):
         if voltage > self._max_voltage:
             self.error = "ERR 2"
         else:
-            if self.calculate_potential_current(voltage) > self.get_current():
-                self.output_mode = "M CI"
             self.voltage_sp = voltage
-
+            if self.calculate_potential_current(voltage) > self.current_limit_sp and self.output_status == "OUT ON":
+                self.output_mode = "M CI"
+                    
     def get_current(self):
         if self.output_status == "OUT ON" and self.output_mode == "M CI":
             self.current = self.current_limit_sp + ((random()-0.5)/1000)
