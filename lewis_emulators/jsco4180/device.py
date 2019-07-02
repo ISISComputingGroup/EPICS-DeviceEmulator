@@ -1,3 +1,4 @@
+import time
 from collections import OrderedDict
 from states import PumpOff, PumpOn, PumpTimed
 from lewis.devices import StateMachineDevice
@@ -25,10 +26,6 @@ class SimulatedJsco4180(StateMachineDevice):
 
         self.pump_mode = "Off"
 
-        self.valve_position = 1
-
-        self.file_open = False
-        self.file_number = 1
         self.program_runtime = 0
 
         self.error = 0
@@ -37,6 +34,9 @@ class SimulatedJsco4180(StateMachineDevice):
     @property
     def state(self):
         return self._csm.state
+
+    def crash_pump(self):
+        self.device.connected = False
 
     def _get_state_handlers(self):
         return {
