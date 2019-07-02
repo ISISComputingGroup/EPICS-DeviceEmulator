@@ -67,6 +67,7 @@ def timed_reply(action, reply=None, minimum_time_delay=0):
     Args:
         action: The name of the action method to look for on the device
         reply (str): Desired output reply string when input time delay is less than the minimum
+        minimum_time_delay: The minimum time between commands sent to the device
 
     Returns:
        The function returns as normal if minimum delay exceeded. The command is not executed and the action method is
