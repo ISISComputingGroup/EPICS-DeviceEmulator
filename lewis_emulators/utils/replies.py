@@ -61,7 +61,7 @@ class _LastInput:
 @has_log
 def timed_reply(action, reply=None, minimum_time_delay=0):
     """
-    Decorator that inhibits a command and performs a action if call time is greater than some minimum time delay
+    Decorator that inhibits a command and performs a action if call time is less than than some minimum time delay
     between the the current and last input
 
     Args:
@@ -90,12 +90,11 @@ def timed_reply(action, reply=None, minimum_time_delay=0):
                 time_since_last_request = new_input_time - _LastInput.last_input_time
                 valid_input = time_since_last_request > minimum_time_delay
                 if valid_input:
+                    self.log.info("Within time tolerance ({}ms) was {}ms".format(minimum_time_delay, time_since_last_request))
                     _LastInput.last_input_time = new_input_time
-                    result = func(self, *args, **kwargs)
-                    return result
+                    return func(self, *args, **kwargs)
                 else:
-                    self.log.info("Violated time tolerance ({}) was {}".format(minimum_time_delay, time_since_last_request))
-                    self.log.info("Input time: {}, time since last func call: {}".format(new_input_time, _LastInput.last_input_time))
+                    self.log.info("Violated time tolerance ({}ms) was {}ms".format(minimum_time_delay, time_since_last_request))
                     device = _get_device_from(self)
                     action_function = getattr(device, action)
                     action_function()
