@@ -6,9 +6,14 @@ from enum import Enum
 
 if_connected = conditional_reply('connected')
 if_input_error = conditional_reply('input_correct', "ER,OF,00")
+if_in_measurement_mode = conditional_reply('in_measurement_mode', None)
+if_in_setup_mode = conditional_reply('in_setup_mode', None)
 
 
 class Modes(Enum):
+    """
+    Pump Modes
+    """
     MEASURE = 'R0'
     SET_UP = 'Q0'
 
@@ -32,6 +37,7 @@ class KeylkgStreamInterface(StreamInterface):
         }
 
     @if_connected
+    @if_in_measurement_mode
     def reset_output(self, output):
         if output == 0:
             self.device.output1_raw_value = 0.0000
@@ -43,6 +49,7 @@ class KeylkgStreamInterface(StreamInterface):
         return "VR"
 
     @if_connected
+    @if_in_measurement_mode
     def get_value_output(self, output):
         if output == 0:
             return "M0,{0},{1}".format(round(self.device.output1_raw_value - self.device.output1_offset, 4),
@@ -53,6 +60,7 @@ class KeylkgStreamInterface(StreamInterface):
             return "M2,{0}".format(self.device.output2_raw_value - self.device.output2_offset, 4)
 
     @if_connected
+    @if_in_setup_mode
     def set_measurement_mode(self, head, function):
         if head == 1:
             self.device.head1_measurement_mode = function
@@ -61,6 +69,7 @@ class KeylkgStreamInterface(StreamInterface):
         return "SW,HB"
 
     @if_connected
+    @if_in_measurement_mode
     def get_measurement_mode(self, head):
         if head == 1:
             return "SR,HB,1,{0}".format(self.device.head1_measurement_mode)
@@ -69,6 +78,7 @@ class KeylkgStreamInterface(StreamInterface):
 
     @if_connected
     @if_input_error
+    @if_in_setup_mode
     def set_offset(self, output, offset_value):
         if output == 0:
             self.device.output1_offset = offset_value
@@ -80,6 +90,7 @@ class KeylkgStreamInterface(StreamInterface):
         return "SW,OF"
 
     @if_connected
+    @if_in_measurement_mode
     def get_offset(self, output):
         if output == 1:
             return "SR,OF,1,{0}".format(self.device.output1_offset)

@@ -23,6 +23,20 @@ class SimulatedKeylkg(StateMachineDevice):
         self.head1_measurement_mode = 0
         self.head1_measurement_mode = 0
 
+    @property
+    def in_measurement_mode(self):
+        """
+        :return: True if in measurement mode
+        """
+        return self.mode == Modes.MEASURE
+
+    @property
+    def in_setup_mode(self):
+        """
+        :return: True if in setup mode
+        """
+        return self.mode == Modes.SET_UP
+
     def _get_state_handlers(self):
         return {
             'default': DefaultState(),
