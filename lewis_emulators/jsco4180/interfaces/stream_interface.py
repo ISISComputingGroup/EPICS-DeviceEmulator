@@ -118,22 +118,38 @@ class Jsco4180StreamInterface(StreamInterface):
     @if_valid_input_delay
     @if_connected
     def get_component_a(self):
-        return self.device.component_A
+        if self.device.single_channel_mode:
+            result = 100
+        else:
+            result = self.device.component_A
+        return result
 
     @if_valid_input_delay
     @if_connected
     def get_component_b(self):
-        return self.device.component_B
+        if self.device.single_channel_mode:
+            result = 0
+        else:
+            result = self.device.component_B
+        return result
 
     @if_valid_input_delay
     @if_connected
     def get_component_c(self):
-        return self.device.component_C
+        if self.device.single_channel_mode:
+            result = 0
+        else:
+            result = self.device.component_C
+        return result
 
     @if_valid_input_delay
     @if_connected
     def get_component_d(self):
-        return self.device.component_D
+        if self.device.single_channel_mode:
+            result = 0
+        else:
+            result = self.device.component_D
+        return result
 
     @if_valid_input_delay
     @if_connected

@@ -11,6 +11,7 @@ class SimulatedJsco4180(StateMachineDevice):
         Initialize all of the device's attributes.
         """
         self.connected = True
+        self.single_channel_mode = False
 
         self.flowrate_sp = 0.010
         self.flowrate = 0.000
