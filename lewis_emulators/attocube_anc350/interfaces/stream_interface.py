@@ -54,10 +54,37 @@ ANC_STATUS_ENABLE = 0x1000
 
 
 def convert_to_ints(command, start, end):
+    """
+    Converts an incoming set of bytes into a list of ints. Assuming there are BYTES_IN_INT bytes in an int.
+
+    Args:
+        command: The incoming bytes.
+        start: The index at which to start
+        end: The index at which to end
+
+    Returns: A list of integers converted from the command.
+    """
     return [raw_bytes_to_int(command[x:x + BYTES_IN_INT]) for x in range(start, end, BYTES_IN_INT)]
 
 
 def generate_response(address, index, correlation_num, data=None):
+    """
+    Creates a response of the format:
+    * Length (the length of the response)
+    * Opcode (always ACK in this case)
+    * Address (where the driver had read/written to)
+    * Index (the axis the driver had read/written from)
+    * Correlation Number (the ID of the message we're responding to)
+    * Reason (whether the request was successful, always SUCCESS currently)
+
+    Args:
+        address: The memory address where the driver had read/written to
+        index: The axis the driver had read/written from
+        correlation_num: The ID of the message we're responding to
+        data (optional): The data we want to send back to the driver (only valid on a get command)
+
+    Returns: The raw bytes to send back to the driver.
+    """
     int_responses = [UC_ACK, address, index, correlation_num, UC_REASON_OK]
     if data is not None:
         int_responses.append(data)
@@ -85,8 +112,6 @@ class AttocubeANC350StreamInterface(StreamInterface):
 
     def any_command(self, command):
         response = ''
-
-        print ("Got command")
 
         while command:
             # Length doesn't include itself
