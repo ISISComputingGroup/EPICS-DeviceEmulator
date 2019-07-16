@@ -8,6 +8,7 @@ class SimulatedAttocubeANC350(StateMachineDevice):
         """
         Initialize all of the device's attributes.
         """
+        self.connected = True
         self.position = 0
         self.position_setpoint = 0
         self.speed = 10

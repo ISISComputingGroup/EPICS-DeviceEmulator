@@ -2,6 +2,7 @@ from lewis.adapters.stream import StreamInterface, Cmd
 from lewis.core.logging import has_log
 from lewis_emulators.utils.byte_conversions import int_to_raw_bytes, raw_bytes_to_int
 from functools import partial
+from lewis_emulators.utils.replies import conditional_reply
 
 BYTES_IN_INT = 4
 HEADER_LENGTH = 4*BYTES_IN_INT
@@ -51,6 +52,9 @@ ANC_STATUS_SENS_ERR = 0x0100
 ANC_STATUS_DISCONN = 0x0400
 ANC_STATUS_REF_VALID = 0x0800
 ANC_STATUS_ENABLE = 0x1000
+
+
+if_connected = conditional_reply("connected")
 
 
 def convert_to_ints(command, start, end):
@@ -154,6 +158,7 @@ class AttocubeANC350StreamInterface(StreamInterface):
             pass  # Ignore unimplemented commands for now
         return generate_response(address, index, correlation_num)
 
+    @if_connected
     def get(self, address, index, correlation_num):
         command_mapping = {
             ID_ANC_COUNTER: int(self.device.position),
