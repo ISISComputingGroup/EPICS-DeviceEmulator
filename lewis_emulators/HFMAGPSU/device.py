@@ -1,34 +1,57 @@
+from datetime import datetime
+
 from lewis.devices import StateMachineDevice
 from collections import OrderedDict
-from states import DefaultInitState, DefaultStartedState, DefaultStoppedState
+from states import DefaultInitState, HoldingState, TrippedState, RampingState
 
 
 class SimulatedHFMAGPSU(StateMachineDevice):
 
     def _initialize_data(self):
+        # field constant (load line gradient)
+        self.constant = 0.029
 
-        self._is_output_mode_tesla = True
-        self._is_heater_on = True
-        self._is_paused = True
-        self._output = 0.0
-        self._direction = '+'
-        self._ramp_target = 'MID'
-        self._heater_value = 0.0
-        self._max_target = 10
-        self._mid_target = 0.0
-        self._ramp_rate = 0.5
-        self._limit = 5.0
-        self._log_message = "this is the initial log message"
-        self._constant = 0.029
-        self._zero_target = 0.0
-        self._mid_final_target = 0
-        self.ready = True
+        # targets
+        self.max_target = 10
+        self.mid_target = 0.0
+        self.prev_target = 0.0
+        self.zero_target = 0.0
+        self.at_target = False
+
+        # ramp
+        self.ramp_target = "ZERO"
+        self.ramp_rate = 0.5
+
+        # paused
+        self.is_paused = True
+
+        # output
+        self.output = 0.0
+        self.is_output_mode_tesla = True
+        self.direction = '+'
+
+        # heater
+        self.is_heater_on = True
+        self.heater_value = 0.0
+
+        # quenched
+        self.is_quenched = False
+
+        # external trip
+        self.is_xtripped = False
+
+        # PSU voltage limit
+        self.limit = 5.0
+
+        # log message
+        self.log_message = "this is the initial log message"
 
     def _get_state_handlers(self):
         return {
             'init': DefaultInitState(),
-            'not_ramping': DefaultStoppedState(),
-            'ramping': DefaultStartedState(),
+            'holding': HoldingState(),
+            'tripped': TrippedState(),
+            'ramping': RampingState(),
         }
 
     def _get_initial_state(self):
@@ -37,119 +60,29 @@ class SimulatedHFMAGPSU(StateMachineDevice):
     def _get_transition_handlers(self):
 
         return OrderedDict([
-            (('init', 'not_ramping'), lambda: self.ready),
-            (('not_ramping', 'ramping'), lambda: not self._is_paused),
-            (('ramping', 'not_ramping'), lambda: self._is_paused),
+            (('init', 'ramping'), lambda: not self.at_target and not self.is_paused),
+            (('ramping', 'holding'), lambda: self.is_paused or self.at_target),
+            (('ramping', 'tripped'), lambda: self.is_quenched or self.is_xtripped),
+            (('holding', 'ramping'), lambda: not self.at_target and not self.is_paused),
         ])
 
-    @property
-    def direction(self):
-        return self._direction
+    # Utilities
 
-    @property
-    def is_output_mode_tesla(self):
-        return self._is_output_mode_tesla
+    def timestamp_str(self):
+        return datetime.now().strftime('%H:%M:%S')
 
-    @property
-    def output(self):
-        return self._output
+    def check_is_at_target(self):
+        if self.output == self.ramp_target_value():
+            self.at_target = True
+        else:
+            self.at_target = False
 
-    @property
-    def ramp_target(self):
-        return self._ramp_target
-
-    @property
-    def is_heater_on(self):
-        return self._is_heater_on
-
-    @property
-    def heater_value(self):
-        return self._heater_value
-
-    @property
-    def max_target(self):
-        return float(self._max_target)
-
-    @property
-    def mid_target(self):
-        return float(self._mid_target)
-
-    @property
-    def ramp_rate(self):
-        return self._ramp_rate
-
-    @property
-    def is_paused(self):
-        return self._is_paused
-
-    @property
-    def limit(self):
-        return self._limit
-
-    @property
-    def log_message(self):
-        return self._log_message
-
-    @property
-    def constant(self):
-        return float(self._constant)
-
-    @property
-    def mid_final_target(self):
-        return self._mid_final_target
-
-    @direction.setter
-    def direction(self, d):
-        self._direction = d
-
-    @is_output_mode_tesla.setter
-    def is_output_mode_tesla(self, om):
-        self._is_output_mode_tesla = om
-
-    @ramp_target.setter
-    def ramp_target(self, rt):
-        self._ramp_target = rt
-
-    @is_heater_on.setter
-    def is_heater_on(self, hs):
-        self._is_heater_on = hs
-
-    @heater_value.setter
-    def heater_value(self, hv):
-        self._heater_value = hv
-
-    @max_target.setter
-    def max_target(self, mt):
-        self._max_target = mt
-
-    @mid_target.setter
-    def mid_target(self, mt):
-        self._mid_target = mt
-
-    @ramp_rate.setter
-    def ramp_rate(self, rate):
-        self._ramp_rate = rate
-
-    @is_paused.setter
-    def is_paused(self, p):
-        self._is_paused = p
-
-    @limit.setter
-    def limit(self, lim):
-        self._limit = lim
-
-    @log_message.setter
-    def log_message(self, lm):
-        self._log_message = lm
-
-    @output.setter
-    def output(self, op):
-        self._output = op
-
-    @constant.setter
-    def constant(self, cons):
-        self._constant = cons
-
-    @mid_final_target.setter
-    def mid_final_target(self, mft):
-        self._mid_final_target = mft
+    def ramp_target_value(self):
+        if self.ramp_target == "MID":
+            return self.mid_target
+        elif self.ramp_target == "MAX":
+            return self.max_target
+        elif self.ramp_target == "ZERO":
+            return self.zero_target
+        else:
+            raise AssertionError("Invalid arg received")

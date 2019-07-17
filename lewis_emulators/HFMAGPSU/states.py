@@ -2,12 +2,12 @@ from lewis.core.statemachine import State
 from lewis.core import approaches
 
 
-def get_target_value(target, mid_val, max_val):
+def get_target_value(device):
 
-    if target == "MID":
-        target_value = mid_val
-    elif target == "MAX":
-        target_value = max_val
+    if device.ramp_target == "MID":
+        target_value = device.mid_target
+    elif device.ramp_target == "MAX":
+        target_value = device.max_target
     else:
         target_value = 0
 
@@ -15,28 +15,38 @@ def get_target_value(target, mid_val, max_val):
 
 
 class DefaultInitState(State):
-    pass
+
+    def in_state(self, dt):
+        device = self._context
+        device.check_is_at_target()
 
 
-class DefaultStoppedState(State):
+class HoldingState(State):
+
+    def on_entry(self, dt):
+        device = self._context
+        print("*********** ENTERED HOLD STATE")
+        print(device.output, device.direction)
+
+    def in_state(self, dt):
+        device = self._context
+        device.check_is_at_target()
+
+
+class TrippedState(State):
 
     def in_state(self, dt):
         pass
 
 
-class DefaultStartedState(State):
+class RampingState(State):
 
     def in_state(self, dt):
         device = self._context
-        rate = float(device._ramp_rate)
-        target = float(get_target_value(device._ramp_target, device._mid_target, device._max_target))
-        constant = float(device._constant)
-        if device._is_output_mode_tesla:
+        rate = float(device.ramp_rate)
+        target = float(get_target_value(device))
+        constant = float(device.constant)
+        if device.is_output_mode_tesla:
             rate = rate * constant
-        if device._direction == '-':
-            target *= -1
-        device._output = approaches.linear(float(device._output), float(target), float(rate), dt)
-
-
-
-
+        device.output = approaches.linear(float(device.output), float(target), float(rate), dt)
+        device.check_is_at_target()
