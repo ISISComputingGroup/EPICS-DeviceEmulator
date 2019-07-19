@@ -102,20 +102,14 @@ class HFMAGPSUStreamInterface(StreamInterface):
         constant = self._device.constant
         if output_mode in ["ON", "1"]:
             if not self._device.is_output_mode_tesla:
-                self._device.output *= constant  # TODO refactor this logic into device
-                self._device.max_target *= constant
-                self._device.mid_target *= constant
-                self._device.is_output_mode_tesla = True
+                self._device.switch_mode("TESLA")
                 self._create_log_message("UNITS", "TESLA")
         elif output_mode in ["OFF", "0"]:
             if constant == 0:
                 self._device.error_message = "------> No field constant has been entered"
             else:
                 if self._device.is_output_mode_tesla:
-                    self._device.output /= constant
-                    self._device.max_target /= constant
-                    self._device.mid_target /= constant
-                    self._device.is_output_mode_tesla = False
+                    self._device.switch_mode("AMPS")
                     self._create_log_message("UNITS", "AMPS")
         else:
             raise AssertionError("Invalid arguments sent")
@@ -201,8 +195,7 @@ class HFMAGPSUStreamInterface(StreamInterface):
             self._create_log_message("PAUSE STATUS", output)
         elif paused in ["OFF", "0"]:
             self._device.is_paused = False
-            ramp_complete = abs(float(self._device.output) - float(target)) < 0.00001
-            if ramp_complete:
+            if self._device.check_is_at_target():
                 self._create_log_message("RAMP STATUS", output)
             else:
                 output = "RAMPING FROM {:.6} TO {:.6} {} AT {:.6} A/SEC".format(self._device.output,

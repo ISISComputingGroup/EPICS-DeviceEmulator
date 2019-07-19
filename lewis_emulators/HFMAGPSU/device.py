@@ -71,6 +71,18 @@ class SimulatedHFMAGPSU(StateMachineDevice):
     def timestamp_str(self):
         return datetime.now().strftime('%H:%M:%S')
 
+    def switch_mode(self, mode):
+        if mode == "TESLA":
+            self.output *= self.constant
+            self.max_target *= self.constant
+            self.mid_target *= self.constant
+            self.is_output_mode_tesla = True
+        elif mode == "AMPS":
+            self.output /= self.constant
+            self.max_target /= self.constant
+            self.mid_target /= self.constant
+            self.is_output_mode_tesla = False
+
     def check_is_at_target(self):
         if self.output == self.ramp_target_value():
             self.at_target = True
