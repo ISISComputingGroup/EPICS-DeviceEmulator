@@ -4,6 +4,12 @@ from states import DefaultState
 from lewis.devices import StateMachineDevice
 
 
+class TemperatureChannel(object):
+    def __init__(self):
+        self.temperature = 0
+        self.temperature_sp = 0
+
+
 @has_log
 class SimulatedHeliox(StateMachineDevice):
 
@@ -16,6 +22,13 @@ class SimulatedHeliox(StateMachineDevice):
 
         self.temperature_stable = True
 
+        self.temperature_channels = {
+            "HE3SORB": TemperatureChannel(),
+            "HE4POT": TemperatureChannel(),
+            "HELOW": TemperatureChannel(),
+            "HEHIGH": TemperatureChannel(),
+        }
+
     def _get_state_handlers(self):
         return {
             'default': DefaultState()
@@ -26,3 +39,9 @@ class SimulatedHeliox(StateMachineDevice):
 
     def _get_transition_handlers(self):
         return OrderedDict([])
+
+    def backdoor_set_channel_temperature(self, channel, temperature):
+        self.temperature_channels[channel].temperature = temperature
+
+    def backdoor_set_channel_temperature_sp(self, channel, temperature_sp):
+        self.temperature_channels[channel].temperature_sp = temperature_sp

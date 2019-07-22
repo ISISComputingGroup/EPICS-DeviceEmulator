@@ -6,6 +6,43 @@ ISOBUS_PREFIX = "@1"
 DEVICE_NAME = "HelioxX"
 
 
+# Format of the long-style response when querying an individual temperature card.
+INDIVIDUAL_CHANNEL_RESPONSE_FORMAT = "STAT:DEV:{name}:TEMP" \
+               ":EXCT:TYPE:UNIP:MAG:0" \
+               ":STAT:40000000" \
+               ":NICK:MB1.T1" \
+               ":LOOP:AUX:None" \
+               ":D:1.0" \
+               ":HTR:None" \
+               ":I:1.0" \
+               ":THTF:None" \
+               ":HSET:0" \
+               ":PIDT:OFF" \
+               ":ENAB:OFF" \
+               ":SWFL:None" \
+               ":FAUT:OFF" \
+               ":FSET:0" \
+               ":PIDF:None" \
+               ":P:1.0" \
+               ":SWMD:FIX" \
+               ":TSET:{tset:.4f}K" \
+               ":MAN:HVER:1" \
+               ":FVER:1.12" \
+               ":SERL:111450078" \
+               ":CAL:OFFS:0" \
+               ":COLDL:999.00K" \
+               ":INT:LIN:SCAL:1" \
+               ":FILE:None" \
+               ":HOTL:999.00K" \
+               ":TYPE:TCE" \
+               ":SIG:VOLT:-0.0038mV" \
+               ":CURR:-0.0000A" \
+               ":TEMP:{temp:.4f}K" \
+               ":POWR:0.0000W" \
+               ":RES:0.0000O" \
+               ":SLOP:0.0000O/K"
+
+
 class HelioxStreamInterface(StreamInterface):
     commands = {
         CmdBuilder("get_catalog").optional(ISOBUS_PREFIX)
@@ -35,6 +72,24 @@ class HelioxStreamInterface(StreamInterface):
             .escape("READ:DEV:HeHigh:TEMP").eos().build(),
         CmdBuilder("get_all_he_low_status").optional(ISOBUS_PREFIX)
             .escape("READ:DEV:HeLow:TEMP").eos().build(),
+
+        CmdBuilder("get_he3_sorb_temp").optional(ISOBUS_PREFIX)
+            .escape("READ:DEV:He3Sorb:TEMP:SIG:TEMP").eos().build(),
+        CmdBuilder("get_he4_pot_temp").optional(ISOBUS_PREFIX)
+            .escape("READ:DEV:He4Pot:TEMP:SIG:TEMP").eos().build(),
+        CmdBuilder("get_he_high_temp").optional(ISOBUS_PREFIX)
+            .escape("READ:DEV:HeHigh:TEMP:SIG:TEMP").eos().build(),
+        CmdBuilder("get_he_low_temp").optional(ISOBUS_PREFIX)
+            .escape("READ:DEV:HeLow:TEMP:SIG:TEMP").eos().build(),
+
+        CmdBuilder("get_he3_sorb_temp_sp").optional(ISOBUS_PREFIX)
+            .escape("READ:DEV:He3Sorb:TEMP:LOOP:TSET").eos().build(),
+        CmdBuilder("get_he4_pot_temp_sp").optional(ISOBUS_PREFIX)
+            .escape("READ:DEV:He4Pot:TEMP:LOOP:TSET").eos().build(),
+        CmdBuilder("get_he_high_temp_sp").optional(ISOBUS_PREFIX)
+            .escape("READ:DEV:HeHigh:TEMP:LOOP:TSET").eos().build(),
+        CmdBuilder("get_he_low_temp_sp").optional(ISOBUS_PREFIX)
+            .escape("READ:DEV:HeLow:TEMP:LOOP:TSET").eos().build(),
     }
 
     in_terminator = "\n"
@@ -74,6 +129,9 @@ class HelioxStreamInterface(StreamInterface):
                ":NVLT:10.000mB"
 
     def get_catalog(self):
+        """
+        This is only needed by the LabVIEW driver - it is not used by EPICS.
+        """
         return "STAT:SYS:CAT" \
                ":DEV:HelioxX:HEL" \
                ":DEV:He3Sorb:TEMP" \
@@ -90,148 +148,32 @@ class HelioxStreamInterface(StreamInterface):
         return "STAT:DEV:{}:NICK:{}".format(arg, "FAKENICKNAME")
 
     def get_all_he3_sorb_status(self):
-        return "STAT:DEV:He3Sorb:TEMP" \
-               ":EXCT:TYPE:UNIP:MAG:0" \
-               ":STAT:40000000" \
-               ":NICK:MB1.T1" \
-               ":LOOP:AUX:None" \
-               ":D:1.0" \
-               ":HTR:None" \
-               ":I:1.0" \
-               ":THTF:None" \
-               ":HSET:0" \
-               ":PIDT:OFF" \
-               ":ENAB:OFF" \
-               ":SWFL:None" \
-               ":FAUT:OFF" \
-               ":FSET:0" \
-               ":PIDF:None" \
-               ":P:1.0" \
-               ":SWMD:FIX" \
-               ":TSET:0.0000K" \
-               ":MAN:HVER:1" \
-               ":FVER:1.12" \
-               ":SERL:111450078" \
-               ":CAL:OFFS:0" \
-               ":COLDL:999.00K" \
-               ":INT:LIN:SCAL:1" \
-               ":FILE:None" \
-               ":HOTL:999.00K" \
-               ":TYPE:TCE" \
-               ":SIG:VOLT:-0.0038mV" \
-               ":CURR:-0.0000A" \
-               ":TEMP:1.2345K" \
-               ":POWR:0.0000W" \
-               ":RES:0.0000O" \
-               ":SLOP:0.0000O/K"
+        return INDIVIDUAL_CHANNEL_RESPONSE_FORMAT.format(
+            name="He3Sorb",
+            tset=self.device.temperature_channels["HE3SORB"].temperature_sp,
+            temp=self.device.temperature_channels["HE3SORB"].temperature,
+        )
 
     def get_all_he4_pot_status(self):
-        return "STAT:DEV:He4Pot:TEMP" \
-               ":EXCT:TYPE:UNIP:MAG:0" \
-               ":STAT:40000000" \
-               ":NICK:MB1.T1" \
-               ":LOOP:AUX:None" \
-               ":D:1.0" \
-               ":HTR:None" \
-               ":I:1.0" \
-               ":THTF:None" \
-               ":HSET:0" \
-               ":PIDT:OFF" \
-               ":ENAB:OFF" \
-               ":SWFL:None" \
-               ":FAUT:OFF" \
-               ":FSET:0" \
-               ":PIDF:None" \
-               ":P:1.0" \
-               ":SWMD:FIX" \
-               ":TSET:0.0000K" \
-               ":MAN:HVER:1" \
-               ":FVER:1.12" \
-               ":SERL:111450078" \
-               ":CAL:OFFS:0" \
-               ":COLDL:999.00K" \
-               ":INT:LIN:SCAL:1" \
-               ":FILE:None" \
-               ":HOTL:999.00K" \
-               ":TYPE:TCE" \
-               ":SIG:VOLT:-0.0038mV" \
-               ":CURR:-0.0000A" \
-               ":TEMP:2.3456K" \
-               ":POWR:0.0000W" \
-               ":RES:0.0000O" \
-               ":SLOP:0.0000O/K"
-
-    def get_all_he_low_status(self):
-        return "STAT:DEV:HeLow:TEMP" \
-               ":EXCT:TYPE:UNIP:MAG:0" \
-               ":STAT:40000000" \
-               ":NICK:MB1.T1" \
-               ":LOOP:AUX:None" \
-               ":D:1.0" \
-               ":HTR:None" \
-               ":I:1.0" \
-               ":THTF:None" \
-               ":HSET:0" \
-               ":PIDT:OFF" \
-               ":ENAB:OFF" \
-               ":SWFL:None" \
-               ":FAUT:OFF" \
-               ":FSET:0" \
-               ":PIDF:None" \
-               ":P:1.0" \
-               ":SWMD:FIX" \
-               ":TSET:0.0000K" \
-               ":MAN:HVER:1" \
-               ":FVER:1.12" \
-               ":SERL:111450078" \
-               ":CAL:OFFS:0" \
-               ":COLDL:999.00K" \
-               ":INT:LIN:SCAL:1" \
-               ":FILE:None" \
-               ":HOTL:999.00K" \
-               ":TYPE:TCE" \
-               ":SIG:VOLT:-0.0038mV" \
-               ":CURR:-0.0000A" \
-               ":TEMP:3.4567K" \
-               ":POWR:0.0000W" \
-               ":RES:0.0000O" \
-               ":SLOP:0.0000O/K"
+        return INDIVIDUAL_CHANNEL_RESPONSE_FORMAT.format(
+            name="He4Pot",
+            tset=self.device.temperature_channels["HE4POT"].temperature_sp,
+            temp=self.device.temperature_channels["HE4POT"].temperature,
+        )
 
     def get_all_he_high_status(self):
-        return "STAT:DEV:HeHigh:TEMP" \
-               ":EXCT:TYPE:UNIP:MAG:0" \
-               ":STAT:40000000" \
-               ":NICK:MB1.T1" \
-               ":LOOP:AUX:None" \
-               ":D:1.0" \
-               ":HTR:None" \
-               ":I:1.0" \
-               ":THTF:None" \
-               ":HSET:0" \
-               ":PIDT:OFF" \
-               ":ENAB:OFF" \
-               ":SWFL:None" \
-               ":FAUT:OFF" \
-               ":FSET:0" \
-               ":PIDF:None" \
-               ":P:1.0" \
-               ":SWMD:FIX" \
-               ":TSET:0.0000K" \
-               ":MAN:HVER:1" \
-               ":FVER:1.12" \
-               ":SERL:111450078" \
-               ":CAL:OFFS:0" \
-               ":COLDL:999.00K" \
-               ":INT:LIN:SCAL:1" \
-               ":FILE:None" \
-               ":HOTL:999.00K" \
-               ":TYPE:TCE" \
-               ":SIG:VOLT:-0.0038mV" \
-               ":CURR:-0.0000A" \
-               ":TEMP:4.5678K" \
-               ":POWR:0.0000W" \
-               ":RES:0.0000O" \
-               ":SLOP:0.0000O/K"
+        return INDIVIDUAL_CHANNEL_RESPONSE_FORMAT.format(
+            name="HeHigh",
+            tset=self.device.temperature_channels["HEHIGH"].temperature_sp,
+            temp=self.device.temperature_channels["HEHIGH"].temperature,
+        )
+
+    def get_all_he_low_status(self):
+        return INDIVIDUAL_CHANNEL_RESPONSE_FORMAT.format(
+            name="HeLow",
+            tset=self.device.temperature_channels["HELOW"].temperature_sp,
+            temp=self.device.temperature_channels["HELOW"].temperature,
+        )
 
     def set_heliox_setpoint(self, new_setpoint):
         self.device.temperature_sp = new_setpoint
@@ -245,3 +187,27 @@ class HelioxStreamInterface(StreamInterface):
 
     def get_heliox_stable(self):
         return "STAT:DEV:{}:HEL:SIG:H3PS:{}".format(DEVICE_NAME, "Stable" if self.device.temperature_stable else "Unstable")
+
+    def get_he3_sorb_temp(self):
+        return "STAT:DEV:He3Sorb:TEMP:SIG:TEMP:{:.4f}K".format(self.device.temperature_channels["HE3SORB"].temperature)
+
+    def get_he4_pot_temp(self):
+        return "STAT:DEV:He4Pot:TEMP:SIG:TEMP:{:.4f}K".format(self.device.temperature_channels["HE4POT"].temperature)
+
+    def get_he_low_temp(self):
+        return "STAT:DEV:HeLow:TEMP:SIG:TEMP:{:.4f}K".format(self.device.temperature_channels["HELOW"].temperature)
+
+    def get_he_high_temp(self):
+        return "STAT:DEV:HeHigh:TEMP:SIG:TEMP:{:.4f}K".format(self.device.temperature_channels["HEHIGH"].temperature)
+
+    def get_he3_sorb_temp_sp(self):
+        return "STAT:DEV:He3Sorb:TEMP:LOOP:TSET:{:.4f}K".format(self.device.temperature_channels["HE3SORB"].temperature_sp)
+
+    def get_he4_pot_temp_sp(self):
+        return "STAT:DEV:He4Pot:TEMP:LOOP:TSET:{:.4f}K".format(self.device.temperature_channels["HE4POT"].temperature_sp)
+
+    def get_he_low_temp_sp(self):
+        return "STAT:DEV:HeLow:TEMP:LOOP:TSET:{:.4f}K".format(self.device.temperature_channels["HELOW"].temperature_sp)
+
+    def get_he_high_temp_sp(self):
+        return "STAT:DEV:HeHigh:TEMP:LOOP:TSET:{:.4f}K".format(self.device.temperature_channels["HEHIGH"].temperature_sp)
