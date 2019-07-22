@@ -14,8 +14,12 @@ class SimulatedHeliox(StateMachineDevice):
         self.temperature = 0
         self.temperature_sp = 0
 
+        self.temperature_stable = True
+
     def _get_state_handlers(self):
-        return {'default': DefaultState()}
+        return {
+            'default': DefaultState()
+        }
 
     def _get_initial_state(self):
         return 'default'

@@ -8,25 +8,33 @@ DEVICE_NAME = "HelioxX"
 
 class HelioxStreamInterface(StreamInterface):
     commands = {
-        CmdBuilder("get_catalog")
-            .escape(ISOBUS_PREFIX).escape("READ:SYS:CAT").eos().build(),
+        CmdBuilder("get_catalog").optional(ISOBUS_PREFIX)
+            .escape("READ:SYS:CAT").eos().build(),
 
-        CmdBuilder("set_heliox_setpoint")
-            .escape(ISOBUS_PREFIX).escape("SET:DEV:{}:HEL:SIG:TSET:".format(DEVICE_NAME)).float().escape("K").eos().build(),
-        CmdBuilder("get_heliox_status")
-            .escape(ISOBUS_PREFIX).escape("READ:DEV:").escape(DEVICE_NAME).escape(":HEL").eos().build(),
+        CmdBuilder("get_all_heliox_status").optional(ISOBUS_PREFIX)
+            .escape("READ:DEV:").escape(DEVICE_NAME).escape(":HEL").eos().build(),
 
-        CmdBuilder("get_nickname")
-            .escape(ISOBUS_PREFIX).escape("READ:DEV:").any().escape(":NICK").eos().build(),
+        CmdBuilder("get_heliox_temp").optional(ISOBUS_PREFIX)
+            .escape("READ:DEV:").escape(DEVICE_NAME).escape(":HEL:SIG:TEMP").eos().build(),
+        CmdBuilder("get_heliox_temp_sp_rbv").optional(ISOBUS_PREFIX)
+            .escape("READ:DEV:").escape(DEVICE_NAME).escape(":HEL:SIG:TSET").eos().build(),
+        CmdBuilder("get_heliox_stable").optional(ISOBUS_PREFIX)
+            .escape("READ:DEV:").escape(DEVICE_NAME).escape(":HEL:SIG:H3PS").eos().build(),
 
-        CmdBuilder("get_he3_sorb_temp")
-            .escape(ISOBUS_PREFIX).escape("READ:DEV:He3Sorb:TEMP").eos().build(),
-        CmdBuilder("get_he4_pot_temp")
-            .escape(ISOBUS_PREFIX).escape("READ:DEV:He4Pot:TEMP").eos().build(),
-        CmdBuilder("get_he_high_temp")
-            .escape(ISOBUS_PREFIX).escape("READ:DEV:HeHigh:TEMP").eos().build(),
-        CmdBuilder("get_he_low_temp")
-            .escape(ISOBUS_PREFIX).escape("READ:DEV:HeLow:TEMP").eos().build(),
+        CmdBuilder("set_heliox_setpoint").optional(ISOBUS_PREFIX)
+            .escape("SET:DEV:{}:HEL:SIG:TSET:".format(DEVICE_NAME)).float().escape("K").eos().build(),
+
+        CmdBuilder("get_nickname").optional(ISOBUS_PREFIX)
+            .escape("READ:DEV:").any().escape(":NICK").eos().build(),
+
+        CmdBuilder("get_all_he3_sorb_status").optional(ISOBUS_PREFIX)
+            .escape("READ:DEV:He3Sorb:TEMP").eos().build(),
+        CmdBuilder("get_all_he4_pot_status").optional(ISOBUS_PREFIX)
+            .escape("READ:DEV:He4Pot:TEMP").eos().build(),
+        CmdBuilder("get_all_he_high_status").optional(ISOBUS_PREFIX)
+            .escape("READ:DEV:HeHigh:TEMP").eos().build(),
+        CmdBuilder("get_all_he_low_status").optional(ISOBUS_PREFIX)
+            .escape("READ:DEV:HeLow:TEMP").eos().build(),
     }
 
     in_terminator = "\n"
@@ -38,7 +46,11 @@ class HelioxStreamInterface(StreamInterface):
         self.log.error(err_string)
         return err_string
 
-    def get_heliox_status(self):
+    def get_all_heliox_status(self):
+        """
+        This function is used by the labview VI. In EPICS it is more convenient to ask for the parameters individually,
+        so we don't use this large function which generates all of the possible status information.
+        """
         return "STAT:DEV:{}".format(DEVICE_NAME) + \
                ":HEL:LOWT:2.5000K" \
                ":BT:0.0000K" \
@@ -53,9 +65,9 @@ class HelioxStreamInterface(StreamInterface):
                ":PCT:2.0000K" \
                ":SIG:H4PS:Stable" \
                ":STAT:Regenerate" \
-               ":TEMP:{}K".format(self.device.temperature) + \
-               ":TSET:{}K".format(self.device.temperature_sp) + \
-               ":H3PS:Stable" \
+               ":TEMP:{:.4f}K".format(self.device.temperature) + \
+               ":TSET:{:.4f}K".format(self.device.temperature_sp) + \
+               ":H3PS:{}".format("Stable" if self.device.temperature_stable else "Unstable") + \
                ":SRBS:Stable" \
                ":SRBR:32.000K" \
                ":SCT:3.0000K" \
@@ -77,7 +89,7 @@ class HelioxStreamInterface(StreamInterface):
         """
         return "STAT:DEV:{}:NICK:{}".format(arg, "FAKENICKNAME")
 
-    def get_he3_sorb_temp(self):
+    def get_all_he3_sorb_status(self):
         return "STAT:DEV:He3Sorb:TEMP" \
                ":EXCT:TYPE:UNIP:MAG:0" \
                ":STAT:40000000" \
@@ -105,14 +117,15 @@ class HelioxStreamInterface(StreamInterface):
                ":INT:LIN:SCAL:1" \
                ":FILE:None" \
                ":HOTL:999.00K" \
-               ":TYPE:TCE:SIG:VOLT:-0.0038mV" \
+               ":TYPE:TCE" \
+               ":SIG:VOLT:-0.0038mV" \
                ":CURR:-0.0000A" \
                ":TEMP:1.2345K" \
                ":POWR:0.0000W" \
                ":RES:0.0000O" \
                ":SLOP:0.0000O/K"
 
-    def get_he4_pot_temp(self):
+    def get_all_he4_pot_status(self):
         return "STAT:DEV:He4Pot:TEMP" \
                ":EXCT:TYPE:UNIP:MAG:0" \
                ":STAT:40000000" \
@@ -140,14 +153,15 @@ class HelioxStreamInterface(StreamInterface):
                ":INT:LIN:SCAL:1" \
                ":FILE:None" \
                ":HOTL:999.00K" \
-               ":TYPE:TCE:SIG:VOLT:-0.0038mV" \
+               ":TYPE:TCE" \
+               ":SIG:VOLT:-0.0038mV" \
                ":CURR:-0.0000A" \
                ":TEMP:2.3456K" \
                ":POWR:0.0000W" \
                ":RES:0.0000O" \
                ":SLOP:0.0000O/K"
 
-    def get_he_low_temp(self):
+    def get_all_he_low_status(self):
         return "STAT:DEV:HeLow:TEMP" \
                ":EXCT:TYPE:UNIP:MAG:0" \
                ":STAT:40000000" \
@@ -175,14 +189,15 @@ class HelioxStreamInterface(StreamInterface):
                ":INT:LIN:SCAL:1" \
                ":FILE:None" \
                ":HOTL:999.00K" \
-               ":TYPE:TCE:SIG:VOLT:-0.0038mV" \
+               ":TYPE:TCE" \
+               ":SIG:VOLT:-0.0038mV" \
                ":CURR:-0.0000A" \
                ":TEMP:3.4567K" \
                ":POWR:0.0000W" \
                ":RES:0.0000O" \
                ":SLOP:0.0000O/K"
 
-    def get_he_high_temp(self):
+    def get_all_he_high_status(self):
         return "STAT:DEV:HeHigh:TEMP" \
                ":EXCT:TYPE:UNIP:MAG:0" \
                ":STAT:40000000" \
@@ -210,7 +225,8 @@ class HelioxStreamInterface(StreamInterface):
                ":INT:LIN:SCAL:1" \
                ":FILE:None" \
                ":HOTL:999.00K" \
-               ":TYPE:TCE:SIG:VOLT:-0.0038mV" \
+               ":TYPE:TCE" \
+               ":SIG:VOLT:-0.0038mV" \
                ":CURR:-0.0000A" \
                ":TEMP:4.5678K" \
                ":POWR:0.0000W" \
@@ -219,3 +235,13 @@ class HelioxStreamInterface(StreamInterface):
 
     def set_heliox_setpoint(self, new_setpoint):
         self.device.temperature_sp = new_setpoint
+        return self.get_heliox_temp_sp_rbv()
+
+    def get_heliox_temp(self):
+        return "STAT:DEV:HelioxX:HEL:SIG:TEMP:{:.4f}K".format(self.device.temperature)
+
+    def get_heliox_temp_sp_rbv(self):
+        return "STAT:DEV:HelioxX:HEL:SIG:TSET:{:.4f}K".format(self.device.temperature_sp)
+
+    def get_heliox_stable(self):
+        return "STAT:DEV:{}:HEL:SIG:H3PS:{}".format(DEVICE_NAME, "Stable" if self.device.temperature_stable else "Unstable")
