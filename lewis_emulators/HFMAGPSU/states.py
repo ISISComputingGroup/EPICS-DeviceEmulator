@@ -24,9 +24,7 @@ class DefaultInitState(State):
 class HoldingState(State):
 
     def on_entry(self, dt):
-        device = self._context
         print("*********** ENTERED HOLD STATE")
-        print(device.output, device.direction)
 
     def in_state(self, dt):
         device = self._context

@@ -216,7 +216,7 @@ class HFMAGPSUStreamInterface(StreamInterface):
         return "........ MAX SETTING: {:.4} {}\r\n".format(self._device.max_target, mode)
 
     def write_max_target(self, max_target):
-        self._device.max_target = abs(max_target)
+        self._device.max_target = abs(max_target)  # abs because PSU ignores sign
         units = self._get_output_mode_string()
         self._create_log_message("MAX SETTING", max_target,  suffix=" {}\r\n".format(units))
         return self._device.log_message
@@ -226,7 +226,7 @@ class HFMAGPSUStreamInterface(StreamInterface):
         return "........ MID SETTING: {:.4} {}\r\n".format(self._device.mid_target, mode)
 
     def write_mid_target(self, mid_target):
-        self._device.mid_target = abs(mid_target)
+        self._device.mid_target = abs(mid_target)  # abs because PSU ignores sign
         units = self._get_output_mode_string()
         self._create_log_message("MID SETTING", mid_target, suffix=" {}".format(units))
         return self._device.log_message
