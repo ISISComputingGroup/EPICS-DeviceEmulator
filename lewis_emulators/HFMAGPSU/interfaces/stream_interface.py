@@ -63,6 +63,9 @@ class HFMAGPSUStreamInterface(StreamInterface):
     def _get_output_mode_string(self):
         return "TESLA" if self._device.is_output_mode_tesla else "AMPS"
 
+    def _get_paused_state_str(self):
+        return "ON" if self._device.is_paused else "OFF"
+
     def _get_ramp_target_value(self):
         target = None
         if self._device.ramp_target == "MID":
@@ -86,10 +89,7 @@ class HFMAGPSUStreamInterface(StreamInterface):
         return "........\r\n"
 
     def read_output_mode(self):
-        mode = "AMPS"
-        if self._device.is_output_mode_tesla:
-            mode = "TESLA"
-        return "........ UNITS: {}\r\n".format(mode)
+        return "........ UNITS: {}\r\n".format(self._get_output_mode_string())
 
     def read_output(self):
         return "{} OUTPUT: {} {} AT {} VOLTS \r\n".format(self._timestamp(),
@@ -180,10 +180,7 @@ class HFMAGPSUStreamInterface(StreamInterface):
         return self._device.log_message
 
     def read_pause(self):
-        paused = "OFF"
-        if self._device.is_paused:
-            paused = "ON"
-        return "........ PAUSE STATUS: {}\r\n".format(paused)
+        return "........ PAUSE STATUS: {}\r\n".format(self._get_paused_state_str())
 
     def write_pause(self, paused):
         mode = self._get_output_mode_string()
