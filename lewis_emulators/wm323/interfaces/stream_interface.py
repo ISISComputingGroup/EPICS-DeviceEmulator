@@ -24,7 +24,7 @@ class Wm323StreamInterface(StreamInterface):
         return err_string
 
     def get_status(self):
-        return "323Du {} {} {} !".format(self.device.speed, self.device.direction, self.device.running)
+        return "{} {} {} {} !".format(self.device.type, self.device.speed, self.device.direction, self.device.running)
 
     def set_speed(self, speed):
         self.device.speed = speed

@@ -14,6 +14,7 @@ class SimulatedWm323(StateMachineDevice):
         self.speed = 0
         self.direction = "CCW"
         self.running = 0
+        self.type = "323Du"
 
     def _get_state_handlers(self):
         return {'default': DefaultState()}
