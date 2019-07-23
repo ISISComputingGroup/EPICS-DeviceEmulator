@@ -50,3 +50,6 @@ class SimulatedHeliox(StateMachineDevice):
 
     def backdoor_set_channel_stability(self, channel, stability):
         self.temperature_channels[channel].stable = stability
+
+    def backdoor_set_channel_heater_auto(self, channel, heater_auto):
+        self.temperature_channels[channel].heater_auto = heater_auto

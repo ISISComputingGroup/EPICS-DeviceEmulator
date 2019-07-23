@@ -3,44 +3,7 @@ from lewis_emulators.utils.command_builder import CmdBuilder
 
 
 ISOBUS_PREFIX = "@1"
-DEVICE_NAME = "HelioxX"
-
-
-# Format of the long-style response when querying an individual temperature card.
-INDIVIDUAL_CHANNEL_LONG_RESPONSE_FORMAT = "STAT:DEV:{name}:TEMP" \
-               ":EXCT:TYPE:UNIP:MAG:0" \
-               ":STAT:40000000" \
-               ":NICK:MB1.T1" \
-               ":LOOP:AUX:None" \
-               ":D:1.0" \
-               ":HTR:None" \
-               ":I:1.0" \
-               ":THTF:None" \
-               ":HSET:0" \
-               ":PIDT:OFF" \
-               ":ENAB:OFF" \
-               ":SWFL:None" \
-               ":FAUT:OFF" \
-               ":FSET:0" \
-               ":PIDF:None" \
-               ":P:1.0" \
-               ":SWMD:FIX" \
-               ":TSET:{tset:.4f}K" \
-               ":MAN:HVER:1" \
-               ":FVER:1.12" \
-               ":SERL:111450078" \
-               ":CAL:OFFS:0" \
-               ":COLDL:999.00K" \
-               ":INT:LIN:SCAL:1" \
-               ":FILE:None" \
-               ":HOTL:999.00K" \
-               ":TYPE:TCE" \
-               ":SIG:VOLT:-0.0038mV" \
-               ":CURR:-0.0000A" \
-               ":TEMP:{temp:.4f}K" \
-               ":POWR:0.0000W" \
-               ":RES:0.0000O" \
-               ":SLOP:0.0000O/K"
+PRIMARY_DEVICE_NAME = "HelioxX"
 
 
 class HelioxStreamInterface(StreamInterface):
@@ -49,52 +12,34 @@ class HelioxStreamInterface(StreamInterface):
             .escape("READ:SYS:CAT").eos().build(),
 
         CmdBuilder("get_all_heliox_status").optional(ISOBUS_PREFIX)
-            .escape("READ:DEV:").escape(DEVICE_NAME).escape(":HEL").eos().build(),
+            .escape("READ:DEV:").escape(PRIMARY_DEVICE_NAME).escape(":HEL").eos().build(),
 
         CmdBuilder("get_heliox_temp").optional(ISOBUS_PREFIX)
-            .escape("READ:DEV:").escape(DEVICE_NAME).escape(":HEL:SIG:TEMP").eos().build(),
+            .escape("READ:DEV:").escape(PRIMARY_DEVICE_NAME).escape(":HEL:SIG:TEMP").eos().build(),
         CmdBuilder("get_heliox_temp_sp_rbv").optional(ISOBUS_PREFIX)
-            .escape("READ:DEV:").escape(DEVICE_NAME).escape(":HEL:SIG:TSET").eos().build(),
+            .escape("READ:DEV:").escape(PRIMARY_DEVICE_NAME).escape(":HEL:SIG:TSET").eos().build(),
         CmdBuilder("get_heliox_stable").optional(ISOBUS_PREFIX)
-            .escape("READ:DEV:").escape(DEVICE_NAME).escape(":HEL:SIG:H3PS").eos().build(),
+            .escape("READ:DEV:").escape(PRIMARY_DEVICE_NAME).escape(":HEL:SIG:H3PS").eos().build(),
 
         CmdBuilder("set_heliox_setpoint").optional(ISOBUS_PREFIX)
-            .escape("SET:DEV:{}:HEL:SIG:TSET:".format(DEVICE_NAME)).float().escape("K").eos().build(),
+            .escape("SET:DEV:{}:HEL:SIG:TSET:".format(PRIMARY_DEVICE_NAME)).float().escape("K").eos().build(),
 
         CmdBuilder("get_nickname").optional(ISOBUS_PREFIX)
             .escape("READ:DEV:").any().escape(":NICK").eos().build(),
 
-        CmdBuilder("get_all_he3_sorb_status").optional(ISOBUS_PREFIX)
-            .escape("READ:DEV:He3Sorb:TEMP").eos().build(),
-        CmdBuilder("get_all_he4_pot_status").optional(ISOBUS_PREFIX)
-            .escape("READ:DEV:He4Pot:TEMP").eos().build(),
-        CmdBuilder("get_all_he_high_status").optional(ISOBUS_PREFIX)
-            .escape("READ:DEV:HeHigh:TEMP").eos().build(),
-        CmdBuilder("get_all_he_low_status").optional(ISOBUS_PREFIX)
-            .escape("READ:DEV:HeLow:TEMP").eos().build(),
-
-        CmdBuilder("get_he3_sorb_temp").optional(ISOBUS_PREFIX)
-            .escape("READ:DEV:He3Sorb:TEMP:SIG:TEMP").eos().build(),
-        CmdBuilder("get_he4_pot_temp").optional(ISOBUS_PREFIX)
-            .escape("READ:DEV:He4Pot:TEMP:SIG:TEMP").eos().build(),
-        CmdBuilder("get_he_high_temp").optional(ISOBUS_PREFIX)
-            .escape("READ:DEV:HeHigh:TEMP:SIG:TEMP").eos().build(),
-        CmdBuilder("get_he_low_temp").optional(ISOBUS_PREFIX)
-            .escape("READ:DEV:HeLow:TEMP:SIG:TEMP").eos().build(),
-
-        CmdBuilder("get_he3_sorb_temp_sp").optional(ISOBUS_PREFIX)
-            .escape("READ:DEV:He3Sorb:TEMP:LOOP:TSET").eos().build(),
-        CmdBuilder("get_he4_pot_temp_sp").optional(ISOBUS_PREFIX)
-            .escape("READ:DEV:He4Pot:TEMP:LOOP:TSET").eos().build(),
-        CmdBuilder("get_he_high_temp_sp").optional(ISOBUS_PREFIX)
-            .escape("READ:DEV:HeHigh:TEMP:LOOP:TSET").eos().build(),
-        CmdBuilder("get_he_low_temp_sp").optional(ISOBUS_PREFIX)
-            .escape("READ:DEV:HeLow:TEMP:LOOP:TSET").eos().build(),
+        CmdBuilder("get_channel_status").optional(ISOBUS_PREFIX)
+            .escape("READ:DEV:").arg(r"[^:]*").escape(":TEMP").eos().build(),
+        CmdBuilder("get_channel_temp").optional(ISOBUS_PREFIX)
+            .escape("READ:DEV:").arg(r"[^:]*").escape(":TEMP:SIG:TEMP").eos().build(),
+        CmdBuilder("get_channel_temp_sp").optional(ISOBUS_PREFIX)
+            .escape("READ:DEV:").arg(r"[^:]*").escape(":TEMP:LOOP:TSET").eos().build(),
+        CmdBuilder("get_channel_heater_auto").optional(ISOBUS_PREFIX)
+            .escape("READ:DEV:").arg(r"[^:]*").escape(":TEMP:LOOP:ENAB").eos().build(),
 
         CmdBuilder("get_he3_sorb_stable").optional(ISOBUS_PREFIX)
-            .escape("READ:DEV:{}:HEL:SIG:SRBS".format(DEVICE_NAME)).eos().build(),
+            .escape("READ:DEV:{}:HEL:SIG:SRBS".format(PRIMARY_DEVICE_NAME)).eos().build(),
         CmdBuilder("get_he4_pot_stable").optional(ISOBUS_PREFIX)
-            .escape("READ:DEV:{}:HEL:SIG:H4PS".format(DEVICE_NAME)).eos().build(),
+            .escape("READ:DEV:{}:HEL:SIG:H4PS".format(PRIMARY_DEVICE_NAME)).eos().build(),
     }
 
     in_terminator = "\n"
@@ -111,7 +56,7 @@ class HelioxStreamInterface(StreamInterface):
         This function is used by the labview VI. In EPICS it is more convenient to ask for the parameters individually,
         so we don't use this large function which generates all of the possible status information.
         """
-        return "STAT:DEV:{}".format(DEVICE_NAME) + \
+        return "STAT:DEV:{}".format(PRIMARY_DEVICE_NAME) + \
                ":HEL:LOWT:2.5000K" \
                ":BT:0.0000K" \
                ":NVCN:17.000mB" \
@@ -152,34 +97,6 @@ class HelioxStreamInterface(StreamInterface):
         """
         return "STAT:DEV:{}:NICK:{}".format(arg, "FAKENICKNAME")
 
-    def get_all_he3_sorb_status(self):
-        return INDIVIDUAL_CHANNEL_LONG_RESPONSE_FORMAT.format(
-            name="He3Sorb",
-            tset=self.device.temperature_channels["HE3SORB"].temperature_sp,
-            temp=self.device.temperature_channels["HE3SORB"].temperature,
-        )
-
-    def get_all_he4_pot_status(self):
-        return INDIVIDUAL_CHANNEL_LONG_RESPONSE_FORMAT.format(
-            name="He4Pot",
-            tset=self.device.temperature_channels["HE4POT"].temperature_sp,
-            temp=self.device.temperature_channels["HE4POT"].temperature,
-        )
-
-    def get_all_he_high_status(self):
-        return INDIVIDUAL_CHANNEL_LONG_RESPONSE_FORMAT.format(
-            name="HeHigh",
-            tset=self.device.temperature_channels["HEHIGH"].temperature_sp,
-            temp=self.device.temperature_channels["HEHIGH"].temperature,
-        )
-
-    def get_all_he_low_status(self):
-        return INDIVIDUAL_CHANNEL_LONG_RESPONSE_FORMAT.format(
-            name="HeLow",
-            tset=self.device.temperature_channels["HELOW"].temperature_sp,
-            temp=self.device.temperature_channels["HELOW"].temperature,
-        )
-
     def set_heliox_setpoint(self, new_setpoint):
         self.device.temperature_sp = new_setpoint
         return self.get_heliox_temp_sp_rbv()
@@ -191,42 +108,69 @@ class HelioxStreamInterface(StreamInterface):
         return "STAT:DEV:HelioxX:HEL:SIG:TSET:{:.4f}K".format(self.device.temperature_sp)
 
     def get_heliox_stable(self):
-        return "STAT:DEV:{}:HEL:SIG:H3PS:{}".format(DEVICE_NAME, "Stable" if self.device.temperature_stable else "Unstable")
+        return "STAT:DEV:{}:HEL:SIG:H3PS:{}"\
+            .format(PRIMARY_DEVICE_NAME, "Stable" if self.device.temperature_stable else "Unstable")
 
-    # Individual channel temperatures
+    def get_channel_status(self, channel):
+        temperature_channel = self.device.temperature_channels[channel.upper()]
+        return "STAT:DEV:{name}:TEMP" \
+               ":EXCT:TYPE:UNIP:MAG:0" \
+               ":STAT:40000000" \
+               ":NICK:MB1.T1" \
+               ":LOOP:AUX:None" \
+               ":D:1.0" \
+               ":HTR:None" \
+               ":I:1.0" \
+               ":THTF:None" \
+               ":HSET:0" \
+               ":PIDT:OFF" \
+               ":ENAB:{heater_auto}" \
+               ":SWFL:None" \
+               ":FAUT:OFF" \
+               ":FSET:0" \
+               ":PIDF:None" \
+               ":P:1.0" \
+               ":SWMD:FIX" \
+               ":TSET:{tset:.4f}K" \
+               ":MAN:HVER:1" \
+               ":FVER:1.12" \
+               ":SERL:111450078" \
+               ":CAL:OFFS:0" \
+               ":COLDL:999.00K" \
+               ":INT:LIN:SCAL:1" \
+               ":FILE:None" \
+               ":HOTL:999.00K" \
+               ":TYPE:TCE" \
+               ":SIG:VOLT:-0.0038mV" \
+               ":CURR:-0.0000A" \
+               ":TEMP:{temp:.4f}K" \
+               ":POWR:0.0000W" \
+               ":RES:0.0000O" \
+               ":SLOP:0.0000O/K".format(
+                    name=channel,
+                    tset=temperature_channel.temperature_sp,
+                    temp=temperature_channel.temperature,
+                    heater_auto="ON" if temperature_channel.heater_auto else "OFF",
+                )
 
-    def get_he3_sorb_temp(self):
-        return "STAT:DEV:He3Sorb:TEMP:SIG:TEMP:{:.4f}K".format(self.device.temperature_channels["HE3SORB"].temperature)
+    def get_channel_temp(self, chan):
+        return "STAT:DEV:{}:TEMP:SIG:TEMP:{:.4f}K"\
+            .format(chan, self.device.temperature_channels[chan.upper()].temperature)
 
-    def get_he4_pot_temp(self):
-        return "STAT:DEV:He4Pot:TEMP:SIG:TEMP:{:.4f}K".format(self.device.temperature_channels["HE4POT"].temperature)
+    def get_channel_temp_sp(self, chan):
+        return "STAT:DEV:{}:TEMP:LOOP:TSET:{:.4f}K"\
+            .format(chan, self.device.temperature_channels[chan.upper()].temperature_sp)
 
-    def get_he_low_temp(self):
-        return "STAT:DEV:HeLow:TEMP:SIG:TEMP:{:.4f}K".format(self.device.temperature_channels["HELOW"].temperature)
-
-    def get_he_high_temp(self):
-        return "STAT:DEV:HeHigh:TEMP:SIG:TEMP:{:.4f}K".format(self.device.temperature_channels["HEHIGH"].temperature)
-
-    # Individual channel temperature setpoint readbacks
-
-    def get_he3_sorb_temp_sp(self):
-        return "STAT:DEV:He3Sorb:TEMP:LOOP:TSET:{:.4f}K".format(self.device.temperature_channels["HE3SORB"].temperature_sp)
-
-    def get_he4_pot_temp_sp(self):
-        return "STAT:DEV:He4Pot:TEMP:LOOP:TSET:{:.4f}K".format(self.device.temperature_channels["HE4POT"].temperature_sp)
-
-    def get_he_low_temp_sp(self):
-        return "STAT:DEV:HeLow:TEMP:LOOP:TSET:{:.4f}K".format(self.device.temperature_channels["HELOW"].temperature_sp)
-
-    def get_he_high_temp_sp(self):
-        return "STAT:DEV:HeHigh:TEMP:LOOP:TSET:{:.4f}K".format(self.device.temperature_channels["HEHIGH"].temperature_sp)
+    def get_channel_heater_auto(self, chan):
+        return "STAT:DEV:{}:TEMP:LOOP:ENAB:{}"\
+            .format(chan, "ON" if self.device.temperature_channels[chan.upper()].heater_auto else "OFF")
     
     # Individual channel stabilities
 
     def get_he3_sorb_stable(self):
         return "STAT:DEV:{}:HEL:SIG:SRBS:{}"\
-            .format(DEVICE_NAME, "Stable" if self.device.temperature_channels["HE3SORB"].stable else "Unstable")
+            .format(PRIMARY_DEVICE_NAME, "Stable" if self.device.temperature_channels["HE3SORB"].stable else "Unstable")
 
     def get_he4_pot_stable(self):
         return "STAT:DEV:{}:HEL:SIG:H4PS:{}"\
-            .format(DEVICE_NAME, "Stable" if self.device.temperature_channels["HE4POT"].stable else "Unstable")
+            .format(PRIMARY_DEVICE_NAME, "Stable" if self.device.temperature_channels["HE4POT"].stable else "Unstable")
