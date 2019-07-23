@@ -7,7 +7,7 @@ DEVICE_NAME = "HelioxX"
 
 
 # Format of the long-style response when querying an individual temperature card.
-INDIVIDUAL_CHANNEL_RESPONSE_FORMAT = "STAT:DEV:{name}:TEMP" \
+INDIVIDUAL_CHANNEL_LONG_RESPONSE_FORMAT = "STAT:DEV:{name}:TEMP" \
                ":EXCT:TYPE:UNIP:MAG:0" \
                ":STAT:40000000" \
                ":NICK:MB1.T1" \
@@ -90,6 +90,11 @@ class HelioxStreamInterface(StreamInterface):
             .escape("READ:DEV:HeHigh:TEMP:LOOP:TSET").eos().build(),
         CmdBuilder("get_he_low_temp_sp").optional(ISOBUS_PREFIX)
             .escape("READ:DEV:HeLow:TEMP:LOOP:TSET").eos().build(),
+
+        CmdBuilder("get_he3_sorb_stable").optional(ISOBUS_PREFIX)
+            .escape("READ:DEV:{}:HEL:SIG:SRBS".format(DEVICE_NAME)).eos().build(),
+        CmdBuilder("get_he4_pot_stable").optional(ISOBUS_PREFIX)
+            .escape("READ:DEV:{}:HEL:SIG:H4PS".format(DEVICE_NAME)).eos().build(),
     }
 
     in_terminator = "\n"
@@ -118,12 +123,12 @@ class HelioxStreamInterface(StreamInterface):
                ":PE:3.5000K" \
                ":RGNA:1.0000K" \
                ":PCT:2.0000K" \
-               ":SIG:H4PS:Stable" \
+               ":SIG:H4PS:{}".format("Stable" if self.device.temperature_channels["HE4POT"].stable else "Unstable") + \
                ":STAT:Regenerate" \
                ":TEMP:{:.4f}K".format(self.device.temperature) + \
                ":TSET:{:.4f}K".format(self.device.temperature_sp) + \
                ":H3PS:{}".format("Stable" if self.device.temperature_stable else "Unstable") + \
-               ":SRBS:Stable" \
+               ":SRBS:{}".format("Stable" if self.device.temperature_channels["HE3SORB"].stable else "Unstable") + \
                ":SRBR:32.000K" \
                ":SCT:3.0000K" \
                ":NVLT:10.000mB"
@@ -148,28 +153,28 @@ class HelioxStreamInterface(StreamInterface):
         return "STAT:DEV:{}:NICK:{}".format(arg, "FAKENICKNAME")
 
     def get_all_he3_sorb_status(self):
-        return INDIVIDUAL_CHANNEL_RESPONSE_FORMAT.format(
+        return INDIVIDUAL_CHANNEL_LONG_RESPONSE_FORMAT.format(
             name="He3Sorb",
             tset=self.device.temperature_channels["HE3SORB"].temperature_sp,
             temp=self.device.temperature_channels["HE3SORB"].temperature,
         )
 
     def get_all_he4_pot_status(self):
-        return INDIVIDUAL_CHANNEL_RESPONSE_FORMAT.format(
+        return INDIVIDUAL_CHANNEL_LONG_RESPONSE_FORMAT.format(
             name="He4Pot",
             tset=self.device.temperature_channels["HE4POT"].temperature_sp,
             temp=self.device.temperature_channels["HE4POT"].temperature,
         )
 
     def get_all_he_high_status(self):
-        return INDIVIDUAL_CHANNEL_RESPONSE_FORMAT.format(
+        return INDIVIDUAL_CHANNEL_LONG_RESPONSE_FORMAT.format(
             name="HeHigh",
             tset=self.device.temperature_channels["HEHIGH"].temperature_sp,
             temp=self.device.temperature_channels["HEHIGH"].temperature,
         )
 
     def get_all_he_low_status(self):
-        return INDIVIDUAL_CHANNEL_RESPONSE_FORMAT.format(
+        return INDIVIDUAL_CHANNEL_LONG_RESPONSE_FORMAT.format(
             name="HeLow",
             tset=self.device.temperature_channels["HELOW"].temperature_sp,
             temp=self.device.temperature_channels["HELOW"].temperature,
@@ -188,6 +193,8 @@ class HelioxStreamInterface(StreamInterface):
     def get_heliox_stable(self):
         return "STAT:DEV:{}:HEL:SIG:H3PS:{}".format(DEVICE_NAME, "Stable" if self.device.temperature_stable else "Unstable")
 
+    # Individual channel temperatures
+
     def get_he3_sorb_temp(self):
         return "STAT:DEV:He3Sorb:TEMP:SIG:TEMP:{:.4f}K".format(self.device.temperature_channels["HE3SORB"].temperature)
 
@@ -200,6 +207,8 @@ class HelioxStreamInterface(StreamInterface):
     def get_he_high_temp(self):
         return "STAT:DEV:HeHigh:TEMP:SIG:TEMP:{:.4f}K".format(self.device.temperature_channels["HEHIGH"].temperature)
 
+    # Individual channel temperature setpoint readbacks
+
     def get_he3_sorb_temp_sp(self):
         return "STAT:DEV:He3Sorb:TEMP:LOOP:TSET:{:.4f}K".format(self.device.temperature_channels["HE3SORB"].temperature_sp)
 
@@ -211,3 +220,13 @@ class HelioxStreamInterface(StreamInterface):
 
     def get_he_high_temp_sp(self):
         return "STAT:DEV:HeHigh:TEMP:LOOP:TSET:{:.4f}K".format(self.device.temperature_channels["HEHIGH"].temperature_sp)
+    
+    # Individual channel stabilities
+
+    def get_he3_sorb_stable(self):
+        return "STAT:DEV:{}:HEL:SIG:SRBS:{}"\
+            .format(DEVICE_NAME, "Stable" if self.device.temperature_channels["HE3SORB"].stable else "Unstable")
+
+    def get_he4_pot_stable(self):
+        return "STAT:DEV:{}:HEL:SIG:H4PS:{}"\
+            .format(DEVICE_NAME, "Stable" if self.device.temperature_channels["HE4POT"].stable else "Unstable")

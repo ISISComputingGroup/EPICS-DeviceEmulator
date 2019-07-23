@@ -8,6 +8,8 @@ class TemperatureChannel(object):
     def __init__(self):
         self.temperature = 0
         self.temperature_sp = 0
+        self.stable = True
+        self.heater_auto = True
 
 
 @has_log
@@ -45,3 +47,6 @@ class SimulatedHeliox(StateMachineDevice):
 
     def backdoor_set_channel_temperature_sp(self, channel, temperature_sp):
         self.temperature_channels[channel].temperature_sp = temperature_sp
+
+    def backdoor_set_channel_stability(self, channel, stability):
+        self.temperature_channels[channel].stable = stability
