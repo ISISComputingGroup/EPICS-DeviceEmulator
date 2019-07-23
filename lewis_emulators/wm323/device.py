@@ -12,6 +12,8 @@ class SimulatedWm323(StateMachineDevice):
         Initialize all of the device's attributes.
         """
         self.speed = 0
+        self.direction = "CCW"
+        self.running = 0
 
     def _get_state_handlers(self):
         return {'default': DefaultState()}
