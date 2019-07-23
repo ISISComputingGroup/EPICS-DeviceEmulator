@@ -5,11 +5,15 @@ from lewis.devices import StateMachineDevice
 
 
 class TemperatureChannel(object):
+    """
+    Class to represent an individual temperature channel on a Heliox fridge. e.g. He3Sorb or He4Pot channels.
+    """
     def __init__(self):
         self.temperature = 0
         self.temperature_sp = 0
         self.stable = True
         self.heater_auto = True
+        self.heater_percent = 0
 
 
 @has_log
@@ -53,3 +57,6 @@ class SimulatedHeliox(StateMachineDevice):
 
     def backdoor_set_channel_heater_auto(self, channel, heater_auto):
         self.temperature_channels[channel].heater_auto = heater_auto
+
+    def backdoor_set_channel_heater_percent(self, channel, percent):
+        self.temperature_channels[channel].heater_percent = percent

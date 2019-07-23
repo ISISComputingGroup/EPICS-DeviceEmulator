@@ -35,6 +35,8 @@ class HelioxStreamInterface(StreamInterface):
             .escape("READ:DEV:").arg(r"[^:]*").escape(":TEMP:LOOP:TSET").eos().build(),
         CmdBuilder("get_channel_heater_auto").optional(ISOBUS_PREFIX)
             .escape("READ:DEV:").arg(r"[^:]*").escape(":TEMP:LOOP:ENAB").eos().build(),
+        CmdBuilder("get_channel_heater_percentage").optional(ISOBUS_PREFIX)
+            .escape("READ:DEV:").arg(r"[^:]*").escape(":TEMP:LOOP:HSET").eos().build(),
 
         CmdBuilder("get_he3_sorb_stable").optional(ISOBUS_PREFIX)
             .escape("READ:DEV:{}:HEL:SIG:SRBS".format(PRIMARY_DEVICE_NAME)).eos().build(),
@@ -122,7 +124,7 @@ class HelioxStreamInterface(StreamInterface):
                ":HTR:None" \
                ":I:1.0" \
                ":THTF:None" \
-               ":HSET:0" \
+               ":HSET:{heater_percent:.4f}" \
                ":PIDT:OFF" \
                ":ENAB:{heater_auto}" \
                ":SWFL:None" \
@@ -151,6 +153,7 @@ class HelioxStreamInterface(StreamInterface):
                     tset=temperature_channel.temperature_sp,
                     temp=temperature_channel.temperature,
                     heater_auto="ON" if temperature_channel.heater_auto else "OFF",
+                    heater_percent=temperature_channel.heater_percent,
                 )
 
     def get_channel_temp(self, chan):
@@ -164,6 +167,10 @@ class HelioxStreamInterface(StreamInterface):
     def get_channel_heater_auto(self, chan):
         return "STAT:DEV:{}:TEMP:LOOP:ENAB:{}"\
             .format(chan, "ON" if self.device.temperature_channels[chan.upper()].heater_auto else "OFF")
+
+    def get_channel_heater_percentage(self, chan):
+        return "STAT:DEV:{}:TEMP:LOOP:HSET:{:.4f}"\
+            .format(chan, self.device.temperature_channels[chan.upper()].heater_percent)
     
     # Individual channel stabilities
 
