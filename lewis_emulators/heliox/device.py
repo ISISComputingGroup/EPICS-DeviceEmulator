@@ -35,6 +35,8 @@ class SimulatedHeliox(StateMachineDevice):
             "HEHIGH": TemperatureChannel(),
         }
 
+        self.connected = True
+
     def _get_state_handlers(self):
         return {
             'default': DefaultState()
