@@ -1,5 +1,6 @@
 from lewis.adapters.stream import StreamInterface, Cmd
 from lewis_emulators.utils.command_builder import CmdBuilder
+from ..device import Direction
 
 
 class Wm323StreamInterface(StreamInterface):
@@ -24,22 +25,22 @@ class Wm323StreamInterface(StreamInterface):
         return err_string
 
     def get_status(self):
-        return "{} {} {} {} !".format(self.device.type, self.device.speed, self.device.direction, self.device.running)
+        running_int = 0
+        if self.device.running:
+            running_int = 1
+        return "{} {} {} {} !".format(self.device.type, self.device.speed, self.device.direction.name, running_int)
 
     def set_speed(self, speed):
         self.device.speed = speed
 
-    def set_rotation(self, direction):
-        self.device.direction = direction
-
     def set_rotation_cw(self):
-        self.device.direction = "CW"
+        self.device.direction = Direction.CW
 
     def set_rotation_ccw(self):
-        self.device.direction = "CCW"
+        self.device.direction = Direction.CCW
 
     def set_running_start(self):
-        self.device.running = 1
+        self.device.running = True
 
     def set_running_stop(self):
-        self.device.running = 0
+        self.device.running = False
