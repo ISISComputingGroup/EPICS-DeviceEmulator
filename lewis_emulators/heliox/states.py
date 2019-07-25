@@ -18,6 +18,4 @@ class He3PotEmptyState(State):
     def in_state(self, dt):
         device = self._context
 
-        rate = 0.1
-
-        device.temperature = approaches.linear(device.temperature, He3PotEmptyState.DRIFT_TOWARDS, rate, dt)
+        device.temperature = approaches.linear(device.temperature, device.drift_towards, device.drift_rate, dt)

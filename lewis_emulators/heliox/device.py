@@ -38,6 +38,11 @@ class SimulatedHeliox(StateMachineDevice):
         self.connected = True
 
         self.helium_3_pot_empty = False
+        self.drift_towards = 1.5  # Drift to 1.5K ~= temperature of 1K pot.
+        self.drift_rate = 1
+
+    def reset(self):
+        self._initialize_data()
 
     def _get_state_handlers(self):
         return {
