@@ -35,6 +35,8 @@ class SimulatedHeliox(StateMachineDevice):
             "HEHIGH": TemperatureChannel(),
         }
 
+        self.status = "Low Temp"
+
         self.connected = True
 
         self.helium_3_pot_empty = False

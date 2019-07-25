@@ -22,6 +22,8 @@ class HelioxStreamInterface(StreamInterface):
             .escape("READ:DEV:").escape(PRIMARY_DEVICE_NAME).escape(":HEL:SIG:TSET").eos().build(),
         CmdBuilder("get_heliox_stable").optional(ISOBUS_PREFIX)
             .escape("READ:DEV:").escape(PRIMARY_DEVICE_NAME).escape(":HEL:SIG:H3PS").eos().build(),
+        CmdBuilder("get_heliox_status").optional(ISOBUS_PREFIX)
+            .escape("READ:DEV:").escape(PRIMARY_DEVICE_NAME).escape(":HEL:SIG:STAT").eos().build(),
 
         CmdBuilder("set_heliox_setpoint").optional(ISOBUS_PREFIX)
             .escape("SET:DEV:{}:HEL:SIG:TSET:".format(PRIMARY_DEVICE_NAME)).float().escape("K").eos().build(),
@@ -74,7 +76,7 @@ class HelioxStreamInterface(StreamInterface):
                ":RGNA:1.0000K" \
                ":PCT:2.0000K" \
                ":SIG:H4PS:{}".format("Stable" if self.device.temperature_channels["HE4POT"].stable else "Unstable") + \
-               ":STAT:Regenerate" \
+               ":STAT:{}".format(self.device.status) + \
                ":TEMP:{:.4f}K".format(self.device.temperature) + \
                ":TSET:{:.4f}K".format(self.device.temperature_sp) + \
                ":H3PS:{}".format("Stable" if self.device.temperature_stable else "Unstable") + \
@@ -121,6 +123,10 @@ class HelioxStreamInterface(StreamInterface):
     def get_heliox_stable(self):
         return "STAT:DEV:{}:HEL:SIG:H3PS:{}"\
             .format(PRIMARY_DEVICE_NAME, "Stable" if self.device.temperature_stable else "Unstable")
+
+    @if_connected
+    def get_heliox_status(self):
+        return "STAT:DEV:{}:HEL:SIG:STAT:{}".format(PRIMARY_DEVICE_NAME, self.device.status)
 
     @if_connected
     def get_channel_status(self, channel):
