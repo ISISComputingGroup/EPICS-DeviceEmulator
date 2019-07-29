@@ -109,7 +109,7 @@ class HelioxStreamInterface(StreamInterface):
     @if_connected
     def set_heliox_setpoint(self, new_setpoint):
         self.device.temperature_sp = new_setpoint
-        return self.get_heliox_temp_sp_rbv()
+        return "STAT:SET:DEV:HelioxX:HEL:SIG:TSET:{:.4f}K:VALID".format(new_setpoint)
 
     @if_connected
     def get_heliox_temp(self):
