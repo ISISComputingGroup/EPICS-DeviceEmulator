@@ -90,11 +90,10 @@ def timed_reply(action, reply=None, minimum_time_delay=0):
                 time_since_last_request = new_input_time - _LastInput.last_input_time
                 valid_input = time_since_last_request > minimum_time_delay
                 if valid_input:
-                    self.log.info("Within time tolerance ({}ms) was {}ms".format(minimum_time_delay, time_since_last_request))
                     _LastInput.last_input_time = new_input_time
                     return func(self, *args, **kwargs)
                 else:
-                    self.log.info("Violated time tolerance ({}ms) was {}ms".format(minimum_time_delay, time_since_last_request))
+                    self.log.info("Violated time tolerance ({}ms) was {}ms. Calling action ({}) on device".format(minimum_time_delay, time_since_last_request, action))
                     device = _get_device_from(self)
                     action_function = getattr(device, action)
                     action_function()

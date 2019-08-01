@@ -1,3 +1,4 @@
+from lewis.core import approaches
 from lewis.core.statemachine import State
 
 
@@ -5,16 +6,26 @@ class PumpOff(State):
 
     def on_entry(self, dt):
         device = self._context
-        device.program_runtime = 0
+        device.flowrate = 0.0
+        device.pressure = 0.0
 
 
 class PumpOn(State):
-    pass
 
-
-class PumpTimed(State):
-
-    # Update time for each tick while in state
-    def in_state(self, dt):
+    def on_entry(self, dt):
         device = self._context
-        device.program_runtime += int(dt)
+        device.simulate_pumping()
+
+
+class PumpProgram(State):
+
+    def on_entry(self, dt):
+        device = self._context
+        device.simulate_pumping()
+
+
+class PumpProgramTimed(State):
+
+    def on_entry(self, dt):
+        device = self._context
+        device.simulate_pumping()
