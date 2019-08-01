@@ -24,7 +24,7 @@ class PumpProgram(State):
         device.simulate_pumping()
 
 
-class PumpProgramTimed(State):
+class PumpProgramReset(State):
 
     def on_entry(self, dt):
         device = self._context

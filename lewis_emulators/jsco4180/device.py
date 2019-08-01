@@ -1,6 +1,6 @@
 import time
 from collections import OrderedDict
-from states import PumpOff, PumpOn, PumpProgram, PumpProgramTimed
+from states import PumpOff, PumpOn, PumpProgram, PumpProgramReset
 from lewis.devices import StateMachineDevice
 
 
@@ -8,7 +8,7 @@ states = OrderedDict([
     ("pump_off", PumpOff()),
     ("pump_on", PumpOn()),
     ("pump_program", PumpProgram()),
-    ("pump_program_timed", PumpProgramTimed())])
+    ("pump_program_reset", PumpProgramReset())])
 
 
 class SimulatedJsco4180(StateMachineDevice):
@@ -46,14 +46,7 @@ class SimulatedJsco4180(StateMachineDevice):
         return self._csm.state
 
     def crash_pump(self):
-        print("##### CRASH PUMP #####")
         self.connected = False
-        print("New connected status: {}".format(self.connected))
-
-    def attempt_single_channel_mode_reset(self):
-        if self.device.file_number is not None and self.device.file_open is False:
-            print("ATTEMPTING RESET")
-            self.device.single_channel_mode = False
 
     def simulate_pumping(self):
         self.flowrate = self.flowrate_rbv
@@ -69,20 +62,20 @@ class SimulatedJsco4180(StateMachineDevice):
         return OrderedDict([
             (("pump_on", "pump_off"), lambda: self.status == "pump_off"),
             (("pump_program", "pump_off"), lambda: self.status == "pump_off"),
-            (("pump_program_timed", "pump_off"), lambda: self.status == "pump_off"),
+            (("pump_program_reset", "pump_off"), lambda: self.status == "pump_off"),
 
             (("pump_off", "pump_on"), lambda: self.status == "on"),
             (("pump_off", "pump_program"), lambda: self.status == "pump_program"),
-            (("pump_off", "pump_program_timed"), lambda: self.status == "pump_program_timed"),
+            (("pump_off", "pump_program_reset"), lambda: self.status == "pump_program_reset"),
 
             (("pump_on", "pump_program"), lambda: self.status == "pump_program"),
-            (("pump_on", "pump_program_timed"), lambda: self.status == "pump_program_timed"),
+            (("pump_on", "pump_program_reset"), lambda: self.status == "pump_program_reset"),
 
             (("pump_program", "pump_on"), lambda: self.status == "pump_on"),
-            (("pump_program", "pump_program_timed"), lambda: self.status == "pump_program_timed"),
+            (("pump_program", "pump_program_reset"), lambda: self.status == "pump_program_reset"),
 
-            (("pump_program_timed", "pump_on"), lambda: self.status == "pump_on"),
-            (("pump_program_timed", "pump_program"), lambda: self.status == "pump_program"),
+            (("pump_program_reset", "pump_on"), lambda: self.status == "pump_on"),
+            (("pump_program_reset", "pump_program"), lambda: self.status == "pump_program"),
         ])
 
     def reset(self):

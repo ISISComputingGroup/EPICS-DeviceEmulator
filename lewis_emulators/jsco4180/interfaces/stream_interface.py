@@ -74,7 +74,14 @@ class Jsco4180StreamInterface(StreamInterface):
     @if_valid_input_delay
     @if_connected
     def get_status(self):
-        return 0 if self.device.status == "pump_off" else 1
+        if self.device.status == "pump_off":
+            return 0
+        elif self.device.status == "pump_on":
+            return 33  # Running program but time halted
+        elif self.device.status == "pump_program":
+            return 49  # Running program with time
+        elif self.device.status == "pump_program_reset":
+            return 49  # Running program with reset timer
 
     @if_valid_input_delay
     @if_connected
@@ -87,17 +94,13 @@ class Jsco4180StreamInterface(StreamInterface):
             self.device.status = "pump_off"
             return self.out_terminator
         elif mode == 6:
-            # Pump program
+            # Pump program (time increment halted)
             self.device.status = "pump_program"
             return self.out_terminator
         elif mode == 8:
-            # Pump timed Program
-            self.device.status = "pump_program_timed"
+            # Pump reset and rerun program
+            self.device.status = "pump_program_reset"
             self.device.program_runtime = 0
-            return self.out_terminator
-        else:
-            # Ignore others
-            self.device.status = "off"
             return self.out_terminator
 
     @if_valid_input_delay
@@ -152,7 +155,7 @@ class Jsco4180StreamInterface(StreamInterface):
     @if_valid_input_delay
     @if_connected
     def get_program_runtime(self):
-        if self.device.status == 'pump_program_timed':
+        if self.device.status == 'pump_program_reset':
             self.device.program_runtime += 1
         return int(self.device.program_runtime)
 
