@@ -1,6 +1,6 @@
 from collections import OrderedDict
 from lewis.core.logging import has_log
-from states import DefaultState
+from states import TemperatureControlState, He3PotEmptyState
 from lewis.devices import StateMachineDevice
 
 
@@ -35,16 +35,31 @@ class SimulatedHeliox(StateMachineDevice):
             "HEHIGH": TemperatureChannel(),
         }
 
+        self.status = "Low Temp"
+
+        self.connected = True
+
+        self.helium_3_pot_empty = False
+        self.drift_towards = 1.5  # Drift to 1.5K ~= temperature of 1K pot.
+        self.drift_rate = 1
+
+    def reset(self):
+        self._initialize_data()
+
     def _get_state_handlers(self):
         return {
-            'default': DefaultState()
+            'temperature_control': TemperatureControlState(),
+            'helium_3_empty': He3PotEmptyState(),
         }
 
     def _get_initial_state(self):
-        return 'default'
+        return 'temperature_control'
 
     def _get_transition_handlers(self):
-        return OrderedDict([])
+        return OrderedDict([
+            (('temperature_control', 'helium_3_empty'), lambda: self.helium_3_pot_empty),
+            (('helium_3_empty', 'temperature_control'), lambda: not self.helium_3_pot_empty),
+        ])
 
     def backdoor_set_channel_temperature(self, channel, temperature):
         self.temperature_channels[channel].temperature = temperature

@@ -1,6 +1,8 @@
 from lewis.adapters.stream import StreamInterface
 from lewis_emulators.utils.command_builder import CmdBuilder
+from lewis_emulators.utils.replies import conditional_reply
 
+if_connected = conditional_reply("connected")
 
 ISOBUS_PREFIX = "@1"
 PRIMARY_DEVICE_NAME = "HelioxX"
@@ -20,6 +22,8 @@ class HelioxStreamInterface(StreamInterface):
             .escape("READ:DEV:").escape(PRIMARY_DEVICE_NAME).escape(":HEL:SIG:TSET").eos().build(),
         CmdBuilder("get_heliox_stable").optional(ISOBUS_PREFIX)
             .escape("READ:DEV:").escape(PRIMARY_DEVICE_NAME).escape(":HEL:SIG:H3PS").eos().build(),
+        CmdBuilder("get_heliox_status").optional(ISOBUS_PREFIX)
+            .escape("READ:DEV:").escape(PRIMARY_DEVICE_NAME).escape(":HEL:SIG:STAT").eos().build(),
 
         CmdBuilder("set_heliox_setpoint").optional(ISOBUS_PREFIX)
             .escape("SET:DEV:{}:HEL:SIG:TSET:".format(PRIMARY_DEVICE_NAME)).float().escape("K").eos().build(),
@@ -53,6 +57,7 @@ class HelioxStreamInterface(StreamInterface):
         self.log.error(err_string)
         return err_string
 
+    @if_connected
     def get_all_heliox_status(self):
         """
         This function is used by the labview VI. In EPICS it is more convenient to ask for the parameters individually,
@@ -71,7 +76,7 @@ class HelioxStreamInterface(StreamInterface):
                ":RGNA:1.0000K" \
                ":PCT:2.0000K" \
                ":SIG:H4PS:{}".format("Stable" if self.device.temperature_channels["HE4POT"].stable else "Unstable") + \
-               ":STAT:Regenerate" \
+               ":STAT:{}".format(self.device.status) + \
                ":TEMP:{:.4f}K".format(self.device.temperature) + \
                ":TSET:{:.4f}K".format(self.device.temperature_sp) + \
                ":H3PS:{}".format("Stable" if self.device.temperature_stable else "Unstable") + \
@@ -80,6 +85,7 @@ class HelioxStreamInterface(StreamInterface):
                ":SCT:3.0000K" \
                ":NVLT:10.000mB"
 
+    @if_connected
     def get_catalog(self):
         """
         This is only needed by the LabVIEW driver - it is not used by EPICS.
@@ -91,6 +97,7 @@ class HelioxStreamInterface(StreamInterface):
                ":DEV:HeLow:TEMP" \
                ":DEV:HeHigh:TEMP"
 
+    @if_connected
     def get_nickname(self, arg):
         """
         Returns a fake nickname. This is only implemented to allow this emulator to be used with the existing
@@ -99,20 +106,29 @@ class HelioxStreamInterface(StreamInterface):
         """
         return "STAT:DEV:{}:NICK:{}".format(arg, "FAKENICKNAME")
 
+    @if_connected
     def set_heliox_setpoint(self, new_setpoint):
         self.device.temperature_sp = new_setpoint
-        return self.get_heliox_temp_sp_rbv()
+        return "STAT:SET:DEV:HelioxX:HEL:SIG:TSET:{:.4f}K:VALID".format(new_setpoint)
 
+    @if_connected
     def get_heliox_temp(self):
         return "STAT:DEV:HelioxX:HEL:SIG:TEMP:{:.4f}K".format(self.device.temperature)
 
+    @if_connected
     def get_heliox_temp_sp_rbv(self):
         return "STAT:DEV:HelioxX:HEL:SIG:TSET:{:.4f}K".format(self.device.temperature_sp)
 
+    @if_connected
     def get_heliox_stable(self):
         return "STAT:DEV:{}:HEL:SIG:H3PS:{}"\
             .format(PRIMARY_DEVICE_NAME, "Stable" if self.device.temperature_stable else "Unstable")
 
+    @if_connected
+    def get_heliox_status(self):
+        return "STAT:DEV:{}:HEL:SIG:STAT:{}".format(PRIMARY_DEVICE_NAME, self.device.status)
+
+    @if_connected
     def get_channel_status(self, channel):
         temperature_channel = self.device.temperature_channels[channel.upper()]
         return "STAT:DEV:{name}:TEMP" \
@@ -156,28 +172,34 @@ class HelioxStreamInterface(StreamInterface):
                     heater_percent=temperature_channel.heater_percent,
                 )
 
+    @if_connected
     def get_channel_temp(self, chan):
         return "STAT:DEV:{}:TEMP:SIG:TEMP:{:.4f}K"\
             .format(chan, self.device.temperature_channels[chan.upper()].temperature)
 
+    @if_connected
     def get_channel_temp_sp(self, chan):
         return "STAT:DEV:{}:TEMP:LOOP:TSET:{:.4f}K"\
             .format(chan, self.device.temperature_channels[chan.upper()].temperature_sp)
 
+    @if_connected
     def get_channel_heater_auto(self, chan):
         return "STAT:DEV:{}:TEMP:LOOP:ENAB:{}"\
             .format(chan, "ON" if self.device.temperature_channels[chan.upper()].heater_auto else "OFF")
 
+    @if_connected
     def get_channel_heater_percentage(self, chan):
         return "STAT:DEV:{}:TEMP:LOOP:HSET:{:.4f}"\
             .format(chan, self.device.temperature_channels[chan.upper()].heater_percent)
     
     # Individual channel stabilities
 
+    @if_connected
     def get_he3_sorb_stable(self):
         return "STAT:DEV:{}:HEL:SIG:SRBS:{}"\
             .format(PRIMARY_DEVICE_NAME, "Stable" if self.device.temperature_channels["HE3SORB"].stable else "Unstable")
 
+    @if_connected
     def get_he4_pot_stable(self):
         return "STAT:DEV:{}:HEL:SIG:H4PS:{}"\
             .format(PRIMARY_DEVICE_NAME, "Stable" if self.device.temperature_channels["HE4POT"].stable else "Unstable")
