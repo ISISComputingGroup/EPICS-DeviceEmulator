@@ -60,20 +60,19 @@ class SimulatedJsco4180(StateMachineDevice):
 
     def _get_transition_handlers(self):
         return OrderedDict([
-            (("pump_on", "pump_off"), lambda: self.status == "pump_off"),
-            (("pump_program", "pump_off"), lambda: self.status == "pump_off"),
-            (("pump_program_reset", "pump_off"), lambda: self.status == "pump_off"),
-
             (("pump_off", "pump_on"), lambda: self.status == "on"),
             (("pump_off", "pump_program"), lambda: self.status == "pump_program"),
             (("pump_off", "pump_program_reset"), lambda: self.status == "pump_program_reset"),
 
+            (("pump_on", "pump_off"), lambda: self.status == "pump_off"),
             (("pump_on", "pump_program"), lambda: self.status == "pump_program"),
             (("pump_on", "pump_program_reset"), lambda: self.status == "pump_program_reset"),
 
+            (("pump_program", "pump_off"), lambda: self.status == "pump_off"),
             (("pump_program", "pump_on"), lambda: self.status == "pump_on"),
             (("pump_program", "pump_program_reset"), lambda: self.status == "pump_program_reset"),
 
+            (("pump_program_reset", "pump_off"), lambda: self.status == "pump_off"),
             (("pump_program_reset", "pump_on"), lambda: self.status == "pump_on"),
             (("pump_program_reset", "pump_program"), lambda: self.status == "pump_program"),
         ])
