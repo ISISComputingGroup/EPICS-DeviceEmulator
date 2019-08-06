@@ -4,6 +4,25 @@ from states import DefaultState
 from lewis.devices import StateMachineDevice
 
 
+class Sensor(object):
+    def __init__(self):
+        self.setpoint = 0
+
+        self.valve_enabled = False
+        self.relay_enabled = False
+
+        self.gain = 0
+        self.offset = 0
+        self.rtd_offset = 0
+        self.input_range = 0
+        self.output_range = 0
+        self.ext_input_range = 0
+        self.ext_output_range = 0
+        self.scale = 0
+        self.upper_limit = 0
+        self.lower_limit = 0
+
+
 @has_log
 class Simulated_MKS_PR4000B(StateMachineDevice):
 
@@ -11,6 +30,11 @@ class Simulated_MKS_PR4000B(StateMachineDevice):
         """
         Initialize all of the device's attributes.
         """
+        self.channels = {
+            1: Sensor(),
+            2: Sensor(),
+        }
+        self.connected = True
 
     def reset(self):
         self._initialize_data()
