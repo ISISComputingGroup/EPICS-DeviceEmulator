@@ -22,6 +22,16 @@ class Sensor(object):
         self.upper_limit = 0
         self.lower_limit = 0
 
+        self.signalmode = 0
+        self.limitmode = 0
+
+        self.formula_relay = "formula+1"
+
+        self.external_input = 0
+
+        self.range = 0
+        self.range_units = 0
+
 
 @has_log
 class Simulated_MKS_PR4000B(StateMachineDevice):
@@ -35,6 +45,7 @@ class Simulated_MKS_PR4000B(StateMachineDevice):
             2: Sensor(),
         }
         self.connected = True
+        self.remote_mode = True
 
     def reset(self):
         self._initialize_data()
@@ -49,3 +60,6 @@ class Simulated_MKS_PR4000B(StateMachineDevice):
 
     def _get_transition_handlers(self):
         return OrderedDict([])
+
+    def backdoor_set_channel_property(self, channel, property, value):
+        setattr(self.channels[int(channel)], str(property), float(value))

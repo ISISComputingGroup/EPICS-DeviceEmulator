@@ -1,5 +1,3 @@
-import functools
-
 import six
 from lewis.adapters.stream import StreamInterface
 from lewis_emulators.utils.command_builder import CmdBuilder
@@ -20,10 +18,23 @@ class MKS_PR4000B_StreamInterface(StreamInterface):
 
             CmdBuilder("get_relay_status").escape("?RL").int().eos().build(),
             CmdBuilder("set_relay_status").escape("RL").int().escape(",").enum("ON", "OFF").eos().build(),
+
+            CmdBuilder("get_formula_relay").escape("?FR").int().eos().build(),
+            CmdBuilder("set_formula_relay").escape("FR").int().escape(",").any().eos().build(),
+
+            CmdBuilder("get_remote_mode").escape("?RT").eos().build(),
+            CmdBuilder("set_remote_mode").escape("RT").escape(",").enum("ON", "OFF").eos().build(),
+
+            CmdBuilder("get_external_input").escape("EX").int().eos().build(),
+
+            CmdBuilder("get_status").escape("ST").eos().build(),
+
+            CmdBuilder("set_range").escape("RG").int().escape(",").float().escape(",").eos().build(),
+            CmdBuilder("get_range").escape("?RG").int().eos().build(),
         }
 
         # Done like this to avoid excessive code duplication.
-        float_get_and_set_commands = {
+        numeric_get_and_set_commands = {
             "SP": "setpoint",
             "GN": "gain",
             "OF": "offset",
@@ -35,6 +46,8 @@ class MKS_PR4000B_StreamInterface(StreamInterface):
             "SC": "scale",
             "UL": "upper_limit",
             "LL": "lower_limit",
+            "SM": "signalmode",  # As far as the emulator is concerned, this is an int. IOC treats is as enum.
+            "LM": "limitmode",  # As far as the emulator is concerned, this is an int. IOC treats is as enum.
         }
 
         # Closures to force the functions to bind correctly (trying to create these in the loop will run into
@@ -55,7 +68,7 @@ class MKS_PR4000B_StreamInterface(StreamInterface):
             return setter
 
         # Update the command mapping with the newly-generated commands.
-        for command_name, emulator_name in six.iteritems(float_get_and_set_commands):
+        for command_name, emulator_name in six.iteritems(numeric_get_and_set_commands):
             self.commands.update({
                 CmdBuilder(setter_factory(emulator_name)).escape(command_name).int().escape(",").float().eos().build(),
                 CmdBuilder(getter_factory(emulator_name)).escape("?{}".format(command_name)).int().eos().build(),
@@ -90,4 +103,40 @@ class MKS_PR4000B_StreamInterface(StreamInterface):
     @if_connected
     def set_relay_status(self, chan, status):
         self.device.channels[chan].relay_enabled = (status == "ON")
+        return ""
+
+    @if_connected
+    def get_formula_relay(self, chan):
+        return self.device.channels[chan].formula_relay
+
+    @if_connected
+    def set_formula_relay(self, chan, formula):
+        self.device.channels[chan].formula_relay = formula
+        return ""
+
+    @if_connected
+    def get_remote_mode(self):
+        return "ON" if self.device.remote_mode else "OFF"
+
+    @if_connected
+    def set_remote_mode(self, mode):
+        self.device.remote_mode = (mode == "ON")
+        return ""
+
+    @if_connected
+    def get_external_input(self, chan):
+        return "{:.2f}".format(self.device.channels[chan].external_input)
+
+    @if_connected
+    def get_status(self):
+        return "{:05d}".format(0)  # Return a constant here, just to keep IOC happy.
+
+    @if_connected
+    def get_range(self, chan):
+        return "{:.2f},{:02d}".format(self.device.channels[chan].range, self.device.channels[chan].range_units)
+
+    @if_connected
+    def set_range(self, chan, range, units):
+        self.device.channels[chan].range = range
+        self.device.channels[chan].range_units = units
         return ""
