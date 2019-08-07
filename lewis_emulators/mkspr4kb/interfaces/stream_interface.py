@@ -29,8 +29,10 @@ class MKS_PR4000B_StreamInterface(StreamInterface):
 
             CmdBuilder("get_status").escape("ST").eos().build(),
 
-            CmdBuilder("set_range").escape("RG").int().escape(",").float().escape(",").eos().build(),
+            CmdBuilder("set_range").escape("RG").int().escape(",").float().escape(",").int().eos().build(),
             CmdBuilder("get_range").escape("?RG").int().eos().build(),
+
+            CmdBuilder("get_id").escape("?ID").eos().build(),
         }
 
         # Done like this to avoid excessive code duplication.
@@ -140,3 +142,7 @@ class MKS_PR4000B_StreamInterface(StreamInterface):
         self.device.channels[chan].range = range
         self.device.channels[chan].range_units = units
         return ""
+
+    @if_connected
+    def get_id(self):
+        return "emulated_mks_pr4000"
