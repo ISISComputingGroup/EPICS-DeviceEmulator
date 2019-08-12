@@ -35,7 +35,7 @@ class MKS_PR4000B_StreamInterface(StreamInterface):
             CmdBuilder("get_id").escape("?ID").eos().build(),
         }
 
-        # Done like this to avoid excessive code duplication.
+        # These get appended to the list of commands above - just map command syntax against emulator property
         numeric_get_and_set_commands = {
             "SP": "setpoint",
             "GN": "gain",
