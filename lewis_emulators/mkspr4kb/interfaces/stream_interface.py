@@ -75,7 +75,6 @@ class MKS_PR4000B_StreamInterface(StreamInterface):
 
         Factory methods are used to force the functions to bind correctly.
         """
-        # late-binding issues.
         def getter_factory(name):
             def getter(chan):
                 if not self.device.connected:
