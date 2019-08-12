@@ -52,7 +52,29 @@ class MKS_PR4000B_StreamInterface(StreamInterface):
             "LM": "limitmode",  # As far as the emulator is concerned, this is an int. IOC treats is as enum.
         }
 
-        # Closures to force the functions to bind correctly (trying to create these in the loop will run into
+        getter_factory, setter_factory = self._get_getter_and_setter_factories()
+
+        for command_name, emulator_name in six.iteritems(numeric_get_and_set_commands):
+            self.commands.update({
+                CmdBuilder(setter_factory(emulator_name)).escape(command_name).int().escape(",").float().eos().build(),
+                CmdBuilder(getter_factory(emulator_name)).escape("?{}".format(command_name)).int().eos().build(),
+            })
+
+    def _get_getter_and_setter_factories(self):
+        """
+        Returns a pair of functions (getter_factory, setter_factory) which can generate appropriate attribute getters
+        and setters for a given property name.
+
+        For example:
+        >>> getter_factory("foo")
+        will generate the getter accessing
+        >>> self.device.channels[chan].foo
+        where
+        >>> chan
+        is one of the captured arguments to the getter.
+
+        Factory methods are used to force the functions to bind correctly.
+        """
         # late-binding issues.
         def getter_factory(name):
             def getter(chan):
@@ -69,12 +91,7 @@ class MKS_PR4000B_StreamInterface(StreamInterface):
                 return ""
             return setter
 
-        # Update the command mapping with the newly-generated commands.
-        for command_name, emulator_name in six.iteritems(numeric_get_and_set_commands):
-            self.commands.update({
-                CmdBuilder(setter_factory(emulator_name)).escape(command_name).int().escape(",").float().eos().build(),
-                CmdBuilder(getter_factory(emulator_name)).escape("?{}".format(command_name)).int().eos().build(),
-            })
+        return getter_factory, setter_factory
 
     in_terminator = "\r"
     out_terminator = "\r"
