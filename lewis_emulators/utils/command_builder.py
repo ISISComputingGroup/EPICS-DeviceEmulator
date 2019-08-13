@@ -84,6 +84,17 @@ class CmdBuilder(object):
         self._add_to_regex(regex, False)
         return self
 
+    def enum(self, *allowed_values):
+        """
+        Matches one of a set of specified strings.
+
+        :param allowed_values: the values this function is allowed to match
+        :return:  builder
+        """
+        self._add_to_regex("({})".format("|".join([re.escape(arg) for arg in allowed_values])), is_arg=True)
+        self.argument_mappings.append(str)
+        return self
+
     def spaces(self, at_least_one=False):
         """
         Add a regex for any number of spaces
