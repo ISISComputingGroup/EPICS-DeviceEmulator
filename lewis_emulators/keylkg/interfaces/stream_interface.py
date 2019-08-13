@@ -6,8 +6,6 @@ from enum import Enum
 
 if_connected = conditional_reply('connected')
 if_input_error = conditional_reply('input_correct', "ER,OF,00")
-if_in_measurement_mode = conditional_reply('in_measurement_mode', None)
-if_in_setup_mode = conditional_reply('in_setup_mode', None)
 
 
 class Modes(Enum):
@@ -37,67 +35,88 @@ class KeylkgStreamInterface(StreamInterface):
         }
 
     @if_connected
-    @if_in_measurement_mode
     def reset_output(self, output):
-        if output == 0:
-            self.device.output1_raw_value = 0.0000
-            self.device.output2_raw_value = 0.0000
-        elif output == 1:
-            self.device.output1_raw_value = 0.0000
-        elif output == 2:
-            self.device.output2_raw_value = 0.0000
-        return "VR"
+        if self.device.mode == "Q0":
+            return "ER,VR,01"
+        else:
+            if output == 0:
+                self.device.output1_raw_value = 0.0000
+                self.device.output2_raw_value = 0.0000
+            elif output == 1:
+                self.device.output1_raw_value = 0.0000
+            elif output == 2:
+                self.device.output2_raw_value = 0.0000
+            return "VR"
 
     @if_connected
-    @if_in_measurement_mode
     def get_value_output(self, output):
+        m1_offset_measurement = self.device.output1_raw_value - self.device.output1_offset
+        m2_offset_measurement = self.device.output2_raw_value - self.device.output2_offset
+
         if output == 0:
-            return "M0,{0},{1}".format(round(self.device.output1_raw_value - self.device.output1_offset, 4),
-                                       round(self.device.output2_raw_value - self.device.output2_offset, 4))
+            return "ER,M0,01" if self.device.mode == Modes.SET_UP else "M0,{0:+08.4f},{1:+08.4f}".format(m1_offset_measurement,
+                                                                                                         m2_offset_measurement)
         elif output == 1:
-            return "M1,{0}".format(round(self.device.output1_raw_value - self.device.output1_offset, 4))
+            return "ER,M1,01" if self.device.mode == Modes.SET_UP else "M1,{:+08.4f}".format(m1_offset_measurement)
         elif output == 2:
-            return "M2,{0}".format(self.device.output2_raw_value - self.device.output2_offset, 4)
+            return "ER,M2,01" if self.device.mode == Modes.SET_UP else "M2,{:+08.4f}".format(m2_offset_measurement)
 
     @if_connected
-    @if_in_setup_mode
     def set_measurement_mode(self, head, function):
-        if head == 1:
-            self.device.head1_measurement_mode = function
-        elif head == 2:
-            self.device.head2_measurement_mode = function
-        return "SW,HB"
+        if self.device.mode == "R0":
+            return "ER,HB,01"
+        else:
+            if head == 1:
+                self.device.head1_measurement_mode = function
+            elif head == 2:
+                self.device.head2_measurement_mode = function
+            return "SW,HB"
 
     @if_connected
-    @if_in_measurement_mode
     def get_measurement_mode(self, head):
-        if head == 1:
-            return "SR,HB,1,{0}".format(self.device.head1_measurement_mode)
-        elif head == 2:
-            return "SR,HB,2,{0}".format(self.device.head2_measurement_mode)
+        if self.device.mode == "R0":
+            return "ER,HB,01"
+        else:
+            if head == 1:
+                return "SR,HB,1,{0}".format(self.device.head1_measurement_mode)
+            elif head == 2:
+                return "SR,HB,2,{0}".format(self.device.head2_measurement_mode)
 
     @if_connected
     @if_input_error
-    @if_in_setup_mode
     def set_offset(self, output, offset_value):
-        if output == 0:
-            self.device.output1_offset = offset_value
-            self.device.output2_offset = offset_value
-        elif output == 1:
-            self.device.output1_offset = offset_value
-        elif output == 2:
-            self.device.output2_offset = offset_value
-        return "SW,OF"
+        # The device requires a +07d formatted input that is converted to within the
+        # (-99.999, 99.000) limits. We convert this so that our read back will be correct.
+        converted_value = offset_value * 10e-5
+
+        if self.device.mode == "R0":
+            return "ER,OF,01"
+        else:
+            if output == 0:
+                self.device.output1_offset = converted_value
+                self.device.output2_offset = converted_value
+            elif output == 1:
+                self.device.output1_offset = converted_value
+            elif output == 2:
+                self.device.output2_offset = converted_value
+            return "SW,OF"
 
     @if_connected
-    @if_in_measurement_mode
     def get_offset(self, output):
-        if output == 1:
-            return "SR,OF,1,{0}".format(self.device.output1_offset)
-        elif output == 2:
-            return "SR,OF,2,{0}".format(self.device.output2_offset)
+        if self.device.mode == "R0":
+            return "ER,OF,01"
+        else:
+            if output == 1:
+                return "SR,OF,1,{:+08.4f}".format(self.device.output1_offset)
+            elif output == 2:
+                return "SR,OF,2,{:+08.4f}".format(self.device.output2_offset)
 
     @if_connected
     def set_mode(self, new_mode):
-        self.device.mode = Modes(new_mode)
-        return self.device.mode.value
+        if self.device.mode == new_mode:
+            print("Testing mode: {mode} {mode_binary}".format(self.device.mode, self.device.mode.MEASURE))
+            print("MODE ALREADY IN TARGET MODE")
+            return "ER,{mode},01".format(mode=new_mode)
+        else:
+            self.device.mode = Modes(new_mode)
+            return new_mode
