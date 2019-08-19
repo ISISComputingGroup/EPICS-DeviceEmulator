@@ -90,6 +90,8 @@ class SimulatedEdwards(StateMachineDevice):
         self._turbo_priority = PriorityStates.OK
         self._turbo_alert = AlertStates.no_alert
 
+        self.is_connected = True
+
     def _get_state_handlers(self):
         return {
             'default': DefaultState(),
@@ -110,16 +112,24 @@ class SimulatedEdwards(StateMachineDevice):
 
         return self._turbo_pump
 
-    @turbo_pump.setter
-    def turbo_pump(self, state):
+    def turbo_start_stop(self, value):
         """
-        Sets the running state of the turbo pump
+        Sets the turbo pump running/stopping
 
         Args:
-            value: object, an attribute of the PumpStates class
+            value: int, 1 if starting the pump 0 to stop the pump
         """
 
-        self._turbo_pump = state
+        self.log.info("Starting or stopping turbo {}".format(value))
+
+        if value == 1:
+            self.log.info("Starting turbo")
+            self._turbo_pump = PumpStates.running
+        elif value == 0:
+            self.log.info("Stopping turbo")
+            self._turbo_pump = PumpStates.stopped
+        else:
+            raise ValueError("Invalid start/stop switch ({} not 0 or 1)".format(value))
 
     @property
     def turbo_priority(self):

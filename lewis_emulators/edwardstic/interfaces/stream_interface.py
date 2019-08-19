@@ -82,7 +82,7 @@ def reverse_dict_lookup(dictionary, value_to_find):
         KeyError if value does not exist in the dictionary
     """
 
-    for key, value in dictionary:
+    for key, value in dictionary.items():
         if value == value_to_find:
             return key
     else:
@@ -95,7 +95,7 @@ class EdwardsTICStreamInterface(StreamInterface):
     # Commands that we expect via serial during normal operation
     commands = {
         CmdBuilder("set_turbo_state").escape("!C904 ").int().build(),
-        CmdBuilder("get_turbo_status").escape("?V904").build()
+        CmdBuilder("get_turbo_state").escape("?V904").build()
     }
 
     in_terminator = "\r"
@@ -114,7 +114,7 @@ class EdwardsTICStreamInterface(StreamInterface):
             None.
         """
 
-        print("An error occurred at request {}: {}".format(request, error))
+        self.log.info("An error occurred at request {}: {}".format(request, error))
 
     @conditional_reply("is_connected")
     def set_turbo_state(self, switch):
@@ -122,10 +122,15 @@ class EdwardsTICStreamInterface(StreamInterface):
         Sets the state of the turbo (running/stopped/accelerating...)
         """
 
-        self._device.turbo_state = PUMPSTATES_MAP[switch]
+        self._device.turbo_pump = PUMPSTATES_MAP[switch]
+
+        self._device.turbo_start_stop(switch)
+
+        self.log.info(reverse_dict_lookup(PUMPSTATES_MAP, PUMPSTATES_MAP[switch]))
 
         return "*C904 0"
 
+    @conditional_reply("is_connected")
     def get_turbo_state(self):
         """
         Gets the state of the turbo
@@ -133,10 +138,9 @@ class EdwardsTICStreamInterface(StreamInterface):
 
         state_string = "=V904 {turbo_state};{alert};{priority}"
 
-        return state_string.format(turbo_state=reverse_dict_lookup(PUMPSTATES_MAP, self._device.turbo_state),
-                                   alert=reverse_dict_lookup(ALERTSTATES_MAP, self._device.alert_state),
-                                   priority=reverse_dict_lookup(PRIORITYSTATES_MAP, self._device.priority_state))
-        
+        return state_string.format(turbo_state=reverse_dict_lookup(PUMPSTATES_MAP, self._device._turbo_pump),
+                                   alert=reverse_dict_lookup(ALERTSTATES_MAP, self._device._turbo_alert),
+                                   priority=reverse_dict_lookup(PRIORITYSTATES_MAP, self._device._turbo_priority))
 
     @conditional_reply("is_connected")
     def get_turbo_status(self):
