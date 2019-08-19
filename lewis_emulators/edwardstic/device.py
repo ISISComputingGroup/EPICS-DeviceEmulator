@@ -1,8 +1,7 @@
 from collections import OrderedDict
 from lewis.devices import StateMachineDevice
-from lewis.core.statemachine import State
 
-from lewis_emulators.Lksh218.states import DefaultState
+from states import DefaultState
 
 
 class PumpStates(object):
@@ -87,9 +86,9 @@ class SimulatedEdwards(StateMachineDevice):
         Initialize all of the device's attributes.
         """
 
-        self.turbo_pump = PumpStates.stopped
-        self.turbo_priority = PriorityStates.OK
-        self.turbo_alert = AlertStates.no_alert
+        self._turbo_pump = PumpStates.stopped
+        self._turbo_priority = PriorityStates.OK
+        self._turbo_alert = AlertStates.no_alert
 
     def _get_state_handlers(self):
         return {
@@ -109,7 +108,7 @@ class SimulatedEdwards(StateMachineDevice):
         Gets the running state of the turbo pump
         """
 
-        return self.turbo_pump
+        return self._turbo_pump
 
     @turbo_pump.setter
     def turbo_pump(self, state):
@@ -120,7 +119,7 @@ class SimulatedEdwards(StateMachineDevice):
             value: object, an attribute of the PumpStates class
         """
 
-        self.turbo_pump = state
+        self._turbo_pump = state
 
     @property
     def turbo_priority(self):
@@ -128,7 +127,7 @@ class SimulatedEdwards(StateMachineDevice):
         Gets the priority state of the turbo pump
         """
 
-        return self.turbo_priority
+        return self._turbo_priority
 
 # This setter doesn't exist on the 'real' device
     @turbo_priority.setter
@@ -140,7 +139,7 @@ class SimulatedEdwards(StateMachineDevice):
             value: object, an attribute of the PumpStates class
         """
 
-        self.turbo_priority = state
+        self._turbo_priority = state
 
     @property
     def turbo_alarm(self):
@@ -148,7 +147,7 @@ class SimulatedEdwards(StateMachineDevice):
         Gets the alarm state of the turbo pump
         """
 
-        return self.turbo_alarm
+        return self._turbo_alarm
 
 # This setter doesn't exist on the 'real' device
     @turbo_alarm.setter
@@ -160,5 +159,4 @@ class SimulatedEdwards(StateMachineDevice):
             value: object, an attribute of the PriorityStates class
         """
 
-        self.turbo_alarm = state
-
+        self._turbo_alarm = state
