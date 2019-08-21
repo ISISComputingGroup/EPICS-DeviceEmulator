@@ -1,0 +1,48 @@
+from lewis.adapters.stream import StreamInterface, Cmd
+
+from lewis_emulators.utils.command_builder import CmdBuilder
+
+
+class LinmotStreamInterface(StreamInterface):
+
+    in_terminator = "\r\n"
+    out_terminator = "\r"
+
+    readtimeout = 5000
+
+    def __init__(self):
+
+        super(LinmotStreamInterface, self).__init__()
+        # Commands that we expect via serial during normal operation
+        self. commands = {
+            CmdBuilder(self.set_position).escape("!SP").int().escape("A").eos().build(),
+            CmdBuilder(self.get_position).escape("!GPA").eos().build(),
+            CmdBuilder(self.get_actual_speed_resolution).escape("!VIA").eos().build(),
+            CmdBuilder(self.get_motor_warn_status).escape("!EWA").eos().build(),
+            CmdBuilder(self.get_motor_error_status).escape("!EEA").eos().build(),
+            }
+
+    def handle_error(self, request, error):
+        err_string = "command was: {}, error was: {}: {}\n".format(request, error.__class__.__name__, error)
+        print(err_string)
+        self.log.error(err_string)
+        return err_string
+
+    def set_position(self, target_position):
+        self.device.position = target_position
+        return "#"
+
+    def get_position(self):
+        return "#{position}".format(position=self.device.position)
+
+    def get_actual_speed_resolution(self):
+        return "#{velocity}".format(velocity=self.device.velocity)
+
+    def get_motor_warn_status(self):
+        return "#{motor_warn_status}".format(motor_warn_status=self.device.motor_warn_status)
+
+    def get_motor_error_status(self):
+        return "#{motor_error_status}".format(motor_error_status=self.device.motor_error_status)
+
+    def catch_all(self):
+        pass
