@@ -10,9 +10,11 @@ class SimulatedLinmot(StateMachineDevice):
         Initialize all of the device's attributes.
         """
         self.position = 0
-        self.velocity = 0.1
+        self.velocity = 1
         self.motor_warn_status = 256
         self.motor_error_status = 0
+        self.maximal_speed = 52
+        self.maximal_acceleration = 10
 
     def _get_state_handlers(self):
         return {

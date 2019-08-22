@@ -20,6 +20,8 @@ class LinmotStreamInterface(StreamInterface):
             CmdBuilder(self.get_actual_speed_resolution).escape("!VIA").eos().build(),
             CmdBuilder(self.get_motor_warn_status).escape("!EWA").eos().build(),
             CmdBuilder(self.get_motor_error_status).escape("!EEA").eos().build(),
+            CmdBuilder(self.set_maximal_speed).escape("!SV").int().escape("A").eos().build(), #SV
+            CmdBuilder(self.set_maximal_acceleration).escape("!SA").int().escape("A").eos().build(), #SA
             }
 
     def handle_error(self, request, error):
@@ -43,6 +45,14 @@ class LinmotStreamInterface(StreamInterface):
 
     def get_motor_error_status(self):
         return "#{motor_error_status}".format(motor_error_status=self.device.motor_error_status)
+
+    def set_maximal_speed(self, speed):
+        self.device.maximal_speed = speed
+        return "#"
+
+    def set_maximal_acceleration(self, acceleration):
+        self.device.maximal_acceleration = acceleration
+        return "#"
 
     def catch_all(self):
         pass
