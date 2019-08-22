@@ -41,7 +41,7 @@ class SimulatedOercone(StateMachineDevice):
     def measurement_unit(self, units):
         self._measurement_unit = units
 
-    def backdoor_set_unit(self, unit):
+    def backdoor_set_units(self, unit):
         """
         Sets unit on device. Called only via the backdoor using lewis.
 
@@ -51,6 +51,6 @@ class SimulatedOercone(StateMachineDevice):
         Returns:
             None
         """
-        self.measurement_unit = Units(unit)
+        self.measurement_unit = Units(int(unit))
 
 
