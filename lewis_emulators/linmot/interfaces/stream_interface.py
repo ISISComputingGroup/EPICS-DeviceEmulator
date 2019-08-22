@@ -31,7 +31,9 @@ class LinmotStreamInterface(StreamInterface):
         return err_string
 
     def set_position(self, target_position):
-        self.device.position = target_position
+        self.device.target_position = target_position
+        self.device.new_action = True
+        self.device.position_reached = False
         return "#"
 
     def get_position(self):
