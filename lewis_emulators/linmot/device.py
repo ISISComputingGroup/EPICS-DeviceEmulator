@@ -13,15 +13,17 @@ class SimulatedLinmot(StateMachineDevice):
         Initialize all of the device's attributes.
         """
         self.position = 0
-        self.velocity = 1
-        self.motor_warn_status = 256
-        self.motor_error_status = 0
+        self.target_position = 0
+        self.velocity = 52
         self.maximal_speed = 52
         self.maximal_acceleration = 10
-        self.target_position = 0
+        self.speed_resolution = 190735
+        self.motor_warn_status = 256
+        self.motor_error_status = 0
         self.new_action = False
         self.position_reached = False
         self.tolerance = 0.01
+        self.connected = True
 
     def _get_transition_handlers(self):
         return OrderedDict([
