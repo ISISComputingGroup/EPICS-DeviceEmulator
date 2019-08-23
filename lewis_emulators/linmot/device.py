@@ -55,10 +55,8 @@ class SimulatedLinmot(StateMachineDevice):
     def is_within_hard_limits(self):
         if self.position > self.maximum_value or self.position < self.minimum_value:
             self.inside_limits = False
-            print("inside_limits: {}".format(self.inside_limits))
         else:
             self.inside_limits = True
-            print("inside_limits: {}".format(self.inside_limits))
         return
 
     def _get_state_handlers(self):
