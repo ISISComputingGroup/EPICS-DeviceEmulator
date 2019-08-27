@@ -1,7 +1,17 @@
 from collections import OrderedDict
 from lewis.devices import StateMachineDevice
+from enum import Enum
 
 from states import DefaultState
+
+
+class OnOffStates(Enum):
+    """
+    Holds whether a device function is on or off
+    """
+
+    on = 4
+    off = 0
 
 
 class PumpStates(object):
@@ -79,7 +89,7 @@ class AlertStates(object):
     service_due = object()
 
 
-class SimulatedEdwards(StateMachineDevice):
+class SimulatedEdwardsTIC(StateMachineDevice):
 
     def _initialize_data(self):
         """
@@ -89,7 +99,7 @@ class SimulatedEdwards(StateMachineDevice):
         self._turbo_pump = PumpStates.stopped
         self._turbo_priority = PriorityStates.OK
         self._turbo_alert = AlertStates.no_alert
-
+        self._turbo_in_standby = False
         self.is_connected = True
 
     def _get_state_handlers(self):
@@ -103,6 +113,45 @@ class SimulatedEdwards(StateMachineDevice):
     def _get_transition_handlers(self):
         return OrderedDict([
         ])
+
+    @property
+    def turbo_in_standby(self):
+        """
+        Gets whether the turbo is in standby mode
+        
+        Returns:
+            _turbo_standby: Bool, True if the turbo is in standby mode
+        """
+
+        return self._turbo_in_standby
+
+    @turbo_in_standby.setter
+    def turbo_standby(self, value):
+        """
+        Sets the turbo standby mode
+
+        Args:
+            value: Bool, True to set standby mode. False to unset standby mode
+        """
+
+        self._turbo_in_standby = value
+
+    def turbo_set_standby(self, value):
+        """
+        Sets / unsets turbo standby mode
+
+        Args:
+            value, int: 1 to set standby mode, 0 to unset standby.
+        """
+
+        if value == 1:
+            self.log.info("Entering turbo standby mode")
+            self._turbo_in_standby = True
+        elif value == 0:
+            self.log.info("Leaving turbo standby mode")
+            self._turbo_in_standby = False
+        else:
+            raise ValueError("Invalid standby argument provided ({} not 0 or 1)".format(value))
 
     @property
     def turbo_pump(self):

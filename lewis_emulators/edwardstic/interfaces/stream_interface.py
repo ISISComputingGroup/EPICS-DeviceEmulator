@@ -94,8 +94,11 @@ class EdwardsTICStreamInterface(StreamInterface):
 
     # Commands that we expect via serial during normal operation
     commands = {
-        CmdBuilder("set_turbo_state").escape("!C904 ").int().build(),
-        CmdBuilder("get_turbo_state").escape("?V904").build()
+        CmdBuilder("turbo_start_stop").escape("!C904 ").int().build(),
+        CmdBuilder("get_turbo_state").escape("?V904").build(),
+        CmdBuilder("turbo_set_standby").escape("!C908 ").int().build(),
+        CmdBuilder("turbo_get_standby").escape("?V908").build(),
+        #CmdBuilder("turbo_get_standby").escape("?V908").build()
     }
 
     in_terminator = "\r"
@@ -117,25 +120,38 @@ class EdwardsTICStreamInterface(StreamInterface):
         self.log.info("An error occurred at request {}: {}".format(request, error))
 
     @conditional_reply("is_connected")
-    def set_turbo_state(self, switch):
-        """
-        Sets the state of the turbo (running/stopped/accelerating...)
-        """
+    def turbo_set_standby(self, switch):
+        self._device.turbo_set_standby(switch)
 
-        self._device.turbo_pump = PUMPSTATES_MAP[switch]
+        return "*C908 0"
 
+        #return "=V908 {standby}".format(standby=self._device.turbo_standby)
+
+    def test_get_stby(self):
+        # Device replies 0 (off) or 4 (on)
+        return "=V908 {};0;0".format()
+
+    @conditional_reply("is_connected")
+    def turbo_get_standby(self):
+        return_string = "=V908 {stdby_state};0;0"
+
+        #turbo_in_standby = self._device.turbo_standby
+        standby_state = 4 if self._device.turbo_in_standby else 0
+
+        self.log.info(return_string.format(stdby_state=standby_state))
+
+        return return_string.format(stdby_state=standby_state)
+
+
+    @conditional_reply("is_connected")
+    def turbo_start_stop(self, switch):
+        self.log.info("turbo start stop command received")
         self._device.turbo_start_stop(switch)
-
-        self.log.info(reverse_dict_lookup(PUMPSTATES_MAP, PUMPSTATES_MAP[switch]))
 
         return "*C904 0"
 
     @conditional_reply("is_connected")
     def get_turbo_state(self):
-        """
-        Gets the state of the turbo
-        """
-
         state_string = "=V904 {turbo_state};{alert};{priority}"
 
         return state_string.format(turbo_state=reverse_dict_lookup(PUMPSTATES_MAP, self._device._turbo_pump),
