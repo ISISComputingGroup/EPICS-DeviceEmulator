@@ -13,6 +13,10 @@ class SimulatedAttocubeANC350(StateMachineDevice):
         self.position_setpoint = 0
         self.speed = 10
         self.start_move = False
+        self.amplitude = 30000
+
+    def set_amplitude(self, amplitude):
+        self.amplitude = amplitude
 
     def move(self):
         self.start_move = True

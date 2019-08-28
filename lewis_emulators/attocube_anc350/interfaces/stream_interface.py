@@ -152,9 +152,12 @@ class AttocubeANC350StreamInterface(StreamInterface):
         command_mapping = {
             ID_ANC_TARGET: partial(self.device.set_position_setpoint, position=data[0]),
             ID_ANC_RUN_TARGET: self.device.move,
+            ID_ANC_AMPL: partial(self.device.set_amplitude, data[0])
         }
+
         try:
             command_mapping[address]()
+            print("Device amp is {}".format(self.device.amplitude))
         except KeyError:
             pass  # Ignore unimplemented commands for now
         return generate_response(address, index, correlation_num)
@@ -169,7 +172,7 @@ class AttocubeANC350StreamInterface(StreamInterface):
             ID_ANC_REGSPD_SETP: self.device.speed,
             ID_ANC_SENSOR_VOLT: 2000,
             ID_ANC_MAX_AMP: 60000,
-            ID_ANC_AMPL: 30000,
+            ID_ANC_AMPL: self.device.amplitude,
             ID_ANC_FAST_FREQ: 1000,
         }
         try:
