@@ -112,8 +112,6 @@ class EdwardsTICStreamInterface(StreamInterface):
         CmdBuilder("get_gauge_3").escape("?V915").eos().build(),
     }
 
-
-
     in_terminator = "\r"
     out_terminator = "\r"
 
@@ -187,7 +185,7 @@ class EdwardsTICStreamInterface(StreamInterface):
 
     @conditional_reply("is_connected")
     def turbo_get_sft(self):
-        return "=S905 1;0;0"
+        return "=S905 1;0"
 
     @conditional_reply("is_connected")
     def turbo_get_power(self):
@@ -195,11 +193,11 @@ class EdwardsTICStreamInterface(StreamInterface):
 
     @conditional_reply("is_connected")
     def turbo_get_norm(self):
-        return "=V907 1;0;0"
+        return "=V907 4;0;0"
 
     @conditional_reply("is_connected")
     def turbo_get_cycle(self):
-        return "=V909 1;0;0"
+        return "=V909 1;0;0;0"
 
     @conditional_reply("is_connected")
     def backing_get_status(self):
