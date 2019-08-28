@@ -94,12 +94,25 @@ class EdwardsTICStreamInterface(StreamInterface):
 
     # Commands that we expect via serial during normal operation
     commands = {
-        CmdBuilder("turbo_start_stop").escape("!C904 ").int().build(),
-        CmdBuilder("get_turbo_state").escape("?V904").build(),
-        CmdBuilder("turbo_set_standby").escape("!C908 ").int().build(),
-        CmdBuilder("turbo_get_standby").escape("?V908").build(),
-        #CmdBuilder("turbo_get_standby").escape("?V908").build()
+        CmdBuilder("turbo_start_stop").escape("!C904 ").int().eos().build(),
+        CmdBuilder("get_turbo_state").escape("?V904").eos().build(),
+        CmdBuilder("turbo_get_speed").escape("?V905").eos().build(),
+        CmdBuilder("turbo_get_sft").escape("?S905").eos().build(),
+        CmdBuilder("turbo_get_power").escape("?V906").eos().build(),
+        CmdBuilder("turbo_get_norm").escape("?V907").eos().build(),
+        CmdBuilder("turbo_set_standby").escape("!C908 ").int().eos().build(),
+        CmdBuilder("turbo_get_standby").escape("?V908").eos().build(),
+        CmdBuilder("turbo_get_cycle").escape("?V909").eos().build(),
+        CmdBuilder("backing_get_status").escape("?V910").eos().build(),
+        CmdBuilder("backing_start_stop").escape("!C910 ").int().eos().build(),
+        CmdBuilder("backing_get_speed").escape("?V911").eos().build(),
+        CmdBuilder("backing_get_power").escape("?V912").eos().build(),
+        CmdBuilder("get_gauge_1").escape("?V913").eos().build(),
+        CmdBuilder("get_gauge_2").escape("?V914").eos().build(),
+        CmdBuilder("get_gauge_3").escape("?V915").eos().build(),
     }
+
+
 
     in_terminator = "\r"
     out_terminator = "\r"
@@ -167,3 +180,51 @@ class EdwardsTICStreamInterface(StreamInterface):
         priority = self._device.turbo_priority
 
         return output_string.format(state=state, alert=alert, priority=priority)
+
+    @conditional_reply("is_connected")
+    def turbo_get_speed(self):
+        return "=V905 1;0;0"
+
+    @conditional_reply("is_connected")
+    def turbo_get_sft(self):
+        return "=S905 1;0;0"
+
+    @conditional_reply("is_connected")
+    def turbo_get_power(self):
+        return "=V906 1;0;0"
+
+    @conditional_reply("is_connected")
+    def turbo_get_norm(self):
+        return "=V907 1;0;0"
+
+    @conditional_reply("is_connected")
+    def turbo_get_cycle(self):
+        return "=V909 1;0;0"
+
+    @conditional_reply("is_connected")
+    def backing_get_status(self):
+        return "=V910 1;0;0"
+
+    @conditional_reply("is_connected")
+    def backing_start_stop(self, switch):
+        return "*C910 0"
+
+    @conditional_reply("is_connected")
+    def backing_get_speed(self):
+        return "=V911 1;0;0"
+
+    @conditional_reply("is_connected")
+    def backing_get_power(self):
+        return "=V912 1;0;0"
+
+    @conditional_reply("is_connected")
+    def get_gauge_1(self):
+        return "=V913 1;0;0"
+
+    @conditional_reply("is_connected")
+    def get_gauge_2(self):
+        return "=V914 1;0;0"
+
+    @conditional_reply("is_connected")
+    def get_gauge_3(self):
+        return "=V915 1;0;0"
