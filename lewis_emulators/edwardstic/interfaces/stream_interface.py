@@ -63,10 +63,9 @@ ALERTSTATES_MAP = {
 }
 
 PRIORITYSTATES_MAP = {
-    0: PriorityStates.OK,
-    1: PriorityStates.warning,
-    2: PriorityStates.alarm,
-    3: PriorityStates.alarm
+    PriorityStates.OK: 0,
+    PriorityStates.Warning: 1,
+    PriorityStates.Alarm: 3
     }
 
 
@@ -164,6 +163,10 @@ class EdwardsTICStreamInterface(StreamInterface):
     @conditional_reply("is_connected")
     def get_turbo_state(self):
         state_string = "=V904 {turbo_state};{alert};{priority}"
+
+        return state_string.format(turbo_state=reverse_dict_lookup(PUMPSTATES_MAP, self._device.turbo_pump), 
+                                   alert=0,
+                                   priority=PRIORITYSTATES_MAP[self._device.turbo_priority])
 
         return state_string.format(turbo_state=reverse_dict_lookup(PUMPSTATES_MAP, self._device._turbo_pump),
                                    alert=reverse_dict_lookup(ALERTSTATES_MAP, self._device._turbo_alert),
