@@ -14,6 +14,7 @@ class SimulatedAttocubeANC350(StateMachineDevice):
         self.speed = 10
         self.start_move = False
         self.amplitude = 30000
+        self.axis_on = True
 
     def set_amplitude(self, amplitude):
         self.amplitude = amplitude
@@ -24,6 +25,9 @@ class SimulatedAttocubeANC350(StateMachineDevice):
     def set_position_setpoint(self, position):
         self.position_setpoint = position
 
+    def set_axis_on(self, on_state):
+        self.axis_on = (on_state == 1)
+
     def _get_state_handlers(self):
         return {DefaultState.NAME: DefaultState(),
                 MovingState.NAME: MovingState()}
@@ -33,6 +37,6 @@ class SimulatedAttocubeANC350(StateMachineDevice):
 
     def _get_transition_handlers(self):
         return OrderedDict([
-            ((DefaultState.NAME, MovingState.NAME), lambda: self.start_move),
+            ((DefaultState.NAME, MovingState.NAME), lambda: self.start_move and self.axis_on),
             ((MovingState.NAME, DefaultState.NAME), lambda: self.position_setpoint == self.position),
         ])

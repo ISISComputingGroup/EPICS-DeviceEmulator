@@ -42,7 +42,7 @@ ID_ANC_STOP_EN = 0x0450  # Enables 'hump' detection
 ID_ANC_REGSPD_SELSP = 0x054A  # Type of setpoint for the speed
 ID_ANC_TARGET = 0x0408  # The target to move to
 ID_ANC_RUN_TARGET = 0x040d  # Actually start the move to target
-
+ID_ANC_AXIS_ON = 0x3030  # Turn the axis on (on power cycle the axis is turned off
 
 # Status bitmask
 ANC_STATUS_RUNNING = 0x0001
@@ -152,7 +152,8 @@ class AttocubeANC350StreamInterface(StreamInterface):
         command_mapping = {
             ID_ANC_TARGET: partial(self.device.set_position_setpoint, position=data[0]),
             ID_ANC_RUN_TARGET: self.device.move,
-            ID_ANC_AMPL: partial(self.device.set_amplitude, data[0])
+            ID_ANC_AMPL: partial(self.device.set_amplitude, data[0]),
+            ID_ANC_AXIS_ON: partial(self.device.set_axis_on, data[0]),
         }
 
         try:
