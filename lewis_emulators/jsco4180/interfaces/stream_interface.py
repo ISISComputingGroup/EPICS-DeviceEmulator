@@ -9,6 +9,13 @@ if_input_error = conditional_reply("input_correct", "%%[Error:stack underflow]%%
 if_valid_input_delay = timed_reply(action="crash_pump", minimum_time_delay=100)
 
 
+def combined_checks(func):
+    """
+    Combine all conditional reply checks so we have a single decorator
+    """
+    return if_valid_input_delay(if_connected(if_input_error(func)))
+
+
 class Jsco4180StreamInterface(StreamInterface):
 
     in_terminator = '\r'
@@ -51,18 +58,15 @@ class Jsco4180StreamInterface(StreamInterface):
     def catch_all(self):
         pass
 
-    @if_valid_input_delay
-    @if_connected
+    @combined_checks
     def set_file_open(self, _):
         self.device.file_open = True
 
-    @if_valid_input_delay
-    @if_connected
+    @combined_checks
     def set_file_closed(self, _):
         self.device.file_open = False
 
-    @if_valid_input_delay
-    @if_connected
+    @combined_checks
     def set_file_number(self, file_number):
         state = self.device.state
         if state is not "pump_off":
@@ -71,8 +75,7 @@ class Jsco4180StreamInterface(StreamInterface):
             self.device.file_number = file_number
             self.device.single_channel_mode = False
 
-    @if_valid_input_delay
-    @if_connected
+    @combined_checks
     def get_status(self):
         if self.device.status == "pump_off":
             return 0
@@ -83,8 +86,7 @@ class Jsco4180StreamInterface(StreamInterface):
         elif self.device.status == "pump_program_reset":
             return 49  # Running program with reset timer
 
-    @if_valid_input_delay
-    @if_connected
+    @combined_checks
     def set_pump(self, mode):
         if mode == 0:
             # Pump on
@@ -103,84 +105,68 @@ class Jsco4180StreamInterface(StreamInterface):
             self.device.program_runtime = 0
             return self.out_terminator
 
-    @if_valid_input_delay
-    @if_connected
-    @if_input_error
+    @combined_checks
     def set_flowrate(self, flowrate):
         self.device.flowrate_rbv = flowrate
         return self.out_terminator
 
-    @if_valid_input_delay
-    @if_connected
+    @combined_checks
     def get_flowrate(self):
         return self.device.flowrate
 
-    @if_valid_input_delay
-    @if_connected
+    @combined_checks
     def get_flowrate_rbv(self):
         return self.device.flowrate_rbv
 
-    @if_valid_input_delay
-    @if_connected
+    @combined_checks
     def get_current_flowrate(self):
         return self.device.flowrate
 
-    @if_valid_input_delay
-    @if_connected
+    @combined_checks
     def get_pressure(self):
         return int(self.device.pressure)
 
-    @if_valid_input_delay
-    @if_connected
+    @combined_checks
     def set_pressure_max(self, pressure_max):
         self.device.pressure_max = pressure_max
         return self.out_terminator
 
-    @if_valid_input_delay
-    @if_connected
+    @combined_checks
     def get_pressure_max(self):
         return self.device.pressure_max
 
-    @if_valid_input_delay
-    @if_connected
+    @combined_checks
     def set_pressure_min(self, pressure_min):
         self.device.pressure_min = pressure_min
         return self.out_terminator
 
-    @if_valid_input_delay
-    @if_connected
+    @combined_checks
     def get_pressure_min(self):
         return self.device.pressure_min
 
-    @if_valid_input_delay
-    @if_connected
+    @combined_checks
     def get_program_runtime(self):
         if self.device.status == 'pump_program_reset':
             self.device.program_runtime += 1
         return int(self.device.program_runtime)
 
-    @if_valid_input_delay
-    @if_connected
+    @combined_checks
     def get_component_a(self):
         return 100 if self.device.single_channel_mode else self.device.component_A
 
-    @if_valid_input_delay
-    @if_connected
+    @combined_checks
     def get_component_b(self):
         return 0 if self.device.single_channel_mode else self.device.component_B
 
-    @if_valid_input_delay
-    @if_connected
+    @combined_checks
     def get_component_c(self):
         return 0 if self.device.single_channel_mode else self.device.component_C
 
-    @if_valid_input_delay
-    @if_connected
+    @combined_checks
     def get_component_d(self):
         return 0 if self.device.single_channel_mode else self.device.component_D
 
-    @if_valid_input_delay
-    @if_connected
+    @combined_checks
     def set_composition(self, ramptime, a, b, c):
         self.device.component_A = a
         self.device.component_B = b
@@ -188,13 +174,11 @@ class Jsco4180StreamInterface(StreamInterface):
         self.device.component_D = 100 - (a + b + c)
         return self.out_terminator
 
-    @if_valid_input_delay
-    @if_connected
+    @combined_checks
     def get_error(self):
         return self.device.error
 
-    @if_valid_input_delay
-    @if_connected
+    @combined_checks
     def set_error(self):
         self.device.error = 0
         return self.out_terminator
