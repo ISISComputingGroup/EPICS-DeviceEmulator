@@ -158,6 +158,19 @@ class SimulatedEdwardsTIC(StateMachineDevice):
 
         return self._turbo_pump
 
+    def set_turbo_pump_state(self, state):
+        """
+        Sets the state of the turbo pump.
+        This function doesn't exist on the real device and is only called through the back door.
+
+        Args:
+            State: String, Matches an attribute of the PumpStates class
+        """
+        pump_state = getattr(PumpStates, state)
+        
+        self._turbo_pump = pump_state
+
+
     def turbo_start_stop(self, value):
         """
         Sets the turbo pump running/stopping

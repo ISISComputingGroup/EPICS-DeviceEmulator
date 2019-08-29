@@ -122,10 +122,6 @@ class EdwardsTICStreamInterface(StreamInterface):
                                    alert=self._device.turbo_alert,
                                    priority=PRIORITYSTATES_MAP[self._device.turbo_priority])
 
-        return state_string.format(turbo_state=reverse_dict_lookup(PUMPSTATES_MAP, self._device._turbo_pump),
-                                   alert=reverse_dict_lookup(ALERTSTATES_MAP, self._device._turbo_alert),
-                                   priority=reverse_dict_lookup(PRIORITYSTATES_MAP, self._device._turbo_priority))
-
     @conditional_reply("is_connected")
     def get_turbo_status(self):
         output_string = "*C904 {state};{alert};{priority}"
