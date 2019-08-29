@@ -16,52 +16,6 @@ PUMPSTATES_MAP = {
     7: PumpStates.braking,
 }
 
-ALERTSTATES_MAP = {
-    0: AlertStates.no_alert,
-    1: AlertStates.adc_fault,
-    2: AlertStates.adc_not_ready,
-    3: AlertStates.over_range,
-    4: AlertStates.under_range,
-    5: AlertStates.adc_invalid,
-    6: AlertStates.no_gauge,
-    7: AlertStates.unknown,
-    8: AlertStates.not_supported,
-    9: AlertStates.new_id,
-    13: AlertStates.ion_em_timeout,
-    14: AlertStates.not_struck,
-    15: AlertStates.filament_fail,
-    16: AlertStates.mag_fail,
-    17: AlertStates.striker_fail,
-    20: AlertStates.cal_error,
-    21: AlertStates.initialising,
-    22: AlertStates.emission_error,
-    23: AlertStates.over_pressure,
-    24: AlertStates.asg_cant_zero,
-    25: AlertStates.rampup_timeout,
-    26: AlertStates.droop_timeout,
-    27: AlertStates.run_hours_high,
-    28: AlertStates.sc_interlock,
-    29: AlertStates.id_volts_error,
-    30: AlertStates.serial_id_fail,
-    31: AlertStates.upload_active,
-    32: AlertStates.dx_fault,
-    33: AlertStates.temp_alert,
-    34: AlertStates.sysi_inhibit,
-    35: AlertStates.ext_inhibit,
-    36: AlertStates.temp_inhibit,
-    37: AlertStates.no_reading,
-    38: AlertStates.no_message,
-    39: AlertStates.nov_failure,
-    40: AlertStates.upload_timeout,
-    41: AlertStates.download_failed,
-    42: AlertStates.no_tube,
-    43: AlertStates.use_gauges_4to6,
-    44: AlertStates.degas_inhibited,
-    45: AlertStates.igc_inhibited,
-    46: AlertStates.brownout_short,
-    47: AlertStates.service_due,
-}
-
 PRIORITYSTATES_MAP = {
     PriorityStates.OK: 0,
     PriorityStates.Warning: 1,
@@ -165,7 +119,7 @@ class EdwardsTICStreamInterface(StreamInterface):
         state_string = "=V904 {turbo_state};{alert};{priority}"
 
         return state_string.format(turbo_state=reverse_dict_lookup(PUMPSTATES_MAP, self._device.turbo_pump), 
-                                   alert=0,
+                                   alert=self._device.turbo_alert,
                                    priority=PRIORITYSTATES_MAP[self._device.turbo_priority])
 
         return state_string.format(turbo_state=reverse_dict_lookup(PUMPSTATES_MAP, self._device._turbo_pump),

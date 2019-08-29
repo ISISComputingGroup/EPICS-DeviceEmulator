@@ -86,51 +86,6 @@ class AlertStates(Enum):
     brownout_short = 46
     service_due = 47
 
-    #no_alert = object()
-    #adc_fault = object()
-    #adc_not_ready = object()
-    #over_range = object()
-    #under_range = object()
-    #adc_invalid = object()
-    #no_gauge = object()
-    #unknown = object()
-    #not_supported = object()
-    #new_id = object()
-    #ion_em_timeout = object()
-    #not_struck = object()
-    #filament_fail = object()
-    #mag_fail = object()
-    #striker_fail = object()
-    #cal_error = object()
-    #initialising = object()
-    #emission_error = object()
-    #over_pressure = object()
-    #asg_cant_zero = object()
-    #rampup_timeout = object()
-    #droop_timeout = object()
-    #run_hours_high = object()
-    #sc_interlock = object()
-    #id_volts_error = object()
-    #serial_id_fail = object()
-    #upload_active = object()
-    #dx_fault = object()
-    #temp_alert = object()
-    #sysi_inhibit = object()
-    #ext_inhibit = object()
-    #temp_inhibit = object()
-    #no_reading = object()
-    #no_message = object()
-    #nov_failure = object()
-    #upload_timeout = object()
-    #download_failed = object()
-    #no_tube = object()
-    #use_gauges_4to6 = object()
-    #degas_inhibited = object()
-    #igc_inhibited = object()
-    #brownout_short = object()
-    #service_due = object()
-
-
 class SimulatedEdwardsTIC(StateMachineDevice):
 
     def _initialize_data(self):
@@ -232,37 +187,34 @@ class SimulatedEdwardsTIC(StateMachineDevice):
 
         return self._turbo_priority
 
-# This setter doesn't exist on the 'real' device
     def set_turbo_priority(self, state):
         """
-        Sets the priority state of the turbo pump
+        Sets the priority state of the turbo pump.
+        This function doesn't exist on the real device and is only called through the back door.
 
         Args:
             value: object, an attribute of the PumpStates class
         """
-
-        self.log.info("attempting to set state {}".format(state))
 
         priority_state = getattr(PriorityStates, state)
 
         self._turbo_priority = priority_state
 
     @property
-    def turbo_alarm(self):
+    def turbo_alert(self):
         """
-        Gets the alarm state of the turbo pump
+        Gets the alert state of the turbo pump
         """
 
-        return self._turbo_alarm
+        return self._turbo_alert
 
-# This setter doesn't exist on the 'real' device
-    @turbo_alarm.setter
-    def turbo_alarm(self, state):
+    # This setter doesn't exist on the 'real' device
+    def set_turbo_alert(self, state):
         """
-        Sets the alarm state of the turbo pump
+        Sets the alert state of the turbo pump
 
         Args:
-            value: object, an attribute of the PriorityStates class
+            state: Int, the alert value
         """
 
-        self._turbo_alarm = state
+        self._turbo_alert = state
