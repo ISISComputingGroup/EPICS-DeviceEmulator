@@ -82,9 +82,7 @@ class EdwardsTICStreamInterface(StreamInterface):
         CmdBuilder("backing_start_stop").escape("!C910 ").int().eos().build(),
         CmdBuilder("backing_get_speed").escape("?V911").eos().build(),
         CmdBuilder("backing_get_power").escape("?V912").eos().build(),
-        CmdBuilder("get_gauge_1").escape("?V913").eos().build(),
-        CmdBuilder("get_gauge_2").escape("?V914").eos().build(),
-        CmdBuilder("get_gauge_3").escape("?V915").eos().build(),
+        CmdBuilder("get_gauge").escape("?V91").arg("3|4|5").eos().build(),
     }
 
     in_terminator = "\r"
@@ -190,18 +188,11 @@ class EdwardsTICStreamInterface(StreamInterface):
         return "=V912 1;0;0"
 
     @conditional_reply("is_connected")
-    def get_gauge_1(self):
-        state_string = "=V913 {pressure};{units};{gauge_state};{alert};{priority}"
+    def get_gauge(self, gauge_id):
+        state_string = "=V91{gauge_id} {pressure};{units};{gauge_state};{alert};{priority}"
 
-        return state_string.format(pressure=self._device.gauge_pressure, units=GAUGEUNITS_MAP[self._device.gauge_units],
+        return state_string.format(gauge_id=gauge_id, pressure=self._device.gauge_pressure,
+                                   units=GAUGEUNITS_MAP[self._device.gauge_units],
                                    gauge_state=reverse_dict_lookup(GAUGESTATES_MAP, self._device.gauge_state),
                                    alert=self._device.gauge_alert,
                                    priority=PRIORITYSTATES_MAP[self._device.gauge_priority])
-
-    @conditional_reply("is_connected")
-    def get_gauge_2(self):
-        return "=V914 1;0;0;0;0"
-
-    @conditional_reply("is_connected")
-    def get_gauge_3(self):
-        return "=V915 1;0;0;0;0"
