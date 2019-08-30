@@ -2,7 +2,7 @@ from lewis.adapters.stream import StreamInterface
 from lewis_emulators.utils.command_builder import CmdBuilder
 from lewis.core.logging import has_log
 from lewis_emulators.utils.replies import conditional_reply
-from ..device import PumpStates, AlertStates, PriorityStates
+from ..device import PumpStates, GaugeStates, GaugeUnits, PriorityStates
 
 
 PUMPSTATES_MAP = {
@@ -14,6 +14,28 @@ PUMPSTATES_MAP = {
     3: PumpStates.stopping_normal_delay,
     6: PumpStates.fault_braking,
     7: PumpStates.braking,
+}
+
+GAUGESTATES_MAP = {
+    0: GaugeStates.not_connected,
+    1: GaugeStates.connected,
+    2: GaugeStates.new_id,
+    3: GaugeStates.change,
+    4: GaugeStates.alert,
+    5: GaugeStates.off,
+    6: GaugeStates.striking,
+    7: GaugeStates.initialising,
+    8: GaugeStates.calibrating,
+    9: GaugeStates.zeroing,
+    10: GaugeStates.degassing,
+    11: GaugeStates.on,
+    12: GaugeStates.inhibited
+}
+
+GAUGEUNITS_MAP = {
+    GaugeUnits.Pa: 59,
+    GaugeUnits.V: 66,
+    GaugeUnits.percent: 81
 }
 
 PRIORITYSTATES_MAP = {
@@ -99,7 +121,6 @@ class EdwardsTICStreamInterface(StreamInterface):
     def turbo_get_standby(self):
         return_string = "=V908 {stdby_state};0;0"
 
-        #turbo_in_standby = self._device.turbo_standby
         standby_state = 4 if self._device.turbo_in_standby else 0
 
         self.log.info(return_string.format(stdby_state=standby_state))
@@ -118,7 +139,7 @@ class EdwardsTICStreamInterface(StreamInterface):
     def get_turbo_state(self):
         state_string = "=V904 {turbo_state};{alert};{priority}"
 
-        return state_string.format(turbo_state=reverse_dict_lookup(PUMPSTATES_MAP, self._device.turbo_pump), 
+        return state_string.format(turbo_state=reverse_dict_lookup(PUMPSTATES_MAP, self._device.turbo_pump),
                                    alert=self._device.turbo_alert,
                                    priority=PRIORITYSTATES_MAP[self._device.turbo_priority])
 
@@ -170,12 +191,17 @@ class EdwardsTICStreamInterface(StreamInterface):
 
     @conditional_reply("is_connected")
     def get_gauge_1(self):
-        return "=V913 1;0;0"
+        state_string = "=V913 {pressure};{units};{gauge_state};{alert};{priority}"
+
+        return state_string.format(pressure=self._device.gauge_pressure, units=GAUGEUNITS_MAP[self._device.gauge_units],
+                                   gauge_state=reverse_dict_lookup(GAUGESTATES_MAP, self._device.gauge_state),
+                                   alert=self._device.gauge_alert,
+                                   priority=PRIORITYSTATES_MAP[self._device.gauge_priority])
 
     @conditional_reply("is_connected")
     def get_gauge_2(self):
-        return "=V914 1;0;0"
+        return "=V914 1;0;0;0;0"
 
     @conditional_reply("is_connected")
     def get_gauge_3(self):
-        return "=V915 1;0;0"
+        return "=V915 1;0;0;0;0"
