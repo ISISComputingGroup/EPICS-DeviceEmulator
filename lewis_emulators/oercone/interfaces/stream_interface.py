@@ -1,7 +1,6 @@
 from lewis.adapters.stream import StreamInterface, Cmd
 from lewis_emulators.utils.command_builder import CmdBuilder
 from lewis.core.logging import has_log
-from time import sleep
 from ..device import Units, ReadState
 from lewis_emulators.utils.constants import ACK, ENQ
 
@@ -12,14 +11,13 @@ class OerconeStreamInterface(StreamInterface):
     # Commands that we expect via serial during normal operation
     commands = {
         CmdBuilder("handle_enquiry").escape(ENQ).build(),
-        CmdBuilder("acknowledge_pressure").escape("PR1\r").eos().build(),
-        CmdBuilder("acknowledge_measurement_unit").escape("UNI\r").eos().build(),
-        CmdBuilder("acknowledge_set_measurement_unit").escape("UNI,").arg("0|1|2|3", argument_mapping=int).
-            escape("\r").eos().build()
+        CmdBuilder("acknowledge_pressure").escape("PR1").eos().build(),
+        CmdBuilder("acknowledge_measurement_unit").escape("UNI").eos().build(),
+        CmdBuilder("acknowledge_set_measurement_unit").escape("UNI,").arg("0|1|2|3", argument_mapping=int).eos().build()
     }
 
-    in_terminator = "\n"
-    out_terminator = "\n"
+    in_terminator = "\r\n"
+    out_terminator = "\r\n"
 
     def handle_error(self, request, error):
         """
@@ -47,8 +45,6 @@ class OerconeStreamInterface(StreamInterface):
                 respectively.
             None: Last command unknown.
         """
-        units_flags = range(1, 5)
-
         self.log.info("Mode: {}".format(self._device._read_state.name))
 
         if self._device._read_state.name == "PR1":
@@ -100,7 +96,7 @@ class OerconeStreamInterface(StreamInterface):
         Returns:
             String: Pressure from the channel.
         """
-        return "0,{}\r\n".format(self._device.pressure)
+        return "0,{}".format(self._device.pressure)
 
     def get_measurement_unit(self):
         """
@@ -109,7 +105,7 @@ class OerconeStreamInterface(StreamInterface):
         Returns:
             Name of the units.
         """
-        return "{}\r\n".format(self._device.measurement_unit.value)
+        return "{}".format(self._device.measurement_unit.value)
 
     def set_measurement_unit(self, units):
         """
