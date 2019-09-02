@@ -109,12 +109,6 @@ class EdwardsTICStreamInterface(StreamInterface):
 
         return "*C908 0"
 
-        #return "=V908 {standby}".format(standby=self._device.turbo_standby)
-
-    def test_get_stby(self):
-        # Device replies 0 (off) or 4 (on)
-        return "=V908 {};0;0".format()
-
     @conditional_reply("is_connected")
     def turbo_get_standby(self):
         return_string = "=V908 {stdby_state};0;0"
