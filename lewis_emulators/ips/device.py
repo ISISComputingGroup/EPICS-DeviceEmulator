@@ -141,3 +141,7 @@ class SimulatedIps(StateMachineDevice):
         if new_status and abs(self.current - self.magnet_current) > self.QUENCH_CURRENT_DELTA:
             raise ValueError("Can't set the heater to on while the magnet current and PSU current are mismatched")
         self.heater_on = new_status
+
+    def backdoor_set_activity(self, activity):
+        self.log.info("Activity set to {}".format(activity))
+        self.activity = Activity(activity)

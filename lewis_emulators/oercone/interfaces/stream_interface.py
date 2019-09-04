@@ -47,7 +47,6 @@ class OerconeStreamInterface(StreamInterface):
                 respectively.
             None: Last command unknown.
         """
-        units_flags = range(1, 5)
 
         self.log.info("Mode: {}".format(self._device._read_state.name))
 
