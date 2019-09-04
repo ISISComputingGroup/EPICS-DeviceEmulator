@@ -143,5 +143,5 @@ class SimulatedIps(StateMachineDevice):
         self.heater_on = new_status
 
     def backdoor_set_activity(self, activity):
-        self.log.info("Activity set to {}".format(activity))
         self.activity = Activity(activity)
+        self.log.info("Activity is now {}".format(str(self.activity)))
