@@ -303,16 +303,3 @@ class SimulatedEdwardsTIC(StateMachineDevice):
         """
 
         return self._gauge_units
-
-    def set_gauge_units(self, units):
-        """
-        Sets the units state for the gauges.
-        This function doesn't exist on the real device and is only called through the back door.
-
-        Args:
-            Units: string, the name of the units.
-        """
-
-        new_units = getattr(GaugeUnits, units)
-
-        self._gauge_units = new_units
