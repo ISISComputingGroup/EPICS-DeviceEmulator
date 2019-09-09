@@ -2,7 +2,7 @@ from collections import OrderedDict
 
 from lewis.core.logging import has_log
 
-from lewis_emulators.ips.modes import Activity
+from lewis_emulators.ips.modes import Activity, Control, SweepMode, Mode
 from states import HeaterOffState, HeaterOnState, MagnetQuenchedState
 from lewis.devices import StateMachineDevice
 
@@ -91,6 +91,15 @@ class SimulatedIps(StateMachineDevice):
         # limits are hit.
         self.neg_current_limit, self.pos_current_limit = -10**6, 10**6
 
+        # Local and locked is the zeroth mode of the control command
+        self.control = Control.LOCAL_LOCKED
+
+        # The only sweep mode we are interested in is tesla fast
+        self.sweep_mode = SweepMode.TESLA_FAST
+
+        # Not sure what is the sensible value here
+        self.mode = Mode.SLOW
+
     def _get_state_handlers(self):
         return {
             'heater_off': HeaterOffState(),
@@ -141,7 +150,3 @@ class SimulatedIps(StateMachineDevice):
         if new_status and abs(self.current - self.magnet_current) > self.QUENCH_CURRENT_DELTA:
             raise ValueError("Can't set the heater to on while the magnet current and PSU current are mismatched")
         self.heater_on = new_status
-
-    def backdoor_set_activity(self, activity):
-        self.activity = Activity(activity)
-        self.log.info("Activity is now {}".format(str(self.activity)))
