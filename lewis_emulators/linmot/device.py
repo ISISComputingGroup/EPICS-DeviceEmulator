@@ -1,6 +1,12 @@
 from collections import OrderedDict
+
+from enum import Enum
+
 from states import StoppedState, MovingState, ErrorState
 from lewis.devices import StateMachineDevice
+
+HARD_LIMIT_MINIMUM = 0.0
+HARD_LIMIT_MAXIMUM = 5000.0
 
 states = OrderedDict([("Stopped", StoppedState()),
                       ("Moving", MovingState()),
@@ -9,12 +15,7 @@ states = OrderedDict([("Stopped", StoppedState()),
 
 class SimulatedLinmot(StateMachineDevice):
 
-    def __init__(self, override_states=None, override_transitions=None,
-                 override_initial_state=None, override_initial_data=None):
-
-        super(SimulatedLinmot, self).__init__(override_states=None, override_transitions=None,
-                                              override_initial_state=None, override_initial_data=None)
-        self.inside_limits = False
+    inside_hard_limits = False
 
     def _initialize_data(self):
         """
@@ -22,12 +23,9 @@ class SimulatedLinmot(StateMachineDevice):
         """
         self.position = 0
         self.target_position = 0
-        self.minimum_value = 0.0
-        self.maximum_value = 10000
-        self.inside_limits = True
+        self.inside_hard_limits = True
 
         self.velocity = 52
-        self.maximal_speed = 52
         self.maximal_acceleration = 10
         self.speed_resolution = 190735
 
@@ -42,10 +40,11 @@ class SimulatedLinmot(StateMachineDevice):
 
     def _get_transition_handlers(self):
         return OrderedDict([
-            (("Stopped", "Moving"), lambda: self.new_action is True),
+            (("Stopped", "Moving"), lambda: self.new_action is True and self.position_reached is False),
             (("Moving", "Stopped"), lambda: self.position_reached is True),
-            (("Moving", "Error"), lambda: self.inside_limits is False),
-            (("Stopped", "Error"), lambda: self.inside_limits is False)
+            (("Moving", "Error"), lambda: self.inside_hard_limits is False),
+            (("Stopped", "Error"), lambda: self.inside_hard_limits is False),
+            (("Error", "Stopped"), lambda: self.inside_hard_limits is True)
         ])
 
     @property
@@ -53,10 +52,25 @@ class SimulatedLinmot(StateMachineDevice):
         return self._csm.state
 
     def is_within_hard_limits(self):
-        if self.position > self.maximum_value or self.position < self.minimum_value:
-            self.inside_limits = False
-        else:
-            self.inside_limits = True
+        """
+        Determine if the axis position is within the physics limits of the devices capability.
+
+        The axis has a range of moment, however if taken beyond these then it will put the controller into an
+        error state.
+        """
+        return False if self.position < HARD_LIMIT_MINIMUM or self.position > HARD_LIMIT_MAXIMUM else True
+
+    def move_to_target(self, target_position):
+        """
+        Demand the motor to drive to a target position.
+
+        Argument(s):
+            target_position (int): the desire axis target position
+        """
+        if self.is_within_hard_limits():
+            self.new_action = True
+            self.position_reached = False
+            self.target_position = target_position
         return
 
     def _get_state_handlers(self):
