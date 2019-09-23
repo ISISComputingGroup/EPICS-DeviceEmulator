@@ -1,4 +1,4 @@
-from lewis.adapters.stream import StreamInterface, Cmd
+from lewis.adapters.stream import StreamInterface
 
 from lewis_emulators.utils.command_builder import CmdBuilder
 from lewis_emulators.utils.replies import conditional_reply
@@ -10,6 +10,8 @@ class LinmotStreamInterface(StreamInterface):
 
     in_terminator = "\r\n"
     out_terminator = "\r"
+
+    readtimeout = 1000
 
     # Commands that we expect via serial during normal operation
     commands = {
@@ -39,10 +41,10 @@ class LinmotStreamInterface(StreamInterface):
         return "#{speed_resolution}".format(speed_resolution=self.device.speed_resolution)
 
     def get_motor_warn_status(self):
-        return "#{motor_warn_status}".format(motor_warn_status=self.device.motor_warn_status)
+        return "#{motor_warn_status}".format(motor_warn_status=self.device.motor_warn_status.value)
 
     def get_motor_error_status(self):
-        return "#{motor_error_status}".format(motor_error_status=self.device.motor_error_status)
+        return "#{motor_error_status}".format(motor_error_status=self.device.motor_error_status.value)
 
     def set_maximal_speed(self, speed):
         self.device.velocity = int(speed)

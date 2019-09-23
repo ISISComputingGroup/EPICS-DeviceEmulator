@@ -1,16 +1,20 @@
 from collections import OrderedDict
 
-from enum import Enum
+from states import WarnStateCode, ErrorStateCode
 
-from states import StoppedState, MovingState, ErrorState
+from states import StoppedState, MovingState
 from lewis.devices import StateMachineDevice
 
 HARD_LIMIT_MINIMUM = 0.0
 HARD_LIMIT_MAXIMUM = 5000.0
 
+# Defaults taken from device
+DEVICE_DEFAULT_VELO = 52
+DEVICE_DEFAULT_MAX_ACCEL = 10
+DEVICE_DEFAULT_SPEED_RES = 190735
+
 states = OrderedDict([("Stopped", StoppedState()),
-                      ("Moving", MovingState()),
-                      ("Error", ErrorState())])
+                      ("Moving", MovingState())])
 
 
 class SimulatedLinmot(StateMachineDevice):
@@ -25,12 +29,12 @@ class SimulatedLinmot(StateMachineDevice):
         self.target_position = 0
         self.inside_hard_limits = True
 
-        self.velocity = 52
-        self.maximal_acceleration = 10
-        self.speed_resolution = 190735
+        self.velocity = DEVICE_DEFAULT_VELO
+        self.maximal_acceleration = DEVICE_DEFAULT_MAX_ACCEL
+        self.speed_resolution = DEVICE_DEFAULT_SPEED_RES
 
-        self.motor_warn_status = 256
-        self.motor_error_status = 0
+        self.motor_warn_status = WarnStateCode.STATIONARY
+        self.motor_error_status = ErrorStateCode.NONE
 
         self.new_action = False
         self.position_reached = False
@@ -42,23 +46,31 @@ class SimulatedLinmot(StateMachineDevice):
         return OrderedDict([
             (("Stopped", "Moving"), lambda: self.new_action is True and self.position_reached is False),
             (("Moving", "Stopped"), lambda: self.position_reached is True),
-            (("Moving", "Error"), lambda: self.inside_hard_limits is False),
-            (("Stopped", "Error"), lambda: self.inside_hard_limits is False),
-            (("Error", "Stopped"), lambda: self.inside_hard_limits is True)
         ])
 
     @property
     def state(self):
         return self._csm.state
 
-    def is_within_hard_limits(self):
+    @property
+    def device_error(self):
         """
-        Determine if the axis position is within the physics limits of the devices capability.
+        Is the device errored due to being outside of the hard limits
 
-        The axis has a range of moment, however if taken beyond these then it will put the controller into an
-        error state.
+        Return(s):
+            (bool): True if device in errored state
         """
-        return False if self.position < HARD_LIMIT_MINIMUM or self.position > HARD_LIMIT_MAXIMUM else True
+        return True if not self.within_hard_limits() else False
+
+    @property
+    def motor_warn_status_int(self):
+        """
+        Return the integer value of the warn status enum
+
+        Return(s):
+            (int): int value of the motor_warn_status
+        """
+        return self.motor_warn_status.value
 
     def move_to_target(self, target_position):
         """
@@ -67,11 +79,19 @@ class SimulatedLinmot(StateMachineDevice):
         Argument(s):
             target_position (int): the desire axis target position
         """
-        if self.is_within_hard_limits():
-            self.new_action = True
-            self.position_reached = False
-            self.target_position = target_position
+        self.new_action = True
+        self.position_reached = False
+        self.target_position = target_position
         return
+
+    def within_hard_limits(self):
+        """
+        Determine if the axis position is within the physics limits of the devices capability.
+
+        The axis has a range of moment, however if taken beyond these then it will put the controller into an
+        error state.
+        """
+        return HARD_LIMIT_MINIMUM <= self.position <= HARD_LIMIT_MAXIMUM
 
     def _get_state_handlers(self):
         return states
