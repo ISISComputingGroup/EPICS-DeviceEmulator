@@ -80,7 +80,15 @@ class SimulatedDanfysik(StateMachineDevice):
 
     def reset(self):
         """
-        Reset the device state.
+        Reset the device to the standard off configuration.
+        """
+        self.current = 0
+        self.voltage = 0
+        self.power = False
+
+    def reinitialise(self):
+        """
+        Reinitialise the device state (this is mainly used via the backdoor to clean up between tests)
         """
         self._initialize_data()
 

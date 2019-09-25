@@ -27,6 +27,7 @@ class CommonStreamInterface(object):
         CmdBuilder("set_power_off").escape("F").eos().build(),
         CmdBuilder("set_power_on").escape("N").eos().build(),
         CmdBuilder("get_status").escape("S1").eos().build(),
+        CmdBuilder("reset").escape("RS").eos().build(),
     ]
 
     def handle_error(self, request, error):
@@ -75,6 +76,10 @@ class CommonStreamInterface(object):
     @conditional_reply("comms_initialized")
     def set_power_on(self):
         self.device.power = True
+
+    @conditional_reply("comms_initialized")
+    def reset_device(self):
+        self.device.reset()
 
     @abc.abstractmethod
     def get_status(self):
