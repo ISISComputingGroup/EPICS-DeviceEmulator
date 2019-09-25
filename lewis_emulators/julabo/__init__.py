@@ -16,5 +16,6 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 # *********************************************************************
+from ..lewis_versions import LEWIS_LATEST
 
-framework_version = '1.2.0'
+framework_version = LEWIS_LATEST
