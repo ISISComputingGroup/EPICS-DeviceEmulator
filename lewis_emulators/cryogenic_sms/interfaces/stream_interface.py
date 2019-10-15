@@ -6,7 +6,7 @@ from datetime import datetime
 
 
 @has_log
-class HFMAGPSUStreamInterface(StreamInterface):
+class CRYOSMSStreamInterface(StreamInterface):
 
     in_terminator = "\r\n"
     out_terminator = chr(19)

@@ -5,7 +5,7 @@ from collections import OrderedDict
 from states import DefaultInitState, HoldingState, TrippedState, RampingState
 
 
-class SimulatedHFMAGPSU(StateMachineDevice):
+class SimulatedCRYOSMS(StateMachineDevice):
 
     def _initialize_data(self):
         # field constant (load line gradient)
@@ -23,15 +23,15 @@ class SimulatedHFMAGPSU(StateMachineDevice):
         self.ramp_rate = 0.5
 
         # paused
-        self.is_paused = True
+        self.is_paused = False
 
         # output
         self.output = 0.0
-        self.is_output_mode_tesla = True
+        self.is_output_mode_tesla = False
         self.direction = '+'
 
         # heater
-        self.is_heater_on = True
+        self.is_heater_on = False
         self.heater_value = 0.0
 
         # quenched
