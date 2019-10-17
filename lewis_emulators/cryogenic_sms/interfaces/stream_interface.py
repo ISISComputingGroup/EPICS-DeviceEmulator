@@ -156,9 +156,7 @@ class CRYOSMSStreamInterface(StreamInterface):
         return self._device.log_message
 
     def read_heater_status(self):
-        heater_value = "OFF"
-        if self._device.is_heater_on:
-            heater_value = "ON"
+        heater_value = "ON" if self._device.is_heater_on else "OFF"
         return self._out_message(" HEATER STATUS: {}".format(heater_value))
 
     def write_heater_status(self, heater_status):
