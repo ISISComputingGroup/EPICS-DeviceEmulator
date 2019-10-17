@@ -19,7 +19,7 @@ class SimulatedCRYOSMS(StateMachineDevice):
         self.at_target = False
 
         # ramp
-        self.ramp_target = RampTarget.ZERO
+        self.ramp_target = "ZERO"
         self.ramp_rate = 0.5
 
         # paused
