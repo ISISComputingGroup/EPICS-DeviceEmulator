@@ -3,6 +3,7 @@ from lewis.core.logging import has_log
 
 from lewis_emulators.utils.command_builder import CmdBuilder
 from datetime import datetime
+from ..utils import RampTarget
 
 
 @has_log
@@ -69,11 +70,11 @@ class CRYOSMSStreamInterface(StreamInterface):
         return "ON" if self._device.is_paused else "OFF"
 
     def _get_ramp_target_value(self):
-        if self._device.ramp_target == "MID":
+        if self._device.ramp_target.name == "MID":
             return self._device.mid_target
-        elif self._device.ramp_target == "MAX":
+        elif self._device.ramp_target.name == "MAX":
             return self._device.max_target
-        elif self._device.ramp_target == "ZERO":
+        elif self._device.ramp_target.name == "ZERO":
             return self._device.zero_target
 
     def read_direction(self):
@@ -134,16 +135,16 @@ class CRYOSMSStreamInterface(StreamInterface):
 
     def write_ramp_target(self, ramp_target_str):
         if ramp_target_str in ["0", "ZERO"]:
-            ramp_target = "ZERO"
+            ramp_target = RampTarget.ZERO
         elif ramp_target_str in ["%", "MID"]:
-            ramp_target = "MID"
+            ramp_target = RampTarget.MID
         elif ramp_target_str in ["!", "MAX"]:
-            ramp_target = "MAX"
+            ramp_target = RampTarget.MAX
         else:
             raise ValueError("Invalid arguments sent")
         self._device.ramp_target = ramp_target
         self._device.is_paused = False
-        self._create_log_message("RAMP TARGET", ramp_target)
+        self._create_log_message("RAMP TARGET", ramp_target.name)
         return self._device.log_message
 
     def read_ramp_rate(self):

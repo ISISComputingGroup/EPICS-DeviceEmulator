@@ -3,6 +3,7 @@ from datetime import datetime
 from lewis.devices import StateMachineDevice
 from collections import OrderedDict
 from states import DefaultInitState, HoldingState, TrippedState, RampingState
+from utils import RampTarget
 
 
 class SimulatedCRYOSMS(StateMachineDevice):
@@ -19,7 +20,7 @@ class SimulatedCRYOSMS(StateMachineDevice):
         self.at_target = False
 
         # ramp
-        self.ramp_target = "ZERO"
+        self.ramp_target = RampTarget.ZERO
         self.ramp_rate = 0.5
 
         # paused
@@ -88,9 +89,9 @@ class SimulatedCRYOSMS(StateMachineDevice):
         return self.at_target
 
     def ramp_target_value(self):
-        if self.ramp_target == "MID":
+        if self.ramp_target.name == "MID":
             return self.mid_target
-        elif self.ramp_target == "MAX":
+        elif self.ramp_target.name == "MAX":
             return self.max_target
-        elif self.ramp_target == "ZERO":
+        elif self.ramp_target.name == "ZERO":
             return self.zero_target
