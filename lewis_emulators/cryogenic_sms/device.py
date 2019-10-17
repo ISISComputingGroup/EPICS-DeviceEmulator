@@ -19,7 +19,7 @@ class SimulatedCRYOSMS(StateMachineDevice):
         self.at_target = False
 
         # ramp
-        self.ramp_target = "ZERO"
+        self.ramp_target = RampTarget.ZERO
         self.ramp_rate = 0.5
 
         # paused
@@ -84,10 +84,8 @@ class SimulatedCRYOSMS(StateMachineDevice):
             self.is_output_mode_tesla = False
 
     def check_is_at_target(self):
-        if self.output == self.ramp_target_value():
-            self.at_target = True
-        else:
-            self.at_target = False
+        self.at_target = self.output == self.ramp_target_value()
+        return self.at_target
 
     def ramp_target_value(self):
         if self.ramp_target == "MID":
@@ -96,5 +94,3 @@ class SimulatedCRYOSMS(StateMachineDevice):
             return self.max_target
         elif self.ramp_target == "ZERO":
             return self.zero_target
-        else:
-            raise AssertionError("Invalid arg received")
