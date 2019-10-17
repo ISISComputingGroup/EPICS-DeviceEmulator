@@ -69,11 +69,11 @@ class CRYOSMSStreamInterface(StreamInterface):
         return "ON" if self._device.is_paused else "OFF"
 
     def _get_ramp_target_value(self):
-        if self._device.ramp_target.name == "MID":
+        if self._device.ramp_target == "MID":
             return self._device.mid_target
-        elif self._device.ramp_target.name == "MAX":
+        elif self._device.ramp_target == "MAX":
             return self._device.max_target
-        elif self._device.ramp_target.name == "ZERO":
+        elif self._device.ramp_target == "ZERO":
             return self._device.zero_target
 
     def read_direction(self):
