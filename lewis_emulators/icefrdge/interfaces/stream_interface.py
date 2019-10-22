@@ -10,7 +10,8 @@ class IceFridgeStreamInterface(StreamInterface):
     # Commands that we expect via serial during normal operation
     commands = {
         CmdBuilder("set_temp_setpoint").escape("AUTO TSET=").float().eos().build(),
-        CmdBuilder("get_temp_set_RBV").escape("AUTO TSET?").eos().build()
+        CmdBuilder("get_temp_set_RBV").escape("AUTO TSET?").eos().build(),
+        CmdBuilder("get_temp_set_RBV").escape("TEMPS?").eos().build()
     }
 
     in_terminator = "\n"
