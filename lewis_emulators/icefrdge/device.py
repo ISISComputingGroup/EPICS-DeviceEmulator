@@ -9,15 +9,15 @@ class SimulatedIceFridge(StateMachineDevice):
         """
         Initialize all of the device's attributes.
         """
-        self._temp_setpoint = 0
+        self._auto_temp_setpoint = 0
 
     @property
-    def temp_setpoint(self):
-        return self._temp_setpoint
+    def auto_temp_setpoint(self):
+        return self._auto_temp_setpoint
 
-    @temp_setpoint.setter
-    def temp_setpoint(self, new_temp_setpoint):
-        self._temp_setpoint = new_temp_setpoint
+    @auto_temp_setpoint.setter
+    def auto_temp_setpoint(self, new_temp_setpoint):
+        self._auto_temp_setpoint = new_temp_setpoint
 
     def _get_state_handlers(self):
         return {

@@ -9,9 +9,10 @@ class IceFridgeStreamInterface(StreamInterface):
 
     # Commands that we expect via serial during normal operation
     commands = {
-        CmdBuilder("set_temp_setpoint").escape("AUTO TSET=").float().eos().build(),
-        CmdBuilder("get_temp_set_RBV").escape("AUTO TSET?").eos().build(),
-        CmdBuilder("get_temp_set_RBV").escape("TEMPS?").eos().build()
+        CmdBuilder("set_auto_temp_setpoint").escape("AUTO TSET=").float().eos().build(),
+        CmdBuilder("get_auto_temp_set_RBV").escape("AUTO TSET?").eos().build(),
+        CmdBuilder("get_auto_temp_set_RBV").escape("TEMPS?").eos().build(),
+        CmdBuilder("")
     }
 
     in_terminator = "\n"
@@ -32,8 +33,8 @@ class IceFridgeStreamInterface(StreamInterface):
         self.log.error(err_string)
         return err_string
 
-    def set_temp_setpoint(self, temp_setpoint):
-        self._device.temp_setpoint = temp_setpoint
+    def set_auto_temp_setpoint(self, temp_setpoint):
+        self._device.auto_temp_setpoint = temp_setpoint
 
-    def get_temp_set_RBV(self):
-        return self._device.temp_setpoint
+    def get_auto_temp_set_RBV(self):
+        return self._device.auto_temp_setpoint
