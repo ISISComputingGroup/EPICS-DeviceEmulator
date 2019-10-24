@@ -19,7 +19,11 @@ class IceFridgeStreamInterface(StreamInterface):
         CmdBuilder("set_loop1_temp_setpoint").escape("CRYO-TSET=1,").float().eos().build(),
         CmdBuilder("get_loop1_temp_setpoint").escape("CRYO-TSET1?").eos().build(),
         CmdBuilder("set_loop2_temp_setpoint").escape("CRYO-TSET=2,").float().eos().build(),
-        CmdBuilder("get_loop2_temp_setpoint").escape("CRYO-TSET2?").eos().build()
+        CmdBuilder("get_loop2_temp_setpoint").escape("CRYO-TSET2?").eos().build(),
+        CmdBuilder("set_loop1_proportional_setpoint").escape("CRYO-P=1,").float().eos().build(),
+        CmdBuilder("get_loop1_proportional_setpoint").escape("CRYO-P1?").eos().build(),
+        CmdBuilder("set_loop2_proportional_setpoint").escape("CRYO-P=2,").float().eos().build(),
+        CmdBuilder("get_loop2_proportional_setpoint").escape("CRYO-P2?").eos().build(),
     }
 
     in_terminator = "\n"
@@ -67,3 +71,15 @@ class IceFridgeStreamInterface(StreamInterface):
 
     def get_loop2_temp_setpoint(self):
         return "CRYO-TSET2={}".format(self._device.vti_loop2_temp_setpoint)
+
+    def set_loop1_proportional_setpoint(self, proportional_setpoint):
+        self._device.vti_loop1_proportional = proportional_setpoint
+
+    def get_loop1_proportional_setpoint(self):
+        return "CRYO-P1={}".format(self._device.vti_loop1_proportional)
+
+    def set_loop2_proportional_setpoint(self, proportional_setpoint):
+        self._device.vti_loop2_proportional = proportional_setpoint
+
+    def get_loop2_proportional_setpoint(self):
+        return "CRYO-P2={}".format(self._device.vti_loop2_proportional)
