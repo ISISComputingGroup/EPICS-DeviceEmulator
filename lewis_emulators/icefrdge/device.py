@@ -11,6 +11,10 @@ class SimulatedIceFridge(StateMachineDevice):
         """
         self._auto_temp_setpoint = 0
         self._manual_temp_setpoint = 0
+        self.vti_temp1 = 0
+        self.vti_temp2 = 0
+        self.vti_temp3 = 0
+        self.vti_temp4 = 0
 
     @property
     def auto_temp_setpoint(self):
