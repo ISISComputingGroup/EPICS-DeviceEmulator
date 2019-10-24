@@ -24,6 +24,10 @@ class IceFridgeStreamInterface(StreamInterface):
         CmdBuilder("get_loop1_proportional_setpoint").escape("CRYO-P1?").eos().build(),
         CmdBuilder("set_loop2_proportional_setpoint").escape("CRYO-P=2,").float().eos().build(),
         CmdBuilder("get_loop2_proportional_setpoint").escape("CRYO-P2?").eos().build(),
+        CmdBuilder("set_loop1_integral_setpoint").escape("CRYO-I=1,").float().eos().build(),
+        CmdBuilder("get_loop1_integral_setpoint").escape("CRYO-I1?").eos().build(),
+        CmdBuilder("set_loop2_integral_setpoint").escape("CRYO-I=2,").float().eos().build(),
+        CmdBuilder("get_loop2_integral_setpoint").escape("CRYO-I2?").eos().build(),
     }
 
     in_terminator = "\n"
@@ -83,3 +87,16 @@ class IceFridgeStreamInterface(StreamInterface):
 
     def get_loop2_proportional_setpoint(self):
         return "CRYO-P2={}".format(self._device.vti_loop2_proportional)
+
+    def set_loop1_integral_setpoint(self, integral_setpoint):
+        self._device.vti_loop1_integral = integral_setpoint
+
+    def get_loop1_integral_setpoint(self):
+        return "CRYO-I1={}".format(self._device.vti_loop1_integral)
+
+    def set_loop2_integral_setpoint(self, integral_setpoint):
+        self._device.vti_loop2_integral = integral_setpoint
+
+    def get_loop2_integral_setpoint(self):
+        return "CRYO-I2={}".format(self._device.vti_loop2_integral)
+
