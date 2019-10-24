@@ -15,6 +15,7 @@ class SimulatedIceFridge(StateMachineDevice):
         self.vti_temp2 = 0
         self.vti_temp3 = 0
         self.vti_temp4 = 0
+        self.vti_loop1_temp_setpoint = 0
 
     def _get_state_handlers(self):
         return {

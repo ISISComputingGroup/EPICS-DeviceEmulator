@@ -15,7 +15,9 @@ class IceFridgeStreamInterface(StreamInterface):
         CmdBuilder("set_manual_temp_setpoint").escape("MANUAL TSET=").float().eos().build(),
         CmdBuilder("get_manual_temp_set_RBV").escape("MANUAL TSET?").eos().build(),
         CmdBuilder("get_manual_temp_set_RBV").escape("MANUAL TEMP?").eos().build(),
-        CmdBuilder("get_cryo_temps").escape("CRYO-TEMPS?").eos().build()
+        CmdBuilder("get_cryo_temps").escape("CRYO-TEMPS?").eos().build(),
+        CmdBuilder("set_loop1_temp_setpoint").escape("CRYO-TSET1=1,").float().eos().build(),
+        CmdBuilder("get_loop1_temp_set_RBV").escape("CRYO-TSET1?").eos().build()
     }
 
     in_terminator = "\n"
@@ -51,4 +53,10 @@ class IceFridgeStreamInterface(StreamInterface):
     def get_cryo_temps(self):
         return "CRYO-TEMPS={},{},{},{}".format(self._device.vti_temp1, self._device.vti_temp2, self._device.vti_temp3,
                                                self._device.vti_temp4)
+
+    def set_loop1_temp_setpoint(self, temp_setpoint):
+        self._device.vti_loop1_temp_setpoint = temp_setpoint
+
+    def get_loop1_temp_set_RBV(self):
+        return "CRYO-TSET1={}".format(self._device.vti_loop1_temp_setpoint)
 
