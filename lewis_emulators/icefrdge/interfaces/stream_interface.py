@@ -16,9 +16,9 @@ class IceFridgeStreamInterface(StreamInterface):
         CmdBuilder("get_manual_temp_set_RBV").escape("MANUAL TSET?").eos().build(),
         CmdBuilder("get_manual_temp_set_RBV").escape("MANUAL TEMP?").eos().build(),
         CmdBuilder("get_cryo_temps").escape("CRYO-TEMPS?").eos().build(),
-        CmdBuilder("set_loop1_temp_setpoint").escape("CRYO-TSET1=1,").float().eos().build(),
+        CmdBuilder("set_loop1_temp_setpoint").escape("CRYO-TSET=1,").float().eos().build(),
         CmdBuilder("get_loop1_temp_setpoint").escape("CRYO-TSET1?").eos().build(),
-        CmdBuilder("set_loop2_temp_setpoint").escape("CRYO-TSET2=2,").float().eos().build(),
+        CmdBuilder("set_loop2_temp_setpoint").escape("CRYO-TSET=2,").float().eos().build(),
         CmdBuilder("get_loop2_temp_setpoint").escape("CRYO-TSET2?").eos().build()
     }
 
