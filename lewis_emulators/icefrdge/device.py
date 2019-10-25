@@ -30,8 +30,8 @@ class SimulatedIceFridge(StateMachineDevice):
         self.vti_temp4 = 0
 
         self.vti_loop_channels = {
-            "1": VTILoopChannel(),
-            "2": VTILoopChannel()
+            1: VTILoopChannel(),
+            2: VTILoopChannel()
         }
 
     def _get_state_handlers(self):
