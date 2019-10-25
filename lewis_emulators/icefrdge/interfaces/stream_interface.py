@@ -28,6 +28,10 @@ class IceFridgeStreamInterface(StreamInterface):
         CmdBuilder("get_loop1_integral_setpoint").escape("CRYO-I1?").eos().build(),
         CmdBuilder("set_loop2_integral_setpoint").escape("CRYO-I=2,").float().eos().build(),
         CmdBuilder("get_loop2_integral_setpoint").escape("CRYO-I2?").eos().build(),
+        CmdBuilder("set_loop1_derivative_setpoint").escape("CRYO-D=1,").float().eos().build(),
+        CmdBuilder("get_loop1_derivative_setpoint").escape("CRYO-D1?").eos().build(),
+        CmdBuilder("set_loop2_derivative_setpoint").escape("CRYO-D=2,").float().eos().build(),
+        CmdBuilder("get_loop2_derivative_setpoint").escape("CRYO-D2?").eos().build()
     }
 
     in_terminator = "\n"
@@ -99,4 +103,16 @@ class IceFridgeStreamInterface(StreamInterface):
 
     def get_loop2_integral_setpoint(self):
         return "CRYO-I2={}".format(self._device.vti_loop2_integral)
+
+    def set_loop1_derivative_setpoint(self, derivative_setpoint):
+        self._device.vti_loop1_derivative = derivative_setpoint
+
+    def get_loop1_derivative_setpoint(self):
+        return "CRYO-D1={}".format(self._device.vti_loop1_derivative)
+
+    def set_loop2_derivative_setpoint(self, derivative_setpoint):
+        self._device.vti_loop2_derivative = derivative_setpoint
+
+    def get_loop2_derivative_setpoint(self):
+        return "CRYO-D2={}".format(self._device.vti_loop2_derivative)
 
