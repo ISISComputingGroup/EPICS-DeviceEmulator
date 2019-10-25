@@ -23,6 +23,8 @@ class SimulatedIceFridge(StateMachineDevice):
         self.vti_loop2_integral = 0
         self.vti_loop1_derivative = 0
         self.vti_loop2_derivative = 0
+        self.vti_loop1_ramp_rate = 0
+        self.vti_loop2_ramp_rate = 0
 
     def _get_state_handlers(self):
         return {

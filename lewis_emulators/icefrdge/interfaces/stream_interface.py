@@ -31,7 +31,12 @@ class IceFridgeStreamInterface(StreamInterface):
         CmdBuilder("set_loop1_derivative_setpoint").escape("CRYO-D=1,").float().eos().build(),
         CmdBuilder("get_loop1_derivative_setpoint").escape("CRYO-D1?").eos().build(),
         CmdBuilder("set_loop2_derivative_setpoint").escape("CRYO-D=2,").float().eos().build(),
-        CmdBuilder("get_loop2_derivative_setpoint").escape("CRYO-D2?").eos().build()
+        CmdBuilder("get_loop2_derivative_setpoint").escape("CRYO-D2?").eos().build(),
+
+        CmdBuilder("set_loop1_ramp_rate_setpoint").escape("CRYO-RAMP=1,").float().eos().build(),
+        CmdBuilder("get_loop1_ramp_rate_setpoint").escape("CRYO-RAMP1?").eos().build(),
+        CmdBuilder("set_loop2_ramp_rate_setpoint").escape("CRYO-RAMP=2,").float().eos().build(),
+        CmdBuilder("get_loop2_ramp_rate_setpoint").escape("CRYO-RAMP2?").eos().build()
     }
 
     in_terminator = "\n"
@@ -115,4 +120,16 @@ class IceFridgeStreamInterface(StreamInterface):
 
     def get_loop2_derivative_setpoint(self):
         return "CRYO-D2={}".format(self._device.vti_loop2_derivative)
+
+    def set_loop1_ramp_rate_setpoint(self, ramp_rate_setpoint):
+        self._device.vti_loop1_ramp_rate = ramp_rate_setpoint
+
+    def get_loop1_ramp_rate_setpoint(self):
+        return "CRYO-RAMP1={}".format(self._device.vti_loop1_ramp_rate)
+
+    def set_loop2_ramp_rate_setpoint(self, ramp_rate_setpoint):
+        self._device.vti_loop2_ramp_rate = ramp_rate_setpoint
+
+    def get_loop2_ramp_rate_setpoint(self):
+        return "CRYO-RAMP2={}".format(self._device.vti_loop2_ramp_rate)
 
