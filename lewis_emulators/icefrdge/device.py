@@ -3,6 +3,19 @@ from states import DefaultState
 from lewis.devices import StateMachineDevice
 
 
+class VTILoopChannel(object):
+    """
+    Class to represent an individual channel for controlling loops in the VTI of an ICE dilution fridge. A channel has
+    a temperature setpoint, PID values and a ramp rate.
+    """
+
+    def __init__(self):
+        self.vti_loop_temp_setpoint = 0
+        self.vti_loop_proportional = 0
+        self.vti_loop_integral = 0
+        self.vti_loop_derivative = 0
+        self.vti_loop_ramp_rate = 0
+
 class SimulatedIceFridge(StateMachineDevice):
 
     def _initialize_data(self):
@@ -15,16 +28,11 @@ class SimulatedIceFridge(StateMachineDevice):
         self.vti_temp2 = 0
         self.vti_temp3 = 0
         self.vti_temp4 = 0
-        self.vti_loop1_temp_setpoint = 0
-        self.vti_loop2_temp_setpoint = 0
-        self.vti_loop1_proportional = 0
-        self.vti_loop2_proportional = 0
-        self.vti_loop1_integral = 0
-        self.vti_loop2_integral = 0
-        self.vti_loop1_derivative = 0
-        self.vti_loop2_derivative = 0
-        self.vti_loop1_ramp_rate = 0
-        self.vti_loop2_ramp_rate = 0
+
+        self.vti_loop_channels = {
+            "1": VTILoopChannel(),
+            "2": VTILoopChannel()
+        }
 
     def _get_state_handlers(self):
         return {
