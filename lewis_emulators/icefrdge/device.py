@@ -16,6 +16,7 @@ class VTILoopChannel(object):
         self.vti_loop_derivative = 0
         self.vti_loop_ramp_rate = 0
 
+
 class SimulatedIceFridge(StateMachineDevice):
 
     def _initialize_data(self):
@@ -33,6 +34,8 @@ class SimulatedIceFridge(StateMachineDevice):
             1: VTILoopChannel(),
             2: VTILoopChannel()
         }
+
+        self.lakeshore_mc_cernox = 0
 
     def _get_state_handlers(self):
         return {

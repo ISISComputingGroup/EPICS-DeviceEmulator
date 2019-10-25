@@ -33,6 +33,8 @@ class IceFridgeStreamInterface(StreamInterface):
 
         CmdBuilder("set_loop_ramp_rate_setpoint").escape("CRYO-RAMP=").int().escape(",").float().eos().build(),
         CmdBuilder("get_loop_ramp_rate").escape("CRYO-RAMP").int().escape("?").eos().build(),
+
+        CmdBuilder("get_mc_cernox").escape("LS-DIRECT-READ=RDGK? 4").eos().build()
     }
 
     in_terminator = "\n"
@@ -98,3 +100,6 @@ class IceFridgeStreamInterface(StreamInterface):
 
     def get_loop_ramp_rate(self, loop_num):
         return "CRYO-RAMP{}={}".format(loop_num, self._device.vti_loop_channels[loop_num].vti_loop_ramp_rate)
+
+    def get_mc_cernox(self):
+        return self._device.lakeshore_mc_cernox
