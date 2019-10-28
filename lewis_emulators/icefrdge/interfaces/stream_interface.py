@@ -36,7 +36,10 @@ class IceFridgeStreamInterface(StreamInterface):
 
         CmdBuilder("get_mc_cernox").escape("LS-DIRECT-READ=RDGK? 4").eos().build(),
         CmdBuilder("get_mc_ruo").escape("LS-DIRECT-READ=RDGK? 6").eos().build(),
-        CmdBuilder("get_still_temp").escape("STILL?").eos().build()
+        CmdBuilder("get_still_temp").escape("STILL?").eos().build(),
+
+        CmdBuilder("set_mc_temp_setpoint").escape("LS-DIRECT-SET=SETP ").float().eos().build(),
+        CmdBuilder("get_mc_temp_setpoint").escape("LS-DIRECT-READ=SETP?").eos().build()
     }
 
     in_terminator = "\n"
@@ -111,3 +114,9 @@ class IceFridgeStreamInterface(StreamInterface):
 
     def get_still_temp(self):
         return "STILL={}".format(self._device.lakeshore_still_temp)
+
+    def set_mc_temp_setpoint(self, temp_setpoint):
+        self.device.lakeshore_mc_temp_setpoint = temp_setpoint
+
+    def get_mc_temp_setpoint(self):
+        return self.device.lakeshore_mc_temp_setpoint
