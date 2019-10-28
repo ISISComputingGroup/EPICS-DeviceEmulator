@@ -36,6 +36,7 @@ class SimulatedIceFridge(StateMachineDevice):
         }
 
         self.lakeshore_mc_cernox = 0
+        self.lakeshore_mc_ruo = 0
 
     def _get_state_handlers(self):
         return {

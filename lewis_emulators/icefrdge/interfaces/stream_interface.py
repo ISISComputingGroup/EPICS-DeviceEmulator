@@ -34,7 +34,8 @@ class IceFridgeStreamInterface(StreamInterface):
         CmdBuilder("set_loop_ramp_rate_setpoint").escape("CRYO-RAMP=").int().escape(",").float().eos().build(),
         CmdBuilder("get_loop_ramp_rate").escape("CRYO-RAMP").int().escape("?").eos().build(),
 
-        CmdBuilder("get_mc_cernox").escape("LS-DIRECT-READ=RDGK? 4").eos().build()
+        CmdBuilder("get_mc_cernox").escape("LS-DIRECT-READ=RDGK? 4").eos().build(),
+        CmdBuilder("get_mc_ruo").escape("LS-DIRECT-READ=RDGK? 6").eos().build(),
     }
 
     in_terminator = "\n"
@@ -103,3 +104,6 @@ class IceFridgeStreamInterface(StreamInterface):
 
     def get_mc_cernox(self):
         return self._device.lakeshore_mc_cernox
+
+    def get_mc_ruo(self):
+        return self._device.lakeshore_mc_ruo
