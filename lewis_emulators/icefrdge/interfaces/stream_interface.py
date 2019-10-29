@@ -39,7 +39,10 @@ class IceFridgeStreamInterface(StreamInterface):
         CmdBuilder("get_still_temp").escape("STILL?").eos().build(),
 
         CmdBuilder("set_mc_temp_setpoint").escape("LS-DIRECT-SET=SETP ").float().eos().build(),
-        CmdBuilder("get_mc_temp_setpoint").escape("LS-DIRECT-READ=SETP?").eos().build()
+        CmdBuilder("get_mc_temp_setpoint").escape("LS-DIRECT-READ=SETP?").eos().build(),
+
+        CmdBuilder("set_lakeshore_cmode").escape("LS-DIRECT-SET=CMODE ").int().eos().build(),
+        CmdBuilder("set_lakeshore_scan").escape("LS-DIRECT-SET=SCAN ").int().escape(",").int().eos().build()
     }
 
     in_terminator = "\n"
@@ -120,3 +123,10 @@ class IceFridgeStreamInterface(StreamInterface):
 
     def get_mc_temp_setpoint(self):
         return self.device.lakeshore_mc_temp_setpoint
+
+    def set_lakeshore_scan(self, scan_num1, scan_num2):
+        self.device.lakeshore_scan_num1 = scan_num1
+        self.device.lakeshore_scan_num2 = scan_num2
+
+    def set_lakeshore_cmode(self, cmode):
+        self.device.lakeshore_cmode = cmode
