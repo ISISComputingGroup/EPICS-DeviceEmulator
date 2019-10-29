@@ -40,8 +40,7 @@ class SimulatedIceFridge(StateMachineDevice):
         self.lakeshore_still_temp = 0
 
         self.lakeshore_mc_temp_setpoint = 0
-        self.lakeshore_scan_num1 = 0
-        self.lakeshore_scan_num2 = 0
+        self.lakeshore_scan = 0
         self.lakeshore_cmode = 0
 
     def _get_state_handlers(self):
