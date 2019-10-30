@@ -42,7 +42,11 @@ class IceFridgeStreamInterface(StreamInterface):
         CmdBuilder("get_mc_temp_setpoint").escape("LS-DIRECT-READ=SETP?").eos().build(),
 
         CmdBuilder("set_lakeshore_cmode").escape("LS-DIRECT-SET=CMODE ").int().eos().build(),
-        CmdBuilder("set_lakeshore_scan").escape("LS-DIRECT-SET=SCAN 6,").int().eos().build()
+        CmdBuilder("set_lakeshore_scan").escape("LS-DIRECT-SET=SCAN 6,").int().eos().build(),
+
+        CmdBuilder("set_lakeshore_mc_PIDs").escape("LS-DIRECT-SET=PID ").float().escape(",").float().escape(",").float(
+            ).eos().build(),
+        CmdBuilder("get_lakeshore_mc_PIDs").escape("LS-DIRECT-READ=PID?").eos().build()
     }
 
     in_terminator = "\n"
@@ -129,3 +133,12 @@ class IceFridgeStreamInterface(StreamInterface):
 
     def set_lakeshore_cmode(self, cmode):
         self.device.lakeshore_cmode = cmode
+
+    def set_lakeshore_mc_PIDs(self, proportional, integral, derivative):
+        self.device.lakeshore_mc_proportional = proportional
+        self.device.lakeshore_mc_integral = integral
+        self.device.lakeshore_mc_derivative = derivative
+
+    def get_lakeshore_mc_PIDs(self):
+        return "{},{},{}".format(self.device.lakeshore_mc_proportional, self.device.lakeshore_mc_integral,
+                                 self.device.lakeshore_mc_derivative)

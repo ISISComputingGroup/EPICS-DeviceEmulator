@@ -43,6 +43,10 @@ class SimulatedIceFridge(StateMachineDevice):
         self.lakeshore_scan = 0
         self.lakeshore_cmode = 0
 
+        self.lakeshore_mc_proportional = 0
+        self.lakeshore_mc_integral = 0
+        self.lakeshore_mc_derivative = 0
+
     def _get_state_handlers(self):
         return {
             'default': DefaultState(),
