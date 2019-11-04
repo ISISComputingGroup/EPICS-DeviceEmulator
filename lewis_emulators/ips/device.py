@@ -2,7 +2,7 @@ from collections import OrderedDict
 
 from lewis.core.logging import has_log
 
-from lewis_emulators.ips.modes import Activity
+from lewis_emulators.ips.modes import Activity, Control, SweepMode, Mode
 from states import HeaterOffState, HeaterOnState, MagnetQuenchedState
 from lewis.devices import StateMachineDevice
 
@@ -90,6 +90,15 @@ class SimulatedIps(StateMachineDevice):
         # No idea what sensible values are here. Also not clear what the behaviour is of the controller when these
         # limits are hit.
         self.neg_current_limit, self.pos_current_limit = -10**6, 10**6
+
+        # Local and locked is the zeroth mode of the control command
+        self.control = Control.LOCAL_LOCKED
+
+        # The only sweep mode we are interested in is tesla fast
+        self.sweep_mode = SweepMode.TESLA_FAST
+
+        # Not sure what is the sensible value here
+        self.mode = Mode.SLOW
 
     def _get_state_handlers(self):
         return {

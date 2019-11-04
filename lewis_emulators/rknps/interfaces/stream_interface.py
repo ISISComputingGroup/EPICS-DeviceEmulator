@@ -152,26 +152,29 @@ class RknpsStreamInterface(StreamInterface):
         """
         device = self._device
 
-        status = ("{POWER}.!.....{TRANS}{ILK}{DCOC}{DCOLOAD}{REGMOD}{PREREG}{PHAS}"
+        status = ("{POWER}.!.{SPARE}{SPARE}{SPARE}{SPARE}{TRANS}{ILK}{DCOC}{DCOLOAD}{REGMOD}{PREREG}{PHAS}"
                   "{MPSWATER}{EARTHLEAK}{THERMAL}{MPSTEMP}{DOOR}{MAGWATER}{MAGTEMP}"
-                  "{MPSREADY}.").format(
-                                        POWER=PWR_STRING[device.is_power_on()],
-                                        TRANS=ILK_STRING[device.get_TRANS()],
-                                        ILK=ILK_STRING[device.is_interlock_active()],
-                                        DCOC=ILK_STRING[device.get_DCOC()],
-                                        DCOLOAD=ILK_STRING[device.get_DCOL()],
-                                        REGMOD=ILK_STRING[device.get_REGMOD()],
-                                        PREREG=ILK_STRING[device.get_PREREG()],
-                                        PHAS=ILK_STRING[device.get_PHAS()],
-                                        MPSWATER=ILK_STRING[device.get_MPSWATER()],
-                                        EARTHLEAK=ILK_STRING[device.get_EARTHLEAK()],
-                                        THERMAL=ILK_STRING[device.get_THERMAL()],
-                                        MPSTEMP=ILK_STRING[device.get_MPSTEMP()],
-                                        DOOR=ILK_STRING[device.get_DOOR()],
-                                        MAGWATER=ILK_STRING[device.get_MAGWATER()],
-                                        MAGTEMP=ILK_STRING[device.get_MAGTEMP()],
-                                        MPSREADY=ILK_STRING[device.get_MPSREADY()]
-                                        )
+                  "{MPSREADY}{SPARE}").format(
+                        POWER=PWR_STRING[device.is_power_on()],
+                        TRANS=ILK_STRING[device.get_TRANS()],
+                        ILK=ILK_STRING[device.is_interlock_active()],
+                        DCOC=ILK_STRING[device.get_DCOC()],
+                        DCOLOAD=ILK_STRING[device.get_DCOL()],
+                        REGMOD=ILK_STRING[device.get_REGMOD()],
+                        PREREG=ILK_STRING[device.get_PREREG()],
+                        PHAS=ILK_STRING[device.get_PHAS()],
+                        MPSWATER=ILK_STRING[device.get_MPSWATER()],
+                        EARTHLEAK=ILK_STRING[device.get_EARTHLEAK()],
+                        THERMAL=ILK_STRING[device.get_THERMAL()],
+                        MPSTEMP=ILK_STRING[device.get_MPSTEMP()],
+                        DOOR=ILK_STRING[device.get_DOOR()],
+                        MAGWATER=ILK_STRING[device.get_MAGWATER()],
+                        MAGTEMP=ILK_STRING[device.get_MAGTEMP()],
+                        MPSREADY=ILK_STRING[device.get_MPSREADY()],
+                        # The spare interlocks aren't always on/off.
+                        # Simulate this by making all of the spares "track" one of the other interlocks.
+                        SPARE=ILK_STRING[device.get_DOOR()],
+                    )
 
         return status
 

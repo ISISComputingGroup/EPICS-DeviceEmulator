@@ -3,15 +3,23 @@ from lewis.core.logging import has_log
 
 from lewis_emulators.utils.command_builder import CmdBuilder
 
-from lewis_emulators.ips.modes import Activity
+from lewis_emulators.ips.modes import Activity, Control
 from ..device import amps_to_tesla, tesla_to_amps
 
+from six import iteritems
 
 MODE_MAPPING = {
     0: Activity.HOLD,
     1: Activity.TO_SETPOINT,
     2: Activity.TO_ZERO,
     4: Activity.CLAMP,
+}
+
+CONTROL_MODE_MAPPING = {
+    0: Control.LOCAL_LOCKED,
+    1: Control.REMOTE_LOCKED,
+    2: Control.LOCAL_UNLOCKED,
+    3: Control.REMOTE_UNLOCKED,
 }
 
 
@@ -42,7 +50,7 @@ class IpsStreamInterface(StreamInterface):
         CmdBuilder("get_lead_resistance").escape("R23").eos().build(),
         CmdBuilder("get_magnet_inductance").escape("R24").eos().build(),
 
-        CmdBuilder("set_control_mode").escape("C").int().eos().build(),
+        CmdBuilder("set_control_mode").escape("C").arg("0|1|2|3", argument_mapping=int).eos().build(),
         CmdBuilder("set_mode").escape("A").int().eos().build(),
         CmdBuilder("set_current").escape("I").float().eos().build(),
         CmdBuilder("set_field").escape("J").float().eos().build(),
@@ -72,6 +80,7 @@ class IpsStreamInterface(StreamInterface):
         """
 
     def set_control_mode(self, mode):
+        self.device.control = CONTROL_MODE_MAPPING[mode]
         return "C"
 
     def set_mode(self, mode):
@@ -86,7 +95,7 @@ class IpsStreamInterface(StreamInterface):
         resp = "X{x1}{x2}A{a}C{c}H{h}M{m1}{m2}P{p1}{p2}"
 
         def translate_activity():
-            for k, v in MODE_MAPPING.iteritems():
+            for k, v in iteritems(MODE_MAPPING):
                 if v == self.device.activity:
                     return k
             else:
