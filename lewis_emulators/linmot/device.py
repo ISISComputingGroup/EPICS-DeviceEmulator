@@ -19,8 +19,6 @@ states = OrderedDict([("Stopped", StoppedState()),
 
 class SimulatedLinmot(StateMachineDevice):
 
-    inside_hard_limits = False
-
     def _initialize_data(self):
         """
         Initialize all of the device's attributes.
@@ -60,12 +58,16 @@ class SimulatedLinmot(StateMachineDevice):
         Return(s):
             (bool): True if device in errored state
         """
-        return True if not self.within_hard_limits() else False
+        return not self.within_hard_limits()
 
     @property
     def motor_warn_status_int(self):
         """
         Return the integer value of the warn status enum
+
+        The state machine attempts to replicate the devices warn status codes. This is done via
+        an enum, WarnStateCode, in the states.py: The enum is used for readability but the device
+        only ever returns these integer codes.
 
         Return(s):
             (int): int value of the motor_warn_status
