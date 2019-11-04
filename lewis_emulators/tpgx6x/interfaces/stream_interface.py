@@ -119,6 +119,13 @@ class Tpg36xStreamInterface(TpgStreamInterfaceBase, StreamInterface):
         return "\r"
 
 
+class Tpg361StreamInterface(Tpg36xStreamInterface, StreamInterface):
+    protocol = 'tpg361'
+
+    def get_pressure(self):
+        return "{},{}{}".format(self._device.error1, self._device.pressure1, self.output_terminator())
+
+
 class Tpg26xStreamInterface(TpgStreamInterfaceBase, StreamInterface):
     protocol = 'tpg26x'
 
