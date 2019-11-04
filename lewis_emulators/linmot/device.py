@@ -84,7 +84,6 @@ class SimulatedLinmot(StateMachineDevice):
         self.new_action = True
         self.position_reached = False
         self.target_position = target_position
-        return
 
     def within_hard_limits(self):
         """
