@@ -38,7 +38,7 @@ class MovingState(State):
     def in_state(self, dt):
         device = self._context
         device.position = approaches.linear(device.position, device.target_position, device.velocity, dt)
-        if not device.within_hard_limits():
+        if not device.within_hard_limits():  # If outside of limits device controller faults and must be re-initialised
             device.motor_warn_status = WarnStateCode.UNDEFINED_POSITION
         if abs(device.target_position - device.position) <= device.tolerance:
             device.position_reached = True
