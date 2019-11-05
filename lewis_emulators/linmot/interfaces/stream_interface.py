@@ -8,8 +8,6 @@ class LinmotStreamInterface(StreamInterface):
     in_terminator = "\r\n"
     out_terminator = "\r"
 
-    readtimeout = 1000
-
     # Commands that we expect via serial during normal operation
     commands = {
             CmdBuilder("set_position").escape("!SP").int().escape("A").eos().build(),
