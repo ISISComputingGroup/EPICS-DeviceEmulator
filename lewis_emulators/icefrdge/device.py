@@ -47,6 +47,9 @@ class SimulatedIceFridge(StateMachineDevice):
         self.lakeshore_mc_integral = 0
         self.lakeshore_mc_derivative = 0
 
+        self.lakeshore_mc_heater_range = 0
+        self.lakeshore_cset = 0
+
     def _get_state_handlers(self):
         return {
             'default': DefaultState(),

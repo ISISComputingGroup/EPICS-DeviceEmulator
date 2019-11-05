@@ -46,7 +46,12 @@ class IceFridgeStreamInterface(StreamInterface):
 
         CmdBuilder("set_lakeshore_mc_PIDs").escape("LS-DIRECT-SET=PID ").float().escape(",").float().escape(",").float(
             ).eos().build(),
-        CmdBuilder("get_lakeshore_mc_PIDs").escape("LS-DIRECT-READ=PID?").eos().build()
+        CmdBuilder("get_lakeshore_mc_PIDs").escape("LS-DIRECT-READ=PID?").eos().build(),
+
+        CmdBuilder("set_lakeshore_cset").escape("LS-DIRECT-SET=CSET 06,0,1,025,1,").int().escape(",+388.000").eos(
+            ).build(),
+        CmdBuilder("set_lakeshore_mc_heater_range").escape("LS-DIRECT-SET=HTRRNG ").int().eos().build(),
+        CmdBuilder("get_lakeshore_mc_heater_range").escape("LS-DIRECT-READ=HTRRNG?").eos().build()
     }
 
     in_terminator = "\n"
@@ -142,3 +147,12 @@ class IceFridgeStreamInterface(StreamInterface):
     def get_lakeshore_mc_PIDs(self):
         return "{},{},{}".format(self.device.lakeshore_mc_proportional, self.device.lakeshore_mc_integral,
                                  self.device.lakeshore_mc_derivative)
+
+    def set_lakeshore_cset(self, cset):
+        self.device.lakeshore_cset = cset
+
+    def set_lakeshore_mc_heater_range(self, heater_range):
+        self.device.lakeshore_mc_heater_range = heater_range
+
+    def get_lakeshore_mc_heater_range(self):
+        return self.device.lakeshore_mc_heater_range
