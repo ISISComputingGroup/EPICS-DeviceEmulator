@@ -148,11 +148,13 @@ class IceFridgeStreamInterface(StreamInterface):
         return "{},{},{}".format(self.device.lakeshore_mc_proportional, self.device.lakeshore_mc_integral,
                                  self.device.lakeshore_mc_derivative)
 
-    def set_lakeshore_cset(self, cset):
-        self.device.lakeshore_cset = cset
+    def set_lakeshore_cset(self, cset_heater_range):
+        self.device.lakeshore_mc_heater_range = cset_heater_range
 
     def set_lakeshore_mc_heater_range(self, heater_range):
-        self.device.lakeshore_mc_heater_range = heater_range
+        if heater_range != self.device.lakeshore_mc_heater_range:
+            raise ValueError("Invalid command sequence! The heater range should have already been set to the new value "
+                             "by a CSET command!")
 
     def get_lakeshore_mc_heater_range(self):
         return self.device.lakeshore_mc_heater_range
