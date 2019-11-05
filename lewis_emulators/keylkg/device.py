@@ -15,27 +15,13 @@ class SimulatedKeylkg(StateMachineDevice):
 
         self.mode = Modes.MEASURE
 
-        self.output1_offset = 0.0
-        self.output2_offset = 0.0
-        self.output1_raw_value = 0.0
-        self.output2_raw_value = 0.0
+        self.detector_1_offset = 0.0
+        self.detector_2_offset = 0.0
+        self.detector_1_raw_value = 0.0
+        self.detector_2_raw_value = 0.0
 
-        self.head1_measurement_mode = 0
-        self.head1_measurement_mode = 0
-
-    @property
-    def in_measurement_mode(self):
-        """
-        :return: True if in measurement mode
-        """
-        return self.mode == Modes.MEASURE
-
-    @property
-    def in_setup_mode(self):
-        """
-        :return: True if in setup mode
-        """
-        return self.mode == Modes.SET_UP
+        self.detector_1_measurement_mode = 0
+        self.detector_2_measurement_mode = 0
 
     def _get_state_handlers(self):
         return {
