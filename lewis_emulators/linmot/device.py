@@ -38,8 +38,6 @@ class SimulatedLinmot(StateMachineDevice):
         self.position_reached = False
         self.tolerance = 0.01
 
-        self.connected = True
-
     def _get_transition_handlers(self):
         return OrderedDict([
             (("Stopped", "Moving"), lambda: self.new_action is True and self.position_reached is False),
