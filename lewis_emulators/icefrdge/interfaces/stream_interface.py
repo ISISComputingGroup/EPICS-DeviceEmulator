@@ -149,9 +149,20 @@ class IceFridgeStreamInterface(StreamInterface):
                                  self.device.lakeshore_mc_derivative)
 
     def set_lakeshore_cset(self, cset_heater_range):
+        # The old SECI LabView software sent a two messages when you set the heater range set point. One was an
+        # LS-DIRECT-SET=CSET command and the other was LS-DIRECT-SET=HTRRNG. This method corresponds to the first
+        # command, which sent a bunch of numbers that we are not dealing with in this IOC and the heater range.
+        # Therefore, we only have field in the device emulator for testing the values sent in both commands, and in
+        # here we just set the device heater range to the argument.
         self.device.lakeshore_mc_heater_range = cset_heater_range
 
     def set_lakeshore_mc_heater_range(self, heater_range):
+        # The old SECI LabView software sent a two messages when you set the heater range set point. One was an
+        # LS-DIRECT-SET=CSET command and the other was LS-DIRECT-SET=HTRRNG. This method corresponds to the second
+        # command, which is the actual command for setting the heater range of the dilution fridge. Since the first
+        # command should have been sent already, and thus the device emulator heater range should already have the
+        # same value as the given range, we just check if that value is already the same and throw an error if that is
+        # not the case.
         if heater_range != self.device.lakeshore_mc_heater_range:
             raise ValueError("Invalid command sequence! The heater range should have already been set to the new value "
                              "by a CSET command!")
