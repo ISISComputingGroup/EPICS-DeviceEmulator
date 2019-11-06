@@ -51,7 +51,9 @@ class IceFridgeStreamInterface(StreamInterface):
         CmdBuilder("set_lakeshore_cset").escape("LS-DIRECT-SET=CSET 06,0,1,025,1,").int().escape(",+388.000").eos(
             ).build(),
         CmdBuilder("set_lakeshore_mc_heater_range").escape("LS-DIRECT-SET=HTRRNG ").int().eos().build(),
-        CmdBuilder("get_lakeshore_mc_heater_range").escape("LS-DIRECT-READ=HTRRNG?").eos().build()
+        CmdBuilder("get_lakeshore_mc_heater_range").escape("LS-DIRECT-READ=HTRRNG?").eos().build(),
+
+        CmdBuilder("get_lakeshore_mc_heater_percentage").escape("LS-DIRECT-READ=HTR?").eos().build()
     }
 
     in_terminator = "\n"
@@ -169,3 +171,6 @@ class IceFridgeStreamInterface(StreamInterface):
 
     def get_lakeshore_mc_heater_range(self):
         return self.device.lakeshore_mc_heater_range
+
+    def get_lakeshore_mc_heater_percentage(self):
+        return self.device.lakeshore_mc_heater_percentage
