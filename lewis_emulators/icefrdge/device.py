@@ -54,6 +54,8 @@ class SimulatedIceFridge(StateMachineDevice):
         self.lakeshore_exc_voltage_range_ch5 = 1
         self.lakeshore_exc_voltage_range_ch6 = 1
 
+        self.mimic_pressures = [0, 1, 2.4, 18.7]
+
     def _get_state_handlers(self):
         return {
             'default': DefaultState(),

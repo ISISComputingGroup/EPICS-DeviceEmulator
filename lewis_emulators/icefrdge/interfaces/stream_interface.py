@@ -58,7 +58,9 @@ class IceFridgeStreamInterface(StreamInterface):
 
         CmdBuilder("get_lakeshore_channel_voltage_range").escape("LS-DIRECT-READ=RDGRNG? ").int().eos().build(),
         CmdBuilder("set_lakeshore_channel_voltage_range").escape("LS-DIRECT-SET=RDGRNG ").int().escape(",").int(
-            ).escape(",").int().escape(",").int().escape(",").int().escape(",").int().eos().build()
+            ).escape(",").int().escape(",").int().escape(",").int().escape(",").int().eos().build(),
+
+        CmdBuilder("get_mimic_pressures").escape("P?").eos().build()
     }
 
     in_terminator = "\n"
@@ -212,3 +214,6 @@ class IceFridgeStreamInterface(StreamInterface):
         else:
             raise ValueError("channel number can only be either 5 or 6!")
 
+    def get_mimic_pressures(self):
+        return "P1={:f},P2={:f},P3={:f},P4={:f}".format(self.device.mimic_pressures[0], self.device.mimic_pressures[1],
+                                                        self.device.mimic_pressures[2], self.device.mimic_pressures[3])
