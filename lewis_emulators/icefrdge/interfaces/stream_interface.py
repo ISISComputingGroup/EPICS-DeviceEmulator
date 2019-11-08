@@ -185,9 +185,9 @@ class IceFridgeStreamInterface(StreamInterface):
 
     def get_lakeshore_channel_voltage_range(self, channel):
         if channel == 5:
-            return "{},{:02d},{:02d},{},{}".format(0, self.device.lakeshore_exc_voltage_range_ch5, 10, 1, 2)
+            return "{},{:02d},{:02d},{},{}".format(0, self.device.lakeshore_exc_voltage_range_ch5, 1, 2, 3)
         elif channel == 6:
-            return "{},{:02d},{:02d},{},{}".format(0, self.device.lakeshore_exc_voltage_range_ch6, 10, 1, 2)
+            return "{},{:02d},{:02d},{},{}".format(0, self.device.lakeshore_exc_voltage_range_ch6, 1, 2, 3)
         else:
             raise ValueError("channel number can only be either 5 or 6!")
 
@@ -195,14 +195,14 @@ class IceFridgeStreamInterface(StreamInterface):
         if zero_num != 0:
             raise ValueError("zero_num argument should always be 0")
 
-        if aux1 != 10:
-            raise ValueError("aux1 value should always be 10!")
+        if aux1 != 1:
+            raise ValueError("aux1 value should always be 1!")
 
-        if aux2 != 1:
-            raise ValueError("aux2 value should always be 1!")
+        if aux2 != 2:
+            raise ValueError("aux2 value should always be 2!")
 
-        if aux3 != 2:
-            raise ValueError("aux3 value should always be 2!")
+        if aux3 != 3:
+            raise ValueError("aux3 value should always be 3!")
 
         if channel == 5:
             self.device.lakeshore_exc_voltage_range_ch5 = voltage_range
