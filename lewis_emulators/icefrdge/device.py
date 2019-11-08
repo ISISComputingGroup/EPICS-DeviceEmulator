@@ -51,6 +51,9 @@ class SimulatedIceFridge(StateMachineDevice):
         self.lakeshore_mc_heater_percentage = 0
         self.lakeshore_still_output = 0
 
+        self.lakeshore_exc_voltage_range_ch5 = 1
+        self.lakeshore_exc_voltage_range_ch6 = 1
+
     def _get_state_handlers(self):
         return {
             'default': DefaultState(),

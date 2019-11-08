@@ -54,7 +54,11 @@ class IceFridgeStreamInterface(StreamInterface):
         CmdBuilder("get_lakeshore_mc_heater_range").escape("LS-DIRECT-READ=HTRRNG?").eos().build(),
 
         CmdBuilder("get_lakeshore_mc_heater_percentage").escape("LS-DIRECT-READ=HTR?").eos().build(),
-        CmdBuilder("get_lakeshore_still_output").escape("LS-DIRECT-READ=STILL?").eos().build()
+        CmdBuilder("get_lakeshore_still_output").escape("LS-DIRECT-READ=STILL?").eos().build(),
+
+        CmdBuilder("get_lakeshore_channel_voltage_range").escape("LS-DIRECT-READ=RDGRNG? ").int().eos().build(),
+        CmdBuilder("set_lakeshore_channel_voltage_range").escape("LS-DIRECT-SET=RDGRNG ").int().escape(",").int(
+            ).escape(",").int().escape(",").int().escape(",").int().escape(",").int().eos().build()
     }
 
     in_terminator = "\n"
@@ -178,3 +182,32 @@ class IceFridgeStreamInterface(StreamInterface):
 
     def get_lakeshore_still_output(self):
         return self.device.lakeshore_still_output
+
+    def get_lakeshore_channel_voltage_range(self, channel):
+        if channel == 5:
+            return "{},{:02d},{:02d},{},{}".format(0, self.device.lakeshore_exc_voltage_range_ch5, 10, 1, 2)
+        elif channel == 6:
+            return "{},{:02d},{:02d},{},{}".format(0, self.device.lakeshore_exc_voltage_range_ch6, 10, 1, 2)
+        else:
+            raise ValueError("channel number can only be either 5 or 6!")
+
+    def set_lakeshore_channel_voltage_range(self, channel, zero_num, voltage_range, aux1, aux2, aux3):
+        if zero_num != 0:
+            raise ValueError("zero_num argument should always be 0")
+
+        if aux1 != 10:
+            raise ValueError("aux1 value should always be 10!")
+
+        if aux2 != 1:
+            raise ValueError("aux2 value should always be 1!")
+
+        if aux3 != 2:
+            raise ValueError("aux3 value should always be 2!")
+
+        if channel == 5:
+            self.device.lakeshore_exc_voltage_range_ch5 = voltage_range
+        elif channel == 6:
+            self.device.lakeshore_exc_voltage_range_ch6 = voltage_range
+        else:
+            raise ValueError("channel number can only be either 5 or 6!")
+
