@@ -191,18 +191,19 @@ class IceFridgeStreamInterface(StreamInterface):
         else:
             raise ValueError("channel number can only be either 5 or 6!")
 
-    def set_lakeshore_channel_voltage_range(self, channel, zero_num, voltage_range, aux1, aux2, aux3):
-        if zero_num != 0:
-            raise ValueError("zero_num argument should always be 0")
+    def set_lakeshore_channel_voltage_range(self, channel, mode, voltage_range, resistance_range, auto_range_mode,
+                                            excitation_mode):
+        if mode != 0:
+            raise ValueError("mode should always be 0")
 
-        if aux1 != 1:
-            raise ValueError("aux1 value should always be 1!")
+        if resistance_range != 1:
+            raise ValueError("resistance_range value should always be 1!")
 
-        if aux2 != 2:
-            raise ValueError("aux2 value should always be 2!")
+        if auto_range_mode != 2:
+            raise ValueError("auto_range_mode value should always be 2!")
 
-        if aux3 != 3:
-            raise ValueError("aux3 value should always be 3!")
+        if excitation_mode != 3:
+            raise ValueError("excitation_mode value should always be 3!")
 
         if channel == 5:
             self.device.lakeshore_exc_voltage_range_ch5 = voltage_range
