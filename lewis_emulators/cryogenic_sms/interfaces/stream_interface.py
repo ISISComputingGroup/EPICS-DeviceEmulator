@@ -131,6 +131,8 @@ class CRYOSMSStreamInterface(StreamInterface):
                                                                                   self._device.mid_target,
                                                                                   self._get_output_mode_string(),
                                                                                   self._device.ramp_rate)
+        else:
+            raise ValueError("Didn't match any of the expected conditions")
         return self._out_message(status_message)
 
     def write_ramp_target(self, ramp_target_str):
