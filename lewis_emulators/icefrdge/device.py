@@ -54,7 +54,7 @@ class SimulatedIceFridge(StateMachineDevice):
         self.lakeshore_exc_voltage_range_ch5 = 1
         self.lakeshore_exc_voltage_range_ch6 = 1
 
-        self.mimic_pressures = [0, 1, 2.4, 18.7]
+        self.mimic_pressures = [0, 0, 0, 0]
 
     def _get_state_handlers(self):
         return {
@@ -67,3 +67,19 @@ class SimulatedIceFridge(StateMachineDevice):
     def _get_transition_handlers(self):
         return OrderedDict([
         ])
+
+    def reset(self):
+        """
+        Public method that re-initializes the device's fields.
+        :return: Nothing.
+        """
+        self._initialize_data()
+
+    def set_mimic_pressure(self, index, new_value):
+        """
+        Sets a mimic pressure in the mimic pressures list to a new value.
+        :param index: the index of the pressure we want to set, from 1 to 4.
+        :param new_value: The new pressure value.
+        :return: None.
+        """
+        self.mimic_pressures[index - 1] = new_value
