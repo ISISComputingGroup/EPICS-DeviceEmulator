@@ -73,12 +73,12 @@ class SimulatedCRYOSMS(StateMachineDevice):
         return datetime.now().strftime('%H:%M:%S')
 
     def switch_mode(self, mode):
-        if mode == "TESLA":
+        if mode == "TESLA" and not self.is_output_mode_tesla:
             self.output *= self.constant
             self.max_target *= self.constant
             self.mid_target *= self.constant
             self.is_output_mode_tesla = True
-        elif mode == "AMPS":
+        elif mode == "AMPS" and self.is_output_mode_tesla:
             self.output /= self.constant
             self.max_target /= self.constant
             self.mid_target /= self.constant

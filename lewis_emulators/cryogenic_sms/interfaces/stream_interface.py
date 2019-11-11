@@ -5,6 +5,8 @@ from lewis_emulators.utils.command_builder import CmdBuilder
 from datetime import datetime
 from ..utils import RampTarget
 
+ON_STATES = ["ON", "1"]
+OFF_STATES = ["OFF", "0"]
 
 @has_log
 class CRYOSMSStreamInterface(StreamInterface):
@@ -23,8 +25,8 @@ class CRYOSMSStreamInterface(StreamInterface):
             CmdBuilder(self.read_ramp_status).spaces().regex("R(?:AMP)*").spaces().regex("S(?:TATUS)*").spaces().eos()
                                              .build(),
             CmdBuilder(self.read_heater_status).spaces().escape("H(?:EATER)*").spaces().eos().build(),
-            CmdBuilder(self.read_max_target).regex(re_get).choice("MAX", "!").spaces().eos().build(),
-            CmdBuilder(self.read_mid_target).regex(re_get).choice("MID", "%").spaces().eos().build(),
+            CmdBuilder(self.read_max_target).regex(re_get).enum("MAX", "!").spaces().eos().build(),
+            CmdBuilder(self.read_mid_target).regex(re_get).enum("MID", "%").spaces().eos().build(),
             CmdBuilder(self.read_ramp_rate).regex(re_get).regex("R(?:ATE)*").spaces().eos().build(),
             CmdBuilder(self.read_limit).regex(re_get).regex("V(?:L)*").spaces().eos().build(),
             CmdBuilder(self.read_pause).spaces().regex("P(?:AUSE)*").spaces().eos().build(),
@@ -43,8 +45,8 @@ class CRYOSMSStreamInterface(StreamInterface):
             CmdBuilder(self.write_pause).spaces().regex("P(?:AUSE)*").spaces().arg("OFF|ON|0|1").spaces().eos().build(),
             CmdBuilder(self.write_heater_value).regex(re_set).escape("H(?:EATER)*").spaces().float().spaces().eos()
                                                .build(),
-            CmdBuilder(self.write_max_target).regex(re_set).choice("MAX", "!").spaces().float().spaces().eos().build(),
-            CmdBuilder(self.write_mid_target).regex(re_set).choice("MID", "%").spaces().float().spaces().eos().build(),
+            CmdBuilder(self.write_max_target).regex(re_set).enum("MAX", "!").spaces().float().spaces().eos().build(),
+            CmdBuilder(self.write_mid_target).regex(re_set).enum("MID", "%").spaces().float().spaces().eos().build(),
             CmdBuilder(self.write_ramp_rate).regex(re_set).regex("R(?:AMP)*").spaces().float().spaces().eos().build(),
             CmdBuilder(self.write_limit).regex(re_set).regex("L(?:IMIT)*").spaces().float().spaces().eos().build(),
             CmdBuilder(self.write_constant).regex(re_set).regex("T(?:PA)*").spaces().float().spaces().eos().build()
@@ -97,11 +99,11 @@ class CRYOSMSStreamInterface(StreamInterface):
     def write_output_mode(self, output_mode):
         # Convert values if output mode is changing between amps(OFF) / tesla(ON)
         constant = self._device.constant
-        if output_mode in ["ON", "1"]:
+        if output_mode in ON_STATES:
             if not self._device.is_output_mode_tesla:
                 self._device.switch_mode("TESLA")
                 self._create_log_message("UNITS", "TESLA")
-        elif output_mode in ["OFF", "0"]:
+        elif output_mode in OFF_STATES:
             if constant == 0:
                 self._device.error_message = "------> No field constant has been entered"
             else:
@@ -153,7 +155,7 @@ class CRYOSMSStreamInterface(StreamInterface):
         return self._out_message(" RAMP RATE: {} A/SEC".format(self._device.ramp_rate))
 
     def write_ramp_rate(self, ramp_rate):
-        self._device.ramp_rate = ramp_rate
+        self._device.ramp_rate = float(ramp_rate)
         self._create_log_message("RAMP RATE", ramp_rate, suffix=" A/SEC")
         return self._device.log_message
 
@@ -162,9 +164,9 @@ class CRYOSMSStreamInterface(StreamInterface):
         return self._out_message(" HEATER STATUS: {}".format(heater_value))
 
     def write_heater_status(self, heater_status):
-        if heater_status in ["ON", "1"]:
+        if heater_status in ON_STATES:
             self._device.is_heater_on = True
-        elif heater_status in ["OFF", "0"]:
+        elif heater_status in OFF_STATES:
             self._device.is_heater_on = False
         else:
             raise ValueError("Invalid arguments sent")
@@ -179,10 +181,10 @@ class CRYOSMSStreamInterface(StreamInterface):
         target = self._get_ramp_target_value()
         rate = self._device.ramp_rate
         output = "HOLDING ON PAUSE AT {} {}".format(self._device.output, mode)
-        if paused in ["ON", "1"]:
+        if paused in ON_STATES:
             self._device.is_paused = True
             self._create_log_message("PAUSE STATUS", output)
-        elif paused in ["OFF", "0"]:
+        elif paused in OFF_STATES:
             self._device.is_paused = False
             if self._device.check_is_at_target():
                 self._create_log_message("RAMP STATUS", output)
@@ -208,7 +210,7 @@ class CRYOSMSStreamInterface(StreamInterface):
         return self._out_message(" MAX SETTING: {:.4} {}".format(self._device.max_target, mode))
 
     def write_max_target(self, max_target):
-        self._device.max_target = abs(max_target)  # abs because PSU ignores sign
+        self._device.max_target = abs(float(max_target))  # abs because PSU ignores sign
         units = self._get_output_mode_string()
         self._create_log_message("MAX SETTING", max_target,  suffix=" {}\r\n".format(units))
         return self._device.log_message
@@ -218,7 +220,7 @@ class CRYOSMSStreamInterface(StreamInterface):
         return self._out_message(" MID SETTING: {:.4} {}".format(self._device.mid_target, mode))
 
     def write_mid_target(self, mid_target):
-        self._device.mid_target = abs(mid_target)  # abs because PSU ignores sign
+        self._device.mid_target = abs(float(mid_target))  # abs because PSU ignores sign
         units = self._get_output_mode_string()
         self._create_log_message("MID SETTING", mid_target, suffix=" {}".format(units))
         return self._device.log_message
@@ -235,6 +237,6 @@ class CRYOSMSStreamInterface(StreamInterface):
         return self._out_message(" FIELD CONSTANT: {:.7} T/A".format(self._device.constant))
 
     def write_constant(self, constant):
-        self._device.constant = constant
+        self._device.constant = float(constant)
         self._create_log_message("FIELD CONSTANT", constant, suffix=" T/A")
         return self._device.log_message

@@ -1,5 +1,6 @@
 from lewis.core.statemachine import State
 from lewis.core import approaches
+from lewis.core.logging import has_log
 
 
 def get_target_value(device):
@@ -21,10 +22,11 @@ class DefaultInitState(State):
         device.check_is_at_target()
 
 
+@has_log
 class HoldingState(State):
 
     def on_entry(self, dt):
-        print("*********** ENTERED HOLD STATE")
+        self.log.info("*********** ENTERED HOLD STATE")
 
     def in_state(self, dt):
         device = self._context
@@ -41,10 +43,10 @@ class RampingState(State):
 
     def in_state(self, dt):
         device = self._context
-        rate = float(device.ramp_rate)
-        target = float(get_target_value(device))
-        constant = float(device.constant)
+        rate = device.ramp_rate
+        target = device.ramp_target_value()
+        constant = device.constant
         if device.is_output_mode_tesla:
             rate = rate * constant
-        device.output = approaches.linear(float(device.output), float(target), float(rate), dt)
+        device.output = approaches.linear(device.output, target, rate, dt)
         device.check_is_at_target()
