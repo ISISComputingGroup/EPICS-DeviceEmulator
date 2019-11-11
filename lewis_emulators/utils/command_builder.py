@@ -55,15 +55,6 @@ class CmdBuilder(object):
         if not is_arg:
             self._current_sep = ""
 
-    def choice(self, *choices):
-        """
-        text must be one of the arguments
-        :param choices: add multiple sting for choices; e.g. multiple_choice("SET", "S") returns (:?SET|S)
-        :return: builder
-        """
-        self._add_to_regex("(?:" + "|".join([re.escape(choice) for choice in choices]) + ")", False)
-        return self
-
     def optional(self, text):
         """
         Add some escaped text which does not necessarily need to be there. For commands with optional parameters

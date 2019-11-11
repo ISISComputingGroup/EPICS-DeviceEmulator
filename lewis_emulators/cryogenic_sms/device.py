@@ -3,7 +3,7 @@ from datetime import datetime
 from lewis.devices import StateMachineDevice
 from collections import OrderedDict
 from states import DefaultInitState, HoldingState, TrippedState, RampingState
-from utils import RampTarget
+from utils import RampTarget, RampDirection
 
 
 class SimulatedCRYOSMS(StateMachineDevice):
@@ -29,7 +29,7 @@ class SimulatedCRYOSMS(StateMachineDevice):
         # output
         self.output = 0.0
         self.is_output_mode_tesla = False
-        self.direction = '+'
+        self.direction = RampDirection.POSITIVE
 
         # heater
         self.is_heater_on = False

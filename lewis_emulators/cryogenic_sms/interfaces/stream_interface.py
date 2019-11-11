@@ -3,7 +3,7 @@ from lewis.core.logging import has_log
 
 from lewis_emulators.utils.command_builder import CmdBuilder
 from datetime import datetime
-from ..utils import RampTarget
+from ..utils import RampTarget, RampDirection
 
 ON_STATES = ["ON", "1"]
 OFF_STATES = ["OFF", "0"]
@@ -80,11 +80,15 @@ class CRYOSMSStreamInterface(StreamInterface):
             return self._device.zero_target
 
     def read_direction(self):
-        dir_dict = {"+": "POSITIVE", "-": "NEGATIVE", "0": "ZERO"}
-        return "CURRENT DIRECTION: {}\r\n".format(dir_dict[self._device.direction])
+        return "CURRENT DIRECTION: {}\r\n".format(self._device.direction.name)
 
     def write_direction(self, direction):
-        self._device.direction = direction
+        if direction == "+":
+            self._device.direction = RampDirection.POSITIVE
+        if direction == "-":
+            self._device.direction = RampDirection.NEGATIVE
+        if direction == "0":
+            self._device.direction = RampDirection.ZERO
         return self._out_message("")
 
     def read_output_mode(self):
