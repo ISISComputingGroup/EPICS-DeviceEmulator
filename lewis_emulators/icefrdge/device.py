@@ -56,6 +56,9 @@ class SimulatedIceFridge(StateMachineDevice):
 
         self.mimic_pressures = [0, 0, 0, 0]
 
+        # The mimic panel has 10 valves, easier to use list comprehension than write them directly
+        self.mimic_valves = [False for i in range(10)]
+
     def _get_state_handlers(self):
         return {
             'default': DefaultState(),
@@ -83,3 +86,26 @@ class SimulatedIceFridge(StateMachineDevice):
         :return: None.
         """
         self.mimic_pressures[index - 1] = new_value
+
+    def set_mimic_valve(self, valve_number, valve_status):
+        """
+        Sets the status of a mimic valve in the mimic valve status list to a new value.
+        :param valve_number: the index of the valve you want to set, from 1 to 10.
+        :param valve_status: 1 if the valve is open, 0 if it is closed.
+        :return: None
+        """
+
+        if valve_number < 1 or valve_number > 10:
+            raise ValueError("the number of the valve can only be between 1 and 10!")
+
+        if valve_status != 0 and valve_status != 1:
+            raise ValueError("the status of the valve can only be 0 or 1!")
+
+        self.mimic_valves[valve_number - 1] = SimulatedIceFridge._int_to_bool(valve_status)
+
+    @staticmethod
+    def _int_to_bool(integer):
+        if integer == 0:
+            return False
+        else:
+            return True

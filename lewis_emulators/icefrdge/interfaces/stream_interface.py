@@ -60,7 +60,10 @@ class IceFridgeStreamInterface(StreamInterface):
         CmdBuilder("set_lakeshore_channel_voltage_range").escape("LS-DIRECT-SET=RDGRNG ").int().escape(",").int(
             ).escape(",").int().escape(",").int().escape(",").int().escape(",").int().eos().build(),
 
-        CmdBuilder("get_mimic_pressures").escape("P?").eos().build()
+        CmdBuilder("get_mimic_pressures").escape("P?").eos().build(),
+
+        CmdBuilder("get_mimic_valves").escape("VALVES?").eos().build(),
+        CmdBuilder("set_mimic_valve").escape("V").int().escape("=").int().eos().build()
     }
 
     in_terminator = "\n"
@@ -217,3 +220,25 @@ class IceFridgeStreamInterface(StreamInterface):
     def get_mimic_pressures(self):
         return "P1={:f},P2={:f},P3={:f},P4={:f}".format(self.device.mimic_pressures[0], self.device.mimic_pressures[1],
                                                         self.device.mimic_pressures[2], self.device.mimic_pressures[3])
+
+    def get_mimic_valves(self):
+        valve_statuses = []
+        for i in range(10):
+            valve_statuses.append("V{}={},".format(i + 1, IceFridgeStreamInterface._bool_to_int(
+                self.device.mimic_valves[i])))
+
+        valve_reply = "".join(valve_statuses)
+        valve_reply = valve_reply[:-1]
+
+        print(valve_reply)
+        return valve_reply
+
+    def set_mimic_valve(self, valve_number, valve_status):
+        self.device.set_mimic_valve(valve_number, valve_status)
+
+    @staticmethod
+    def _bool_to_int(boolean):
+        if boolean:
+            return 1
+        else:
+            return 0
