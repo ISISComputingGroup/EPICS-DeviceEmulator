@@ -14,7 +14,7 @@ class TDKLambdaGenesysStreamInterface(StreamInterface):
         CmdBuilder("remote").escape("RMT 1").build(),
         CmdBuilder("write_power").escape("OUT ").arg("[OFF|ON]").build(),
         CmdBuilder("read_power").escape("OUT?").build(),
-        CmdBuilder("initialize_comms").escape("ADR ").int().endOfString().build(),
+        CmdBuilder("initialize_comms").escape("ADR ").int().eos().build(),
     }
 
     in_terminator = "\r"

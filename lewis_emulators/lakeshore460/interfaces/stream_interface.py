@@ -19,7 +19,7 @@ class Lakeshore460StreamInterface(StreamInterface):
         CmdBuilder("get_source").escape("VSRC?").build(),
         CmdBuilder("set_source").escape("VSRC ").digit().build(),
         CmdBuilder("get_channel").escape("CHNL?").build(),
-        CmdBuilder("set_channel").escape("CHNL ").arg("X|Y|Z|V").endOfString().build(),
+        CmdBuilder("set_channel").escape("CHNL ").arg("X|Y|Z|V").eos().build(),
         CmdBuilder("get_magnetic_field_reading").escape("FIELD?").build(),
         CmdBuilder("get_magnetic_field_reading_multiplier").escape("FIELDM?").build(),
         CmdBuilder("get_max_hold_reading").escape("MAXR?").build(),
