@@ -230,7 +230,6 @@ class IceFridgeStreamInterface(StreamInterface):
         valve_reply = "".join(valve_statuses)
         valve_reply = valve_reply[:-1]
 
-        print(valve_reply)
         return valve_reply
 
     def set_mimic_valve(self, valve_number, valve_status):
