@@ -222,12 +222,14 @@ class IceFridgeStreamInterface(StreamInterface):
                                                         self.device.mimic_pressures[2], self.device.mimic_pressures[3])
 
     def get_mimic_valves(self):
-        valve_statuses = []
-        for i in range(10):
-            valve_statuses.append("V{}={},".format(i + 1, IceFridgeStreamInterface._bool_to_int(
-                self.device.mimic_valves[i])))
 
-        valve_reply = "".join(valve_statuses)
+        # the device response has 10 valve values in one string, so it is easier to build the string as a list
+        # comprehension rather than doing it manually.
+        valve_reply = ["V{}={},".format(i + 1, IceFridgeStreamInterface._bool_to_int(self.device.mimic_valves[i]))
+                       for i in range(10)]
+
+        # the last element that was added was 'V10=x,' and we do not need a comma at the end of the message, so we
+        # remove the last element
         valve_reply = valve_reply[:-1]
 
         return valve_reply
