@@ -25,8 +25,8 @@ class CRYOSMSStreamInterface(StreamInterface):
             CmdBuilder(self.read_ramp_status).spaces().regex("R(?:AMP)*").spaces().regex("S(?:TATUS)*").spaces().eos()
                                              .build(),
             CmdBuilder(self.read_heater_status).spaces().escape("H(?:EATER)*").spaces().eos().build(),
-            CmdBuilder(self.read_max_target).regex(re_get).enum("MAX", "!").spaces().eos().build(),
-            CmdBuilder(self.read_mid_target).regex(re_get).enum("MID", "%").spaces().eos().build(),
+            CmdBuilder(self.read_max_target).regex(re_get).regex("(?:MAX|!)*").spaces().eos().build(),
+            CmdBuilder(self.read_mid_target).regex(re_get).regex("(?:MID|%)*").spaces().eos().build(),
             CmdBuilder(self.read_ramp_rate).regex(re_get).regex("R(?:ATE)*").spaces().eos().build(),
             CmdBuilder(self.read_limit).regex(re_get).regex("V(?:L)*").spaces().eos().build(),
             CmdBuilder(self.read_pause).spaces().regex("P(?:AUSE)*").spaces().eos().build(),
@@ -45,8 +45,8 @@ class CRYOSMSStreamInterface(StreamInterface):
             CmdBuilder(self.write_pause).spaces().regex("P(?:AUSE)*").spaces().arg("OFF|ON|0|1").spaces().eos().build(),
             CmdBuilder(self.write_heater_value).regex(re_set).escape("H(?:EATER)*").spaces().float().spaces().eos()
                                                .build(),
-            CmdBuilder(self.write_max_target).regex(re_set).enum("MAX", "!").spaces().float().spaces().eos().build(),
-            CmdBuilder(self.write_mid_target).regex(re_set).enum("MID", "%").spaces().float().spaces().eos().build(),
+            CmdBuilder(self.write_max_target).regex(re_set).regex("(?:MAX|!)").spaces().float().spaces().eos().build(),
+            CmdBuilder(self.write_mid_target).regex(re_set).regex("(?:MID|%)").spaces().float().spaces().eos().build(),
             CmdBuilder(self.write_ramp_rate).regex(re_set).regex("R(?:AMP)*").spaces().float().spaces().eos().build(),
             CmdBuilder(self.write_limit).regex(re_set).regex("L(?:IMIT)*").spaces().float().spaces().eos().build(),
             CmdBuilder(self.write_constant).regex(re_set).regex("T(?:PA)*").spaces().float().spaces().eos().build()
