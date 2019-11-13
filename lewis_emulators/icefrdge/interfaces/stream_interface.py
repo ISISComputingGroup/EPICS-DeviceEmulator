@@ -63,6 +63,7 @@ class IceFridgeStreamInterface(StreamInterface):
         CmdBuilder("get_mimic_pressures").escape("P?").eos().build(),
 
         CmdBuilder("set_mimic_valve").escape("V").int().escape("=").int().eos().build(),
+        CmdBuilder("set_mimic_solenoid_valve").escape("SV").int().escape("=").int().eos().build(),
         CmdBuilder("get_mimic_valves").escape("VALVES?").eos().build(),
 
         CmdBuilder("set_mimic_proportional_valve").escape("PV").int().escape("=").float().eos().build(),
@@ -228,6 +229,9 @@ class IceFridgeStreamInterface(StreamInterface):
     def set_mimic_valve(self, valve_number, valve_status):
         self.device.set_mimic_valve(valve_number, valve_status)
 
+    def set_mimic_solenoid_valve(self, valve_number, valve_status):
+        self.device.set_solenoid_valve(valve_number, valve_status)
+
     def get_mimic_valves(self):
         # the device response has 10 valve values in one string, so it is easier to build the string as a list
         # comprehension rather than doing it manually.
@@ -239,6 +243,12 @@ class IceFridgeStreamInterface(StreamInterface):
         # the last element that was added was 'V10=x,' and we do not need a comma at the end of the message, so we
         # remove the last element
         valve_reply = valve_reply[:-1]
+
+        solenoid_valves = "SV1={},SV2={},".format(IceFridgeStreamInterface._bool_to_int(
+            self.device.mimic_solenoid_valves[0]), IceFridgeStreamInterface._bool_to_int(
+            self.device.mimic_solenoid_valves[1]))
+
+        valve_reply = solenoid_valves + valve_reply
 
         return valve_reply
 
@@ -253,10 +263,10 @@ class IceFridgeStreamInterface(StreamInterface):
         self.device.set_mimic_proportional_valve(valve_num, valve_value)
 
     def set_mimic_needle_valve(self, valve_value):
-        self.device.needle_valve = valve_value
+        self.device.mimic_needle_valve = valve_value
 
     def get_mimic_proportional_valves(self):
         return "PV1={:f},PV2={:f},NV={:f},PV4={:f}".format(self.device.mimic_proportional_valves[0],
                                                            self.device.mimic_proportional_valves[1],
-                                                           self.device.needle_valve,
+                                                           self.device.mimic_needle_valve,
                                                            self.device.mimic_proportional_valves[2])
