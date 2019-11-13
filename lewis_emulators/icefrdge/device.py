@@ -58,9 +58,11 @@ class SimulatedIceFridge(StateMachineDevice):
 
         # The mimic panel has 10 valves, easier to use list comprehension than write them directly
         self.mimic_valves = [False for i in range(10)]
+
         self.mimic_proportional_valves = [0, 0, 0]
         self.mimic_needle_valve = 0
         self.mimic_solenoid_valves = [False, False]
+        self.mimic_1K_stage = 0
 
     def _get_state_handlers(self):
         return {

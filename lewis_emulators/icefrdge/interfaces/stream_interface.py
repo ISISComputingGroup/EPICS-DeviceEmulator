@@ -68,7 +68,9 @@ class IceFridgeStreamInterface(StreamInterface):
 
         CmdBuilder("set_mimic_proportional_valve").escape("PV").int().escape("=").float().eos().build(),
         CmdBuilder("set_mimic_needle_valve").escape("NV=").float().eos().build(),
-        CmdBuilder("get_mimic_proportional_valves").escape("PV?").eos().build()
+        CmdBuilder("get_mimic_proportional_valves").escape("PV?").eos().build(),
+
+        CmdBuilder("get_mimic_1K_stage").escape("CRYO?").eos().build()
     }
 
     in_terminator = "\n"
@@ -270,3 +272,6 @@ class IceFridgeStreamInterface(StreamInterface):
                                                            self.device.mimic_proportional_valves[1],
                                                            self.device.mimic_needle_valve,
                                                            self.device.mimic_proportional_valves[2])
+
+    def get_mimic_1K_stage(self):
+        return "CRYO={:f}".format(self.device.mimic_1K_stage)
