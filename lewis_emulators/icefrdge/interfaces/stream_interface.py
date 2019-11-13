@@ -62,8 +62,12 @@ class IceFridgeStreamInterface(StreamInterface):
 
         CmdBuilder("get_mimic_pressures").escape("P?").eos().build(),
 
+        CmdBuilder("set_mimic_valve").escape("V").int().escape("=").int().eos().build(),
         CmdBuilder("get_mimic_valves").escape("VALVES?").eos().build(),
-        CmdBuilder("set_mimic_valve").escape("V").int().escape("=").int().eos().build()
+
+        CmdBuilder("set_mimic_proportional_valve").escape("PV").int().escape("=").float().eos().build(),
+        CmdBuilder("set_mimic_needle_valve").escape("NV=").float().eos().build(),
+        CmdBuilder("get_mimic_proportional_valves").escape("PV?").eos().build()
     }
 
     in_terminator = "\n"
@@ -221,6 +225,9 @@ class IceFridgeStreamInterface(StreamInterface):
         return "P1={:f},P2={:f},P3={:f},P4={:f}".format(self.device.mimic_pressures[0], self.device.mimic_pressures[1],
                                                         self.device.mimic_pressures[2], self.device.mimic_pressures[3])
 
+    def set_mimic_valve(self, valve_number, valve_status):
+        self.device.set_mimic_valve(valve_number, valve_status)
+
     def get_mimic_valves(self):
         # the device response has 10 valve values in one string, so it is easier to build the string as a list
         # comprehension rather than doing it manually.
@@ -235,12 +242,21 @@ class IceFridgeStreamInterface(StreamInterface):
 
         return valve_reply
 
-    def set_mimic_valve(self, valve_number, valve_status):
-        self.device.set_mimic_valve(valve_number, valve_status)
-
     @staticmethod
     def _bool_to_int(boolean):
         if boolean:
             return 1
         else:
             return 0
+
+    def set_mimic_proportional_valve(self, valve_num, valve_value):
+        self.device.set_mimic_proportional_valve(valve_num, valve_value)
+
+    def set_mimic_needle_valve(self, valve_value):
+        self.device.needle_valve = valve_value
+
+    def get_mimic_proportional_valves(self):
+        return "PV1={:f},PV2={:f},NV={:f},PV4={:f}".format(self.device.mimic_proportional_valves[0],
+                                                           self.device.mimic_proportional_valves[1],
+                                                           self.device.needle_valve,
+                                                           self.device.mimic_proportional_valves[2])

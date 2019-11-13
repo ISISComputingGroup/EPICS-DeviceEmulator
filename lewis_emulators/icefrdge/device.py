@@ -58,6 +58,8 @@ class SimulatedIceFridge(StateMachineDevice):
 
         # The mimic panel has 10 valves, easier to use list comprehension than write them directly
         self.mimic_valves = [False for i in range(10)]
+        self.mimic_proportional_valves = [0, 0, 0]
+        self.needle_valve = 0
 
     def _get_state_handlers(self):
         return {
@@ -95,13 +97,27 @@ class SimulatedIceFridge(StateMachineDevice):
         :return: None
         """
 
-        if valve_number < 1 or valve_number > 10:
-            raise ValueError("the number of the valve can only be between 1 and 10!")
-
         if valve_status != 0 and valve_status != 1:
             raise ValueError("the status of the valve can only be 0 or 1!")
 
         self.mimic_valves[valve_number - 1] = SimulatedIceFridge._int_to_bool(valve_status)
+
+    def set_mimic_proportional_valve(self, valve_number, valve_value):
+        """
+        Sets the status of a mimic valve in the mimic valve status list to a new value.
+        :param valve_number: the index of the valve you want to set, which is 1, 2 or 4. This is because in the LabView
+        software used on SECI, the mimic panel only has proportional valves 1, 2 and 4.
+        :param valve_value: the new value of the valve.
+        :return: None
+        """
+
+        if valve_number != 1 and valve_number != 2 and valve_number != 4:
+            raise ValueError("valve number argument can only be 1, 2 or 4!")
+
+        if valve_number == 4:
+            valve_number = 3
+
+        self.mimic_proportional_valves[valve_number - 1] = valve_value
 
     @staticmethod
     def _int_to_bool(integer):
