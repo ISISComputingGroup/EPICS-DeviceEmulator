@@ -2,21 +2,15 @@ from lewis.adapters.stream import StreamInterface, Cmd
 from lewis_emulators.utils.command_builder import CmdBuilder
 from lewis.core.logging import has_log
 from lewis_emulators.utils.constants import ACK, ENQ
+from lewis_emulators.utils.replies import conditional_reply
 
+if_connected = conditional_reply("connected")
 
 @has_log
 class IceFridgeStreamInterface(StreamInterface):
 
     # Commands that we expect via serial during normal operation
     commands = {
-        CmdBuilder("set_auto_temp_setpoint").escape("AUTO TSET=").float().eos().build(),
-        CmdBuilder("get_auto_temp_set_RBV").escape("AUTO TSET?").eos().build(),
-        CmdBuilder("get_auto_temp_set_RBV").escape("AUTO TEMP?").eos().build(),
-
-        CmdBuilder("set_manual_temp_setpoint").escape("MANUAL TSET=").float().eos().build(),
-        CmdBuilder("get_manual_temp_set_RBV").escape("MANUAL TSET?").eos().build(),
-        CmdBuilder("get_manual_temp_set_RBV").escape("MANUAL TEMP?").eos().build(),
-
         CmdBuilder("get_cryo_temps").escape("CRYO-TEMPS?").eos().build(),
 
         CmdBuilder("set_loop_temp_setpoint").escape("CRYO-TSET=").int().escape(",").float().eos().build(),
@@ -92,18 +86,6 @@ class IceFridgeStreamInterface(StreamInterface):
         print(err_string)
         self.log.error(err_string)
         return err_string
-
-    def set_auto_temp_setpoint(self, temp_setpoint):
-        self._device.auto_temp_setpoint = temp_setpoint
-
-    def get_auto_temp_set_RBV(self):
-        return self._device.auto_temp_setpoint
-
-    def set_manual_temp_setpoint(self, temp_setpoint):
-        self._device.manual_temp_setpoint = temp_setpoint
-
-    def get_manual_temp_set_RBV(self):
-        return self._device.manual_temp_setpoint
 
     def get_cryo_temps(self):
         return "CRYO-TEMPS={},{},{},{}".format(self._device.vti_temp1, self._device.vti_temp2, self._device.vti_temp3,
@@ -236,6 +218,7 @@ class IceFridgeStreamInterface(StreamInterface):
     def set_mimic_solenoid_valve(self, valve_number, valve_status):
         self.device.set_solenoid_valve(valve_number, valve_status)
 
+    @if_connected
     def get_mimic_valves(self):
         # the device response has 10 valve values in one string, so it is easier to build the string as a list
         # comprehension rather than doing it manually.

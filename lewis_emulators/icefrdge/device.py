@@ -23,8 +23,6 @@ class SimulatedIceFridge(StateMachineDevice):
         """
         Initialize all of the device's attributes.
         """
-        self.auto_temp_setpoint = 0
-        self.manual_temp_setpoint = 0
         self.vti_temp1 = 0
         self.vti_temp2 = 0
         self.vti_temp3 = 0
@@ -65,6 +63,8 @@ class SimulatedIceFridge(StateMachineDevice):
 
         self.mixing_chamber_temp = 0
         self.mixing_chamber_resistance = 0
+
+        self.connected = True
 
     def _get_state_handlers(self):
         return {
