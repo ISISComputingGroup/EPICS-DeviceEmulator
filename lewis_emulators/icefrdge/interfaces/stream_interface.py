@@ -87,70 +87,91 @@ class IceFridgeStreamInterface(StreamInterface):
         self.log.error(err_string)
         return err_string
 
+    @if_connected
     def get_cryo_temps(self):
         return "CRYO-TEMPS={},{},{},{}".format(self._device.vti_temp1, self._device.vti_temp2, self._device.vti_temp3,
                                                self._device.vti_temp4)
 
+    @if_connected
     def set_loop_temp_setpoint(self, loop_num, temp_setpoint):
         self._device.vti_loop_channels[loop_num].vti_loop_temp_setpoint = temp_setpoint
 
+    @if_connected
     def get_loop_temp(self, loop_num):
         return "CRYO-TSET{}={}".format(loop_num, self._device.vti_loop_channels[loop_num].vti_loop_temp_setpoint)
 
+    @if_connected
     def set_loop_proportional_setpoint(self, loop_num, proportional_setpoint):
         self._device.vti_loop_channels[loop_num].vti_loop_proportional = proportional_setpoint
 
+    @if_connected
     def get_loop_proportional(self, loop_num):
         return "CRYO-P{}={}".format(loop_num, self._device.vti_loop_channels[loop_num].vti_loop_proportional)
 
+    @if_connected
     def set_loop_integral_setpoint(self, loop_num, integral_setpoint):
         self._device.vti_loop_channels[loop_num].vti_loop_integral = integral_setpoint
 
+    @if_connected
     def get_loop_integral(self, loop_num):
         return "CRYO-I{}={}".format(loop_num, self._device.vti_loop_channels[loop_num].vti_loop_integral)
 
+    @if_connected
     def set_loop_derivative_setpoint(self, loop_num, derivative_setpoint):
         self._device.vti_loop_channels[loop_num].vti_loop_derivative = derivative_setpoint
 
+    @if_connected
     def get_loop_derivative(self, loop_num):
         return "CRYO-D{}={}".format(loop_num, self._device.vti_loop_channels[loop_num].vti_loop_derivative)
 
+    @if_connected
     def set_loop_ramp_rate_setpoint(self, loop_num, ramp_rate_setpoint):
         self._device.vti_loop_channels[loop_num].vti_loop_ramp_rate = ramp_rate_setpoint
 
+    @if_connected
     def get_loop_ramp_rate(self, loop_num):
         return "CRYO-RAMP{}={}".format(loop_num, self._device.vti_loop_channels[loop_num].vti_loop_ramp_rate)
 
+    @if_connected
     def get_mc_cernox(self):
         return self._device.lakeshore_mc_cernox
 
+    @if_connected
     def get_mc_ruo(self):
         return self._device.lakeshore_mc_ruo
 
+    @if_connected
     def get_still_temp(self):
         return "STILL={}".format(self._device.lakeshore_still_temp)
 
+    @if_connected
     def set_mc_temp_setpoint(self, temp_setpoint):
         self.device.lakeshore_mc_temp_setpoint = temp_setpoint
 
+    @if_connected
     def get_mc_temp_setpoint(self):
         return self.device.lakeshore_mc_temp_setpoint
 
+    @if_connected
     def set_lakeshore_scan(self, scan_num):
         self.device.lakeshore_scan = scan_num
 
+    @if_connected
     def set_lakeshore_cmode(self, cmode):
         self.device.lakeshore_cmode = cmode
 
+    @if_connected
     def set_lakeshore_mc_PIDs(self, proportional, integral, derivative):
         self.device.lakeshore_mc_proportional = proportional
         self.device.lakeshore_mc_integral = integral
         self.device.lakeshore_mc_derivative = derivative
 
+    @if_connected
     def get_lakeshore_mc_PIDs(self):
         return "{},{},{}".format(self.device.lakeshore_mc_proportional, self.device.lakeshore_mc_integral,
                                  self.device.lakeshore_mc_derivative)
 
+    @if_connected
     def set_lakeshore_cset(self, cset_heater_range):
         # The old SECI LabView software sent a two messages when you set the heater range set point. One was an
         # LS-DIRECT-SET=CSET command and the other was LS-DIRECT-SET=HTRRNG. This method corresponds to the first
@@ -159,6 +180,7 @@ class IceFridgeStreamInterface(StreamInterface):
         # here we just set the device heater range to the argument.
         self.device.lakeshore_mc_heater_range = cset_heater_range
 
+    @if_connected
     def set_lakeshore_mc_heater_range(self, heater_range):
         # The old SECI LabView software sent a two messages when you set the heater range set point. One was an
         # LS-DIRECT-SET=CSET command and the other was LS-DIRECT-SET=HTRRNG. This method corresponds to the second
@@ -170,15 +192,19 @@ class IceFridgeStreamInterface(StreamInterface):
             raise ValueError("Invalid command sequence! The heater range should have already been set to the new value "
                              "by a CSET command!")
 
+    @if_connected
     def get_lakeshore_mc_heater_range(self):
         return self.device.lakeshore_mc_heater_range
 
+    @if_connected
     def get_lakeshore_mc_heater_percentage(self):
         return self.device.lakeshore_mc_heater_percentage
 
+    @if_connected
     def get_lakeshore_still_output(self):
         return self.device.lakeshore_still_output
 
+    @if_connected
     def get_lakeshore_channel_voltage_range(self, channel):
         if channel == 5:
             return "{},{:02d},{:02d},{},{}".format(0, self.device.lakeshore_exc_voltage_range_ch5, 1, 2, 3)
@@ -187,6 +213,7 @@ class IceFridgeStreamInterface(StreamInterface):
         else:
             raise ValueError("channel number can only be either 5 or 6!")
 
+    @if_connected
     def set_lakeshore_channel_voltage_range(self, channel, mode, voltage_range, resistance_range, auto_range_mode,
                                             excitation_mode):
         if mode != 0:
@@ -208,13 +235,16 @@ class IceFridgeStreamInterface(StreamInterface):
         else:
             raise ValueError("channel number can only be either 5 or 6!")
 
+    @if_connected
     def get_mimic_pressures(self):
         return "P1={:f},P2={:f},P3={:f},P4={:f}".format(self.device.mimic_pressures[0], self.device.mimic_pressures[1],
                                                         self.device.mimic_pressures[2], self.device.mimic_pressures[3])
 
+    @if_connected
     def set_mimic_valve(self, valve_number, valve_status):
         self.device.set_mimic_valve(valve_number, valve_status)
 
+    @if_connected
     def set_mimic_solenoid_valve(self, valve_number, valve_status):
         self.device.set_solenoid_valve(valve_number, valve_status)
 
@@ -246,23 +276,29 @@ class IceFridgeStreamInterface(StreamInterface):
         else:
             return 0
 
+    @if_connected
     def set_mimic_proportional_valve(self, valve_num, valve_value):
         self.device.set_mimic_proportional_valve(valve_num, valve_value)
 
+    @if_connected
     def set_mimic_needle_valve(self, valve_value):
         self.device.mimic_needle_valve = valve_value
 
+    @if_connected
     def get_mimic_proportional_valves(self):
         return "PV1={:f},PV2={:f},NV={:f},PV4={:f}".format(self.device.mimic_proportional_valves[0],
                                                            self.device.mimic_proportional_valves[1],
                                                            self.device.mimic_needle_valve,
                                                            self.device.mimic_proportional_valves[2])
 
+    @if_connected
     def get_mimic_1K_stage(self):
         return "CRYO={:f}".format(self.device.mimic_1K_stage)
 
+    @if_connected
     def get_mimic_mc_temp(self):
         return "MC={:f}".format(self.device.mixing_chamber_temp)
 
+    @if_connected
     def get_mimic_mc_resistance(self):
         return "MC-R={:f}".format(self.device.mixing_chamber_resistance)
