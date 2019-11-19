@@ -67,8 +67,15 @@ class IceFridgeStreamInterface(StreamInterface):
         CmdBuilder("get_mimic_1K_stage").escape("CRYO?").eos().build(),
         CmdBuilder("get_mimic_mc_temp").escape("MC?").eos().build(),
         CmdBuilder("get_mimic_mc_resistance").escape("MC-R?").eos().build(),
+
         CmdBuilder("set_skipped_status").escape("SKIP").eos().build(),
-        CmdBuilder("set_stopped_status").escape("STOP").eos().build()
+        CmdBuilder("set_stopped_status").escape("STOP").eos().build(),
+
+        CmdBuilder("set_condense").escape("CONDENSE").eos().build(),
+        CmdBuilder("set_circulate").escape("CIRCULATE").eos().build(),
+        CmdBuilder("set_temp_control").escape("TSET=").int().eos().build(),
+        CmdBuilder("set_make_safe").escape("MAKE SAFE").eos().build(),
+        CmdBuilder("set_warm_up").escape("WARM UP").eos().build()
     }
 
     in_terminator = "\n"
@@ -312,3 +319,18 @@ class IceFridgeStreamInterface(StreamInterface):
     @if_connected
     def set_stopped_status(self):
         self.device.stopped = True
+
+    def set_condense(self):
+        self.device.condense = True
+
+    def set_circulate(self):
+        self.device.circulate = True
+
+    def set_temp_control(self, temperature):
+        self.device.temp_control = temperature
+
+    def set_make_safe(self):
+        self.device.make_safe = True
+
+    def set_warm_up(self):
+        self.device.warm_up = True

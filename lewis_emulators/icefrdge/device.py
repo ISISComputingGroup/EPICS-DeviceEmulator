@@ -69,6 +69,12 @@ class SimulatedIceFridge(StateMachineDevice):
         self.skipped = False
         self.stopped = False
 
+        self.condense = False
+        self.circulate = False
+        self.temp_control = 0
+        self.make_safe = False
+        self.warm_up = False
+
     def _get_state_handlers(self):
         return {
             'default': DefaultState(),
