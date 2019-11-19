@@ -66,6 +66,9 @@ class SimulatedIceFridge(StateMachineDevice):
 
         self.connected = True
 
+        self.skipped = False
+        self.stopped = False
+
     def _get_state_handlers(self):
         return {
             'default': DefaultState(),

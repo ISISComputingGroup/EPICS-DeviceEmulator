@@ -66,7 +66,9 @@ class IceFridgeStreamInterface(StreamInterface):
 
         CmdBuilder("get_mimic_1K_stage").escape("CRYO?").eos().build(),
         CmdBuilder("get_mimic_mc_temp").escape("MC?").eos().build(),
-        CmdBuilder("get_mimic_mc_resistance").escape("MC-R?").eos().build()
+        CmdBuilder("get_mimic_mc_resistance").escape("MC-R?").eos().build(),
+        CmdBuilder("set_skipped_status").escape("SKIP=").int().eos().build(),
+        CmdBuilder("set_stopped_status").escape("STOP=").int().eos().build()
     }
 
     in_terminator = "\n"
@@ -302,3 +304,13 @@ class IceFridgeStreamInterface(StreamInterface):
     @if_connected
     def get_mimic_mc_resistance(self):
         return "MC-R={:f}".format(self.device.mixing_chamber_resistance)
+
+    @if_connected
+    def set_skipped_status(self, skip):
+        if skip > 0:
+            self.device.skipped = True
+
+    @if_connected
+    def set_stopped_status(self, stop):
+        if stop > 0:
+            self.device.stopped = True
