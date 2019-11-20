@@ -75,7 +75,9 @@ class IceFridgeStreamInterface(StreamInterface):
         CmdBuilder("set_circulate").escape("CIRCULATE").eos().build(),
         CmdBuilder("set_temp_control").escape("TSET=").int().eos().build(),
         CmdBuilder("set_make_safe").escape("MAKE SAFE").eos().build(),
-        CmdBuilder("set_warm_up").escape("WARM UP").eos().build()
+        CmdBuilder("set_warm_up").escape("WARM UP").eos().build(),
+
+        CmdBuilder("get_mimic_info").escape("INFO?").eos().build()
     }
 
     in_terminator = "\n"
@@ -334,3 +336,6 @@ class IceFridgeStreamInterface(StreamInterface):
 
     def set_warm_up(self):
         self.device.warm_up = True
+
+    def get_mimic_info(self):
+        return self.device.mimic_info

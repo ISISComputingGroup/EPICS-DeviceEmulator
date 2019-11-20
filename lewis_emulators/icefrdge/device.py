@@ -75,6 +75,8 @@ class SimulatedIceFridge(StateMachineDevice):
         self.make_safe = False
         self.warm_up = False
 
+        self.mimic_info = ""
+
     def _get_state_handlers(self):
         return {
             'default': DefaultState(),
