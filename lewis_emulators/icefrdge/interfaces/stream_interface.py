@@ -314,11 +314,9 @@ class IceFridgeStreamInterface(StreamInterface):
     def get_mimic_mc_resistance(self):
         return "MC-R={:f}".format(self.device.mixing_chamber_resistance)
 
-    @if_connected
     def set_skipped_status(self):
         self.device.skipped = True
 
-    @if_connected
     def set_stopped_status(self):
         self.device.stopped = True
 
@@ -337,5 +335,6 @@ class IceFridgeStreamInterface(StreamInterface):
     def set_warm_up(self):
         self.device.warm_up = True
 
+    @if_connected
     def get_mimic_info(self):
         return self.device.mimic_info
