@@ -54,12 +54,12 @@ class SimulatedIceFridge(StateMachineDevice):
 
         self.pressures = [0, 0, 0, 0]
         # The mimic panel has 10 valves, easier to use list comprehension than write them directly
-        self.mimic_valves = [False for i in range(10)]
+        self.valves = [False for i in range(10)]
 
-        self.mimic_proportional_valves = [0, 0, 0]
-        self.mimic_needle_valve = 0
-        self.mimic_solenoid_valves = [False, False]
-        self.mimic_1K_stage = 0
+        self.proportional_valves = [0, 0, 0]
+        self.needle_valve = 0
+        self.solenoid_valves = [False, False]
+        self.temp_1K_stage = 0
 
         self.mixing_chamber_temp = 0
         self.mixing_chamber_resistance = 0
@@ -96,7 +96,7 @@ class SimulatedIceFridge(StateMachineDevice):
         """
         self._initialize_data()
 
-    def set_mimic_pressure(self, index, new_value):
+    def set_pressure(self, index, new_value):
         """
         Sets a mimic pressure in the mimic pressures list to a new value.
         :param index: the index of the pressure we want to set, from 1 to 4.
@@ -105,7 +105,7 @@ class SimulatedIceFridge(StateMachineDevice):
         """
         self.mimic_pressures[index - 1] = new_value
 
-    def set_mimic_valve(self, valve_number, valve_status):
+    def set_valve(self, valve_number, valve_status):
         """
         Sets the status of a mimic valve in the mimic valve status list to a new value.
         :param valve_number: the index of the valve you want to set, from 1 to 10.
@@ -116,7 +116,7 @@ class SimulatedIceFridge(StateMachineDevice):
         if valve_status != 0 and valve_status != 1:
             raise ValueError("the status of the valve can only be 0 or 1!")
 
-        self.mimic_valves[valve_number - 1] = SimulatedIceFridge._int_to_bool(valve_status)
+        self.valves[valve_number - 1] = SimulatedIceFridge._int_to_bool(valve_status)
 
     def set_solenoid_valve(self, valve_number, valve_status):
         """
@@ -129,9 +129,9 @@ class SimulatedIceFridge(StateMachineDevice):
         if valve_status != 0 and valve_status != 1:
             raise ValueError("the status of the valve can only be 0 or 1!")
 
-        self.mimic_solenoid_valves[valve_number - 1] = SimulatedIceFridge._int_to_bool(valve_status)
+        self.solenoid_valves[valve_number - 1] = SimulatedIceFridge._int_to_bool(valve_status)
 
-    def set_mimic_proportional_valve(self, valve_number, valve_value):
+    def set_proportional_valve(self, valve_number, valve_value):
         """
         Sets the status of a mimic valve in the mimic valve status list to a new value.
         :param valve_number: the index of the valve you want to set, which is 1, 2 or 4. This is because in the LabView
@@ -146,7 +146,7 @@ class SimulatedIceFridge(StateMachineDevice):
         if valve_number == 4:
             valve_number = 3
 
-        self.mimic_proportional_valves[valve_number - 1] = valve_value
+        self.proportional_valves[valve_number - 1] = valve_value
 
     @staticmethod
     def _int_to_bool(integer):

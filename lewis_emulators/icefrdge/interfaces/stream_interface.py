@@ -56,24 +56,24 @@ class IceFridgeStreamInterface(StreamInterface):
 
         CmdBuilder("get_pressures").escape("P?").eos().build(),
 
-        CmdBuilder("set_mimic_valve").escape("V").int().escape("=").int().eos().build(),
-        CmdBuilder("set_mimic_solenoid_valve").escape("SV").int().escape("=").int().eos().build(),
-        CmdBuilder("get_mimic_valves").escape("VALVES?").eos().build(),
+        CmdBuilder("set_valve").escape("V").int().escape("=").int().eos().build(),
+        CmdBuilder("set_solenoid_valve").escape("SV").int().escape("=").int().eos().build(),
+        CmdBuilder("get_valves").escape("VALVES?").eos().build(),
 
-        CmdBuilder("set_mimic_proportional_valve").escape("PV").int().escape("=").float().eos().build(),
-        CmdBuilder("set_mimic_needle_valve").escape("NV=").float().eos().build(),
-        CmdBuilder("get_mimic_proportional_valves").escape("PV?").eos().build(),
+        CmdBuilder("set_proportional_valve").escape("PV").int().escape("=").float().eos().build(),
+        CmdBuilder("set_needle_valve").escape("NV=").float().eos().build(),
+        CmdBuilder("get_proportional_valves").escape("PV?").eos().build(),
 
-        CmdBuilder("get_mimic_1K_stage").escape("CRYO?").eos().build(),
-        CmdBuilder("get_mimic_mc_temp").escape("MC?").eos().build(),
-        CmdBuilder("get_mimic_mc_resistance").escape("MC-R?").eos().build(),
+        CmdBuilder("get_1K_stage").escape("CRYO?").eos().build(),
+        CmdBuilder("get_mc_temp").escape("MC?").eos().build(),
+        CmdBuilder("get_mc_resistance").escape("MC-R?").eos().build(),
 
         CmdBuilder("set_skipped_status").escape("SKIP").eos().build(),
         CmdBuilder("set_stopped_status").escape("STOP").eos().build(),
 
         CmdBuilder("set_condense").escape("CONDENSE").eos().build(),
         CmdBuilder("set_circulate").escape("CIRCULATE").eos().build(),
-        CmdBuilder("set_temp_control").escape("TSET=").int().eos().build(),
+        CmdBuilder("set_temp_control").escape("TSET=").float().eos().build(),
         CmdBuilder("set_make_safe").escape("MAKE SAFE").eos().build(),
         CmdBuilder("set_warm_up").escape("WARM UP").eos().build(),
 
@@ -252,18 +252,18 @@ class IceFridgeStreamInterface(StreamInterface):
                                                         self.device.pressures[2], self.device.pressures[3])
 
     @if_connected
-    def set_mimic_valve(self, valve_number, valve_status):
-        self.device.set_mimic_valve(valve_number, valve_status)
+    def set_valve(self, valve_number, valve_status):
+        self.device.set_valve(valve_number, valve_status)
 
     @if_connected
-    def set_mimic_solenoid_valve(self, valve_number, valve_status):
+    def set_solenoid_valve(self, valve_number, valve_status):
         self.device.set_solenoid_valve(valve_number, valve_status)
 
     @if_connected
-    def get_mimic_valves(self):
+    def get_valves(self):
         # the device response has 10 valve values in one string, so it is easier to build the string as a list
         # comprehension rather than doing it manually.
-        valve_statuses = ["V{}={},".format(i + 1, IceFridgeStreamInterface._bool_to_int(self.device.mimic_valves[i]))
+        valve_statuses = ["V{}={},".format(i + 1, IceFridgeStreamInterface._bool_to_int(self.device.valves[i]))
                        for i in range(10)]
 
         valve_reply = "".join(valve_statuses)
@@ -273,8 +273,8 @@ class IceFridgeStreamInterface(StreamInterface):
         valve_reply = valve_reply[:-1]
 
         solenoid_valves = "SV1={},SV2={},".format(IceFridgeStreamInterface._bool_to_int(
-            self.device.mimic_solenoid_valves[0]), IceFridgeStreamInterface._bool_to_int(
-            self.device.mimic_solenoid_valves[1]))
+            self.device.solenoid_valves[0]), IceFridgeStreamInterface._bool_to_int(
+            self.device.solenoid_valves[1]))
 
         valve_reply = solenoid_valves + valve_reply
 
@@ -288,30 +288,30 @@ class IceFridgeStreamInterface(StreamInterface):
             return 0
 
     @if_connected
-    def set_mimic_proportional_valve(self, valve_num, valve_value):
-        self.device.set_mimic_proportional_valve(valve_num, valve_value)
+    def set_proportional_valve(self, valve_num, valve_value):
+        self.device.set_proportional_valve(valve_num, valve_value)
 
     @if_connected
-    def set_mimic_needle_valve(self, valve_value):
-        self.device.mimic_needle_valve = valve_value
+    def set_needle_valve(self, valve_value):
+        self.device.needle_valve = valve_value
 
     @if_connected
-    def get_mimic_proportional_valves(self):
-        return "PV1={:f},PV2={:f},NV={:f},PV4={:f}".format(self.device.mimic_proportional_valves[0],
-                                                           self.device.mimic_proportional_valves[1],
-                                                           self.device.mimic_needle_valve,
-                                                           self.device.mimic_proportional_valves[2])
+    def get_proportional_valves(self):
+        return "PV1={:f},PV2={:f},NV={:f},PV4={:f}".format(self.device.proportional_valves[0],
+                                                           self.device.proportional_valves[1],
+                                                           self.device.needle_valve,
+                                                           self.device.proportional_valves[2])
 
     @if_connected
-    def get_mimic_1K_stage(self):
-        return "CRYO={:f}".format(self.device.mimic_1K_stage)
+    def get_1K_stage(self):
+        return "CRYO={:f}".format(self.device.temp_1K_stage)
 
     @if_connected
-    def get_mimic_mc_temp(self):
+    def get_mc_temp(self):
         return "MC={:f}".format(self.device.mixing_chamber_temp)
 
     @if_connected
-    def get_mimic_mc_resistance(self):
+    def get_mc_resistance(self):
         return "MC-R={:f}".format(self.device.mixing_chamber_resistance)
 
     def set_skipped_status(self):
