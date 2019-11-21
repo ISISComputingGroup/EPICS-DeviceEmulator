@@ -103,7 +103,7 @@ class SimulatedIceFridge(StateMachineDevice):
         :param new_value: The new pressure value.
         :return: None.
         """
-        self.mimic_pressures[index - 1] = new_value
+        self.pressures[index - 1] = new_value
 
     def set_valve(self, valve_number, valve_status):
         """
