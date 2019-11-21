@@ -52,7 +52,7 @@ class SimulatedIceFridge(StateMachineDevice):
         self.lakeshore_exc_voltage_range_ch5 = 1
         self.lakeshore_exc_voltage_range_ch6 = 1
 
-        self.mimic_pressures = [0, 0, 0, 0]
+        self.pressures = [0, 0, 0, 0]
         # The mimic panel has 10 valves, easier to use list comprehension than write them directly
         self.mimic_valves = [False for i in range(10)]
 

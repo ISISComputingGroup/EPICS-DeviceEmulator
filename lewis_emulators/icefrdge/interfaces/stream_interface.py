@@ -54,7 +54,7 @@ class IceFridgeStreamInterface(StreamInterface):
         CmdBuilder("set_lakeshore_channel_voltage_range").escape("LS-DIRECT-SET=RDGRNG ").int().escape(",").int(
             ).escape(",").int().escape(",").int().escape(",").int().escape(",").int().eos().build(),
 
-        CmdBuilder("get_mimic_pressures").escape("P?").eos().build(),
+        CmdBuilder("get_pressures").escape("P?").eos().build(),
 
         CmdBuilder("set_mimic_valve").escape("V").int().escape("=").int().eos().build(),
         CmdBuilder("set_mimic_solenoid_valve").escape("SV").int().escape("=").int().eos().build(),
@@ -247,9 +247,9 @@ class IceFridgeStreamInterface(StreamInterface):
             raise ValueError("channel number can only be either 5 or 6!")
 
     @if_connected
-    def get_mimic_pressures(self):
-        return "P1={:f},P2={:f},P3={:f},P4={:f}".format(self.device.mimic_pressures[0], self.device.mimic_pressures[1],
-                                                        self.device.mimic_pressures[2], self.device.mimic_pressures[3])
+    def get_pressures(self):
+        return "P1={:f},P2={:f},P3={:f},P4={:f}".format(self.device.pressures[0], self.device.pressures[1],
+                                                        self.device.pressures[2], self.device.pressures[3])
 
     @if_connected
     def set_mimic_valve(self, valve_number, valve_status):
