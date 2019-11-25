@@ -1,4 +1,6 @@
 from lewis.adapters.stream import StreamInterface, Cmd
+
+from lewis_emulators.icefrdge import SimulatedIceFridge
 from lewis_emulators.utils.command_builder import CmdBuilder
 from lewis.core.logging import has_log
 from lewis_emulators.utils.constants import ACK, ENQ
@@ -80,7 +82,12 @@ class IceFridgeStreamInterface(StreamInterface):
         CmdBuilder("get_mimic_info").escape("INFO?").eos().build(),
 
         CmdBuilder("set_nv_mode").escape("NVMODE=").string().eos().build(),
-        CmdBuilder("get_nv_mode").escape("NVMODE?").eos().build()
+        CmdBuilder("get_nv_mode").escape("NVMODE?").eos().build(),
+
+        CmdBuilder("set_1K_pump").escape("1KPUMP=").int().eos().build(),
+        CmdBuilder("get_pumps").escape("PUMPS?").eos().build(),
+        CmdBuilder("set_he3_pump").escape("HE3PUMP=").int().eos().build(),
+        CmdBuilder("set_roots_pump").escape("ROOTS=").int().eos().build()
     }
 
     in_terminator = "\n"
@@ -357,3 +364,26 @@ class IceFridgeStreamInterface(StreamInterface):
             return "AUTO"
         else:
             return "MANUAL"
+
+    def set_1K_pump(self, pump_1K):
+        if pump_1K != 0 and pump_1K != 1:
+            raise ValueError("1K pump value can be 1 or 0!")
+
+        self.device.pump_1K = SimulatedIceFridge.int_to_bool(pump_1K)
+
+    def get_pumps(self):
+        return "1KPUMP={},HE3PUMP={},ROOTS={}".format(SimulatedIceFridge.bool_to_pump_status(self.device.pump_1K),
+                                                      SimulatedIceFridge.bool_to_pump_status(self.device.he3_pump),
+                                                      SimulatedIceFridge.bool_to_pump_status(self.device.roots_pump))
+
+    def set_he3_pump(self, he3_pump):
+        if he3_pump != 0 and he3_pump != 1:
+            raise ValueError("Helium 3 pump value can be 1 or 0!")
+
+        self.device.he3_pump = SimulatedIceFridge.int_to_bool(he3_pump)
+
+    def set_roots_pump(self, roots_pump):
+        if roots_pump != 0 and roots_pump != 1:
+            raise ValueError("Roots pump value can be 1 or 0!")
+
+        self.device.roots_pump = SimulatedIceFridge.int_to_bool(roots_pump)

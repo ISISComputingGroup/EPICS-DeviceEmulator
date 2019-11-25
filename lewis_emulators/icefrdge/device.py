@@ -76,7 +76,10 @@ class SimulatedIceFridge(StateMachineDevice):
         self.warm_up = False
 
         self.mimic_info = ""
-        self.mimic_nv_mode = False
+        self.needle_valve_mode = False
+        self.pump_1K = False
+        self.he3_pump = False
+        self.roots_pump = False
 
     def _get_state_handlers(self):
         return {
@@ -117,7 +120,7 @@ class SimulatedIceFridge(StateMachineDevice):
         if valve_status != 0 and valve_status != 1:
             raise ValueError("the status of the valve can only be 0 or 1!")
 
-        self.valves[valve_number - 1] = SimulatedIceFridge._int_to_bool(valve_status)
+        self.valves[valve_number - 1] = SimulatedIceFridge.int_to_bool(valve_status)
 
     def set_solenoid_valve(self, valve_number, valve_status):
         """
@@ -130,7 +133,7 @@ class SimulatedIceFridge(StateMachineDevice):
         if valve_status != 0 and valve_status != 1:
             raise ValueError("the status of the valve can only be 0 or 1!")
 
-        self.solenoid_valves[valve_number - 1] = SimulatedIceFridge._int_to_bool(valve_status)
+        self.solenoid_valves[valve_number - 1] = SimulatedIceFridge.int_to_bool(valve_status)
 
     def set_proportional_valve(self, valve_number, valve_value):
         """
@@ -150,8 +153,15 @@ class SimulatedIceFridge(StateMachineDevice):
         self.proportional_valves[valve_number - 1] = valve_value
 
     @staticmethod
-    def _int_to_bool(integer):
+    def int_to_bool(integer):
         if integer == 0:
             return False
         else:
             return True
+
+    @staticmethod
+    def bool_to_pump_status(boolean):
+        if boolean:
+            return "ON"
+        else:
+            return "OFF"
