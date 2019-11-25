@@ -354,34 +354,38 @@ class IceFridgeStreamInterface(StreamInterface):
         if nv_mode != "MANUAL" and nv_mode != "AUTO":
             raise ValueError("nv mode can only be set to MANUAL or AUTO!")
         elif nv_mode == "MANUAL":
-            self.device.mimic_nv_mode = False
+            self.device.needle_valve_mode = False
         else:
-            self.device.mimic_nv_mode = True
+            self.device.needle_valve_mode = True
 
     @if_connected
     def get_nv_mode(self):
-        if self.device.mimic_nv_mode:
+        if self.device.needle_valve_mode:
             return "AUTO"
         else:
             return "MANUAL"
 
+    @if_connected
     def set_1K_pump(self, pump_1K):
         if pump_1K != 0 and pump_1K != 1:
             raise ValueError("1K pump value can be 1 or 0!")
 
         self.device.pump_1K = SimulatedIceFridge.int_to_bool(pump_1K)
 
+    @if_connected
     def get_pumps(self):
         return "1KPUMP={},HE3PUMP={},ROOTS={}".format(SimulatedIceFridge.bool_to_pump_status(self.device.pump_1K),
                                                       SimulatedIceFridge.bool_to_pump_status(self.device.he3_pump),
                                                       SimulatedIceFridge.bool_to_pump_status(self.device.roots_pump))
 
+    @if_connected
     def set_he3_pump(self, he3_pump):
         if he3_pump != 0 and he3_pump != 1:
             raise ValueError("Helium 3 pump value can be 1 or 0!")
 
         self.device.he3_pump = SimulatedIceFridge.int_to_bool(he3_pump)
 
+    @if_connected
     def set_roots_pump(self, roots_pump):
         if roots_pump != 0 and roots_pump != 1:
             raise ValueError("Roots pump value can be 1 or 0!")
