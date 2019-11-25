@@ -76,6 +76,7 @@ class SimulatedIceFridge(StateMachineDevice):
         self.warm_up = False
 
         self.mimic_info = ""
+        self.mimic_nv_mode = False
 
     def _get_state_handlers(self):
         return {

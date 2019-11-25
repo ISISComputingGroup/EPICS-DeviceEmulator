@@ -77,7 +77,10 @@ class IceFridgeStreamInterface(StreamInterface):
         CmdBuilder("set_make_safe").escape("MAKE SAFE").eos().build(),
         CmdBuilder("set_warm_up").escape("WARM UP").eos().build(),
 
-        CmdBuilder("get_mimic_info").escape("INFO?").eos().build()
+        CmdBuilder("get_mimic_info").escape("INFO?").eos().build(),
+
+        CmdBuilder("set_nv_mode").escape("NVMODE=").string().eos().build(),
+        CmdBuilder("get_nv_mode").escape("NVMODE?").eos().build()
     }
 
     in_terminator = "\n"
@@ -338,3 +341,19 @@ class IceFridgeStreamInterface(StreamInterface):
     @if_connected
     def get_mimic_info(self):
         return self.device.mimic_info
+
+    @if_connected
+    def set_nv_mode(self, nv_mode):
+        if nv_mode != "MANUAL" and nv_mode != "AUTO":
+            raise ValueError("nv mode can only be set to MANUAL or AUTO!")
+        elif nv_mode == "MANUAL":
+            self.device.mimic_nv_mode = False
+        else:
+            self.device.mimic_nv_mode = True
+
+    @if_connected
+    def get_nv_mode(self):
+        if self.device.mimic_nv_mode:
+            return "AUTO"
+        else:
+            return "MANUAL"
