@@ -84,7 +84,7 @@ class IceFridgeStreamInterface(StreamInterface):
         CmdBuilder("set_nv_mode").escape("NVMODE=").string().eos().build(),
         CmdBuilder("get_nv_mode").escape("NVMODE?").eos().build(),
 
-        CmdBuilder("set_1K_pump").escape("1KPUMP=").int().eos().build(),
+        CmdBuilder("set_1k_pump").escape("1KPUMP=").int().eos().build(),
         CmdBuilder("get_pumps").escape("PUMPS?").eos().build(),
         CmdBuilder("set_he3_pump").escape("HE3PUMP=").int().eos().build(),
         CmdBuilder("set_roots_pump").escape("ROOTS=").int().eos().build()
@@ -237,6 +237,10 @@ class IceFridgeStreamInterface(StreamInterface):
     @if_connected
     def set_lakeshore_channel_voltage_range(self, channel, mode, voltage_range, resistance_range, auto_range_mode,
                                             excitation_mode):
+        # The command to set the voltage range of a channel also returns 4 other values that are needed for the command
+        # to get the voltage range. We check if the those 4 values correspond to the default values, as described in
+        # the Lakeshore 370 manual.
+
         if mode != 0:
             raise ValueError("mode should always be 0")
 
@@ -263,18 +267,37 @@ class IceFridgeStreamInterface(StreamInterface):
 
     @if_connected
     def set_valve(self, valve_number, valve_status):
-        self.device.set_valve(valve_number, valve_status)
+        """
+        Sets the status of a mimic valve in the mimic valve status list to a new value.
+        :param valve_number: the index of the valve you want to set, from 1 to 10.
+        :param valve_status: 1 if the valve is open, 0 if it is closed.
+        :return: None
+        """
+
+        if IceFridgeStreamInterface._is_bit(valve_status):
+            self.device.valves[valve_number - 1] = valve_status
+        else:
+            raise ValueError("The status of the valve can be either 0 or 1!")
 
     @if_connected
     def set_solenoid_valve(self, valve_number, valve_status):
-        self.device.set_solenoid_valve(valve_number, valve_status)
+        """
+        Sets the status of a mimic solenoid valve in the mimic solenoid valve status list to a new value.
+        :param valve_number: the index of the valve you want to set, from 1 to 10.
+        :param valve_status: 1 if the valve is open, 0 if it is closed.
+        :return: None
+        """
+
+        if IceFridgeStreamInterface._is_bit(valve_status):
+            self.device.solenoid_valves[valve_number - 1] = valve_status
+        else:
+            raise ValueError("The status of the solenoid valve can be either 0 or 1!")
 
     @if_connected
     def get_valves(self):
         # the device response has 10 valve values in one string, so it is easier to build the string as a list
         # comprehension rather than doing it manually.
-        valve_statuses = ["V{}={},".format(i + 1, IceFridgeStreamInterface._bool_to_int(self.device.valves[i]))
-                       for i in range(10)]
+        valve_statuses = ["V{}={},".format(i + 1, self.device.valves[i]) for i in range(10)]
 
         valve_reply = "".join(valve_statuses)
 
@@ -282,24 +305,36 @@ class IceFridgeStreamInterface(StreamInterface):
         # remove the last element
         valve_reply = valve_reply[:-1]
 
-        solenoid_valves = "SV1={},SV2={},".format(IceFridgeStreamInterface._bool_to_int(
-            self.device.solenoid_valves[0]), IceFridgeStreamInterface._bool_to_int(
-            self.device.solenoid_valves[1]))
+        solenoid_valves = "SV1={},SV2={},".format(self.device.solenoid_valves[0], self.device.solenoid_valves[1])
 
         valve_reply = solenoid_valves + valve_reply
 
         return valve_reply
 
     @staticmethod
-    def _bool_to_int(boolean):
-        if boolean:
-            return 1
+    def _is_bit(number):
+        if number == 0 or number == 1:
+            return True
         else:
-            return 0
+            return False
 
     @if_connected
     def set_proportional_valve(self, valve_num, valve_value):
-        self.device.set_proportional_valve(valve_num, valve_value)
+        """
+        Sets the status of a mimic valve in the mimic valve status list to a new value.
+        :param valve_num: the index of the valve you want to set, which is 1, 2 or 4. This is because in the LabView
+        software used on SECI, the mimic panel only has proportional valves 1, 2 and 4.
+        :param valve_value: the new value of the valve.
+        :return: None
+        """
+
+        if valve_num != 1 and valve_num != 2 and valve_num != 4:
+            raise ValueError("valve number argument can only be 1, 2 or 4!")
+
+        if valve_num == 4:
+            valve_num = 3
+
+        self.device.proportional_valves[valve_num - 1] = valve_value
 
     @if_connected
     def set_needle_valve(self, valve_value):
@@ -351,12 +386,12 @@ class IceFridgeStreamInterface(StreamInterface):
 
     @if_connected
     def set_nv_mode(self, nv_mode):
-        if nv_mode != "MANUAL" and nv_mode != "AUTO":
-            raise ValueError("nv mode can only be set to MANUAL or AUTO!")
-        elif nv_mode == "MANUAL":
+        if nv_mode == "MANUAL":
             self.device.needle_valve_mode = False
-        else:
+        elif nv_mode == "AUTO":
             self.device.needle_valve_mode = True
+        else:
+            raise ValueError("nv mode can only be set to MANUAL or AUTO!")
 
     @if_connected
     def get_nv_mode(self):
@@ -366,28 +401,38 @@ class IceFridgeStreamInterface(StreamInterface):
             return "MANUAL"
 
     @if_connected
-    def set_1K_pump(self, pump_1K):
-        if pump_1K != 0 and pump_1K != 1:
+    def set_1k_pump(self, pump_1k):
+        if IceFridgeStreamInterface._is_bit(pump_1k):
+            self.device.pump_1K = pump_1k
+        else:
             raise ValueError("1K pump value can be 1 or 0!")
-
-        self.device.pump_1K = SimulatedIceFridge.int_to_bool(pump_1K)
 
     @if_connected
     def get_pumps(self):
-        return "1KPUMP={},HE3PUMP={},ROOTS={}".format(SimulatedIceFridge.bool_to_pump_status(self.device.pump_1K),
-                                                      SimulatedIceFridge.bool_to_pump_status(self.device.he3_pump),
-                                                      SimulatedIceFridge.bool_to_pump_status(self.device.roots_pump))
+        return "1KPUMP={},HE3PUMP={},ROOTS={}".format(IceFridgeStreamInterface._bit_to_pump_status(self.device.pump_1K),
+                                                      IceFridgeStreamInterface._bit_to_pump_status(self.device.he3_pump),
+                                                      IceFridgeStreamInterface._bit_to_pump_status(
+                                                          self.device.roots_pump))
 
     @if_connected
     def set_he3_pump(self, he3_pump):
-        if he3_pump != 0 and he3_pump != 1:
+        if IceFridgeStreamInterface._is_bit(he3_pump):
+            self.device.he3_pump = he3_pump
+        else:
             raise ValueError("Helium 3 pump value can be 1 or 0!")
-
-        self.device.he3_pump = SimulatedIceFridge.int_to_bool(he3_pump)
 
     @if_connected
     def set_roots_pump(self, roots_pump):
-        if roots_pump != 0 and roots_pump != 1:
+        if IceFridgeStreamInterface._is_bit(roots_pump):
+            self.device.roots_pump = roots_pump
+        else:
             raise ValueError("Roots pump value can be 1 or 0!")
 
-        self.device.roots_pump = SimulatedIceFridge.int_to_bool(roots_pump)
+    @staticmethod
+    def _bit_to_pump_status(bit):
+        if bit == 1:
+            return "ON"
+        elif bit == 0:
+            return "OFF"
+        else:
+            raise ValueError("pump value in device can only be o or 1")
