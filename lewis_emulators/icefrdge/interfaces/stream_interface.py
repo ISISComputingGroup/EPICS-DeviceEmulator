@@ -110,8 +110,8 @@ class IceFridgeStreamInterface(StreamInterface):
 
     @if_connected
     def get_cryo_temps(self):
-        return "CRYO-TEMPS={},{},{},{}".format(self._device.vti_temp1, self._device.vti_temp2, self._device.vti_temp3,
-                                               self._device.vti_temp4)
+        return "CRYO-TEMPS={},{},{},{}".format(self._device.vti_temps[0], self._device.vti_temps[1],
+                                               self._device.vti_temps[2], self._device.vti_temps[3])
 
     @if_connected
     def set_loop_temp_setpoint(self, loop_num, temp_setpoint):

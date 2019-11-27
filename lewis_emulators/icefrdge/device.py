@@ -23,10 +23,7 @@ class SimulatedIceFridge(StateMachineDevice):
         """
         Initialize all of the device's attributes.
         """
-        self.vti_temp1 = 0
-        self.vti_temp2 = 0
-        self.vti_temp3 = 0
-        self.vti_temp4 = 0
+        self.vti_temps = [0, 0, 0, 0]
 
         self.vti_loop_channels = {
             1: VTILoopChannel(),
@@ -99,6 +96,15 @@ class SimulatedIceFridge(StateMachineDevice):
         :return: Nothing.
         """
         self._initialize_data()
+
+    def set_cryo_temp(self, cryo_temp_num, temp_value):
+        """
+        Sets a vti cryo temperature to a new value.
+        :param cryo_temp_num: the index of the cryo temperature, from 1 to 4.
+        :param temp_value: The new temperature value.
+        :return: None.
+        """
+        self.vti_temps[cryo_temp_num - 1] = temp_value
 
     def set_pressure(self, index, new_value):
         """
