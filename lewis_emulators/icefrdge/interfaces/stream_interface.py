@@ -76,6 +76,7 @@ class IceFridgeStreamInterface(StreamInterface):
         CmdBuilder("set_condense").escape("CONDENSE").eos().build(),
         CmdBuilder("set_circulate").escape("CIRCULATE").eos().build(),
         CmdBuilder("set_temp_control").escape("TSET=").float().eos().build(),
+        CmdBuilder("get_temp_control").escape("TSET?").eos().build(),
         CmdBuilder("set_make_safe").escape("MAKE SAFE").eos().build(),
         CmdBuilder("set_warm_up").escape("WARM UP").eos().build(),
 
@@ -90,8 +91,8 @@ class IceFridgeStreamInterface(StreamInterface):
         CmdBuilder("set_roots_pump").escape("ROOTS=").int().eos().build()
     }
 
-    in_terminator = "\n"
-    out_terminator = "\n"
+    in_terminator = "\r\n"
+    out_terminator = "\r\n"
 
     def handle_error(self, request, error):
         """
@@ -373,6 +374,9 @@ class IceFridgeStreamInterface(StreamInterface):
 
     def set_temp_control(self, temperature):
         self.device.temp_control = temperature
+
+    def get_temp_control(self):
+        return "TSET={}".format(self.device.temp_control)
 
     def set_make_safe(self):
         self.device.make_safe = True
