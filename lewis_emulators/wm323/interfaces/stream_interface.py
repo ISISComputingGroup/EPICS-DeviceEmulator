@@ -8,7 +8,7 @@ class Wm323StreamInterface(StreamInterface):
     # Commands that we expect via serial during normal operation
     commands = {
         CmdBuilder("get_status").escape("1RS").eos().build(),
-        CmdBuilder("set_speed").escape("1SP").int().eos().build(),
+        CmdBuilder("set_speed").escape("1SP ").float().eos().build(),
         CmdBuilder("set_rotation_cw").escape("1RR").eos().build(),
         CmdBuilder("set_rotation_ccw").escape("1RL").eos().build(),
         CmdBuilder("set_running_start").escape("1GO").eos().build(),
