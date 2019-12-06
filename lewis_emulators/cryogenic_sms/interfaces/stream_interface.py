@@ -24,7 +24,7 @@ class CRYOSMSStreamInterface(StreamInterface):
             CmdBuilder(self.read_output).regex(re_get).regex("O(?:UTPUT)*").spaces().eos().build(),
             CmdBuilder(self.read_ramp_status).spaces().regex("R(?:AMP)*").spaces().regex("S(?:TATUS)*").spaces().eos()
                                              .build(),
-            CmdBuilder(self.read_heater_status).spaces().escape("H(?:EATER)*").spaces().eos().build(),
+            CmdBuilder(self.read_heater_status).regex(re_get).regex("H(?:EATER)*").spaces().eos().build(),
             CmdBuilder(self.read_max_target).regex(re_get).regex("(?:MAX|!)*").spaces().eos().build(),
             CmdBuilder(self.read_mid_target).regex(re_get).regex("(?:MID|%)*").spaces().eos().build(),
             CmdBuilder(self.read_ramp_rate).regex(re_get).regex("R(?:ATE)*").spaces().eos().build(),
@@ -123,7 +123,7 @@ class CRYOSMSStreamInterface(StreamInterface):
 
     def read_ramp_status(self):
         output = self._device.output
-        status_message = " RAMP STATUS: "
+        status_message = "RAMP STATUS: "
         if self._device.is_paused:
             status_message += "HOLDING ON PAUSE AT {} {}".format(output, self._get_output_mode_string())
         elif self._device.at_target:
