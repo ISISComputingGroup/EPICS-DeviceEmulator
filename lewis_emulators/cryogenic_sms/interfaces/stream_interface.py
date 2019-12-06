@@ -104,16 +104,16 @@ class CRYOSMSStreamInterface(StreamInterface):
         # Convert values if output mode is changing between amps(OFF) / tesla(ON)
         constant = self._device.constant
         if output_mode in ON_STATES:
+            self._create_log_message("UNITS", "TESLA")
             if not self._device.is_output_mode_tesla:
                 self._device.switch_mode("TESLA")
-                self._create_log_message("UNITS", "TESLA")
         elif output_mode in OFF_STATES:
             if constant == 0:
                 self._device.error_message = "------> No field constant has been entered"
             else:
+                self._create_log_message("UNITS", "AMPS")
                 if self._device.is_output_mode_tesla:
                     self._device.switch_mode("AMPS")
-                    self._create_log_message("UNITS", "AMPS")
         else:
             raise ValueError("Invalid arguments sent")
         return self._device.log_message
