@@ -73,6 +73,7 @@ class SimulatedIceFridge(StateMachineDevice):
         self.warm_up = False
 
         self.mimic_info = ""
+        self.state = ""
         self.needle_valve_mode = False
         self.pump_1K = 0
         self.he3_pump = 0

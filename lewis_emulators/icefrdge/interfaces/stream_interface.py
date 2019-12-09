@@ -81,6 +81,7 @@ class IceFridgeStreamInterface(StreamInterface):
         CmdBuilder("set_warm_up").escape("WARM UP").eos().build(),
 
         CmdBuilder("get_mimic_info").escape("INFO?").eos().build(),
+        CmdBuilder("get_state").escape("STATE?").eos().build(),
 
         CmdBuilder("set_nv_mode").escape("NVMODE=").string().eos().build(),
         CmdBuilder("get_nv_mode").escape("NVMODE?").eos().build(),
@@ -387,6 +388,10 @@ class IceFridgeStreamInterface(StreamInterface):
     @if_connected
     def get_mimic_info(self):
         return self.device.mimic_info
+
+    @if_connected
+    def get_state(self):
+        return self.device.state
 
     @if_connected
     def set_nv_mode(self, nv_mode):
