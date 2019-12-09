@@ -315,7 +315,8 @@ class IceFridgeStreamInterface(StreamInterface):
     def get_valves(self):
         # the device response has 10 valve values in one string, so it is easier to build the string as a list
         # comprehension rather than doing it manually.
-        valve_statuses = ["V{}={},".format(i + 1, self.device.valves[i]) for i in range(10)]
+        valve_statuses = ["V{}={},".format(i + 1, IceFridgeStreamInterface._bit_to_valve_status(self.device.valves[i]))
+                          for i in range(10)]
 
         valve_reply = "".join(valve_statuses)
 
@@ -323,11 +324,19 @@ class IceFridgeStreamInterface(StreamInterface):
         # remove the last element
         valve_reply = valve_reply[:-1]
 
-        solenoid_valves = "SV1={},SV2={},".format(self.device.solenoid_valves[0], self.device.solenoid_valves[1])
+        solenoid_valves = "SV1={},SV2={},".format(IceFridgeStreamInterface._bit_to_valve_status(
+            self.device.solenoid_valves[0]), IceFridgeStreamInterface._bit_to_valve_status(
+            self.device.solenoid_valves[1]))
 
         valve_reply = solenoid_valves + valve_reply
-
         return valve_reply
+
+    @staticmethod
+    def _bit_to_valve_status(number):
+        if number == 0:
+            return "CLOSED"
+        else:
+            return "OPEN"
 
     @staticmethod
     def _is_bit(number):
