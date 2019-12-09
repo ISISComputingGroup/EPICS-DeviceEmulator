@@ -118,6 +118,7 @@ class IceFridgeStreamInterface(StreamInterface):
     @if_connected
     def set_loop_temp_setpoint(self, loop_num, temp_setpoint):
         self._device.vti_loop_channels[loop_num].vti_loop_temp_setpoint = temp_setpoint
+        return "OK"
 
     @if_connected
     def get_loop_temp(self, loop_num):
@@ -126,6 +127,7 @@ class IceFridgeStreamInterface(StreamInterface):
     @if_connected
     def set_loop_proportional_setpoint(self, loop_num, proportional_setpoint):
         self._device.vti_loop_channels[loop_num].vti_loop_proportional = proportional_setpoint
+        return "OK"
 
     @if_connected
     def get_loop_proportional(self, loop_num):
@@ -134,6 +136,7 @@ class IceFridgeStreamInterface(StreamInterface):
     @if_connected
     def set_loop_integral_setpoint(self, loop_num, integral_setpoint):
         self._device.vti_loop_channels[loop_num].vti_loop_integral = integral_setpoint
+        return "OK"
 
     @if_connected
     def get_loop_integral(self, loop_num):
@@ -142,6 +145,7 @@ class IceFridgeStreamInterface(StreamInterface):
     @if_connected
     def set_loop_derivative_setpoint(self, loop_num, derivative_setpoint):
         self._device.vti_loop_channels[loop_num].vti_loop_derivative = derivative_setpoint
+        return "OK"
 
     @if_connected
     def get_loop_derivative(self, loop_num):
@@ -150,6 +154,7 @@ class IceFridgeStreamInterface(StreamInterface):
     @if_connected
     def set_loop_ramp_rate_setpoint(self, loop_num, ramp_rate_setpoint):
         self._device.vti_loop_channels[loop_num].vti_loop_ramp_rate = ramp_rate_setpoint
+        return "OK"
 
     @if_connected
     def get_loop_ramp_rate(self, loop_num):
@@ -170,6 +175,7 @@ class IceFridgeStreamInterface(StreamInterface):
     @if_connected
     def set_mc_temp_setpoint(self, temp_setpoint):
         self.device.lakeshore_mc_temp_setpoint = temp_setpoint
+        return "Set LakeShore 370"
 
     @if_connected
     def get_mc_temp_setpoint(self):
@@ -178,16 +184,19 @@ class IceFridgeStreamInterface(StreamInterface):
     @if_connected
     def set_lakeshore_scan(self, scan_num):
         self.device.lakeshore_scan = scan_num
+        return "Set LakeShore 370"
 
     @if_connected
     def set_lakeshore_cmode(self, cmode):
         self.device.lakeshore_cmode = cmode
+        return "Set LakeShore 370"
 
     @if_connected
     def set_lakeshore_mc_PIDs(self, proportional, integral, derivative):
         self.device.lakeshore_mc_proportional = proportional
         self.device.lakeshore_mc_integral = integral
         self.device.lakeshore_mc_derivative = derivative
+        return "Set LakeShore 370"
 
     @if_connected
     def get_lakeshore_mc_PIDs(self):
@@ -202,6 +211,7 @@ class IceFridgeStreamInterface(StreamInterface):
         # Therefore, we only have field in the device emulator for testing the values sent in both commands, and in
         # here we just set the device heater range to the argument.
         self.device.lakeshore_mc_heater_range = cset_heater_range
+        return "Set LakeShore 370"
 
     @if_connected
     def set_lakeshore_mc_heater_range(self, heater_range):
@@ -214,6 +224,7 @@ class IceFridgeStreamInterface(StreamInterface):
         if heater_range != self.device.lakeshore_mc_heater_range:
             raise ValueError("Invalid command sequence! The heater range should have already been set to the new value "
                              "by a CSET command!")
+        return "Set LakeShore 370"
 
     @if_connected
     def get_lakeshore_mc_heater_range(self):
@@ -257,8 +268,10 @@ class IceFridgeStreamInterface(StreamInterface):
 
         if channel == 5:
             self.device.lakeshore_exc_voltage_range_ch5 = voltage_range
+            return "Set LakeShore 370"
         elif channel == 6:
             self.device.lakeshore_exc_voltage_range_ch6 = voltage_range
+            return "Set LakeShore 370"
         else:
             raise ValueError("channel number can only be either 5 or 6!")
 
@@ -278,6 +291,7 @@ class IceFridgeStreamInterface(StreamInterface):
 
         if IceFridgeStreamInterface._is_bit(valve_status):
             self.device.valves[valve_number - 1] = valve_status
+            return "OK"
         else:
             raise ValueError("The status of the valve can be either 0 or 1!")
 
@@ -292,6 +306,7 @@ class IceFridgeStreamInterface(StreamInterface):
 
         if IceFridgeStreamInterface._is_bit(valve_status):
             self.device.solenoid_valves[valve_number - 1] = valve_status
+            return "OK"
         else:
             raise ValueError("The status of the solenoid valve can be either 0 or 1!")
 
@@ -337,10 +352,7 @@ class IceFridgeStreamInterface(StreamInterface):
             valve_num = 3
 
         self.device.proportional_valves[valve_num - 1] = valve_value
-
-    @if_connected
-    def set_needle_valve(self, valve_value):
-        self.device.needle_valve = valve_value
+        return "OK"
 
     @if_connected
     def get_proportional_valves(self):
@@ -348,6 +360,11 @@ class IceFridgeStreamInterface(StreamInterface):
                                                            self.device.proportional_valves[1],
                                                            self.device.needle_valve,
                                                            self.device.proportional_valves[2])
+
+    @if_connected
+    def set_needle_valve(self, valve_value):
+        self.device.needle_valve = valve_value
+        return "OK"
 
     @if_connected
     def get_1K_stage(self):
@@ -363,27 +380,34 @@ class IceFridgeStreamInterface(StreamInterface):
 
     def set_skipped_status(self):
         self.device.skipped = True
+        return "OK"
 
     def set_stopped_status(self):
         self.device.stopped = True
+        return "OK"
 
     def set_condense(self):
         self.device.condense = True
+        return "OK"
 
     def set_circulate(self):
         self.device.circulate = True
+        return "OK"
 
     def set_temp_control(self, temperature):
         self.device.temp_control = temperature
+        return "OK"
 
     def get_temp_control(self):
         return "TSET={}".format(self.device.temp_control)
 
     def set_make_safe(self):
         self.device.make_safe = True
+        return "OK"
 
     def set_warm_up(self):
         self.device.warm_up = True
+        return "OK"
 
     @if_connected
     def get_mimic_info(self):
@@ -397,8 +421,10 @@ class IceFridgeStreamInterface(StreamInterface):
     def set_nv_mode(self, nv_mode):
         if nv_mode == "MANUAL":
             self.device.needle_valve_mode = False
+            return "OK"
         elif nv_mode == "AUTO":
             self.device.needle_valve_mode = True
+            return "OK"
         else:
             raise ValueError("nv mode can only be set to MANUAL or AUTO!")
 
@@ -413,6 +439,7 @@ class IceFridgeStreamInterface(StreamInterface):
     def set_1k_pump(self, pump_1k):
         if IceFridgeStreamInterface._is_bit(pump_1k):
             self.device.pump_1K = pump_1k
+            return "OK"
         else:
             raise ValueError("1K pump value can be 1 or 0!")
 
@@ -427,6 +454,7 @@ class IceFridgeStreamInterface(StreamInterface):
     def set_he3_pump(self, he3_pump):
         if IceFridgeStreamInterface._is_bit(he3_pump):
             self.device.he3_pump = he3_pump
+            return "OK"
         else:
             raise ValueError("Helium 3 pump value can be 1 or 0!")
 
@@ -434,6 +462,7 @@ class IceFridgeStreamInterface(StreamInterface):
     def set_roots_pump(self, roots_pump):
         if IceFridgeStreamInterface._is_bit(roots_pump):
             self.device.roots_pump = roots_pump
+            return "OK"
         else:
             raise ValueError("Roots pump value can be 1 or 0!")
 
