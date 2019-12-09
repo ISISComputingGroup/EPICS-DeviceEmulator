@@ -53,8 +53,9 @@ class IceFridgeStreamInterface(StreamInterface):
         CmdBuilder("get_lakeshore_still_output").escape("LS-DIRECT-READ=STILL?").eos().build(),
 
         CmdBuilder("get_lakeshore_channel_voltage_range").escape("LS-DIRECT-READ=RDGRNG? ").int().eos().build(),
-        CmdBuilder("set_lakeshore_channel_voltage_range").escape("LS-DIRECT-SET=RDGRNG ").int().escape(",").int(
-            ).escape(",").int().escape(",").int().escape(",").int().escape(",").int().eos().build(),
+        CmdBuilder("set_lakeshore_channel_voltage_range").escape("LS-DIRECT-SET=RDGRNG ").spaces().int().escape(",").
+            int().escape(",").spaces().int().escape(",").spaces().int().escape(",").int().escape(",").int().eos().
+            build(),
 
         CmdBuilder("get_pressures").escape("P?").eos().build(),
 
