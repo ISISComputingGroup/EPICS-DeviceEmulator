@@ -456,8 +456,8 @@ class IceFridgeStreamInterface(StreamInterface):
     @if_connected
     def get_pumps(self):
         return "1KPUMP={},HE3PUMP={},ROOTS={}".format(IceFridgeStreamInterface._bit_to_pump_status(self.device.pump_1K),
-                                                      IceFridgeStreamInterface._bit_to_pump_status(self.device.he3_pump),
-                                                      IceFridgeStreamInterface._bit_to_pump_status(
+                                                      IceFridgeStreamInterface._bit_to_pump_status(self.device.he3_pump)
+                                                      , IceFridgeStreamInterface._bit_to_pump_status(
                                                           self.device.roots_pump))
 
     @if_connected
