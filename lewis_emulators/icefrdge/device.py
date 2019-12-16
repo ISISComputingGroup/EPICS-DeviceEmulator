@@ -68,7 +68,7 @@ class SimulatedIceFridge(StateMachineDevice):
 
         self.condense = False
         self.circulate = False
-        self.temp_control = False
+        self.temp_control = 0
         self.make_safe = False
         self.warm_up = False
 
