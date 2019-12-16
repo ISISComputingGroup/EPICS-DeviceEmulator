@@ -1,9 +1,7 @@
 from lewis.adapters.stream import StreamInterface, Cmd
 
-from lewis_emulators.icefrdge import SimulatedIceFridge
 from lewis_emulators.utils.command_builder import CmdBuilder
 from lewis.core.logging import has_log
-from lewis_emulators.utils.constants import ACK, ENQ
 from lewis_emulators.utils.replies import conditional_reply
 
 if_connected = conditional_reply("connected")
