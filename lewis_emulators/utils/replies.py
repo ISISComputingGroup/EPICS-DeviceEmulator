@@ -45,10 +45,11 @@ def conditional_reply(property_name, reply=None):
 
             try:
                 do_reply = getattr(device, property_name)
-                return func(self, *args, **kwargs) if do_reply else reply
             except AttributeError:
                 raise AttributeError(
                     "Expected device to contain an attribute called '{}' but it wasn't found.".format(property_name))
+
+            return func(self, *args, **kwargs) if do_reply else reply
 
         return wrapper
     return decorator
