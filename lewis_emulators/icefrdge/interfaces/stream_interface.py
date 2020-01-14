@@ -38,7 +38,7 @@ class IceFridgeStreamInterface(StreamInterface):
         CmdBuilder("set_lakeshore_cmode").escape("LS-DIRECT-SET=CMODE ").int().eos().build(),
         CmdBuilder("set_lakeshore_scan").escape("LS-DIRECT-SET=SCAN 6,").int().eos().build(),
 
-        CmdBuilder("set_lakeshore_mc_PIDs").escape("LS-DIRECT-SET=PID ").float().escape(",").float().escape(",").float(
+        CmdBuilder("set_lakeshore_mc_PIDs").escape("LS-DIRECT-SET=PID ").float().escape(",").int().escape(",").int(
             ).eos().build(),
         CmdBuilder("get_lakeshore_mc_PIDs").escape("LS-DIRECT-READ=PID?").eos().build(),
 
@@ -199,7 +199,7 @@ class IceFridgeStreamInterface(StreamInterface):
 
     @if_connected
     def get_lakeshore_mc_PIDs(self):
-        return "{},{},{}".format(self.device.lakeshore_mc_proportional, self.device.lakeshore_mc_integral,
+        return "{:f},{:d},{:d}".format(self.device.lakeshore_mc_proportional, self.device.lakeshore_mc_integral,
                                  self.device.lakeshore_mc_derivative)
 
     @if_connected
