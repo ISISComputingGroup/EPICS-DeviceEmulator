@@ -38,7 +38,7 @@ class IceFridgeStreamInterface(StreamInterface):
         CmdBuilder("set_lakeshore_cmode").escape("LS-DIRECT-SET=CMODE ").int().eos().build(),
         CmdBuilder("set_lakeshore_scan").escape("LS-DIRECT-SET=SCAN 6,").int().eos().build(),
 
-        CmdBuilder("set_lakeshore_mc_PIDs").escape("LS-DIRECT-SET=PID ").float().escape(",").float().escape(",").float(
+        CmdBuilder("set_lakeshore_mc_PIDs").escape("LS-DIRECT-SET=PID ").float().escape(",").int().escape(",").int(
             ).eos().build(),
         CmdBuilder("get_lakeshore_mc_PIDs").escape("LS-DIRECT-READ=PID?").eos().build(),
 
@@ -174,7 +174,7 @@ class IceFridgeStreamInterface(StreamInterface):
     @if_connected
     def set_mc_temp_setpoint(self, temp_setpoint):
         self.device.lakeshore_mc_temp_setpoint = temp_setpoint
-        return "Set LakeShore 370"
+        return "OK"
 
     @if_connected
     def get_mc_temp_setpoint(self):
@@ -183,23 +183,23 @@ class IceFridgeStreamInterface(StreamInterface):
     @if_connected
     def set_lakeshore_scan(self, scan_num):
         self.device.lakeshore_scan = scan_num
-        return "Set LakeShore 370"
+        return "OK"
 
     @if_connected
     def set_lakeshore_cmode(self, cmode):
         self.device.lakeshore_cmode = cmode
-        return "Set LakeShore 370"
+        return "OK"
 
     @if_connected
     def set_lakeshore_mc_PIDs(self, proportional, integral, derivative):
         self.device.lakeshore_mc_proportional = proportional
         self.device.lakeshore_mc_integral = integral
         self.device.lakeshore_mc_derivative = derivative
-        return "Set LakeShore 370"
+        return "OK"
 
     @if_connected
     def get_lakeshore_mc_PIDs(self):
-        return "{},{},{}".format(self.device.lakeshore_mc_proportional, self.device.lakeshore_mc_integral,
+        return "{:f},{:d},{:d}".format(self.device.lakeshore_mc_proportional, self.device.lakeshore_mc_integral,
                                  self.device.lakeshore_mc_derivative)
 
     @if_connected
@@ -210,7 +210,7 @@ class IceFridgeStreamInterface(StreamInterface):
         # Therefore, we only have field in the device emulator for testing the values sent in both commands, and in
         # here we just set the device heater range to the argument.
         self.device.lakeshore_mc_heater_range = cset_heater_range
-        return "Set LakeShore 370"
+        return "OK"
 
     @if_connected
     def set_lakeshore_mc_heater_range(self, heater_range):
@@ -223,7 +223,7 @@ class IceFridgeStreamInterface(StreamInterface):
         if heater_range != self.device.lakeshore_mc_heater_range:
             raise ValueError("Invalid command sequence! The heater range should have already been set to the new value "
                              "by a CSET command!")
-        return "Set LakeShore 370"
+        return "OK"
 
     @if_connected
     def get_lakeshore_mc_heater_range(self):
@@ -267,10 +267,10 @@ class IceFridgeStreamInterface(StreamInterface):
 
         if channel == 5:
             self.device.lakeshore_exc_voltage_range_ch5 = voltage_range
-            return "Set LakeShore 370"
+            return "OK"
         elif channel == 6:
             self.device.lakeshore_exc_voltage_range_ch6 = voltage_range
-            return "Set LakeShore 370"
+            return "OK"
         else:
             raise ValueError("channel number can only be either 5 or 6!")
 
