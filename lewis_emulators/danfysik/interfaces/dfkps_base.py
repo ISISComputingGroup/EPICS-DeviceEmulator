@@ -27,6 +27,7 @@ class CommonStreamInterface(object):
         CmdBuilder("set_power_off").escape("F").eos().build(),
         CmdBuilder("set_power_on").escape("N").eos().build(),
         CmdBuilder("get_status").escape("S1").eos().build(),
+        CmdBuilder("get_sp_rbv").escape("RA").eos().build(),
         CmdBuilder("reset").escape("RS").eos().build(),
     ]
 
@@ -48,6 +49,10 @@ class CommonStreamInterface(object):
     @conditional_reply("comms_initialized")
     def set_current(self, value):
         self.device.current = value
+
+    @conditional_reply("comms_initialized")
+    def get_sp_rbv(self):
+        return self.device.current
 
     @conditional_reply("device_available")
     @conditional_reply("comms_initialized")
