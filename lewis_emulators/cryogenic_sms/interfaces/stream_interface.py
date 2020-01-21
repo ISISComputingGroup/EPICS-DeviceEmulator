@@ -116,7 +116,6 @@ class CRYOSMSStreamInterface(StreamInterface):
                     self._device.switch_mode("AMPS")
         else:
             raise ValueError("Invalid arguments sent")
-        self.log.warn(self._device.log_message)
         return self._device.log_message
 
     def read_ramp_target(self):
