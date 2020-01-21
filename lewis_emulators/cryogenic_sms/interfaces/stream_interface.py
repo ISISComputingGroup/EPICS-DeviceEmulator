@@ -24,7 +24,7 @@ class CRYOSMSStreamInterface(StreamInterface):
             CmdBuilder(self.read_output).regex(re_get).regex("O(?:UTPUT)*").spaces().eos().build(),
             CmdBuilder(self.read_ramp_status).spaces().regex("R(?:AMP)*").spaces().regex("S(?:TATUS)*").spaces().eos()
                                              .build(),
-            CmdBuilder(self.read_heater_status).regex(re_get).regex("H(?:EATER)*").spaces().eos().build(),
+            CmdBuilder(self.read_heater_status).spaces().regex("H(?:EATER)*").spaces().eos().build(),
             CmdBuilder(self.read_max_target).regex(re_get).regex("(?:MAX|!)*").spaces().eos().build(),
             CmdBuilder(self.read_mid_target).regex(re_get).regex("(?:MID|%)*").spaces().eos().build(),
             CmdBuilder(self.read_ramp_rate).regex(re_get).regex("R(?:ATE)*").spaces().eos().build(),
@@ -108,14 +108,15 @@ class CRYOSMSStreamInterface(StreamInterface):
             if not self._device.is_output_mode_tesla:
                 self._device.switch_mode("TESLA")
         elif output_mode in OFF_STATES:
+            self._create_log_message("UNITS", "AMPS")
             if constant == 0:
                 self._device.error_message = "------> No field constant has been entered"
             else:
-                self._create_log_message("UNITS", "AMPS")
                 if self._device.is_output_mode_tesla:
                     self._device.switch_mode("AMPS")
         else:
             raise ValueError("Invalid arguments sent")
+        self.log.warn(self._device.log_message)
         return self._device.log_message
 
     def read_ramp_target(self):
