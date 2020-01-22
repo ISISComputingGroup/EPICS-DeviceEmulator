@@ -96,25 +96,51 @@ class SimulatedDanfysik(StateMachineDevice):
         self._initialize_data()
 
     def set_current_read_factor(self, factor):
+        """
+        Set the scale factor between current and raw when reading a value.
+        Args:
+            factor: The scale factor to apply.
+        """
         self.current_read_factor = factor
 
     def set_current_write_factor(self, factor):
+        """
+        Set the scale factor between current and raw when writing a value.
+        Args:
+            factor: The scale factor to apply.
+        """
         self.current_write_factor = factor
 
     def get_current(self):
-        current_pp100k = self.current / self.current_read_factor
-        return current_pp100k
+        """
+        Return:
+             The readback value of current as raw value (parts per 100,000)
+        """
+        raw_rbv = self.current / self.current_read_factor
+        return raw_rbv
 
     def get_last_setpoint(self):
-        current_ppm = self.current * self.current_write_factor
-        return current_ppm
+        """
+        Return:
+             The setpoint readback value of current as raw value (parts per 1,000,000)
+        """
+        raw_sp_rbv = self.current * self.current_write_factor
+        return raw_sp_rbv
 
-    def set_current(self, current_ppm):
-        current = current_ppm / self.current_write_factor
-        print("\n\ncurrent {} | factor {} | scaled {}\n".format(current_ppm, self.current_write_factor, current))
+    def set_current(self, raw_sp):
+        """
+        Set a new value for current.
+        Args:
+            raw_sp: The new value in raw (parts per 1,000,000)
+        """
+        current = raw_sp / self.current_write_factor
         self.current = current
 
     def get_voltage(self):
+        """
+        Return:
+             The readback value of voltage scaled by the custom scale factor
+        """
         return self.voltage * self.voltage_read_factor
 
     def _get_state_handlers(self):

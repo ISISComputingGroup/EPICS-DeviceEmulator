@@ -44,8 +44,7 @@ class CommonStreamInterface(object):
     @conditional_reply("device_available")
     @conditional_reply("comms_initialized")
     def get_current(self):
-        curr = self.device.get_current()
-        return int(round(curr))
+        return int(round(self.device.get_current()))
 
     @conditional_reply("comms_initialized")
     def set_current(self, value):
