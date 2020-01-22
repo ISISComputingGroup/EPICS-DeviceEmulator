@@ -30,6 +30,9 @@ class SimulatedDanfysik(StateMachineDevice):
 
         self.current = 0
         self.voltage = 0
+        self.voltage_read_factor = 1
+        self.current_read_factor = 1
+        self.current_write_factor = 1
 
         self.field_units = FieldUnits.GAUSS
         self.negative_polarity = False
@@ -91,6 +94,28 @@ class SimulatedDanfysik(StateMachineDevice):
         Reinitialise the device state (this is mainly used via the backdoor to clean up between tests)
         """
         self._initialize_data()
+
+    def set_current_read_factor(self, factor):
+        self.current_read_factor = factor
+
+    def set_current_write_factor(self, factor):
+        self.current_write_factor = factor
+
+    def get_current(self):
+        current_pp100k = self.current / self.current_read_factor
+        return current_pp100k
+
+    def get_last_setpoint(self):
+        current_ppm = self.current * self.current_write_factor
+        return current_ppm
+
+    def set_current(self, current_ppm):
+        current = current_ppm / self.current_write_factor
+        print("\n\ncurrent {} | factor {} | scaled {}\n".format(current_ppm, self.current_write_factor, current))
+        self.current = current
+
+    def get_voltage(self):
+        return self.voltage * self.voltage_read_factor
 
     def _get_state_handlers(self):
         """
