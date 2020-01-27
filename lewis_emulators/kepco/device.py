@@ -21,6 +21,8 @@ class SimulatedKepco(StateMachineDevice):
         self._idn = "000000000000000000000000000000000000000"
         self.connected = True
 
+        self.remote_comms_enabled = True
+
     def _get_state_handlers(self):
         """
         Returns: states and their names
@@ -92,7 +94,7 @@ class SimulatedKepco(StateMachineDevice):
     @setpoint_voltage.setter
     def setpoint_voltage(self, setpoint_voltage):
         """
-        :param SETPOINTVOLTAGE: set the Setpoint Voltage
+        :param setpoint_voltage: set the Setpoint Voltage
         :return:
         """
         self._setpoint_voltage = setpoint_voltage
@@ -107,7 +109,7 @@ class SimulatedKepco(StateMachineDevice):
     @setpoint_current.setter
     def setpoint_current(self, setpoint_current):
         """
-        :param SETpoint CURRENT: set the setpoint current
+        :param setpoint_current: set the setpoint current
         :return:
         """
         self._setpoint_current = setpoint_current
