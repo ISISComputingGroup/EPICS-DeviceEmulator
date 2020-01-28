@@ -23,6 +23,10 @@ class SimulatedItc503(StateMachineDevice):
 
         self.heater_v = 0
 
+        # Set by tests, affects the response format of the device. Slightly different models of ITC will respond
+        # differently
+        self.report_sweep_state_with_leading_zero = False
+
     def _get_state_handlers(self):
         return {'default': DefaultState()}
 
