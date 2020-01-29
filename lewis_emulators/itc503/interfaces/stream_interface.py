@@ -89,7 +89,12 @@ class Itc503StreamInterface(StreamInterface):
         return "R{:.1f}".format(self.device.temperature_sp)
 
     def get_status(self):
-        return "X0A{mode}C{ctrl}S{sweeping}H{control_channel}L{autopid}".format(
+        if self.device.report_sweep_state_with_leading_zero:
+            format_string = "X0A{mode}C{ctrl}S{sweeping:02d}H{control_channel}L{autopid}"
+        else:
+            format_string = "X0A{mode}C{ctrl}S{sweeping:01d}H{control_channel}L{autopid}"
+
+        return format_string.format(
             mode=self.device.mode,
             ctrl=self.device.control,
             sweeping=1 if self.device.sweeping else 0,
