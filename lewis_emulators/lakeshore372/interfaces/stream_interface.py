@@ -28,7 +28,7 @@ class Lakeshore372StreamInterface(StreamInterface):
 
         CmdBuilder("get_heater_power").escape("HTR?").eos().build(),
 
-        CmdBuilder("get_pid").escape("PID? 0").eos().build(),
+        CmdBuilder("get_pid").escape("PID? ").optional("0").eos().build(),
         CmdBuilder("set_pid").escape("PID ").float().escape(",").int().escape(",").int().eos().build(),
 
         CmdBuilder("get_outmode").escape("OUTMODE? 0").eos().build(),
