@@ -24,7 +24,7 @@ class CRYOSMSStreamInterface(StreamInterface):
             CmdBuilder(self.read_output).regex(re_get).regex("O(?:UTPUT)*").spaces().eos().build(),
             CmdBuilder(self.read_ramp_status).spaces().regex("R(?:AMP)*").spaces().regex("S(?:TATUS)*").spaces().eos()
                                              .build(),
-            CmdBuilder(self.read_heater_status).spaces().escape("H(?:EATER)*").spaces().eos().build(),
+            CmdBuilder(self.read_heater_status).spaces().regex("H(?:EATER)*").spaces().eos().build(),
             CmdBuilder(self.read_max_target).regex(re_get).regex("(?:MAX|!)*").spaces().eos().build(),
             CmdBuilder(self.read_mid_target).regex(re_get).regex("(?:MID|%)*").spaces().eos().build(),
             CmdBuilder(self.read_ramp_rate).regex(re_get).regex("R(?:ATE)*").spaces().eos().build(),
@@ -104,16 +104,16 @@ class CRYOSMSStreamInterface(StreamInterface):
         # Convert values if output mode is changing between amps(OFF) / tesla(ON)
         constant = self._device.constant
         if output_mode in ON_STATES:
+            self._create_log_message("UNITS", "TESLA")
             if not self._device.is_output_mode_tesla:
                 self._device.switch_mode("TESLA")
-                self._create_log_message("UNITS", "TESLA")
         elif output_mode in OFF_STATES:
+            self._create_log_message("UNITS", "AMPS")
             if constant == 0:
                 self._device.error_message = "------> No field constant has been entered"
             else:
                 if self._device.is_output_mode_tesla:
                     self._device.switch_mode("AMPS")
-                    self._create_log_message("UNITS", "AMPS")
         else:
             raise ValueError("Invalid arguments sent")
         return self._device.log_message
@@ -123,7 +123,7 @@ class CRYOSMSStreamInterface(StreamInterface):
 
     def read_ramp_status(self):
         output = self._device.output
-        status_message = " RAMP STATUS: "
+        status_message = "RAMP STATUS: "
         if self._device.is_paused:
             status_message += "HOLDING ON PAUSE AT {} {}".format(output, self._get_output_mode_string())
         elif self._device.at_target:
