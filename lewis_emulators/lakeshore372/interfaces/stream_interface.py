@@ -29,7 +29,7 @@ class Lakeshore372StreamInterface(StreamInterface):
         CmdBuilder("get_heater_power").escape("HTR?").eos().build(),
 
         CmdBuilder("get_pid").escape("PID? ").optional("0").eos().build(),
-        CmdBuilder("set_pid").escape("PID ").float().escape(",").int().escape(",").int().eos().build(),
+        CmdBuilder("set_pid").escape("PID ").float().escape(",").float().escape(",").float().eos().build(),
 
         CmdBuilder("get_outmode").escape("OUTMODE? 0").eos().build(),
         CmdBuilder("set_outmode").escape("OUTMODE 0,").int().escape(",").int().escape(",").int().escape(",").int().escape(",").int().escape(",").int().eos().build(),
@@ -76,8 +76,8 @@ class Lakeshore372StreamInterface(StreamInterface):
 
     def set_pid(self, p, i, d):
         self._device.p = p
-        self._device.i = i
-        self._device.d = d
+        self._device.i = int(round(i))
+        self._device.d = int(round(d))
 
     @if_connected
     def get_outmode(self):
