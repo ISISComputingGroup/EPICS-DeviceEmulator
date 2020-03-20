@@ -15,11 +15,16 @@ class SimulatedSampleChanger(StateMachineDevice):
     CAR_SPEED = 1.0/6.0  # Carousel takes 6 seconds per position (measured on actual device)
 
     def _initialize_data(self):
+        self.reset()
+
+    def reset(self):
         self.car_pos = -1
         self.car_target = -1
         self.arm_lowered = False
         self.current_err = Errors.NO_ERR
-        self._drop_sample_on_next_move = False
+        self._position_to_drop_sample = None
+        self._sample_retrieved = False
+        self.drop_persistently = False
 
     def _get_state_handlers(self):
         return {
@@ -37,8 +42,8 @@ class SimulatedSampleChanger(StateMachineDevice):
         return OrderedDict([
             (('init', 'initialising'), lambda: self.car_target > 0),
             (('initialising', 'idle'), lambda: self.car_pos == 1),
-            (('idle', 'car_moving'), lambda: self.car_target != self.car_pos and not self.drop_sample_on_next_move),
-            (('idle', 'sample_dropped'), lambda: self.car_target != self.car_pos and self.drop_sample_on_next_move),
+            (('idle', 'car_moving'), lambda: self.car_target != self.car_pos),
+            (('car_moving', 'sample_dropped'), lambda: self._position_to_drop_sample != None and (self._position_to_drop_sample - self.car_pos) < 0.5),
             (('car_moving', 'idle'), lambda: self.car_pos == self.car_target),
             (('sample_dropped', 'idle'), lambda: self.car_target != self.car_pos),
         ])
@@ -105,9 +110,20 @@ class SimulatedSampleChanger(StateMachineDevice):
         return Errors.NO_ERR
 
     @property
-    def drop_sample_on_next_move(self):
-        return self._drop_sample_on_next_move
+    def sample_retrieved(self):
+        return self._sample_retrieved
 
-    @drop_sample_on_next_move.setter
-    def drop_sample_on_next_move(self, value):
-        self._drop_sample_on_next_move = (bool(value) or value == "True")
+    @sample_retrieved.setter
+    def sample_retrieved(self, val):
+        if not self.drop_persistently:
+            self._sample_retrieved = val
+            self.position_to_drop_sample = None
+        self.arm_lowered = True
+
+    @property
+    def position_to_drop_sample(self):
+        return self._position_to_drop_sample
+
+    @position_to_drop_sample.setter
+    def position_to_drop_sample(self, value):
+        self._position_to_drop_sample = value

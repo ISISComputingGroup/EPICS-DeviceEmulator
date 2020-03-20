@@ -7,6 +7,7 @@ class Errors(object):
     ERR_INV_DEST = 5
     ERR_NOT_INITIALISED = 6
     ERR_ARM_DROPPED = 7
+    ERR_ARM_FAILED_TO_LOWER = 8
     ERR_ARM_UP = 8
     ERR_CANT_ROT_IF_NOT_UP = 10
 
@@ -28,7 +29,7 @@ class SampleDroppedState(State):
         self._context.log.info("Entered sample dropped state.")
         self._context.current_err = Errors.ERR_ARM_DROPPED
         self._context.car_target = self._context.car_pos
-        self._context.drop_sample_on_next_move = False
 
     def on_exit(self, dt):
+        self._context.current_err = Errors.NO_ERR
         self._context.log.info("Exited sample dropped state.")
