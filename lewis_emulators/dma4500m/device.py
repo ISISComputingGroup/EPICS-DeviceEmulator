@@ -45,7 +45,6 @@ class SimulatedDMA4500M(StateMachineDevice):
             return "measurement aborted"
 
     def finished(self):
-        print(self.status)
         return self.status
 
     def set_temperature(self, temperature):
@@ -61,7 +60,6 @@ class SimulatedDMA4500M(StateMachineDevice):
             return "no new data"
         else:
             data = self.data_buffer
-            print(data)
             self.data_buffer = ""
             return data
 
