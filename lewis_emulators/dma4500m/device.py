@@ -32,17 +32,17 @@ class SimulatedDMA4500M(StateMachineDevice):
     def start(self):
         if self.measuring:
             return "measurement already started"
-
-        self.sample_id += 1
-        self.measuring = True
-        return "measurement started"
+        else:
+            self.sample_id += 1
+            self.measuring = True
+            return "measurement started"
 
     def abort(self):
         if not self.measuring:
             return "measurement not started"
-
-        self.measuring = False
-        return "measurement aborted"
+        else:
+            self.measuring = False
+            return "measurement aborted"
 
     def finished(self):
         print(self.status)
@@ -51,19 +51,19 @@ class SimulatedDMA4500M(StateMachineDevice):
     def set_temperature(self, temperature):
         if self.measuring:
             return "not allowed during measurement"
-
-        self.target_temperature = temperature
-        self.setting_temperature = True
-        return "accepted"
+        else:
+            self.target_temperature = temperature
+            self.setting_temperature = True
+            return "accepted"
 
     def get_data(self):
         if not self.data_buffer:
             return "no new data"
-
-        data = self.data_buffer
-        print(data)
-        self.data_buffer = ""
-        return data
+        else:
+            data = self.data_buffer
+            print(data)
+            self.data_buffer = ""
+            return data
 
     def get_raw_data(self):
         sample_id = self.sample_id or "NaN"
