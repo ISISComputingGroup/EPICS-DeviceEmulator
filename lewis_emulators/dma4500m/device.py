@@ -64,7 +64,7 @@ class SimulatedDMA4500M(StateMachineDevice):
             return data
 
     def get_raw_data(self):
-        sample_id = self.sample_id or "NaN"
+        sample_id = self.sample_id if self.sample_id else "NaN"
         return "{0:.6f};{1:.2f};{2:.2f};{3}".format(self.density,
                                                     self.actual_temperature,
                                                     self.target_temperature,
