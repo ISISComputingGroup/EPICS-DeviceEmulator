@@ -33,25 +33,15 @@ class DMA4500MStreamInterface(StreamInterface):
 
     @if_connected
     def start(self):
-        if self._device.measuring:
-            return "measurement already started"
-
-        self._device.sample_id += 1
-        self._device.measuring = True
-        return "measurement started"
+        return self._device.start()
 
     @if_connected
     def abort(self):
-        if not self._device.measuring:
-            return "measurement not started"
-
-        self._device.measuring = False
-        return "measurement aborted"
+        return self._device.abort()
 
     @if_connected
     def finished(self):
-        print(self._device.status)
-        return self._device.status
+        return self._device.finished()
 
     @if_connected
     def set_temperature(self, temperature_arg):
@@ -60,31 +50,16 @@ class DMA4500MStreamInterface(StreamInterface):
         except ValueError:
             return "the given temperature could not be parsed"
 
-        if self._device.measuring:
-            return "not allowed during measurement"
-
-        self._device.target_temperature = temperature
-        self._device.setting_temperature = True
-        return "accepted"
+        return self._device.set_temperature(temperature)
 
     @if_connected
     def get_data(self):
-        if not self._device.data_buffer:
-            return "no new data"
-
-        data = self._device.data_buffer
-        print(data)
-        self._device.data_buffer = ""
-        return data
+        return self._device.get_data()
 
     @if_connected
     def get_data_with_subs(self):
-        return self.get_data()
+        return self._device.get_data()
 
     @if_connected
     def get_raw_data(self):
-        sample_id = self._device.sample_id or "NaN"
-        return "{0:.6f};{1:.2f};{2:.2f};{3}".format(self._device.density,
-                                                    self._device.actual_temperature,
-                                                    self._device.target_temperature,
-                                                    sample_id)
+        return self._device.get_raw_data()
