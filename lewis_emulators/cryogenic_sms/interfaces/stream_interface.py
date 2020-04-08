@@ -95,8 +95,9 @@ class CRYOSMSStreamInterface(StreamInterface):
         return self._out_message("UNITS: {}".format(self._get_output_mode_string()))
 
     def read_output(self):
+        sign = -1 if self._device.direction == RampDirection.NEGATIVE else 1
         return "{} OUTPUT: {} {} AT {} VOLTS \r\n".format(self._timestamp(),
-                                                          self._device.output,
+                                                          self._device.output * sign,
                                                           self._get_output_mode_string(),
                                                           self._device.heater_value)
 
