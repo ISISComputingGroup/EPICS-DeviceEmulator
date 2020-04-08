@@ -130,10 +130,13 @@ class Lakeshore460StreamInterface(StreamInterface):
         self._device.channels[self.get_channel()].filter_status = filter
 
     def set_relative_mode_status(self, rel_mode):
+        self.log.info("Setting channel {} rel mode to {}".format(self.get_channel(), rel_mode))
         self._device.channels[self.get_channel()].rel_mode_status = rel_mode
 
     def get_relative_mode_status(self):
-        return "{0}".format(self._device.channels[self.get_channel()].rel_mode_status)
+        return_val = "{0}".format(self._device.channels[self.get_channel()].rel_mode_status)
+        self.log.info("Getting channel {} rel mode, value is{}".format(self.get_channel(), return_val))
+        return return_val
 
     def set_auto_mode_status(self, auto_mode_status):
         self._device.channels[self.get_channel()].auto_mode_status = auto_mode_status
