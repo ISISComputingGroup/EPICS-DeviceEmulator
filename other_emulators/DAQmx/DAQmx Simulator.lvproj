@@ -73,7 +73,7 @@
 				<Property Name="Bld_localDestDirType" Type="Str">relativeToProject</Property>
 				<Property Name="Bld_modifyLibraryFile" Type="Bool">true</Property>
 				<Property Name="Bld_previewCacheID" Type="Str">{F0B1A97E-05A1-4165-8CC2-5A122E65528F}</Property>
-				<Property Name="Bld_version.build" Type="Int">2</Property>
+				<Property Name="Bld_version.build" Type="Int">7</Property>
 				<Property Name="Bld_version.major" Type="Int">1</Property>
 				<Property Name="Destination[0].destName" Type="Str">start_sim.exe</Property>
 				<Property Name="Destination[0].path" Type="Path">../start_sim.exe</Property>
@@ -84,7 +84,7 @@
 				<Property Name="Destination[1].path" Type="Path">../data</Property>
 				<Property Name="Destination[1].path.type" Type="Str">relativeToProject</Property>
 				<Property Name="DestinationCount" Type="Int">2</Property>
-				<Property Name="Source[0].itemID" Type="Str">{7A84589B-2BE2-4823-AE48-417668C448A6}</Property>
+				<Property Name="Source[0].itemID" Type="Str">{D10F49FF-FE2B-44E0-91F5-807434181978}</Property>
 				<Property Name="Source[0].type" Type="Str">Container</Property>
 				<Property Name="Source[1].destinationIndex" Type="Int">0</Property>
 				<Property Name="Source[1].itemID" Type="Ref">/My Computer/Start Simulation.vi</Property>
@@ -114,7 +114,7 @@
 				<Property Name="Bld_localDestDirType" Type="Str">relativeToProject</Property>
 				<Property Name="Bld_modifyLibraryFile" Type="Bool">true</Property>
 				<Property Name="Bld_previewCacheID" Type="Str">{DA5770AA-28BD-4FD0-A8E9-1F88901DB54B}</Property>
-				<Property Name="Bld_version.build" Type="Int">1</Property>
+				<Property Name="Bld_version.build" Type="Int">5</Property>
 				<Property Name="Bld_version.major" Type="Int">1</Property>
 				<Property Name="Destination[0].destName" Type="Str">stop_sim.exe</Property>
 				<Property Name="Destination[0].path" Type="Path">../stop_sim.exe</Property>
