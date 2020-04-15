@@ -75,7 +75,7 @@ class MezfliprStreamInterface(StreamInterface):
     @if_connected
     def set_flipper_steps(self, params):
         self._device.params = params
-        self._device.mode = "step"
+        self._device.mode = "steps"
         return "flipper_steps={}".format(params)
 
     @if_connected
