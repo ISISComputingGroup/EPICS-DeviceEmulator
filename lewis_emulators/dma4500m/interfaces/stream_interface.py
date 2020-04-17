@@ -21,7 +21,6 @@ class DMA4500MStreamInterface(StreamInterface):
             CmdBuilder(self.finished).escape("finished").eos().build(),
             CmdBuilder(self.set_temperature).escape("set").optional(" ").escape("temperature ").arg(".+").eos().build(),
             CmdBuilder(self.get_data).escape("get").optional(" ").escape("data").eos().build(),
-            CmdBuilder(self.get_data_with_subs).escape("get").optional(" ").escape("data").optional(" ").escape("with").optional(" ").escape("subs").eos().build(),
             CmdBuilder(self.get_raw_data).escape("get").optional(" ").escape("raw").optional(" ").escape("data").eos().build(),
         }
 
@@ -54,10 +53,6 @@ class DMA4500MStreamInterface(StreamInterface):
 
     @if_connected
     def get_data(self):
-        return self._device.get_data()
-
-    @if_connected
-    def get_data_with_subs(self):
         return self._device.get_data()
 
     @if_connected
