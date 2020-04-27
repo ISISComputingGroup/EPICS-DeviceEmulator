@@ -1,9 +1,11 @@
+from lewis.core.logging import has_log
 from lewis.devices import StateMachineDevice
 from lewis.core.statemachine import State
-from states import MovingState, Errors
+from states import MovingState, Errors, SampleDroppedState
 from collections import OrderedDict
 
 
+@has_log
 class SimulatedSampleChanger(StateMachineDevice):
     MIN_CAROUSEL = 1
     MAX_CAROUSEL = 20
@@ -13,17 +15,24 @@ class SimulatedSampleChanger(StateMachineDevice):
     CAR_SPEED = 1.0/6.0  # Carousel takes 6 seconds per position (measured on actual device)
 
     def _initialize_data(self):
+        self.reset()
+
+    def reset(self):
         self.car_pos = -1
         self.car_target = -1
         self.arm_lowered = False
         self.current_err = Errors.NO_ERR
+        self._position_to_drop_sample = None
+        self._sample_retrieved = False
+        self.drop_persistently = False
 
     def _get_state_handlers(self):
         return {
             'init': State(),
             'initialising': MovingState(),
             'idle': State(),
-            'car_moving': MovingState()
+            'car_moving': MovingState(),
+            'sample_dropped': SampleDroppedState(),
         }
 
     def _get_initial_state(self):
@@ -34,7 +43,10 @@ class SimulatedSampleChanger(StateMachineDevice):
             (('init', 'initialising'), lambda: self.car_target > 0),
             (('initialising', 'idle'), lambda: self.car_pos == 1),
             (('idle', 'car_moving'), lambda: self.car_target != self.car_pos),
-            (('car_moving', 'idle'), lambda: self.car_pos == self.car_target)])
+            (('car_moving', 'sample_dropped'), lambda: self._position_to_drop_sample != None and (self._position_to_drop_sample - self.car_pos) < 0.5),
+            (('car_moving', 'idle'), lambda: self.car_pos == self.car_target),
+            (('sample_dropped', 'idle'), lambda: self.car_target != self.car_pos),
+        ])
 
     def is_car_at_one(self):
         return self.car_pos == self.MIN_CAROUSEL
@@ -96,3 +108,22 @@ class SimulatedSampleChanger(StateMachineDevice):
         self.car_target = self.MIN_CAROUSEL
         self.current_err = Errors.NO_ERR
         return Errors.NO_ERR
+
+    @property
+    def sample_retrieved(self):
+        return self._sample_retrieved
+
+    @sample_retrieved.setter
+    def sample_retrieved(self, val):
+        if not self.drop_persistently:
+            self._sample_retrieved = val
+            self.position_to_drop_sample = None
+        self.arm_lowered = True
+
+    @property
+    def position_to_drop_sample(self):
+        return self._position_to_drop_sample
+
+    @position_to_drop_sample.setter
+    def position_to_drop_sample(self, value):
+        self._position_to_drop_sample = value
