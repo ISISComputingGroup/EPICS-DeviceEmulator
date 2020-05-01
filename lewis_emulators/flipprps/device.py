@@ -6,10 +6,7 @@ from lewis.devices import StateMachineDevice
 class SimulatedFlipprps(StateMachineDevice):
 
     def _initialize_data(self):
-        """
-        Initialize all of the device's attributes.
-        """
-        pass
+        self.polarity = 0
 
     def _get_state_handlers(self):
         return {

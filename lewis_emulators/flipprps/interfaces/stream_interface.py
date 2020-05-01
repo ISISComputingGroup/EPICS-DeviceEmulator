@@ -5,8 +5,16 @@ class FlipprpsStreamInterface(StreamInterface):
 
     # Commands that we expect via serial during normal operation
     commands = {
-        Cmd("catch_all", "^#9.*$"),  # Catch-all command for debugging
+        Cmd("set_polarity_down", "^dn$"),
+        Cmd("set_polarity_up", "^up$"),
     }
 
-    def catch_all(self):
-        pass
+    terminator = "\r\n"
+
+    def set_polarity_down(self):
+        self._device.polarity = 0
+        return "OK" + self.terminator
+
+    def set_polarity_up(self):
+        self._device.polarity = 1
+        return "OK" + self.terminator
