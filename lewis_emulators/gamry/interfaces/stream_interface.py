@@ -24,7 +24,7 @@ class GamryStreamInterface(StreamInterface):
         return "BEAMOFF"
 
     def charged(self):
-        self.handler.unsolicitedReply("STOPPED")
+        self.handler.unsolicited_reply("STOPPED")
 
     def start_charging(self):
         t = Timer(self.charging_time, self.charged)
