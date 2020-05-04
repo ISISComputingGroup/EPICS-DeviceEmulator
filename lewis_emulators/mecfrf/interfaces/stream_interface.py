@@ -43,9 +43,9 @@ class MecfrfStreamInterface(StreamInterface):
         else:
             if self.device.corrupted_messages:
                 # Nonsense message which should cause alarms in the IOC.
-                handler.unsolicitedReply(b"A" * EXPECTED_MESSAGE_LENGTH)
+                handler.unsolicited_reply(b"A" * EXPECTED_MESSAGE_LENGTH)
             else:
-                handler.unsolicitedReply(self._construct_status_message())
+                handler.unsolicited_reply(self._construct_status_message())
 
     def _construct_status_message(self):
         # Fixed message "preamble"
