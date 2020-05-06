@@ -7,7 +7,7 @@ from response_utilities import phase_information_response_packet, rotator_angle_
 
 
 @has_log
-class SimulatedFinsPLC(StreamInterface):
+class FinsPLCStreamInterface(StreamInterface):
 
     # Commands that we expect via serial during normal operation. Match anything!
     commands = {

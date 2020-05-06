@@ -1,3 +1,3 @@
-from .stream_interface import SimulatedFinsPLC
+from .stream_interface import FinsPLCStreamInterface
 
-__all__ = ['SimulatedFinsPLC']
+__all__ = ['FinsPLCStreamInterface']
