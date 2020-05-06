@@ -7,6 +7,15 @@ class SimulatedFinsPLC(StateMachineDevice):
 
     FINS_HE_RECOVERY_NODE = 58
 
+    memory_value_mapping = {
+        19500: 1,  # heartbeat
+        19533: 999,  # helium purity
+        19534: 2136,  # dew point
+        19900: 245  # HE_BAG_PR_BE_ATM
+    }
+
+    double_word_memory_locations = {}
+
     def _initialize_data(self):
         """
         Initialize all of the device's attributes.

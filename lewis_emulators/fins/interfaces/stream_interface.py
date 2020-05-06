@@ -17,15 +17,6 @@ class FinsPLCStreamInterface(StreamInterface):
     in_terminator = "\r\n"
     out_terminator = in_terminator
 
-    memory_value_mapping = {
-        19500: 1,  # heartbeat
-        19533: 999,  # helium purity
-        19534: 2136,  # dew point
-        19900: 245  # HE_BAG_PR_BE_ATM
-    }
-
-    double_word_memory_locations = {}
-
     def handle_error(self, request, error):
         print("An error occurred at request " + repr(request) + ": " + repr(error))
         return str(error)
@@ -83,7 +74,7 @@ class FinsPLCStreamInterface(StreamInterface):
 
         number_of_words_to_read = raw_bytes_to_int(command[16:18])
 
-        if number_of_words_to_read == 2 and memory_start_address not in self.double_word_memory_locations:
+        if number_of_words_to_read == 2 and memory_start_address not in self.device.double_word_memory_locations:
             raise ValueError("The memory start address specified corresponds to a single word in the memory map, "
                              "not two.")
         elif number_of_words_to_read > 2:
