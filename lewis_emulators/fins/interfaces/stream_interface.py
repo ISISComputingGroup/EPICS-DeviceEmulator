@@ -4,11 +4,10 @@ from lewis.core.logging import has_log
 from lewis_emulators.utils.byte_conversions import raw_bytes_to_int
 from response_utilities import phase_information_response_packet, rotator_angle_response_packet, \
     phase_time_response_packet, general_status_response_packet
-from .crc16 import crc16_matches, crc16
 
 
 @has_log
-class SkfMb350ChopperStreamInterface(StreamInterface):
+class SimulatedFinsPLC(StreamInterface):
 
     # Commands that we expect via serial during normal operation. Match anything!
     commands = {
@@ -49,10 +48,6 @@ class SkfMb350ChopperStreamInterface(StreamInterface):
             raise ValueError("Command number should be in map")
 
         command_data = [c for c in command[3:-2]]
-
-        if not crc16_matches(command[:-2], command[-2:]):
-            raise ValueError("CRC Checksum didn't match. Expected {} but got {}"
-                             .format(crc16(command[:-2]), command[-2:]))
 
         return command_mapping[command_number](address, command_data)
 

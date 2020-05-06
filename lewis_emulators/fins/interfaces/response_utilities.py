@@ -100,7 +100,6 @@ class ResponseBuilder(object):
         """
         Adds an float to the builder (4 bytes, IEEE single-precision)
         :param value: The float to add
-        :param length: How many bytes should the integer be represented as
         :return: The builder
         """
         self.response += float_to_raw_bytes(value)
@@ -123,10 +122,8 @@ class ResponseBuilder(object):
         :param device: The lewis device
         :return: (ResponseBuilder) the builder with the common header bytes.
         """
-        return self.add_int(address, 1) \
-                .add_int(command_number, 1) \
-                .add_int(0x00, 1) \
-                .add_int(int(device.get_frequency()), 2)
+        return self.add_int(address, 1).add_int(command_number, 1).add_int(0x00, 1) \
+            .add_int(int(device.get_frequency()), 2)
 
     def build(self):
         """
