@@ -4,6 +4,7 @@ from lewis.core.logging import has_log
 from lewis_emulators.utils.byte_conversions import raw_bytes_to_int
 from response_utilities import phase_time_response_packet, general_status_response_packet, check_is_byte, \
     dm_memory_area_read_response_fins_frame
+from ..device import SimulatedFinsPLC
 
 
 @has_log
@@ -23,41 +24,23 @@ class FinsPLCStreamInterface(StreamInterface):
 
     def any_command(self, command):
 
-        icf = ord(command[0])
-        if icf != 0x80:
-            raise ValueError("ICF value should always be 0x80 for a command sent to the emulator")
-
-        # Reserved byte. Should always be 0x00
-        if ord(command[1]) != 0x00:
-            raise ValueError("Reserved byte should always be 0x00.")
-
-        if ord(command[2]) != 0x02:
-            raise ValueError("Gate count should always be 0x02.")
-
-        check_is_byte(command[3])
+        self._check_fins_frame_header_validity(command[:10])
+        
         self.device.network_address = ord(command[3])
         self.log.info("Server network address: {}".format(self.device.network_address))
 
-        if ord(command[4]) != 0x3A:
-            raise ValueError("The node address of the FINS helium recovery PLC should be 58!")
-
-        check_is_byte(command[5])
         self.device.unit_address = ord(command[5])
         self.log.info("Server Unit address: {}".format(self.device.unit_address))
 
-        check_is_byte(command[6])
         client_network_address = ord(command[6])
         self.log.info("Client network address: {}".format(client_network_address))
 
-        check_is_byte(command[7])
         client_node_address = ord(command[7])
         self.log.info("Client node address: {}".format(client_node_address))
 
-        check_is_byte(command[8])
         client_unit_address = ord(command[8])
         self.log.info("Client unit address: {}".format(client_unit_address))
 
-        check_is_byte(command[9])
         service_id = ord(command[9])
         self.log.info("Service id: {}".format(service_id))
 
@@ -85,6 +68,25 @@ class FinsPLCStreamInterface(StreamInterface):
                                                        client_node_address, client_unit_address, service_id,
                                                        memory_start_address, number_of_words_to_read)
 
-    def get_phase_info(self, address, data):
-        self.log.info("Getting phase info")
-        return phase_information_response_packet(address, self._device)
+    @staticmethod
+    def _check_fins_frame_header_validity(fins_frame_header):
+
+        icf = ord(fins_frame_header[0])
+        if icf != 0x80:
+            raise ValueError("ICF value should always be 0x80 for a command sent to the emulator")
+
+        # Reserved byte. Should always be 0x00
+        if ord(fins_frame_header[1]) != 0x00:
+            raise ValueError("Reserved byte should always be 0x00.")
+
+        if ord(fins_frame_header[2]) != 0x02:
+            raise ValueError("Gate count should always be 0x02.")
+
+        check_is_byte(fins_frame_header[3])
+
+        if ord(fins_frame_header[4]) != SimulatedFinsPLC.FINS_HE_RECOVERY_NODE:
+            raise ValueError("The node address of the FINS helium recovery PLC should be {}!".format(
+                SimulatedFinsPLC.FINS_HE_RECOVERY_NODE))
+
+        for i in range(5, 10):
+            check_is_byte(fins_frame_header[i])
