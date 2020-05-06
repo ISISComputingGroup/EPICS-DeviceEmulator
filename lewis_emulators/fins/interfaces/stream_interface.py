@@ -23,9 +23,17 @@ class FinsPLCStreamInterface(StreamInterface):
         return str(error)
 
     def any_command(self, command):
-
+        """
+        Handles all command sent to this emulator. It checks the validity of the command, and raises an error if it
+        finds something invalid. If the command is valid, then it returns a string representing the response to the
+        command.
+        :param command: A string where every character represents a byte from the received FINS command frame.
+        :return: a string where each character represents a
+        byte from the FINS response frame.
+        """
         self._check_fins_frame_header_validity(command[:10])
-        
+
+        # We extract information necessary for building the FINS response header
         self.device.network_address = ord(command[3])
         self.log.info("Server network address: {}".format(self.device.network_address))
 
