@@ -1,6 +1,19 @@
 from lewis_emulators.utils.byte_conversions import int_to_raw_bytes, float_to_raw_bytes
 
 
+def check_is_byte(character):
+    number = ord(character)
+
+    if 0 > number > 255:
+        raise ValueError("the character in the string must represent a byte value")
+
+
+def dm_memory_area_read_response_fins_frame(server_network_address, server_unit_address, client_network_address,
+                                            client_node_address, client_unit_address, service_id, memory_start_address,
+                                            number_f_words):
+    pass
+
+
 def general_status_response_packet(address, device, command):
     """
     Returns the general response packet, the default response to any command that doesn't have a more specific response.
@@ -15,46 +28,6 @@ def general_status_response_packet(address, device, command):
     """
     return ResponseBuilder() \
         .add_common_header(address, command, device) \
-        .build()
-
-
-def phase_information_response_packet(address, device):
-    """
-    Returns the response to the "get_phase_information" command.
-
-    Response structure is:
-        8 bytes common header (see ResponseBuilder.add_common_header)
-        4 bytes (IEEE single-precision float): The current phase
-        4 bytes (IEEE single-precision float): Phase repeatability
-        4 bytes (IEEE single-precision float): Phase percent OK
-
-    :param address: The address of this device
-    :param device: The lewis device
-    :return: The response
-    """
-    return ResponseBuilder() \
-        .add_common_header(address, 0xC0, device) \
-        .add_float(device.get_phase()) \
-        .add_float(device.get_phase_repeatability()) \
-        .add_float(device.get_phase_percent_ok()) \
-        .build()
-
-
-def rotator_angle_response_packet(address, device):
-    """
-    Returns the response to the "get_rotator_angle" command.
-
-    Response structure is:
-        8 bytes common header (see ResponseBuilder.add_common_header)
-        4 bytes (unsigned int): The current rotator angle
-
-    :param address: The address of this device
-    :param device: The lewis device
-    :return: The response
-    """
-    return ResponseBuilder() \
-        .add_common_header(address, 0x81, device) \
-        .add_int(int(device.get_rotator_angle()*10), 4) \
         .build()
 
 

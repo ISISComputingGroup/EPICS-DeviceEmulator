@@ -2,8 +2,8 @@ from lewis.adapters.stream import StreamInterface, Cmd
 from lewis.core.logging import has_log
 
 from lewis_emulators.utils.byte_conversions import raw_bytes_to_int
-from response_utilities import phase_information_response_packet, rotator_angle_response_packet, \
-    phase_time_response_packet, general_status_response_packet
+from response_utilities import phase_time_response_packet, general_status_response_packet, check_is_byte, \
+    dm_memory_area_read_response_fins_frame
 
 
 @has_log
@@ -17,88 +17,83 @@ class FinsPLCStreamInterface(StreamInterface):
     in_terminator = "\r\n"
     out_terminator = in_terminator
 
+    memory_value_mapping = {
+        19500: 1,  # heartbeat
+        19533: 999,  # helium purity
+        19534: 2136,  # dew point
+        19900: 245  # HE_BAG_PR_BE_ATM
+    }
+
+    double_word_memory_locations = {}
+
     def handle_error(self, request, error):
         print("An error occurred at request " + repr(request) + ": " + repr(error))
         return str(error)
 
     def any_command(self, command):
 
-        command_mapping = {
-            0x20: self.start,
-            0x30: self.stop,
-            0x60: self.set_rotational_speed,
-            0x81: self.get_rotator_angle,
-            0x82: self.set_rotator_angle,
-            0x85: self.get_phase_delay,
-            0x8E: self.set_gate_width,
-            0x90: self.set_nominal_phase,
-            0xC0: self.get_phase_info,
-        }
+        icf = ord(command[0])
+        if icf != 0x80:
+            raise ValueError("ICF value should always be 0x80 for a command sent to the emulator")
 
-        address = ord(command[0])
-        if not 0 <= address < 16:
-            raise ValueError("Address should be in range 0-15")
+        # Reserved byte. Should always be 0x00
+        if ord(command[1]) != 0x00:
+            raise ValueError("Reserved byte should always be 0x00.")
 
-        # Constant function code. Should always be 0x80
-        if ord(command[1]) != 0x80:
-            raise ValueError("Function code should always be 0x80")
+        if ord(command[2]) != 0x02:
+            raise ValueError("Gate count should always be 0x02.")
 
-        command_number = ord(command[2])
-        if command_number not in command_mapping.keys():
-            raise ValueError("Command number should be in map")
+        check_is_byte(command[3])
+        self.device.network_address = ord(command[3])
+        self.log.info("Server network address: {}".format(self.device.network_address))
 
-        command_data = [c for c in command[3:-2]]
+        if ord(command[4]) != 0x3A:
+            raise ValueError("The node address of the FINS helium recovery PLC should be 58!")
 
-        return command_mapping[command_number](address, command_data)
+        check_is_byte(command[5])
+        self.device.unit_address = ord(command[5])
+        self.log.info("Server Unit address: {}".format(self.device.unit_address))
 
-    def start(self, address, data):
-        self._device.start()
-        return general_status_response_packet(address, self.device, 0x20)
+        check_is_byte(command[6])
+        client_network_address = ord(command[6])
+        self.log.info("Client network address: {}".format(client_network_address))
 
-    def stop(self, address, data):
-        self._device.stop()
-        return general_status_response_packet(address, self.device, 0x30)
+        check_is_byte(command[7])
+        client_node_address = ord(command[7])
+        self.log.info("Client node address: {}".format(client_node_address))
 
-    def set_nominal_phase(self, address, data):
-        self.log.info("Setting phase")
-        self.log.info("Data = {}".format(data))
-        nominal_phase = raw_bytes_to_int(data) / 1000.
-        self.log.info("Setting nominal phase to {}".format(nominal_phase))
-        self._device.set_nominal_phase(nominal_phase)
-        return general_status_response_packet(address, self.device, 0x90)
+        check_is_byte(command[8])
+        client_unit_address = ord(command[8])
+        self.log.info("Client unit address: {}".format(client_unit_address))
 
-    def set_gate_width(self, address, data):
-        self.log.info("Setting gate width")
-        self.log.info("Data = {}".format(data))
-        width = raw_bytes_to_int(data)
-        self.log.info("Setting gate width to {}".format(width))
-        self._device.set_phase_repeatability(width / 10.)
-        return general_status_response_packet(address, self.device, 0x8E)
+        check_is_byte(command[9])
+        service_id = ord(command[9])
+        self.log.info("Service id: {}".format(service_id))
 
-    def set_rotational_speed(self, address, data):
-        self.log.info("Setting frequency")
-        self.log.info("Data = {}".format(data))
-        freq = raw_bytes_to_int(data)
-        self.log.info("Setting frequency to {}".format(freq))
-        self._device.set_frequency(freq)
-        return general_status_response_packet(address, self.device, 0x60)
+        if ord(command[10]) != 0x01 and ord(command[11]) != 0x01:
+            raise ValueError("The command code should be 0x0101, for memory area read command!")
 
-    def set_rotator_angle(self, address, data):
-        self.log.info("Setting rotator angle")
-        self.log.info("Data = {}".format(data))
-        angle_times_ten = raw_bytes_to_int(data)
-        self.log.info("Setting rotator angle to {}".format(angle_times_ten / 10.))
-        self._device.set_rotator_angle(angle_times_ten / 10.)
-        return general_status_response_packet(address, self.device, 0x82)
+        if ord(command[12]) != 0x82:
+            raise ValueError("The emulator only supports reading words from the DM area, for which the code is 82.")
+
+        memory_start_address = raw_bytes_to_int(command[13:15])
+
+        if ord(command[15]) != 0x00:
+            raise ValueError("The emulator only supports word designated memory reading. The bit address must be 0x00")
+
+        number_of_words_to_read = raw_bytes_to_int(command[16:18])
+
+        if number_of_words_to_read == 2 and memory_start_address not in self.double_word_memory_locations:
+            raise ValueError("The memory start address specified corresponds to a single word in the memory map, "
+                             "not two.")
+        elif number_of_words_to_read > 2:
+            raise ValueError("The memory map only specifies data types that should take up two words at most.")
+
+        return dm_memory_area_read_response_fins_frame(self.device.server_network_address,
+                                                       self.device.server_unit_address, client_network_address,
+                                                       client_node_address, client_unit_address, service_id,
+                                                       memory_start_address, number_of_words_to_read)
 
     def get_phase_info(self, address, data):
         self.log.info("Getting phase info")
         return phase_information_response_packet(address, self._device)
-
-    def get_rotator_angle(self, address, data):
-        self.log.info("Getting rotator angle")
-        return rotator_angle_response_packet(address, self._device)
-
-    def get_phase_delay(self, address, data):
-        self.log.info("Getting phase time")
-        return phase_time_response_packet(address, self._device)
