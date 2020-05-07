@@ -37,16 +37,16 @@ def raw_bytes_to_int(raw_bytes):
     return result
 
 
-def float_to_raw_bytes(float_number, low_byte_first=True):
+def float_to_raw_bytes(real_number, low_byte_first=True):
     """
     Converts an floating point number to an unsigned set of bytes.
 
     If low byte first is True, the least significant byte comes first, otherwise the most significant byte comes first.
-    :param floatfloat_number: (int) The integer to convert.
+    :param real_number: (int) The integer to convert.
     :param low_byte_first: (bool) Whether to put the least significant byte first. Treu by default.
     :return (str) A string representation of the bytes.
     """
-    raw_bytes = "".join(chr(c) for c in bytearray(struct.pack(">f", float_number)))
+    raw_bytes = "".join(chr(c) for c in bytearray(struct.pack(">f", real_number)))
 
     return raw_bytes[::-1] if low_byte_first else raw_bytes
 
