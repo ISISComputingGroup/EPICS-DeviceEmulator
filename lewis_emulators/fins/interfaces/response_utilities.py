@@ -23,24 +23,7 @@ def dm_memory_area_read_response_fins_frame(server_network_address, server_unit_
         .add_fins_frame_header(server_network_address, server_unit_address, client_network_address,
                                client_node_address, client_unit_address, service_id) \
         .add_fins_command_and_error_codes() \
-        .add_int(SimulatedFinsPLC.MEMORY_VALUE_MAPPING[memory_start_address], number_of_words * 2)
-
-
-def phase_time_response_packet(address, device):
-    """
-    Returns the response to the "get_phase_information" command.
-
-    Response structure is:
-        8 bytes common header (see ResponseBuilder.add_fins_frame_header)
-        4 bytes (unsigned int): The current rotator angle
-
-    :param address: The address of this device
-    :param device: The lewis device
-    :return: The response
-    """
-    return ResponseBuilder() \
-        .add_fins_frame_header(address, 0x85, device) \
-        .add_float(device.get_phase()/1000.) \
+        .add_int(SimulatedFinsPLC.MEMORY_VALUE_MAPPING[memory_start_address], number_of_words * 2)\
         .build()
 
 
