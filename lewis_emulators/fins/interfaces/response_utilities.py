@@ -14,13 +14,31 @@ def check_is_byte(character):
         raise ValueError("the character in the string must represent a byte value")
 
 
-def dm_memory_area_read_response_fins_frame(device, client_network_address, client_node_address, client_unit_address,
+def dm_memory_area_read_response_fins_frame(device, client_network_address, client_node, client_unit_address,
                                             service_id, memory_start_address, number_of_words):
+    """
+    Returns a response to a DM memory area read command.
+
+    Response structure is:
+        10 bytes FINS frame header.
+        2 bytes (integer): Command code, memory area read in this case
+        2 bytes (integer): End code. Shows errors.
+        2 bytes for every word read.
+
+    :param device: The Lewis device.
+    :param client_network_address: The FINS network address of the client.
+    :param client_node: The FINS node of the client.
+    :param client_unit_address: The FINS unit address of the client.
+    :param service_id: The service ID of the original command.
+    :param memory_start_address: The memory address from where reading starts.
+    :param number_of_words: The number of words to be read, starting from the start address, inclusive.
+    :return: the response, represented as a string.
+    """
 
     # The length argument asks for number of bytes, and each word has two bytes
     return FinsResponseBuilder() \
         .add_fins_frame_header(device.network_address, device.unit_address, client_network_address,
-                               client_node_address, client_unit_address, service_id) \
+                               client_node, client_unit_address, service_id) \
         .add_fins_command_and_error_codes() \
         .add_int(SimulatedFinsPLC.MEMORY_VALUE_MAPPING[memory_start_address], number_of_words * 2) \
         .build()
