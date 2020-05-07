@@ -85,7 +85,15 @@ class FinsPLCStreamInterface(StreamInterface):
 
     @staticmethod
     def _check_fins_frame_header_validity(fins_frame_header):
+        """
+        Checks that the FINS frame header part of the command is valid for a command sent from a client to a server
+        (PLC).
+        :param fins_frame_header: A string where every character represents a byte from the received FINS frame header.
+        :return: None
+        """
 
+        # ICF means Information Control Field, it gives information about if the frame is for a command or a response,
+        # and if a response is needed or not.
         icf = ord(fins_frame_header[0])
         if icf != 0x80:
             raise ValueError("ICF value should always be 0x80 for a command sent to the emulator")

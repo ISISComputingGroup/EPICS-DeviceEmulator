@@ -2,8 +2,13 @@ from lewis_emulators.utils.byte_conversions import int_to_raw_bytes, float_to_ra
 
 
 def check_is_byte(character):
-    number = ord(character)
+    """
+    Checks if the given character can represent a byte. Raises an error of it can not, otherwise returns nothing.
+    :param character: A one character string.
+    :return: None.
+    """
 
+    number = ord(character)
     if 0 > number > 255:
         raise ValueError("the character in the string must represent a byte value")
 
