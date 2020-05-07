@@ -16,7 +16,7 @@ def check_is_byte(character):
 
 def dm_memory_area_read_response_fins_frame(server_network_address, server_unit_address, client_network_address,
                                             client_node_address, client_unit_address, service_id, memory_start_address,
-                                            number_of_words)
+                                            number_of_words):
 
     # The length argument asks for number of bytes, and each word has two bytes
     return ResponseBuilder()\
