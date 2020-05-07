@@ -27,7 +27,7 @@ def raw_bytes_to_int(raw_bytes, low_bytes_first=True):
     Converts an unsigned set of bytes to an integer.
 
     :param raw_bytes: (str) A string representation of the raw bytes.
-    :param low_byte_first: (bool) Whether the given raw bytes are in little endian or not. True by default.
+    :param low_bytes_first: (bool) Whether the given raw bytes are in little endian or not. True by default.
     :return (int): The integer represented by the raw bytes passed in.
     """
 

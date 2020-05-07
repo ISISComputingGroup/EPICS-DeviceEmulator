@@ -20,23 +20,6 @@ def dm_memory_area_read_response_fins_frame(server_network_address, server_unit_
     pass
 
 
-def general_status_response_packet(address, device, command):
-    """
-    Returns the general response packet, the default response to any command that doesn't have a more specific response.
-
-    Response structure is:
-        8 bytes common header (see ResponseBuilder.add_fins_frame_header)
-
-    :param address: The address of this device
-    :param device: The lewis device
-    :param command: The command number that this is a reply to
-    :return: The response
-    """
-    return ResponseBuilder() \
-        .add_fins_frame_header(address, command, device) \
-        .build()
-
-
 def phase_time_response_packet(address, device):
     """
     Returns the response to the "get_phase_information" command.
@@ -107,7 +90,7 @@ class ResponseBuilder(object):
         :param client_node: The FINS node of the client.
         :param client_unit_address: The FINS unit address of the client.
         :param service_id: The service ID of the original command.
-        :return:
+        :return: (ResponseBuilder) the builder with the fins frame header bytes.
         """
 
         return self.add_int(0xC1, 1).add_int(0x00, 1).add_int(0x02, 1) \
