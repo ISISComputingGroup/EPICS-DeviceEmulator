@@ -78,8 +78,7 @@ class FinsPLCStreamInterface(StreamInterface):
         elif number_of_words_to_read > 2:
             raise ValueError("The memory map only specifies data types that should take up two words at most.")
 
-        return dm_memory_area_read_response_fins_frame(self.device.server_network_address,
-                                                       self.device.server_unit_address, client_network_address,
+        return dm_memory_area_read_response_fins_frame(self.device, client_network_address,
                                                        client_node_address, client_unit_address, service_id,
                                                        memory_start_address, number_of_words_to_read)
 

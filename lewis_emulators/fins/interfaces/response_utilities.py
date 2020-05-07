@@ -14,13 +14,12 @@ def check_is_byte(character):
         raise ValueError("the character in the string must represent a byte value")
 
 
-def dm_memory_area_read_response_fins_frame(server_network_address, server_unit_address, client_network_address,
-                                            client_node_address, client_unit_address, service_id, memory_start_address,
-                                            number_of_words):
+def dm_memory_area_read_response_fins_frame(device, client_network_address, client_node_address, client_unit_address,
+                                            service_id, memory_start_address, number_of_words):
 
     # The length argument asks for number of bytes, and each word has two bytes
     return ResponseBuilder()\
-        .add_fins_frame_header(server_network_address, server_unit_address, client_network_address,
+        .add_fins_frame_header(device.network_address, device.unit_address, client_network_address,
                                client_node_address, client_unit_address, service_id) \
         .add_fins_command_and_error_codes() \
         .add_int(SimulatedFinsPLC.MEMORY_VALUE_MAPPING[memory_start_address], number_of_words * 2)\
@@ -83,7 +82,7 @@ class ResponseBuilder(object):
         """
 
         return self.add_int(0xC1, 1).add_int(0x00, 1).add_int(0x02, 1) \
-            .add_int(client_unit_address, 1) \
+            .add_int(client_network_address, 1) \
             .add_int(client_node, 1) \
             .add_int(client_unit_address, 1) \
             .add_int(emulator_network_address, 1) \
