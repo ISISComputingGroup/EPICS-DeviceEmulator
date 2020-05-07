@@ -2,8 +2,7 @@ from lewis.adapters.stream import StreamInterface, Cmd
 from lewis.core.logging import has_log
 
 from lewis_emulators.utils.byte_conversions import raw_bytes_to_int
-from response_utilities import phase_time_response_packet, general_status_response_packet, check_is_byte, \
-    dm_memory_area_read_response_fins_frame
+from response_utilities import check_is_byte, dm_memory_area_read_response_fins_frame
 from ..device import SimulatedFinsPLC
 
 
