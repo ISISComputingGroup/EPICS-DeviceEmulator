@@ -18,11 +18,11 @@ def dm_memory_area_read_response_fins_frame(device, client_network_address, clie
                                             service_id, memory_start_address, number_of_words):
 
     # The length argument asks for number of bytes, and each word has two bytes
-    return FinsResponseBuilder()\
+    return FinsResponseBuilder() \
         .add_fins_frame_header(device.network_address, device.unit_address, client_network_address,
                                client_node_address, client_unit_address, service_id) \
         .add_fins_command_and_error_codes() \
-        .add_int(SimulatedFinsPLC.MEMORY_VALUE_MAPPING[memory_start_address], number_of_words * 2)\
+        .add_int(SimulatedFinsPLC.MEMORY_VALUE_MAPPING[memory_start_address], number_of_words * 2) \
         .build()
 
 
