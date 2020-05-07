@@ -16,7 +16,7 @@ def check_is_byte(character):
 
 def dm_memory_area_read_response_fins_frame(server_network_address, server_unit_address, client_network_address,
                                             client_node_address, client_unit_address, service_id, memory_start_address,
-                                            number_f_words):
+                                            number_of_words):
     pass
 
 
@@ -101,6 +101,15 @@ class ResponseBuilder(object):
             .add_int(SimulatedFinsPLC.FINS_HE_RECOVERY_NODE, 1) \
             .add_int(emulator_unit_address, 1) \
             .add_int(service_id, 1)
+
+    def add_fins_command_and_error_codes(self):
+        """
+        Adds the code for the FINS memory area read command and a default error code to the builder.
+        :return: (ResponseBuilder) the builder with the command and error codes now added
+        """
+
+        # The memory area read command code is 0101, and the 0000 is the No error code.
+        return self.add_int(0x0101, 2).add_int(0x0000, 2)
 
     def build(self):
         """
