@@ -1,4 +1,5 @@
 from lewis_emulators.utils.byte_conversions import int_to_raw_bytes, float_to_raw_bytes
+from ..device import SimulatedFinsPLC
 
 
 def check_is_byte(character):
@@ -78,12 +79,12 @@ class ResponseBuilder(object):
         :param value: The float to add
         :return: The builder
         """
-        
+
         self.response += float_to_raw_bytes(value, False)
         return self
 
     def add_fins_frame_header(self, emulator_network_address, emulator_unit_address, client_network_address,
-                              client_address, client_unit_address, service_id):
+                              client_node, client_unit_address, service_id):
         """
         Makes a FINS frame header with the given data for a response to a client's command.
 
@@ -103,14 +104,20 @@ class ResponseBuilder(object):
         :param emulator_network_address: The FINS network address of the emulator.
         :param emulator_unit_address: The FINS unit address of the emulator.
         :param client_network_address: The FINS network address of the client.
-        :param client_address: The FINS node of the client.
+        :param client_node: The FINS node of the client.
         :param client_unit_address: The FINS unit address of the client.
         :param service_id: The service ID of the original command.
         :return:
         """
 
-        return self.add_int(address, 1).add_int(command_number, 1).add_int(0x00, 1) \
-            .add_int(int(device.get_frequency()), 2)
+        return self.add_int(0xC1, 1).add_int(0x00, 1).add_int(0x02, 1) \
+            .add_int(client_unit_address, 1) \
+            .add_int(client_node, 1) \
+            .add_int(client_unit_address, 1) \
+            .add_int(emulator_network_address, 1) \
+            .add_int(SimulatedFinsPLC.FINS_HE_RECOVERY_NODE, 1) \
+            .add_int(emulator_unit_address, 1) \
+            .add_int(service_id, 1)
 
     def build(self):
         """
