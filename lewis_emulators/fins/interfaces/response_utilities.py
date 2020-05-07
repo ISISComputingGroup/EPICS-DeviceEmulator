@@ -62,16 +62,14 @@ class ResponseBuilder(object):
     def __init__(self):
         self.response = ""
 
-    def add_int(self, value, length, low_byte_first=True):
+    def add_int(self, value, length):
         """
         Adds an integer to the builder
         :param value: The integer to add
         :param length: How many bytes should the integer be represented as
-        :param low_byte_first: If true (default), put the least significant byte first.
-                               If false, put the most significant byte first.
         :return: The builder
         """
-        self.response += int_to_raw_bytes(value, length, low_byte_first)
+        self.response += int_to_raw_bytes(value, length, False)
         return self
 
     def add_float(self, value):
@@ -80,7 +78,7 @@ class ResponseBuilder(object):
         :param value: The float to add
         :return: The builder
         """
-        self.response += float_to_raw_bytes(value)
+        self.response += float_to_raw_bytes(value, False)
         return self
 
     def add_common_header(self, address, command_number, device):
