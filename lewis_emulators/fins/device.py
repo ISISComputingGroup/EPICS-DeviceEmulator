@@ -24,6 +24,8 @@ class SimulatedFinsPLC(StateMachineDevice):
         self.network_address = 0x00
         self.unit_address = 0x00
 
+        self.connected = True
+
     def _get_state_handlers(self):
         return {
             'default': DefaultState(),
@@ -35,3 +37,10 @@ class SimulatedFinsPLC(StateMachineDevice):
     def _get_transition_handlers(self):
         return OrderedDict([
         ])
+
+    def reset(self):
+        """
+        Public method that re-initializes the device's fields.
+        :return: Nothing.
+        """
+        self._initialize_data()
