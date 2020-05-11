@@ -59,6 +59,7 @@ class FinsPLCStreamInterface(StreamInterface):
 
         # the address of the starting word from where reading is done. Addresses are stored in two bytes.
         memory_start_address = raw_bytes_to_int(command[13:15])
+        self.log.info("Memory start address: {}".format(memory_start_address))
 
         # The FINS PLC supports reading either a certain number of words, or can also read individual bits in a word.
         # The helium recovery memory map implies that that PLC uses word designated reading. When bit designated
@@ -67,6 +68,7 @@ class FinsPLCStreamInterface(StreamInterface):
             raise ValueError("The emulator only supports word designated memory reading. The bit address must be 0x00")
 
         number_of_words_to_read = raw_bytes_to_int(command[16:18])
+        self.log.info("Number of words to read: {}".format(number_of_words_to_read))
 
         # The helium recovery PLC memory map has addresses that store types that take up either one word (16 bits) or
         # two. Most take up one word, so if the number of words to read is two we check that the client wants to read
