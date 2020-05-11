@@ -7,11 +7,11 @@ class SimulatedFinsPLC(StateMachineDevice):
 
     FINS_HE_RECOVERY_NODE = 58
 
-    MEMORY_VALUE_MAPPING = {
-        19500: 1,  # heartbeat
-        19533: 999,  # helium purity
-        19534: 2136,  # dew point
-        19900: 245  # HE_BAG_PR_BE_ATM
+    MEMORY_FIELD_MAPPING = {
+        19500: 'heartbeat',
+        19533: 'helium_purity',
+        19534: 'dew_point',
+        19900: 'he_bag_pr_be_atm' 
     }
 
     DOUBLE_WORD_MEMORY_LOCATIONS = {}
@@ -25,6 +25,11 @@ class SimulatedFinsPLC(StateMachineDevice):
         self.unit_address = 0x00
 
         self.connected = True
+
+        self.heartbeat = 0
+        self.helium_purity = 0
+        self.dew_point = 0
+        self.he_bag_pr_be_atm = 0
 
     def _get_state_handlers(self):
         return {
