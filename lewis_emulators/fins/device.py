@@ -11,7 +11,7 @@ class SimulatedFinsPLC(StateMachineDevice):
         19500: 'heartbeat',
         19533: 'helium_purity',
         19534: 'dew_point',
-        19900: 'he_bag_pr_be_atm' 
+        19900: 'he_bag_pr_be_atm'
     }
 
     DOUBLE_WORD_MEMORY_LOCATIONS = {}
