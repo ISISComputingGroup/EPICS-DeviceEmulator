@@ -9,12 +9,16 @@ class FlipprpsStreamInterface(StreamInterface):
         Cmd("set_polarity_up", "^up$"),
     }
 
-    terminator = "\r\n"
+    in_terminator = "\r\n"
+    out_terminator = in_terminator
 
     def set_polarity_down(self):
         self._device.polarity = 0
-        return "OK" + self.terminator
+        return "OK"
 
     def set_polarity_up(self):
         self._device.polarity = 1
-        return "OK" + self.terminator
+        return "OK"
+
+    def handle_error(self, request, error):
+        print("An error occurred at request " + repr(request) + ": " + repr(error))
