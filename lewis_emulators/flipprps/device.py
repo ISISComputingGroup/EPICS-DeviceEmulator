@@ -9,6 +9,7 @@ class SimulatedFlipprps(StateMachineDevice):
         DOWN = 0
         self.polarity = DOWN
         self.id = "Flipper"
+        self.connected = True
 
     def _get_state_handlers(self):
         return {
