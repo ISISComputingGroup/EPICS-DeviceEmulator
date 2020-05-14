@@ -7,10 +7,14 @@ class FlipprpsStreamInterface(StreamInterface):
     commands = {
         Cmd("set_polarity_down", "^dn$"),
         Cmd("set_polarity_up", "^up$"),
+        Cmd("get_id", "^id$"),
     }
 
     in_terminator = "\r\n"
     out_terminator = in_terminator
+
+    def get_id(self):
+        return self._device.id
 
     def set_polarity_down(self):
         self._device.polarity = 0
