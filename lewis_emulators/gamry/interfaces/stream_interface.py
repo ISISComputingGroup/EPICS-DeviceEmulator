@@ -1,10 +1,13 @@
 from lewis.adapters.stream import StreamInterface, Cmd
 from threading import Timer
+from lewis.core.logging import has_log
 
 START_COMM = "START01"
 BEAMON_COMM = "BEAMON"
 BEAMOFF_COMM = "BEAMOFF"
 
+
+@has_log
 class GamryStreamInterface(StreamInterface):
 
     commands = {
@@ -24,7 +27,7 @@ class GamryStreamInterface(StreamInterface):
         return "BEAMOFF"
 
     def charged(self):
-        self.handler.unsolicitedReply("STOPPED")
+        self.handler.unsolicited_reply("STOPPED")
 
     def start_charging(self):
         t = Timer(self.charging_time, self.charged)
@@ -32,5 +35,5 @@ class GamryStreamInterface(StreamInterface):
         return "STARTED"
 
     def handle_error(self, request, error):
-        print "An error occurred at request " + repr(request) + ": " + repr(error)
+        self.log.info("An error occurred at request " + repr(request) + ": " + repr(error))
         return "NAC"
