@@ -18,7 +18,11 @@ class MercuryitcInterface(StreamInterface):
             .escape("READ:DEV:").any().escape(":NICK").eos().build(),
 
         CmdBuilder("get_all_temp_sensor_details").optional(ISOBUS_PREFIX)
-            .escape("READ:DEV:").any().escape(":TEMP").eos().build()
+            .escape("READ:DEV:").any().escape(":TEMP").eos().build(),
+        CmdBuilder("get_all_heater_details").optional(ISOBUS_PREFIX)
+            .escape("READ:DEV:").any().escape(":HTR").eos().build(),
+        CmdBuilder("get_all_aux_details").optional(ISOBUS_PREFIX)
+            .escape("READ:DEV:").any().escape(":AUX").eos().build(),
     }
 
     in_terminator = "\n"
@@ -108,3 +112,55 @@ class MercuryitcInterface(StreamInterface):
                  ":POWR:0.0000W" + \
                  ":RES:{:.4f}O".format(chan.resistance) + \
                  ":SLOP:0.0000O/K"
+
+    @if_connected
+    def get_all_heater_details(self, deviceid):
+        """
+        Gets the details for an entire heater sensor all at once. This is only used by the LabVIEW VI, not by
+        the IOC (the ioc queries each parameter individually)
+        """
+
+        if deviceid not in self.device.channels.keys():
+            self.log.error("Can't get all details for ID {} (doesn't exist)".format(deviceid))
+            return "STAT:DEV:{}:INVALID".format(deviceid)
+
+        if self.device.channels[deviceid].channel_type != "HTR":
+            self.log.error("Can't get all details for ID {} (incorrect channel type)".format(deviceid))
+            return "STAT:DEV:{}:INVALID".format(deviceid)
+
+        chan = self.device.channels[deviceid]
+
+        return "STAT:DEV:{}:HTR".format(deviceid) + \
+               ":STAT:40000000" + \
+               ":NICK:{}".format(chan.nickname) + \
+               ":PMAX:0.1000" + \
+               ":MAN" + \
+                 ":HVER:1" + \
+                 ":FVER:1.10" + \
+                 ":SERL:112123156" + \
+               ":TYPE:unknown" + \
+               ":VLIM:{}".format(chan.voltage_limit) + \
+               ":RES:10" + \
+               ":SIG" + \
+                 ":VOLT:{:.4f}V".format(chan.voltage) + \
+                 ":CURR:{:.4f}A".format(chan.current) + \
+                 ":PERC:0.0000%" + \
+                 ":POWR:{:.4f}W".format(chan.power)
+
+    @if_connected
+    def get_all_aux_details(self, deviceid):
+
+        if deviceid not in self.device.channels.keys():
+            self.log.error("Can't get all details for ID {} (doesn't exist)".format(deviceid))
+            return "STAT:DEV:{}:INVALID".format(deviceid)
+
+        if self.device.channels[deviceid].channel_type != "AUX":
+            self.log.error("Can't get all details for ID {} (incorrect channel type)".format(deviceid))
+            return "STAT:DEV:{}:INVALID".format(deviceid)
+
+        chan = self.device.channels[deviceid]
+
+        return "STAT:DEV:{}:AUX".format(deviceid) + \
+               ":NICK:{}".format(chan.nickname) + \
+               ":SIG" \
+                 ":PERC:{:.4f}".format(chan.percent_open)

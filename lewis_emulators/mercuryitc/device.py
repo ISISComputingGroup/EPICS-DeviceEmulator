@@ -53,6 +53,8 @@ class AuxChannel(Channel):
         super(AuxChannel, self).__init__(nickname)
         self.channel_type = "AUX"
 
+        self.percent_open = 0
+
 
 @has_log
 class SimulatedMercuryitc(StateMachineDevice):
