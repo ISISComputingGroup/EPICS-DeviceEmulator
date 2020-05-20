@@ -16,6 +16,8 @@ class MercuryitcInterface(StreamInterface):
             .escape("READ:SYS:CAT").eos().build(),
         CmdBuilder("get_nickname").optional(ISOBUS_PREFIX)
             .escape("READ:DEV:").any_except(":").escape(":").any().escape(":NICK").eos().build(),
+        CmdBuilder("read_calib_tables").optional(ISOBUS_PREFIX)
+            .escape("READ:FILE:calibration_tables:LIST").eos().build(),
 
         CmdBuilder("get_all_temp_sensor_details").optional(ISOBUS_PREFIX)
             .escape("READ:DEV:").any_except(":").escape(":TEMP").eos().build(),
@@ -75,6 +77,11 @@ class MercuryitcInterface(StreamInterface):
     def get_nickname(self, deviceid, _):
         chan = self._chan_from_id(deviceid)
         return "STAT:DEV:{}:NICK:{}".format(deviceid, chan.nickname)
+
+    @if_connected
+    def read_calib_tables(self):
+        """ This is only required to prevent an error from the labview driver. """
+        return ""
 
     @if_connected
     def get_all_temp_sensor_details(self, deviceid):
