@@ -72,46 +72,25 @@ class MercuryitcInterface(StreamInterface):
         chan = self.device.channels[deviceid]
 
         return "STAT:DEV:{}:TEMP:".format(deviceid) + \
-               "EXCT" + \
-                 ":TYPE:UNIP" + \
-                 ":MAG:0" + \
-               ":STAT:40000000" + \
                ":NICK:{}".format(chan.nickname) + \
                ":LOOP" + \
                  ":AUX:{}".format(chan.associated_aux_channel) + \
                  ":D:{}".format(chan.d) + \
                  ":HTR:{}".format(chan.associated_heater_channel) + \
                  ":I:{}".format(chan.i) + \
-                 ":THTF:None" + \
                  ":HSET:{}".format(chan.heater_percent) + \
                  ":PIDT:{}".format("ON" if chan.autopid else "OFF") + \
                  ":ENAB:{}".format("ON" if chan.heater_auto else "OFF") + \
-                 ":SWFL:None" + \
                  ":FAUT:{}".format("ON" if chan.gas_flow_auto else "OFF") + \
                  ":FSET:{}".format(chan.gas_flow) + \
                  ":PIDF:{}".format(chan.autopid_file if chan.autopid else "None") + \
                  ":P:{}".format(chan.p) + \
-                 ":SWMD:FIX" + \
                  ":TSET:{:.4f}K".format(chan.temperature_sp) + \
-               ":MAN" + \
-                 ":HVER:1" + \
-                 ":FVER:1.12" + \
-                 ":SERL:111450078" + \
                ":CAL" + \
-                 ":OFFS:0" + \
-                 ":COLDL:999.00K" + \
-                 ":INT:LIN" + \
-                 ":SCAL:1" + \
                  ":FILE:{}".format(chan.calibration_file) + \
-                 ":HOTL:999.00K" + \
-                 ":TYPE:TCE" + \
                ":SIG" + \
-                 ":VOLT:-0.0038mV" + \
-                 ":CURR:-0.0000A" + \
                  ":TEMP:{:.4f}K".format(chan.temperature) + \
-                 ":POWR:0.0000W" + \
-                 ":RES:{:.4f}O".format(chan.resistance) + \
-                 ":SLOP:0.0000O/K"
+                 ":RES:{:.4f}O".format(chan.resistance)
 
     @if_connected
     def get_all_heater_details(self, deviceid):
@@ -131,20 +110,11 @@ class MercuryitcInterface(StreamInterface):
         chan = self.device.channels[deviceid]
 
         return "STAT:DEV:{}:HTR".format(deviceid) + \
-               ":STAT:40000000" + \
                ":NICK:{}".format(chan.nickname) + \
-               ":PMAX:0.1000" + \
-               ":MAN" + \
-                 ":HVER:1" + \
-                 ":FVER:1.10" + \
-                 ":SERL:112123156" + \
-               ":TYPE:unknown" + \
                ":VLIM:{}".format(chan.voltage_limit) + \
-               ":RES:10" + \
                ":SIG" + \
                  ":VOLT:{:.4f}V".format(chan.voltage) + \
                  ":CURR:{:.4f}A".format(chan.current) + \
-                 ":PERC:0.0000%" + \
                  ":POWR:{:.4f}W".format(chan.power)
 
     @if_connected

@@ -89,3 +89,6 @@ class SimulatedMercuryitc(StateMachineDevice):
 
     def _get_transition_handlers(self):
         return OrderedDict([])
+
+    def backdoor_set_channel_property(self, chan_id, property_name, value):
+        setattr(self.channels[chan_id], property_name, value)
