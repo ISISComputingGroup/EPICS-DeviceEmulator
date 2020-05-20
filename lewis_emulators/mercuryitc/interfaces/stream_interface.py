@@ -15,14 +15,27 @@ class MercuryitcInterface(StreamInterface):
         CmdBuilder("get_catalog").optional(ISOBUS_PREFIX)
             .escape("READ:SYS:CAT").eos().build(),
         CmdBuilder("get_nickname").optional(ISOBUS_PREFIX)
-            .escape("READ:DEV:").any().escape(":NICK").eos().build(),
+            .escape("READ:DEV:").any_except(":").escape(":").any().escape(":NICK").eos().build(),
 
         CmdBuilder("get_all_temp_sensor_details").optional(ISOBUS_PREFIX)
-            .escape("READ:DEV:").any().escape(":TEMP").eos().build(),
+            .escape("READ:DEV:").any_except(":").escape(":TEMP").eos().build(),
         CmdBuilder("get_all_heater_details").optional(ISOBUS_PREFIX)
-            .escape("READ:DEV:").any().escape(":HTR").eos().build(),
+            .escape("READ:DEV:").any_except(":").escape(":HTR").eos().build(),
         CmdBuilder("get_all_aux_details").optional(ISOBUS_PREFIX)
-            .escape("READ:DEV:").any().escape(":AUX").eos().build(),
+            .escape("READ:DEV:").any_except(":").escape(":AUX").eos().build(),
+
+        CmdBuilder("get_temp_p").optional(ISOBUS_PREFIX)
+            .escape("READ:DEV:").any_except(":").escape(":TEMP:LOOP:P").eos().build(),
+        CmdBuilder("get_temp_i").optional(ISOBUS_PREFIX)
+            .escape("READ:DEV:").any_except(":").escape(":TEMP:LOOP:I").eos().build(),
+        CmdBuilder("get_temp_d").optional(ISOBUS_PREFIX)
+            .escape("READ:DEV:").any_except(":").escape(":TEMP:LOOP:D").eos().build(),
+        CmdBuilder("get_temp_measured").optional(ISOBUS_PREFIX)
+            .escape("READ:DEV:").any_except(":").escape(":TEMP:SIG:TEMP").eos().build(),
+        CmdBuilder("get_temp_setpoint").optional(ISOBUS_PREFIX)
+            .escape("READ:DEV:").any_except(":").escape(":TEMP:LOOP:TSET").eos().build(),
+
+
     }
 
     in_terminator = "\n"
@@ -32,7 +45,8 @@ class MercuryitcInterface(StreamInterface):
         err_string = "command was: {}, error was: {}: {}\n".format(request, error.__class__.__name__, error)
         print(err_string)
         self.log.error(err_string)
-        return err_string
+
+        return "{}:INVALID".format(request.lstrip(ISOBUS_PREFIX))
 
     @if_connected
     def get_catalog(self):
@@ -43,16 +57,24 @@ class MercuryitcInterface(StreamInterface):
 
         return resp
 
-    @if_connected
-    def get_nickname(self, arg):
-
-        deviceid = arg.split(":")[0] if ":" in arg else arg
-
+    def _chan_from_id(self, deviceid, expected_type=None):
         if deviceid not in self.device.channels.keys():
-            self.log.error("Can't get nickname for ID {}".format(deviceid))
-            return "STAT:DEV:{}:NICK:INVALID".format(deviceid)
+            msg = "Unknown channel {}".format(deviceid)
+            self.log.error(msg)
+            raise ValueError(msg)
 
-        return "STAT:DEV:{}:NICK:{}".format(deviceid, self.device.channels[deviceid].nickname)
+        if expected_type is not None and self.device.channels[deviceid].channel_type != expected_type:
+            msg = "Unexpected channel type for {} (expected {}, was {})"\
+                .format(deviceid, expected_type, self.device.channels[deviceid].channel_type)
+            self.log.error(msg)
+            raise ValueError(msg)
+
+        return self.device.channels[deviceid]
+
+    @if_connected
+    def get_nickname(self, deviceid, _):
+        chan = self._chan_from_id(deviceid)
+        return "STAT:DEV:{}:NICK:{}".format(deviceid, chan.nickname)
 
     @if_connected
     def get_all_temp_sensor_details(self, deviceid):
@@ -61,15 +83,7 @@ class MercuryitcInterface(StreamInterface):
         the IOC (the ioc queries each parameter individually)
         """
 
-        if deviceid not in self.device.channels.keys():
-            self.log.error("Can't get all details for ID {} (doesn't exist)".format(deviceid))
-            return "STAT:DEV:{}:INVALID".format(deviceid)
-
-        if self.device.channels[deviceid].channel_type != "TEMP":
-            self.log.error("Can't get all details for ID {} (incorrect channel type)".format(deviceid))
-            return "STAT:DEV:{}:INVALID".format(deviceid)
-
-        chan = self.device.channels[deviceid]
+        chan = self._chan_from_id(deviceid)
 
         return "STAT:DEV:{}:TEMP:".format(deviceid) + \
                ":NICK:{}".format(chan.nickname) + \
@@ -93,21 +107,38 @@ class MercuryitcInterface(StreamInterface):
                  ":RES:{:.4f}O".format(chan.resistance)
 
     @if_connected
+    def get_temp_p(self, deviceid):
+        chan = self._chan_from_id(deviceid, expected_type="TEMP")
+        return "STAT:DEV:{}:TEMP:LOOP:P:{}".format(deviceid, chan.p)
+
+    @if_connected
+    def get_temp_i(self, deviceid):
+        chan = self._chan_from_id(deviceid, expected_type="TEMP")
+        return "STAT:DEV:{}:TEMP:LOOP:I:{}".format(deviceid, chan.i)
+
+    @if_connected
+    def get_temp_d(self, deviceid):
+        chan = self._chan_from_id(deviceid, expected_type="TEMP")
+        return "STAT:DEV:{}:TEMP:LOOP:D:{}".format(deviceid, chan.d)
+
+    @if_connected
+    def get_temp_measured(self, deviceid):
+        chan = self._chan_from_id(deviceid, expected_type="TEMP")
+        return "STAT:DEV:{}:TEMP:SIG:TEMP:{:.4f}K".format(deviceid, chan.temperature)
+
+    @if_connected
+    def get_temp_setpoint(self, deviceid):
+        chan = self._chan_from_id(deviceid, expected_type="TEMP")
+        return "STAT:DEV:{}:TEMP:LOOP:TSET:{:.4f}K".format(deviceid, chan.temperature_sp)
+
+    @if_connected
     def get_all_heater_details(self, deviceid):
         """
         Gets the details for an entire heater sensor all at once. This is only used by the LabVIEW VI, not by
         the IOC (the ioc queries each parameter individually)
         """
 
-        if deviceid not in self.device.channels.keys():
-            self.log.error("Can't get all details for ID {} (doesn't exist)".format(deviceid))
-            return "STAT:DEV:{}:INVALID".format(deviceid)
-
-        if self.device.channels[deviceid].channel_type != "HTR":
-            self.log.error("Can't get all details for ID {} (incorrect channel type)".format(deviceid))
-            return "STAT:DEV:{}:INVALID".format(deviceid)
-
-        chan = self.device.channels[deviceid]
+        chan = self._chan_from_id(deviceid)
 
         return "STAT:DEV:{}:HTR".format(deviceid) + \
                ":NICK:{}".format(chan.nickname) + \
@@ -119,16 +150,11 @@ class MercuryitcInterface(StreamInterface):
 
     @if_connected
     def get_all_aux_details(self, deviceid):
-
-        if deviceid not in self.device.channels.keys():
-            self.log.error("Can't get all details for ID {} (doesn't exist)".format(deviceid))
-            return "STAT:DEV:{}:INVALID".format(deviceid)
-
-        if self.device.channels[deviceid].channel_type != "AUX":
-            self.log.error("Can't get all details for ID {} (incorrect channel type)".format(deviceid))
-            return "STAT:DEV:{}:INVALID".format(deviceid)
-
-        chan = self.device.channels[deviceid]
+        """
+        Gets the details for an entire aux sensor all at once. This is only used by the LabVIEW VI, not by
+        the IOC (the ioc queries each parameter individually)
+        """
+        chan = self._chan_from_id(deviceid)
 
         return "STAT:DEV:{}:AUX".format(deviceid) + \
                ":NICK:{}".format(chan.nickname) + \

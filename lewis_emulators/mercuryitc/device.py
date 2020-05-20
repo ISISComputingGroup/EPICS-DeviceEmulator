@@ -17,22 +17,26 @@ class TemperatureChannel(Channel):
         super(TemperatureChannel, self).__init__(nickname)
         self.channel_type = "TEMP"
 
+        # Sensor measurements
         self.temperature = 0
         self.temperature_sp = 0
         self.resistance = 0
         self.calibration_file = "sim_calib_file"
 
+        # PID control loop settings
         self.autopid = False
         self.autopid_file = "sim_autopid_file"
         self.p = 0
         self.i = 0
         self.d = 0
 
+        # Needle valve & heater settings
         self.gas_flow_auto = True
         self.gas_flow = 0
         self.heater_auto = True
         self.heater_percent = 0
 
+        # Associated channels
         self.associated_heater_channel = None
         self.associated_aux_channel = None
 
@@ -65,10 +69,10 @@ class SimulatedMercuryitc(StateMachineDevice):
         self.channels = {
             "MB0": TemperatureChannel("MB0.T0"),
             "DB0": HeaterChannel("DB0.H0"),
-            "DB1": AuxChannel("DB0.A1"),
-            "MB1": TemperatureChannel("MB1.T1"),
-            "DB2": HeaterChannel("DB0.H1"),
-            "DB3": AuxChannel("DB0.A0"),
+            "DB1": AuxChannel("DB0.A0"),
+            "MB1": TemperatureChannel("MB1.T0"),
+            "DB2": HeaterChannel("DB2.H0"),
+            "DB3": AuxChannel("DB3.A0"),
         }
 
         # Associate each temperature channel with a heater and an auxilary channel:
