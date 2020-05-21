@@ -7,15 +7,15 @@ from lewis.devices import StateMachineDevice
 
 
 class Channel(object):
-    def __init__(self, nickname):
+    def __init__(self, channel_type, nickname):
         super(Channel, self).__init__()
+        self.channel_type = channel_type
         self.nickname = nickname
 
 
 class TemperatureChannel(Channel):
     def __init__(self, nickname):
-        super(TemperatureChannel, self).__init__(nickname)
-        self.channel_type = "TEMP"
+        super(TemperatureChannel, self).__init__("TEMP", nickname)
 
         # Sensor measurements
         self.temperature = 0
@@ -32,7 +32,6 @@ class TemperatureChannel(Channel):
 
         # Needle valve & heater settings
         self.gas_flow_auto = True
-        self.gas_flow = 0
         self.heater_auto = True
         self.heater_percent = 0
 
@@ -43,8 +42,7 @@ class TemperatureChannel(Channel):
 
 class HeaterChannel(Channel):
     def __init__(self, nickname):
-        super(HeaterChannel, self).__init__(nickname)
-        self.channel_type = "HTR"
+        super(HeaterChannel, self).__init__("HTR", nickname)
 
         self.power = 0
         self.voltage = 0
@@ -54,10 +52,9 @@ class HeaterChannel(Channel):
 
 class AuxChannel(Channel):
     def __init__(self, nickname):
-        super(AuxChannel, self).__init__(nickname)
-        self.channel_type = "AUX"
+        super(AuxChannel, self).__init__("AUX", nickname)
 
-        self.percent_open = 0
+        self.gas_flow = 0
 
 
 @has_log
