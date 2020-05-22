@@ -15,10 +15,12 @@ class MercuryitcInterface(StreamInterface):
         # System-level commands
         CmdBuilder("get_catalog").optional(ISOBUS_PREFIX)
             .escape("READ:SYS:CAT").eos().build(),
-        CmdBuilder("get_nickname").optional(ISOBUS_PREFIX)
-            .escape("READ:DEV:").any_except(":").escape(":").any().escape(":NICK").eos().build(),
         CmdBuilder("read_calib_tables").optional(ISOBUS_PREFIX)
             .escape("READ:FILE:calibration_tables:LIST").eos().build(),
+        CmdBuilder("get_nickname").optional(ISOBUS_PREFIX)
+            .escape("READ:DEV:").any_except(":").escape(":").any_except(":").escape(":NICK").eos().build(),
+        CmdBuilder("set_nickname").optional(ISOBUS_PREFIX)
+            .escape("SET:DEV:").any_except(":").escape(":").any_except(":").escape(":NICK:").any_except(":").eos().build(),
 
         # Commands to read all info at once
         CmdBuilder("get_all_temp_sensor_details").optional(ISOBUS_PREFIX)
@@ -28,7 +30,17 @@ class MercuryitcInterface(StreamInterface):
         CmdBuilder("get_all_aux_details").optional(ISOBUS_PREFIX)
             .escape("READ:DEV:").any_except(":").escape(":AUX").eos().build(),
 
+        # Get heater & aux card associations
+        CmdBuilder("get_associated_heater").optional(ISOBUS_PREFIX)
+            .escape("READ:DEV:").any_except(":").escape(":TEMP:LOOP:HTR").eos().build(),
+        CmdBuilder("get_associated_aux").optional(ISOBUS_PREFIX)
+            .escape("READ:DEV:").any_except(":").escape(":TEMP:LOOP:AUX").eos().build(),
+
         # PID settings
+        CmdBuilder("get_autopid").optional(ISOBUS_PREFIX)
+            .escape("READ:DEV:").any_except(":").escape(":TEMP:LOOP:PIDT").eos().build(),
+        CmdBuilder("set_autopid").optional(ISOBUS_PREFIX)
+            .escape("SET:DEV:").any_except(":").escape(":TEMP:LOOP:PIDT:").enum("ON", "OFF").eos().build(),
         CmdBuilder("get_temp_p").optional(ISOBUS_PREFIX)
             .escape("READ:DEV:").any_except(":").escape(":TEMP:LOOP:P").eos().build(),
         CmdBuilder("set_temp_p").optional(ISOBUS_PREFIX)
@@ -118,9 +130,15 @@ class MercuryitcInterface(StreamInterface):
         return self.device.channels[deviceid]
 
     @if_connected
-    def get_nickname(self, deviceid, _):
-        chan = self._chan_from_id(deviceid)
-        return "STAT:DEV:{}:NICK:{}".format(deviceid, chan.nickname)
+    def get_nickname(self, deviceid, devicetype):
+        chan = self._chan_from_id(deviceid, expected_type=devicetype)
+        return "STAT:DEV:{}:{}:NICK:{}".format(deviceid, devicetype, chan.nickname)
+
+    @if_connected
+    def set_nickname(self, deviceid, devicetype, nickname):
+        chan = self._chan_from_id(deviceid, expected_type=devicetype)
+        chan.nickname = nickname
+        return "STAT:SET:DEV:{}:{}:NICK:{}:VALID".format(deviceid, devicetype, chan.nickname)
 
     @if_connected
     def read_calib_tables(self):
@@ -159,6 +177,16 @@ class MercuryitcInterface(StreamInterface):
                  ":RES:{:.4f}O".format(temp_chan.resistance)
 
     @if_connected
+    def get_associated_heater(self, deviceid):
+        chan = self._chan_from_id(deviceid, expected_type="TEMP")
+        return "STAT:DEV:{}:TEMP:LOOP:HTR:{}".format(deviceid, chan.associated_heater_channel)
+
+    @if_connected
+    def get_associated_aux(self, deviceid):
+        chan = self._chan_from_id(deviceid, expected_type="TEMP")
+        return "STAT:DEV:{}:TEMP:LOOP:AUX:{}".format(deviceid, chan.associated_aux_channel)
+
+    @if_connected
     def get_temp_p(self, deviceid):
         chan = self._chan_from_id(deviceid, expected_type="TEMP")
         return "STAT:DEV:{}:TEMP:LOOP:P:{:.4f}".format(deviceid, chan.p)
@@ -168,6 +196,17 @@ class MercuryitcInterface(StreamInterface):
         chan = self._chan_from_id(deviceid, expected_type="TEMP")
         chan.p = p
         return "STAT:SET:DEV:{}:TEMP:LOOP:P:{:.4f}:VALID".format(deviceid, p)
+
+    @if_connected
+    def get_autopid(self, deviceid):
+        chan = self._chan_from_id(deviceid, expected_type="TEMP")
+        return "STAT:DEV:{}:TEMP:LOOP:PIDT:{}".format(deviceid, "ON" if chan.autopid else "OFF")
+
+    @if_connected
+    def set_autopid(self, deviceid, sp):
+        chan = self._chan_from_id(deviceid, expected_type="TEMP")
+        chan.autopid = (sp == "ON")
+        return "STAT:SET:DEV:{}:TEMP:LOOP:PIDT:{}:VALID".format(deviceid, sp)
 
     @if_connected
     def get_temp_i(self, deviceid):
