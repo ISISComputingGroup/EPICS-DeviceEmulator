@@ -61,6 +61,16 @@ class MercuryitcInterface(StreamInterface):
             .escape("READ:DEV:").any_except(":").escape(":TEMP:LOOP:HSET").eos().build(),
         CmdBuilder("set_heater_percent").optional(ISOBUS_PREFIX)
             .escape("SET:DEV:").any_except(":").escape(":TEMP:LOOP:HSET:").float().eos().build(),
+        CmdBuilder("get_heater_voltage").optional(ISOBUS_PREFIX)
+            .escape("READ:DEV:").any_except(":").escape(":HTR:SIG:VOLT").eos().build(),
+        CmdBuilder("get_heater_current").optional(ISOBUS_PREFIX)
+            .escape("READ:DEV:").any_except(":").escape(":HTR:SIG:CURR").eos().build(),
+        CmdBuilder("get_heater_power").optional(ISOBUS_PREFIX)
+            .escape("READ:DEV:").any_except(":").escape(":HTR:SIG:POWR").eos().build(),
+        CmdBuilder("get_heater_voltage_limit").optional(ISOBUS_PREFIX)
+            .escape("READ:DEV:").any_except(":").escape(":HTR:VLIM").eos().build(),
+        CmdBuilder("set_heater_voltage_limit").optional(ISOBUS_PREFIX)
+            .escape("SET:DEV:").any_except(":").escape(":HTR:VLIM:").float().eos().build(),
 
         # Gas flow
         CmdBuilder("get_gas_flow_auto").optional(ISOBUS_PREFIX)
@@ -263,6 +273,32 @@ class MercuryitcInterface(StreamInterface):
                  ":VOLT:{:.4f}V".format(chan.voltage) + \
                  ":CURR:{:.4f}A".format(chan.current) + \
                  ":POWR:{:.4f}W".format(chan.power)
+
+    @if_connected
+    def get_heater_voltage_limit(self, deviceid):
+        chan = self._chan_from_id(deviceid, expected_type="HTR")
+        return "STAT:DEV:{}:HTR:VLIM:{:.4f}".format(deviceid, chan.voltage_limit)
+
+    @if_connected
+    def set_heater_voltage_limit(self, deviceid, sp):
+        chan = self._chan_from_id(deviceid, expected_type="HTR")
+        chan.voltage_limit = sp
+        return "STAT:SET:DEV:{}:HTR:VLIM:{:.4f}:VALID".format(deviceid, chan.voltage_limit)
+
+    @if_connected
+    def get_heater_voltage(self, deviceid):
+        chan = self._chan_from_id(deviceid, expected_type="HTR")
+        return "STAT:DEV:{}:HTR:SIG:VOLT:{:.4f}V".format(deviceid, chan.voltage)
+
+    @if_connected
+    def get_heater_current(self, deviceid):
+        chan = self._chan_from_id(deviceid, expected_type="HTR")
+        return "STAT:DEV:{}:HTR:SIG:CURR:{:.4f}A".format(deviceid, chan.current)
+
+    @if_connected
+    def get_heater_power(self, deviceid):
+        chan = self._chan_from_id(deviceid, expected_type="HTR")
+        return "STAT:DEV:{}:HTR:SIG:POWR:{:.4f}W".format(deviceid, chan.power)
 
     @if_connected
     def get_all_aux_details(self, deviceid):
