@@ -30,8 +30,8 @@ class FinsPLCStreamInterface(StreamInterface):
         :return: a string where each character represents a
         byte from the FINS response frame.
         """
-        hex_command = [hex(ord(character)) for character in command]
-        self.log.info("command is {}".format(hex_command))
+
+        self._log_command(command)
 
         self._check_fins_frame_header_validity(command[:10])
 
@@ -85,6 +85,15 @@ class FinsPLCStreamInterface(StreamInterface):
         return dm_memory_area_read_response_fins_frame(self.device, client_network_address,
                                                        client_node_address, client_unit_address, service_id,
                                                        memory_start_address, number_of_words_to_read)
+
+    def _log_command(self, command):
+        """
+        Nicely displays every byte in the command as a hexadecimal number in the emulator log.
+        :param command: The command received by the emulator.
+        :return: None
+        """
+        hex_command = [hex(ord(character)) for character in command]
+        self.log.info("command is {}".format(hex_command))
 
     @staticmethod
     def _check_fins_frame_header_validity(fins_frame_header):
