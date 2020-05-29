@@ -14,7 +14,7 @@ class FinsPLCStreamInterface(StreamInterface):
         Cmd("any_command", "^([\s\S]*)$"),
     }
 
-    in_terminator = "\r\n"
+    in_terminator = ""
     out_terminator = in_terminator
 
     def handle_error(self, request, error):
