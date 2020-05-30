@@ -119,9 +119,9 @@ class FinsPLCStreamInterface(StreamInterface):
 
         check_is_byte(fins_frame_header[3])
 
-        if ord(fins_frame_header[4]) != SimulatedFinsPLC.FINS_HE_RECOVERY_NODE:
+        if ord(fins_frame_header[4]) != SimulatedFinsPLC.HELIUM_RECOVERY_NODE:
             raise ValueError("The node address of the FINS helium recovery PLC should be {}!".format(
-                SimulatedFinsPLC.FINS_HE_RECOVERY_NODE))
+                SimulatedFinsPLC.HELIUM_RECOVERY_NODE))
 
         for i in range(5, 10):
             check_is_byte(fins_frame_header[i])

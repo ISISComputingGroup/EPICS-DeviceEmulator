@@ -5,16 +5,16 @@ from lewis.devices import StateMachineDevice
 
 class SimulatedFinsPLC(StateMachineDevice):
 
-    FINS_HE_RECOVERY_NODE = 58
+    HELIUM_RECOVERY_NODE = 58
 
-    MEMORY_FIELD_MAPPING = {
+    HE_RECOVERY_MEMORY_FIELD_MAPPING = {
         19500: 'heartbeat',
         19533: 'helium_purity',
         19534: 'dew_point',
         19900: 'he_bag_pr_be_atm'
     }
 
-    DOUBLE_WORD_MEMORY_LOCATIONS = {}
+    HE_RECOVERY_DOUBLE_WORD_MEMORY_LOCATIONS = {}
 
     def _initialize_data(self):
         """
