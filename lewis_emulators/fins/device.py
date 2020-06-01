@@ -47,3 +47,6 @@ class SimulatedFinsPLC(StateMachineDevice):
         :return: Nothing.
         """
         self._initialize_data()
+
+    def get_data(self, memory_address):
+        return getattr(self, SimulatedFinsPLC.HE_RECOVERY_MEMORY_FIELD_MAPPING[memory_address])
