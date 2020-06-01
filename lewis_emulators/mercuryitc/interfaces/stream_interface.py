@@ -1,6 +1,7 @@
 from lewis.adapters.stream import StreamInterface
 from lewis.core.logging import has_log
 
+from lewis_emulators.mercuryitc.device import ChannelTypes
 from lewis_emulators.utils.command_builder import CmdBuilder
 from lewis_emulators.utils.replies import conditional_reply
 
@@ -116,6 +117,13 @@ class MercuryitcInterface(StreamInterface):
         return resp
 
     def _chan_from_id(self, deviceid, expected_type=None):
+        """
+        Gets a channel object from a provided device identifier.
+
+        Args:
+            deviceid: the device identifier e.g. "MB0", "DB1"
+            expected_type: The type of the returned channel, one of ChannelTypes (None to skip check; default).
+        """
         if deviceid not in self.device.channels.keys():
             msg = "Unknown channel {}".format(deviceid)
             self.log.error(msg)
@@ -152,8 +160,8 @@ class MercuryitcInterface(StreamInterface):
         the IOC (the ioc queries each parameter individually)
         """
 
-        temp_chan = self._chan_from_id(deviceid, expected_type="TEMP")
-        aux_chan = self._chan_from_id(temp_chan.associated_aux_channel, expected_type="AUX")
+        temp_chan = self._chan_from_id(deviceid, expected_type=ChannelTypes.TEMP)
+        aux_chan = self._chan_from_id(temp_chan.associated_aux_channel, expected_type=ChannelTypes.AUX)
 
         return "STAT:DEV:{}:TEMP:".format(deviceid) + \
                ":NICK:{}".format(temp_chan.nickname) + \
@@ -178,121 +186,121 @@ class MercuryitcInterface(StreamInterface):
 
     @if_connected
     def get_associated_heater(self, deviceid):
-        chan = self._chan_from_id(deviceid, expected_type="TEMP")
+        chan = self._chan_from_id(deviceid, expected_type=ChannelTypes.TEMP)
         return "STAT:DEV:{}:TEMP:LOOP:HTR:{}".format(deviceid, chan.associated_heater_channel)
 
     @if_connected
     def get_associated_aux(self, deviceid):
-        chan = self._chan_from_id(deviceid, expected_type="TEMP")
+        chan = self._chan_from_id(deviceid, expected_type=ChannelTypes.TEMP)
         return "STAT:DEV:{}:TEMP:LOOP:AUX:{}".format(deviceid, chan.associated_aux_channel)
 
     @if_connected
     def get_temp_p(self, deviceid):
-        chan = self._chan_from_id(deviceid, expected_type="TEMP")
+        chan = self._chan_from_id(deviceid, expected_type=ChannelTypes.TEMP)
         return "STAT:DEV:{}:TEMP:LOOP:P:{:.4f}".format(deviceid, chan.p)
 
     @if_connected
     def set_temp_p(self, deviceid, p):
-        chan = self._chan_from_id(deviceid, expected_type="TEMP")
+        chan = self._chan_from_id(deviceid, expected_type=ChannelTypes.TEMP)
         chan.p = p
         return "STAT:SET:DEV:{}:TEMP:LOOP:P:{:.4f}:VALID".format(deviceid, p)
 
     @if_connected
     def get_autopid(self, deviceid):
-        chan = self._chan_from_id(deviceid, expected_type="TEMP")
+        chan = self._chan_from_id(deviceid, expected_type=ChannelTypes.TEMP)
         return "STAT:DEV:{}:TEMP:LOOP:PIDT:{}".format(deviceid, "ON" if chan.autopid else "OFF")
 
     @if_connected
     def set_autopid(self, deviceid, sp):
-        chan = self._chan_from_id(deviceid, expected_type="TEMP")
+        chan = self._chan_from_id(deviceid, expected_type=ChannelTypes.TEMP)
         chan.autopid = (sp == "ON")
         return "STAT:SET:DEV:{}:TEMP:LOOP:PIDT:{}:VALID".format(deviceid, sp)
 
     @if_connected
     def get_temp_i(self, deviceid):
-        chan = self._chan_from_id(deviceid, expected_type="TEMP")
+        chan = self._chan_from_id(deviceid, expected_type=ChannelTypes.TEMP)
         return "STAT:DEV:{}:TEMP:LOOP:I:{:.4f}".format(deviceid, chan.i)
 
     @if_connected
     def set_temp_i(self, deviceid, i):
-        chan = self._chan_from_id(deviceid, expected_type="TEMP")
+        chan = self._chan_from_id(deviceid, expected_type=ChannelTypes.TEMP)
         chan.i = i
         return "STAT:SET:DEV:{}:TEMP:LOOP:I:{:.4f}:VALID".format(deviceid, i)
 
     @if_connected
     def get_temp_d(self, deviceid):
-        chan = self._chan_from_id(deviceid, expected_type="TEMP")
+        chan = self._chan_from_id(deviceid, expected_type=ChannelTypes.TEMP)
         return "STAT:DEV:{}:TEMP:LOOP:D:{:.4f}".format(deviceid, chan.d)
 
     @if_connected
     def set_temp_d(self, deviceid, d):
-        chan = self._chan_from_id(deviceid, expected_type="TEMP")
+        chan = self._chan_from_id(deviceid, expected_type=ChannelTypes.TEMP)
         chan.d = d
         return "STAT:SET:DEV:{}:TEMP:LOOP:D:{:.4f}:VALID".format(deviceid, d)
 
     @if_connected
     def get_temp_measured(self, deviceid):
-        chan = self._chan_from_id(deviceid, expected_type="TEMP")
+        chan = self._chan_from_id(deviceid, expected_type=ChannelTypes.TEMP)
         return "STAT:DEV:{}:TEMP:SIG:TEMP:{:.4f}K".format(deviceid, chan.temperature)
 
     @if_connected
     def get_temp_setpoint(self, deviceid):
-        chan = self._chan_from_id(deviceid, expected_type="TEMP")
+        chan = self._chan_from_id(deviceid, expected_type=ChannelTypes.TEMP)
         return "STAT:DEV:{}:TEMP:LOOP:TSET:{:.4f}K".format(deviceid, chan.temperature_sp)
 
     @if_connected
     def set_temp_setpoint(self, deviceid, sp):
-        chan = self._chan_from_id(deviceid, expected_type="TEMP")
+        chan = self._chan_from_id(deviceid, expected_type=ChannelTypes.TEMP)
         chan.temperature_sp = sp
         return "STAT:SET:DEV:{}:TEMP:LOOP:TSET:{:.4f}K:VALID".format(deviceid, sp)
 
     @if_connected
     def get_resistance(self, deviceid):
-        chan = self._chan_from_id(deviceid, expected_type="TEMP")
+        chan = self._chan_from_id(deviceid, expected_type=ChannelTypes.TEMP)
         return "STAT:DEV:{}:TEMP:SIG:RES:{:.4f}O".format(deviceid, chan.resistance)
 
     @if_connected
     def get_heater_auto(self, deviceid):
-        chan = self._chan_from_id(deviceid, expected_type="TEMP")
+        chan = self._chan_from_id(deviceid, expected_type=ChannelTypes.TEMP)
         return "STAT:DEV:{}:TEMP:LOOP:ENAB:{}".format(deviceid, "ON" if chan.heater_auto else "OFF")
 
     @if_connected
     def set_heater_auto(self, deviceid, sp):
-        chan = self._chan_from_id(deviceid, expected_type="TEMP")
+        chan = self._chan_from_id(deviceid, expected_type=ChannelTypes.TEMP)
         chan.heater_auto = (sp == "ON")
         return "STAT:SET:DEV:{}:TEMP:LOOP:ENAB:{}:VALID".format(deviceid, "ON" if chan.heater_auto else "OFF")
 
     @if_connected
     def get_gas_flow_auto(self, deviceid):
-        chan = self._chan_from_id(deviceid, expected_type="TEMP")
+        chan = self._chan_from_id(deviceid, expected_type=ChannelTypes.TEMP)
         return "STAT:DEV:{}:TEMP:LOOP:FAUT:{}".format(deviceid, "ON" if chan.gas_flow_auto else "OFF")
 
     @if_connected
     def set_gas_flow_auto(self, deviceid, sp):
-        chan = self._chan_from_id(deviceid, expected_type="TEMP")
+        chan = self._chan_from_id(deviceid, expected_type=ChannelTypes.TEMP)
         chan.gas_flow_auto = (sp == "ON")
         return "STAT:SET:DEV:{}:TEMP:LOOP:FAUT:{}:VALID".format(deviceid, "ON" if chan.gas_flow_auto else "OFF")
 
     @if_connected
     def get_heater_percent(self, deviceid):
-        chan = self._chan_from_id(deviceid, expected_type="TEMP")
+        chan = self._chan_from_id(deviceid, expected_type=ChannelTypes.TEMP)
         return "STAT:DEV:{}:TEMP:LOOP:HSET:{:.4f}".format(deviceid, chan.heater_percent)
 
     @if_connected
     def set_heater_percent(self, deviceid, sp):
-        chan = self._chan_from_id(deviceid, expected_type="TEMP")
+        chan = self._chan_from_id(deviceid, expected_type=ChannelTypes.TEMP)
         chan.heater_percent = sp
         return "STAT:SET:DEV:{}:TEMP:LOOP:HSET:{:.4f}:VALID".format(deviceid, sp)
 
     @if_connected
     def get_gas_flow(self, deviceid):
-        aux_chan = self._chan_from_id(deviceid, expected_type="AUX")
+        aux_chan = self._chan_from_id(deviceid, expected_type=ChannelTypes.AUX)
         return "STAT:DEV:{}:AUX:SIG:PERC:{:.4f}".format(deviceid, aux_chan.gas_flow)
 
     @if_connected
     def set_gas_flow(self, deviceid, sp):
-        temp_chan = self._chan_from_id(deviceid, expected_type="TEMP")
-        aux_chan = self._chan_from_id(temp_chan.associated_aux_channel, expected_type="AUX")
+        temp_chan = self._chan_from_id(deviceid, expected_type=ChannelTypes.TEMP)
+        aux_chan = self._chan_from_id(temp_chan.associated_aux_channel, expected_type=ChannelTypes.AUX)
         aux_chan.gas_flow = sp
         return "STAT:SET:DEV:{}:TEMP:LOOP:FSET:{:.4f}:VALID".format(deviceid, sp)
 
@@ -303,7 +311,7 @@ class MercuryitcInterface(StreamInterface):
         the IOC (the ioc queries each parameter individually)
         """
 
-        chan = self._chan_from_id(deviceid)
+        chan = self._chan_from_id(deviceid, expected_type=ChannelTypes.HTR)
 
         return "STAT:DEV:{}:HTR".format(deviceid) + \
                ":NICK:{}".format(chan.nickname) + \
@@ -315,28 +323,28 @@ class MercuryitcInterface(StreamInterface):
 
     @if_connected
     def get_heater_voltage_limit(self, deviceid):
-        chan = self._chan_from_id(deviceid, expected_type="HTR")
+        chan = self._chan_from_id(deviceid, expected_type=ChannelTypes.HTR)
         return "STAT:DEV:{}:HTR:VLIM:{:.4f}".format(deviceid, chan.voltage_limit)
 
     @if_connected
     def set_heater_voltage_limit(self, deviceid, sp):
-        chan = self._chan_from_id(deviceid, expected_type="HTR")
+        chan = self._chan_from_id(deviceid, expected_type=ChannelTypes.HTR)
         chan.voltage_limit = sp
         return "STAT:SET:DEV:{}:HTR:VLIM:{:.4f}:VALID".format(deviceid, chan.voltage_limit)
 
     @if_connected
     def get_heater_voltage(self, deviceid):
-        chan = self._chan_from_id(deviceid, expected_type="HTR")
+        chan = self._chan_from_id(deviceid, expected_type=ChannelTypes.HTR)
         return "STAT:DEV:{}:HTR:SIG:VOLT:{:.4f}V".format(deviceid, chan.voltage)
 
     @if_connected
     def get_heater_current(self, deviceid):
-        chan = self._chan_from_id(deviceid, expected_type="HTR")
+        chan = self._chan_from_id(deviceid, expected_type=ChannelTypes.HTR)
         return "STAT:DEV:{}:HTR:SIG:CURR:{:.4f}A".format(deviceid, chan.current)
 
     @if_connected
     def get_heater_power(self, deviceid):
-        chan = self._chan_from_id(deviceid, expected_type="HTR")
+        chan = self._chan_from_id(deviceid, expected_type=ChannelTypes.HTR)
         return "STAT:DEV:{}:HTR:SIG:POWR:{:.4f}W".format(deviceid, chan.power)
 
     @if_connected
@@ -345,7 +353,7 @@ class MercuryitcInterface(StreamInterface):
         Gets the details for an entire aux sensor all at once. This is only used by the LabVIEW VI, not by
         the IOC (the ioc queries each parameter individually)
         """
-        chan = self._chan_from_id(deviceid)
+        chan = self._chan_from_id(deviceid, expected_type=ChannelTypes.AUX)
 
         return "STAT:DEV:{}:AUX".format(deviceid) + \
                ":NICK:{}".format(chan.nickname) + \

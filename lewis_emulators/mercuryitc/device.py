@@ -6,6 +6,12 @@ from .states import DefaultState
 from lewis.devices import StateMachineDevice
 
 
+class ChannelTypes(object):
+    TEMP = "TEMP"
+    HTR = "HTR"
+    AUX = "AUX"
+
+
 class Channel(object):
     def __init__(self, channel_type, nickname):
         super(Channel, self).__init__()
@@ -15,7 +21,7 @@ class Channel(object):
 
 class TemperatureChannel(Channel):
     def __init__(self, nickname):
-        super(TemperatureChannel, self).__init__("TEMP", nickname)
+        super(TemperatureChannel, self).__init__(ChannelTypes.TEMP, nickname)
 
         # Sensor measurements
         self.temperature = 0
@@ -42,7 +48,7 @@ class TemperatureChannel(Channel):
 
 class HeaterChannel(Channel):
     def __init__(self, nickname):
-        super(HeaterChannel, self).__init__("HTR", nickname)
+        super(HeaterChannel, self).__init__(ChannelTypes.HTR, nickname)
 
         self.power = 0
         self.voltage = 0
@@ -52,7 +58,7 @@ class HeaterChannel(Channel):
 
 class AuxChannel(Channel):
     def __init__(self, nickname):
-        super(AuxChannel, self).__init__("AUX", nickname)
+        super(AuxChannel, self).__init__(ChannelTypes.AUX, nickname)
 
         self.gas_flow = 0
 
@@ -68,8 +74,8 @@ class SimulatedMercuryitc(StateMachineDevice):
             "DB0": HeaterChannel("DB0.H0"),
             "DB1": AuxChannel("DB0.A0"),
             "MB1": TemperatureChannel("MB1.T0"),
-            "DB2": HeaterChannel("DB2.H0"),
-            "DB3": AuxChannel("DB3.A0"),
+            "DB2": HeaterChannel("DB2.H1"),
+            "DB3": AuxChannel("DB3.A1"),
         }
 
         # Associate each temperature channel with a heater and an auxilary channel:
