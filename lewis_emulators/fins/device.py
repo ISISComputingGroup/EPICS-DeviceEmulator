@@ -11,7 +11,6 @@ class SimulatedFinsPLC(StateMachineDevice):
         19500: 'heartbeat',
         19533: 'helium_purity',
         19534: 'dew_point',
-        19900: 'he_bag_pr_be_atm'
     }
 
     HE_RECOVERY_DOUBLE_WORD_MEMORY_LOCATIONS = {}
@@ -29,7 +28,6 @@ class SimulatedFinsPLC(StateMachineDevice):
         self.heartbeat = 0
         self.helium_purity = 0
         self.dew_point = 0
-        self.he_bag_pr_be_atm = 0
 
     def _get_state_handlers(self):
         return {
