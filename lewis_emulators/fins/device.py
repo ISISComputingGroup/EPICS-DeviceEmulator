@@ -7,13 +7,13 @@ class SimulatedFinsPLC(StateMachineDevice):
 
     HELIUM_RECOVERY_NODE = 58
 
-    HE_RECOVERY_MEMORY_FIELD_MAPPING = {
-        19500: 'heartbeat',
-        19533: 'helium_purity',
-        19534: 'dew_point',
-    }
-
     HE_RECOVERY_DOUBLE_WORD_MEMORY_LOCATIONS = {}
+
+    PV_NAME_TO_MEMORY_MAPPING = {
+        "HEARTBEAT": 19500,
+        "HE_PURITY": 19533,
+        "DEW_POINT": 19534
+    }
 
     def _initialize_data(self):
         """
@@ -25,9 +25,11 @@ class SimulatedFinsPLC(StateMachineDevice):
 
         self.connected = True
 
-        self.heartbeat = 0
-        self.helium_purity = 0
-        self.dew_point = 0
+        self.memory = {
+            19500: 0,  # heartbeat
+            19533: 0,  # helium purity
+            19534: 0,  # dew point
+        }
 
     def _get_state_handlers(self):
         return {
@@ -48,5 +50,6 @@ class SimulatedFinsPLC(StateMachineDevice):
         """
         self._initialize_data()
 
-    def get_data(self, memory_address):
-        return getattr(self, SimulatedFinsPLC.HE_RECOVERY_MEMORY_FIELD_MAPPING[memory_address])
+    def set_memory(self, pv_name, data):
+        memory_location = SimulatedFinsPLC.PV_NAME_TO_MEMORY_MAPPING[pv_name]
+        self.memory[memory_location] = data

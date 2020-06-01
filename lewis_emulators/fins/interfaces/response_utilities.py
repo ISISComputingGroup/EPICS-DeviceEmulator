@@ -40,7 +40,7 @@ def dm_memory_area_read_response_fins_frame(device, client_network_address, clie
         .add_fins_frame_header(device.network_address, device.unit_address, client_network_address,
                                client_node, client_unit_address, service_id) \
         .add_fins_command_and_error_codes() \
-        .add_int(device.get_data(memory_start_address), number_of_words * 2) \
+        .add_int(device.memory[memory_start_address], number_of_words * 2) \
         .build()
 
 
