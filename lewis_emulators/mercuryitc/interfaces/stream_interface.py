@@ -26,6 +26,8 @@ class MercuryitcInterface(StreamInterface):
         # Commands to read all info at once
         CmdBuilder("get_all_temp_sensor_details").optional(ISOBUS_PREFIX)
             .escape("READ:DEV:").any_except(":").escape(":TEMP").eos().build(),
+        CmdBuilder("get_all_pressure_sensor_details").optional(ISOBUS_PREFIX)
+            .escape("READ:DEV:").any_except(":").escape(":PRES").eos().build(),
         CmdBuilder("get_all_heater_details").optional(ISOBUS_PREFIX)
             .escape("READ:DEV:").any_except(":").escape(":HTR").eos().build(),
         CmdBuilder("get_all_aux_details").optional(ISOBUS_PREFIX)
@@ -189,6 +191,37 @@ class MercuryitcInterface(StreamInterface):
                ":SIG" + \
                  ":TEMP:{:.4f}K".format(temp_chan.temperature) + \
                  ":RES:{:.4f}O".format(temp_chan.resistance)
+
+    @if_connected
+    def get_all_pressure_sensor_details(self, deviceid):
+        """
+        Gets the details for an entire temperature sensor all at once. This is only used by the LabVIEW VI, not by
+        the IOC (the ioc queries each parameter individually)
+        """
+
+        pres_chan = self._chan_from_id(deviceid, expected_type=ChannelTypes.PRES)
+        aux_chan = self._chan_from_id(pres_chan.associated_aux_channel, expected_type=ChannelTypes.AUX)
+
+        return "STAT:DEV:{}:PRES:".format(deviceid) + \
+               ":NICK:{}".format(pres_chan.nickname) + \
+               ":LOOP" + \
+                 ":AUX:{}".format(pres_chan.associated_aux_channel) + \
+                 ":D:{}".format(pres_chan.d) + \
+                 ":HTR:{}".format(pres_chan.associated_heater_channel) + \
+                 ":I:{}".format(pres_chan.i) + \
+                 ":HSET:{}".format(pres_chan.heater_percent) + \
+                 ":PIDT:{}".format("ON" if pres_chan.autopid else "OFF") + \
+                 ":ENAB:{}".format("ON" if pres_chan.heater_auto else "OFF") + \
+                 ":FAUT:{}".format("ON" if pres_chan.gas_flow_auto else "OFF") + \
+                 ":FSET:{}".format(aux_chan.gas_flow) + \
+                 ":PIDF:{}".format(pres_chan.autopid_file if pres_chan.autopid else "None") + \
+                 ":P:{}".format(pres_chan.p) + \
+                 ":TSET:{:.4f}K".format(pres_chan.pressure_sp) + \
+               ":CAL" + \
+                 ":FILE:{}".format(pres_chan.calibration_file) + \
+               ":SIG" + \
+                 ":PRES:{:.4f}mBar".format(pres_chan.pressure) + \
+                 ":VOLT:{:.4f}V".format(pres_chan.voltage)
 
     @if_connected
     def get_associated_heater(self, deviceid, chan_type):
