@@ -33,47 +33,53 @@ class MercuryitcInterface(StreamInterface):
 
         # Get heater & aux card associations
         CmdBuilder("get_associated_heater").optional(ISOBUS_PREFIX)
-            .escape("READ:DEV:").any_except(":").escape(":TEMP:LOOP:HTR").eos().build(),
+            .escape("READ:DEV:").any_except(":").escape(":").any_except(":").escape(":LOOP:HTR").eos().build(),
         CmdBuilder("get_associated_aux").optional(ISOBUS_PREFIX)
-            .escape("READ:DEV:").any_except(":").escape(":TEMP:LOOP:AUX").eos().build(),
+            .escape("READ:DEV:").any_except(":").escape(":").any_except(":").escape(":LOOP:AUX").eos().build(),
 
         # PID settings
         CmdBuilder("get_autopid").optional(ISOBUS_PREFIX)
-            .escape("READ:DEV:").any_except(":").escape(":TEMP:LOOP:PIDT").eos().build(),
+            .escape("READ:DEV:").any_except(":").escape(":").any_except(":").escape(":LOOP:PIDT").eos().build(),
         CmdBuilder("set_autopid").optional(ISOBUS_PREFIX)
-            .escape("SET:DEV:").any_except(":").escape(":TEMP:LOOP:PIDT:").enum("ON", "OFF").eos().build(),
+            .escape("SET:DEV:").any_except(":").escape(":").any_except(":").escape(":LOOP:PIDT:").enum("ON", "OFF").eos().build(),
         CmdBuilder("get_temp_p").optional(ISOBUS_PREFIX)
-            .escape("READ:DEV:").any_except(":").escape(":TEMP:LOOP:P").eos().build(),
+            .escape("READ:DEV:").any_except(":").escape(":").any_except(":").escape(":LOOP:P").eos().build(),
         CmdBuilder("set_temp_p").optional(ISOBUS_PREFIX)
-            .escape("SET:DEV:").any_except(":").escape(":TEMP:LOOP:P:").float().eos().build(),
+            .escape("SET:DEV:").any_except(":").escape(":").any_except(":").escape(":LOOP:P:").float().eos().build(),
         CmdBuilder("get_temp_i").optional(ISOBUS_PREFIX)
-            .escape("READ:DEV:").any_except(":").escape(":TEMP:LOOP:I").eos().build(),
+            .escape("READ:DEV:").any_except(":").escape(":").any_except(":").escape(":LOOP:I").eos().build(),
         CmdBuilder("set_temp_i").optional(ISOBUS_PREFIX)
-            .escape("SET:DEV:").any_except(":").escape(":TEMP:LOOP:I:").float().eos().build(),
+            .escape("SET:DEV:").any_except(":").escape(":").any_except(":").escape(":LOOP:I:").float().eos().build(),
         CmdBuilder("get_temp_d").optional(ISOBUS_PREFIX)
-            .escape("READ:DEV:").any_except(":").escape(":TEMP:LOOP:D").eos().build(),
+            .escape("READ:DEV:").any_except(":").escape(":").any_except(":").escape(":LOOP:D").eos().build(),
         CmdBuilder("set_temp_d").optional(ISOBUS_PREFIX)
-            .escape("SET:DEV:").any_except(":").escape(":TEMP:LOOP:D:").float().eos().build(),
+            .escape("SET:DEV:").any_except(":").escape(":").any_except(":").escape(":LOOP:D:").float().eos().build(),
 
-        # Temperature measurements
+        # Raw measurements
         CmdBuilder("get_temp_measured").optional(ISOBUS_PREFIX)
             .escape("READ:DEV:").any_except(":").escape(":TEMP:SIG:TEMP").eos().build(),
-        CmdBuilder("get_temp_setpoint").optional(ISOBUS_PREFIX)
-            .escape("READ:DEV:").any_except(":").escape(":TEMP:LOOP:TSET").eos().build(),
-        CmdBuilder("set_temp_setpoint").optional(ISOBUS_PREFIX)
-            .escape("SET:DEV:").any_except(":").escape(":TEMP:LOOP:TSET:").float().escape("K").eos().build(),
+        CmdBuilder("get_pres_measured").optional(ISOBUS_PREFIX)
+            .escape("READ:DEV:").any_except(":").escape(":PRES:SIG:PRES").eos().build(),
         CmdBuilder("get_resistance").optional(ISOBUS_PREFIX)
             .escape("READ:DEV:").any_except(":").escape(":TEMP:SIG:RES").eos().build(),
+        CmdBuilder("get_voltage").optional(ISOBUS_PREFIX)
+            .escape("READ:DEV:").any_except(":").escape(":PRES:SIG:VOLT").eos().build(),
+
+        # Control loop
+        CmdBuilder("get_control_loop_setpoint").optional(ISOBUS_PREFIX)
+            .escape("READ:DEV:").any_except(":").escape(":").any_except(":").escape(":LOOP:TSET").eos().build(),
+        CmdBuilder("set_control_loop_setpoint").optional(ISOBUS_PREFIX)
+            .escape("SET:DEV:").any_except(":").escape(":").any_except(":").escape(":LOOP:TSET:").float().any_except(":").eos().build(),
 
         # Heater
         CmdBuilder("get_heater_auto").optional(ISOBUS_PREFIX)
-            .escape("READ:DEV:").any_except(":").escape(":TEMP:LOOP:ENAB").eos().build(),
+            .escape("READ:DEV:").any_except(":").escape(":").any_except(":").escape(":LOOP:ENAB").eos().build(),
         CmdBuilder("set_heater_auto").optional(ISOBUS_PREFIX)
-            .escape("SET:DEV:").any_except(":").escape(":TEMP:LOOP:ENAB:").enum("ON", "OFF").eos().build(),
+            .escape("SET:DEV:").any_except(":").escape(":").any_except(":").escape(":LOOP:ENAB:").enum("ON", "OFF").eos().build(),
         CmdBuilder("get_heater_percent").optional(ISOBUS_PREFIX)
-            .escape("READ:DEV:").any_except(":").escape(":TEMP:LOOP:HSET").eos().build(),
+            .escape("READ:DEV:").any_except(":").escape(":").any_except(":").escape(":LOOP:HSET").eos().build(),
         CmdBuilder("set_heater_percent").optional(ISOBUS_PREFIX)
-            .escape("SET:DEV:").any_except(":").escape(":TEMP:LOOP:HSET:").float().eos().build(),
+            .escape("SET:DEV:").any_except(":").escape(":").any_except(":").escape(":LOOP:HSET:").float().eos().build(),
         CmdBuilder("get_heater_voltage").optional(ISOBUS_PREFIX)
             .escape("READ:DEV:").any_except(":").escape(":HTR:SIG:VOLT").eos().build(),
         CmdBuilder("get_heater_current").optional(ISOBUS_PREFIX)
@@ -87,13 +93,13 @@ class MercuryitcInterface(StreamInterface):
 
         # Gas flow
         CmdBuilder("get_gas_flow_auto").optional(ISOBUS_PREFIX)
-            .escape("READ:DEV:").any_except(":").escape(":TEMP:LOOP:FAUT").eos().build(),
+            .escape("READ:DEV:").any_except(":").escape(":").any_except(":").escape(":LOOP:FAUT").eos().build(),
         CmdBuilder("set_gas_flow_auto").optional(ISOBUS_PREFIX)
-            .escape("SET:DEV:").any_except(":").escape(":TEMP:LOOP:FAUT:").enum("ON", "OFF").eos().build(),
+            .escape("SET:DEV:").any_except(":").escape(":").any_except(":").escape(":LOOP:FAUT:").enum("ON", "OFF").eos().build(),
         CmdBuilder("get_gas_flow").optional(ISOBUS_PREFIX)
             .escape("READ:DEV:").any_except(":").escape(":AUX:SIG:PERC").eos().build(),
         CmdBuilder("set_gas_flow").optional(ISOBUS_PREFIX)
-            .escape("SET:DEV:").any_except(":").escape(":TEMP:LOOP:FSET:").float().eos().build(),
+            .escape("SET:DEV:").any_except(":").escape(":").any_except(":").escape(":LOOP:FSET:").float().eos().build(),
 
     }
 
@@ -185,58 +191,58 @@ class MercuryitcInterface(StreamInterface):
                  ":RES:{:.4f}O".format(temp_chan.resistance)
 
     @if_connected
-    def get_associated_heater(self, deviceid):
-        chan = self._chan_from_id(deviceid, expected_type=ChannelTypes.TEMP)
-        return "STAT:DEV:{}:TEMP:LOOP:HTR:{}".format(deviceid, chan.associated_heater_channel)
+    def get_associated_heater(self, deviceid, chan_type):
+        chan = self._chan_from_id(deviceid, expected_type=chan_type)
+        return "STAT:DEV:{}:{}:LOOP:HTR:{}".format(deviceid, chan_type, chan.associated_heater_channel)
 
     @if_connected
-    def get_associated_aux(self, deviceid):
-        chan = self._chan_from_id(deviceid, expected_type=ChannelTypes.TEMP)
-        return "STAT:DEV:{}:TEMP:LOOP:AUX:{}".format(deviceid, chan.associated_aux_channel)
+    def get_associated_aux(self, deviceid, chan_type):
+        chan = self._chan_from_id(deviceid, expected_type=chan_type)
+        return "STAT:DEV:{}:{}:LOOP:AUX:{}".format(deviceid, chan_type, chan.associated_aux_channel)
 
     @if_connected
-    def get_temp_p(self, deviceid):
-        chan = self._chan_from_id(deviceid, expected_type=ChannelTypes.TEMP)
-        return "STAT:DEV:{}:TEMP:LOOP:P:{:.4f}".format(deviceid, chan.p)
+    def get_autopid(self, deviceid, chan_type):
+        chan = self._chan_from_id(deviceid, expected_type=chan_type)
+        return "STAT:DEV:{}:{}:LOOP:PIDT:{}".format(deviceid, chan_type, "ON" if chan.autopid else "OFF")
 
     @if_connected
-    def set_temp_p(self, deviceid, p):
-        chan = self._chan_from_id(deviceid, expected_type=ChannelTypes.TEMP)
-        chan.p = p
-        return "STAT:SET:DEV:{}:TEMP:LOOP:P:{:.4f}:VALID".format(deviceid, p)
-
-    @if_connected
-    def get_autopid(self, deviceid):
-        chan = self._chan_from_id(deviceid, expected_type=ChannelTypes.TEMP)
-        return "STAT:DEV:{}:TEMP:LOOP:PIDT:{}".format(deviceid, "ON" if chan.autopid else "OFF")
-
-    @if_connected
-    def set_autopid(self, deviceid, sp):
-        chan = self._chan_from_id(deviceid, expected_type=ChannelTypes.TEMP)
+    def set_autopid(self, deviceid, chan_type, sp):
+        chan = self._chan_from_id(deviceid, expected_type=chan_type)
         chan.autopid = (sp == "ON")
-        return "STAT:SET:DEV:{}:TEMP:LOOP:PIDT:{}:VALID".format(deviceid, sp)
+        return "STAT:SET:DEV:{}:{}:LOOP:PIDT:{}:VALID".format(deviceid, chan_type, sp)
 
     @if_connected
-    def get_temp_i(self, deviceid):
-        chan = self._chan_from_id(deviceid, expected_type=ChannelTypes.TEMP)
-        return "STAT:DEV:{}:TEMP:LOOP:I:{:.4f}".format(deviceid, chan.i)
+    def get_temp_p(self, deviceid, chan_type):
+        chan = self._chan_from_id(deviceid, expected_type=chan_type)
+        return "STAT:DEV:{}:{}:LOOP:P:{:.4f}".format(deviceid, chan_type, chan.p)
 
     @if_connected
-    def set_temp_i(self, deviceid, i):
-        chan = self._chan_from_id(deviceid, expected_type=ChannelTypes.TEMP)
+    def set_temp_p(self, deviceid, chan_type, p):
+        chan = self._chan_from_id(deviceid, expected_type=chan_type)
+        chan.p = p
+        return "STAT:SET:DEV:{}:{}:LOOP:P:{:.4f}:VALID".format(deviceid, chan_type, p)
+
+    @if_connected
+    def get_temp_i(self, deviceid, chan_type):
+        chan = self._chan_from_id(deviceid, expected_type=chan_type)
+        return "STAT:DEV:{}:{}:LOOP:I:{:.4f}".format(deviceid, chan_type, chan.i)
+
+    @if_connected
+    def set_temp_i(self, deviceid, chan_type, i):
+        chan = self._chan_from_id(deviceid, expected_type=chan_type)
         chan.i = i
-        return "STAT:SET:DEV:{}:TEMP:LOOP:I:{:.4f}:VALID".format(deviceid, i)
+        return "STAT:SET:DEV:{}:{}:LOOP:I:{:.4f}:VALID".format(deviceid, chan_type, i)
 
     @if_connected
-    def get_temp_d(self, deviceid):
-        chan = self._chan_from_id(deviceid, expected_type=ChannelTypes.TEMP)
-        return "STAT:DEV:{}:TEMP:LOOP:D:{:.4f}".format(deviceid, chan.d)
+    def get_temp_d(self, deviceid, chan_type):
+        chan = self._chan_from_id(deviceid, expected_type=chan_type)
+        return "STAT:DEV:{}:{}:LOOP:D:{:.4f}".format(deviceid, chan_type, chan.d)
 
     @if_connected
-    def set_temp_d(self, deviceid, d):
-        chan = self._chan_from_id(deviceid, expected_type=ChannelTypes.TEMP)
+    def set_temp_d(self, deviceid, chan_type, d):
+        chan = self._chan_from_id(deviceid, expected_type=chan_type)
         chan.d = d
-        return "STAT:SET:DEV:{}:TEMP:LOOP:D:{:.4f}:VALID".format(deviceid, d)
+        return "STAT:SET:DEV:{}:{}:LOOP:D:{:.4f}:VALID".format(deviceid, chan_type, d)
 
     @if_connected
     def get_temp_measured(self, deviceid):
@@ -244,15 +250,39 @@ class MercuryitcInterface(StreamInterface):
         return "STAT:DEV:{}:TEMP:SIG:TEMP:{:.4f}K".format(deviceid, chan.temperature)
 
     @if_connected
-    def get_temp_setpoint(self, deviceid):
-        chan = self._chan_from_id(deviceid, expected_type=ChannelTypes.TEMP)
-        return "STAT:DEV:{}:TEMP:LOOP:TSET:{:.4f}K".format(deviceid, chan.temperature_sp)
+    def get_pres_measured(self, deviceid):
+        chan = self._chan_from_id(deviceid, expected_type=ChannelTypes.PRES)
+        return "STAT:DEV:{}:PRES:SIG:PRES:{:.4f}mBar".format(deviceid, chan.pressure)
 
     @if_connected
-    def set_temp_setpoint(self, deviceid, sp):
-        chan = self._chan_from_id(deviceid, expected_type=ChannelTypes.TEMP)
-        chan.temperature_sp = sp
-        return "STAT:SET:DEV:{}:TEMP:LOOP:TSET:{:.4f}K:VALID".format(deviceid, sp)
+    def get_control_loop_setpoint(self, deviceid, chan_type):
+        chan = self._chan_from_id(deviceid, expected_type=chan_type)
+        if chan_type == ChannelTypes.TEMP:
+            val = chan.temperature_sp
+            unit = "K"
+        elif chan_type == ChannelTypes.PRES:
+            val = chan.pressure_sp
+            unit = "mBar"
+        else:
+            raise ValueError("Invalid channel type")
+
+        return "STAT:DEV:{}:{}:LOOP:TSET:{:.4f}{}".format(deviceid, chan_type, val, unit)
+
+    @if_connected
+    def set_control_loop_setpoint(self, deviceid, chan_type, sp, unit):
+        chan = self._chan_from_id(deviceid, expected_type=chan_type)
+        if chan_type == ChannelTypes.TEMP:
+            chan.temperature_sp = sp
+            if unit != "K":
+                raise ValueError("Invalid units")
+        elif chan_type == ChannelTypes.PRES:
+            chan.pressure_sp = sp
+            if unit != "mBar":
+                raise ValueError("Invalid units")
+        else:
+            raise ValueError("Invalid channel type")
+
+        return "STAT:SET:DEV:{}:TEMP:LOOP:TSET:{:.4f}{}:VALID".format(deviceid, chan_type, sp, unit)
 
     @if_connected
     def get_resistance(self, deviceid):
@@ -260,37 +290,42 @@ class MercuryitcInterface(StreamInterface):
         return "STAT:DEV:{}:TEMP:SIG:RES:{:.4f}O".format(deviceid, chan.resistance)
 
     @if_connected
-    def get_heater_auto(self, deviceid):
-        chan = self._chan_from_id(deviceid, expected_type=ChannelTypes.TEMP)
-        return "STAT:DEV:{}:TEMP:LOOP:ENAB:{}".format(deviceid, "ON" if chan.heater_auto else "OFF")
+    def get_voltage(self, deviceid):
+        chan = self._chan_from_id(deviceid, expected_type=ChannelTypes.PRES)
+        return "STAT:DEV:{}:PRES:SIG:VOLT:{:.4f}V".format(deviceid, chan.voltage)
 
     @if_connected
-    def set_heater_auto(self, deviceid, sp):
-        chan = self._chan_from_id(deviceid, expected_type=ChannelTypes.TEMP)
+    def get_heater_auto(self, deviceid, chan_type):
+        chan = self._chan_from_id(deviceid, expected_type=chan_type)
+        return "STAT:DEV:{}:{}:LOOP:ENAB:{}".format(deviceid, chan_type, "ON" if chan.heater_auto else "OFF")
+
+    @if_connected
+    def set_heater_auto(self, deviceid, chan_type, sp):
+        chan = self._chan_from_id(deviceid, expected_type=chan_type)
         chan.heater_auto = (sp == "ON")
-        return "STAT:SET:DEV:{}:TEMP:LOOP:ENAB:{}:VALID".format(deviceid, "ON" if chan.heater_auto else "OFF")
+        return "STAT:SET:DEV:{}:{}:LOOP:ENAB:{}:VALID".format(deviceid, chan_type, "ON" if chan.heater_auto else "OFF")
 
     @if_connected
-    def get_gas_flow_auto(self, deviceid):
-        chan = self._chan_from_id(deviceid, expected_type=ChannelTypes.TEMP)
-        return "STAT:DEV:{}:TEMP:LOOP:FAUT:{}".format(deviceid, "ON" if chan.gas_flow_auto else "OFF")
+    def get_gas_flow_auto(self, deviceid, chan_type):
+        chan = self._chan_from_id(deviceid, expected_type=chan_type)
+        return "STAT:DEV:{}:{}:LOOP:FAUT:{}".format(deviceid, chan_type, "ON" if chan.gas_flow_auto else "OFF")
 
     @if_connected
-    def set_gas_flow_auto(self, deviceid, sp):
-        chan = self._chan_from_id(deviceid, expected_type=ChannelTypes.TEMP)
+    def set_gas_flow_auto(self, deviceid, chan_type, sp):
+        chan = self._chan_from_id(deviceid, expected_type=chan_type)
         chan.gas_flow_auto = (sp == "ON")
-        return "STAT:SET:DEV:{}:TEMP:LOOP:FAUT:{}:VALID".format(deviceid, "ON" if chan.gas_flow_auto else "OFF")
+        return "STAT:SET:DEV:{}:{}:LOOP:FAUT:{}:VALID".format(deviceid, chan_type, "ON" if chan.gas_flow_auto else "OFF")
 
     @if_connected
-    def get_heater_percent(self, deviceid):
-        chan = self._chan_from_id(deviceid, expected_type=ChannelTypes.TEMP)
-        return "STAT:DEV:{}:TEMP:LOOP:HSET:{:.4f}".format(deviceid, chan.heater_percent)
+    def get_heater_percent(self, deviceid, chan_type):
+        chan = self._chan_from_id(deviceid, expected_type=chan_type)
+        return "STAT:DEV:{}:{}:LOOP:HSET:{:.4f}".format(deviceid, chan_type, chan.heater_percent)
 
     @if_connected
-    def set_heater_percent(self, deviceid, sp):
-        chan = self._chan_from_id(deviceid, expected_type=ChannelTypes.TEMP)
+    def set_heater_percent(self, deviceid, chan_type, sp):
+        chan = self._chan_from_id(deviceid, expected_type=chan_type)
         chan.heater_percent = sp
-        return "STAT:SET:DEV:{}:TEMP:LOOP:HSET:{:.4f}:VALID".format(deviceid, sp)
+        return "STAT:SET:DEV:{}:{}:LOOP:HSET:{:.4f}:VALID".format(deviceid, chan_type, sp)
 
     @if_connected
     def get_gas_flow(self, deviceid):
@@ -298,11 +333,11 @@ class MercuryitcInterface(StreamInterface):
         return "STAT:DEV:{}:AUX:SIG:PERC:{:.4f}".format(deviceid, aux_chan.gas_flow)
 
     @if_connected
-    def set_gas_flow(self, deviceid, sp):
-        temp_chan = self._chan_from_id(deviceid, expected_type=ChannelTypes.TEMP)
+    def set_gas_flow(self, deviceid, chan_type, sp):
+        temp_chan = self._chan_from_id(deviceid, expected_type=chan_type)
         aux_chan = self._chan_from_id(temp_chan.associated_aux_channel, expected_type=ChannelTypes.AUX)
         aux_chan.gas_flow = sp
-        return "STAT:SET:DEV:{}:TEMP:LOOP:FSET:{:.4f}:VALID".format(deviceid, sp)
+        return "STAT:SET:DEV:{}:{}:LOOP:FSET:{:.4f}:VALID".format(deviceid, chan_type, sp)
 
     @if_connected
     def get_all_heater_details(self, deviceid):

@@ -10,6 +10,7 @@ class ChannelTypes(object):
     TEMP = "TEMP"
     HTR = "HTR"
     AUX = "AUX"
+    PRES = "PRES"
 
 
 class Channel(object):
@@ -19,15 +20,12 @@ class Channel(object):
         self.nickname = nickname
 
 
-class TemperatureChannel(Channel):
-    def __init__(self, nickname):
-        super(TemperatureChannel, self).__init__(ChannelTypes.TEMP, nickname)
-
-        # Sensor measurements
-        self.temperature = 0
-        self.temperature_sp = 0
-        self.resistance = 0
-        self.calibration_file = "sim_calib_file"
+class TempPressureCommonChannel(Channel):
+    """
+    Holds attributes common to temperature and pressure channels
+    """
+    def __init__(self, channel_type, nickname):
+        super(TempPressureCommonChannel, self).__init__(channel_type, nickname)
 
         # PID control loop settings
         self.autopid = False
@@ -44,6 +42,27 @@ class TemperatureChannel(Channel):
         # Associated channels
         self.associated_heater_channel = None
         self.associated_aux_channel = None
+
+        # Calibration
+        self.calibration_file = "sim_calib_file"
+
+
+class TemperatureChannel(TempPressureCommonChannel):
+    def __init__(self, nickname):
+        super(TemperatureChannel, self).__init__(ChannelTypes.TEMP, nickname)
+
+        self.temperature = 0
+        self.temperature_sp = 0
+        self.resistance = 0
+
+
+class PressureChannel(TempPressureCommonChannel):
+    def __init__(self, nickname):
+        super(PressureChannel, self).__init__(ChannelTypes.PRES, nickname)
+
+        self.pressure = 0
+        self.pressure_sp = 0
+        self.voltage = 0
 
 
 class HeaterChannel(Channel):
@@ -70,20 +89,31 @@ class SimulatedMercuryitc(StateMachineDevice):
         self.connected = True
 
         self.channels = {
+            # Temperature channel 1
             "MB0": TemperatureChannel("MB0.T0"),
             "DB0": HeaterChannel("DB0.H0"),
             "DB1": AuxChannel("DB0.A0"),
+
+            # Temperature channel 2
             "MB1": TemperatureChannel("MB1.T0"),
             "DB2": HeaterChannel("DB2.H1"),
             "DB3": AuxChannel("DB3.A1"),
+
+            # Pressure channel 1
+            "MB2": PressureChannel("MB2.P0"),
+            "DB4": HeaterChannel("DB2.H2"),
+            "DB5": AuxChannel("DB3.A2"),
         }
 
-        # Associate each temperature channel with a heater and an auxilary channel:
+        # Associate each temperature/pressure channel with a heater and an auxilary channel:
         self.channels["MB0"].associated_heater_channel = "DB0"
         self.channels["MB0"].associated_aux_channel = "DB1"
 
         self.channels["MB1"].associated_heater_channel = "DB2"
         self.channels["MB1"].associated_aux_channel = "DB3"
+
+        self.channels["MB2"].associated_heater_channel = "DB4"
+        self.channels["MB2"].associated_aux_channel = "DB5"
 
     def reset(self):
         self._initialize_data()
@@ -98,4 +128,5 @@ class SimulatedMercuryitc(StateMachineDevice):
         return OrderedDict([])
 
     def backdoor_set_channel_property(self, chan_id, property_name, value):
+        assert hasattr(self.channels[chan_id], property_name)
         setattr(self.channels[chan_id], property_name, value)
