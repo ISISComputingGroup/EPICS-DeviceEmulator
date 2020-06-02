@@ -11,6 +11,7 @@ class SimulatedFinsPLC(StateMachineDevice):
 
     PV_NAME_TO_MEMORY_MAPPING = {
         "HEARTBEAT": 19500,
+        "MCP:BANK1:TS2": 19501,
         "HE_PURITY": 19533,
         "DEW_POINT": 19534
     }
@@ -27,6 +28,7 @@ class SimulatedFinsPLC(StateMachineDevice):
 
         self.memory = {
             19500: 0,  # heartbeat
+            19501: 0,  # mcp bank 1 TS2 helium gas resupply
             19533: 0,  # helium purity
             19534: 0,  # dew point
         }
