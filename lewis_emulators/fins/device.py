@@ -31,6 +31,10 @@ class SimulatedFinsPLC(StateMachineDevice):
         "MCP:EXTERNAL_TEMP": 19518,
         "MASS_FLOW:GAS_LIQUEFACTION": 19521,
         "MASS_FLOW:HE_FILLS": 19522,
+        "KAISER_COMPR:INTERNAL_TEMP": 19523,
+        "COLDBOX:HE_TEMP": 19524,
+        "COLDBOX:HE_TEMP:LIMIT": 19525,
+        "TRANSPORT_DEWAR:PRESSURE": 19526,
         "HE_PURITY": 19533,
         "DEW_POINT": 19534
     }
@@ -66,7 +70,11 @@ class SimulatedFinsPLC(StateMachineDevice):
             19517: 0,  # mcp manifold inlet pressure from compressors
             19518: 0,  # mcp external temperature
             19521: 0,  # mass flow meter for gas flow liquefaction
-            19522: 0,  # mass flow meter for helium fills
+            19522: 0,  # mass flow meter for helium fills,
+            19523: 0,  # Kaiser compressor container internal temperature
+            19524: 0,  # Coldbox Helium temperature
+            19525: 0,  # Coldbox Helium temperature limit
+            19526: 0,  # Transport dewar flash pressure
             19533: 0,  # helium purity
             19534: 0,  # dew point
         }
