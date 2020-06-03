@@ -32,6 +32,8 @@ class MercuryitcInterface(StreamInterface):
             .escape("READ:DEV:").any_except(":").escape(":HTR").eos().build(),
         CmdBuilder("get_all_aux_details").optional(ISOBUS_PREFIX)
             .escape("READ:DEV:").any_except(":").escape(":AUX").eos().build(),
+        CmdBuilder("get_all_level_sensor_details").optional(ISOBUS_PREFIX)
+            .escape("READ:DEV:").any_except(":").escape(":LVL").eos().build(),
 
         # Get heater & aux card associations
         CmdBuilder("get_associated_heater").optional(ISOBUS_PREFIX)
@@ -103,6 +105,17 @@ class MercuryitcInterface(StreamInterface):
         CmdBuilder("set_gas_flow").optional(ISOBUS_PREFIX)
             .escape("SET:DEV:").any_except(":").escape(":").any_except(":").escape(":LOOP:FSET:").float().eos().build(),
 
+        # Gas levels
+        CmdBuilder("get_nitrogen_level").optional(ISOBUS_PREFIX)
+            .escape("READ:DEV:").any_except(":").escape(":LVL:SIG:NIT:LEV").eos().build(),
+        CmdBuilder("get_helium_level").optional(ISOBUS_PREFIX)
+            .escape("READ:DEV:").any_except(":").escape(":LVL:SIG:HEL:LEV").eos().build(),
+
+        # Level card probe rates
+        CmdBuilder("get_helium_probe_speed").optional(ISOBUS_PREFIX)
+            .escape("READ:DEV:").any_except(":").escape(":LVL:HEL:PULS:SLOW").eos().build(),
+        CmdBuilder("set_helium_probe_speed").optional(ISOBUS_PREFIX)
+            .escape("READ:DEV:").any_except(":").escape(":LVL:HEL:PULS:SLOW:").enum("ON", "OFF", "0", "1").eos().build(),
     }
 
     in_terminator = "\n"
@@ -122,6 +135,7 @@ class MercuryitcInterface(StreamInterface):
         for chan_location, chan in self.device.channels.items():
             resp += ":DEV:{}:{}".format(chan_location, chan.channel_type)
 
+        self.log.info("Device catalog: {}".format(resp))
         return resp
 
     def _chan_from_id(self, deviceid, expected_type=None):
@@ -427,3 +441,44 @@ class MercuryitcInterface(StreamInterface):
                ":NICK:{}".format(chan.nickname) + \
                ":SIG" \
                  ":PERC:{:.4f}".format(chan.gas_flow)
+
+    @if_connected
+    def get_all_level_sensor_details(self, deviceid):
+        """
+        Gets the details for an entire temperature sensor all at once. This is only used by the LabVIEW VI, not by
+        the IOC (the ioc queries each parameter individually)
+        """
+
+        lvl_chan = self._chan_from_id(deviceid, expected_type=ChannelTypes.LVL)
+
+        return "STAT:DEV:{}:TEMP:".format(deviceid) + \
+               ":NICK:{}".format(lvl_chan.nickname) + \
+               ":SIG" + \
+                 ":NIT:LEV:{:.3f}%".format(lvl_chan.nitrogen_level) + \
+                 ":HEL:LEV:{:.3f}%".format(lvl_chan.helium_level)
+
+    @if_connected
+    def get_nitrogen_level(self, deviceid):
+        chan = self._chan_from_id(deviceid, expected_type=ChannelTypes.LVL)
+
+        return "STAT:DEV:{}:LVL:SIG:NIT:LEV:{:.3f}%".format(deviceid, chan.nitrogen_level)
+
+    @if_connected
+    def get_helium_level(self, deviceid):
+        chan = self._chan_from_id(deviceid, expected_type=ChannelTypes.LVL)
+
+        return "STAT:DEV:{}:LVL:SIG:HEL:LEV:{:.3f}%".format(deviceid, chan.helium_level)
+
+    @if_connected
+    def get_helium_probe_speed(self, deviceid):
+        chan = self._chan_from_id(deviceid, expected_type=ChannelTypes.LVL)
+
+        return "STAT:DEV:{}:LVL:HEL:PULS:SLOW:{}".format(deviceid, "ON" if chan.slow_helium_read_rate else "OFF")
+
+    @if_connected
+    def set_helium_probe_speed(self, deviceid, sp):
+        chan = self._chan_from_id(deviceid, expected_type=ChannelTypes.LVL)
+
+        chan.slow_helium_read_rate = sp in ["ON", "1"]
+
+        return "STAT:SET:DEV:{}:LVL:HEL:PULS:SLOW:{}:VALID".format(deviceid, "ON" if chan.slow_helium_read_rate else "OFF")

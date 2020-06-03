@@ -11,6 +11,7 @@ class ChannelTypes(object):
     HTR = "HTR"
     AUX = "AUX"
     PRES = "PRES"
+    LVL = "LVL"
 
 
 class Channel(object):
@@ -82,6 +83,15 @@ class AuxChannel(Channel):
         self.gas_flow = 0
 
 
+class LevelChannel(Channel):
+    def __init__(self, nickname):
+        super(LevelChannel, self).__init__(ChannelTypes.LVL, nickname)
+
+        self.nitrogen_level = 0
+        self.helium_level = 0
+        self.slow_helium_read_rate = False
+
+
 @has_log
 class SimulatedMercuryitc(StateMachineDevice):
 
@@ -92,28 +102,31 @@ class SimulatedMercuryitc(StateMachineDevice):
             # Temperature channel 1
             "MB0": TemperatureChannel("MB0.T0"),
             "DB0": HeaterChannel("DB0.H0"),
-            "DB1": AuxChannel("DB0.A0"),
+            "DB1": AuxChannel("DB1.A0"),
 
             # Temperature channel 2
-            "MB1": TemperatureChannel("MB1.T0"),
-            "DB2": HeaterChannel("DB2.H1"),
-            "DB3": AuxChannel("DB3.A1"),
+            "DB2": TemperatureChannel("DB2.T1"),
+            "DB3": HeaterChannel("DB3.H1"),
+            "DB4": AuxChannel("DB4.A1"),
 
             # Pressure channel 1
-            "MB2": PressureChannel("MB2.P0"),
-            "DB4": HeaterChannel("DB2.H2"),
-            "DB5": AuxChannel("DB3.A2"),
+            "DB5": PressureChannel("DB5.P0"),
+            "DB6": HeaterChannel("DB6.H2"),
+            "DB7": AuxChannel("DB7.A2"),
+
+            # Level channel 1
+            "DB8": LevelChannel("DB8.L0"),
         }
 
         # Associate each temperature/pressure channel with a heater and an auxilary channel:
         self.channels["MB0"].associated_heater_channel = "DB0"
         self.channels["MB0"].associated_aux_channel = "DB1"
 
-        self.channels["MB1"].associated_heater_channel = "DB2"
-        self.channels["MB1"].associated_aux_channel = "DB3"
+        self.channels["DB2"].associated_heater_channel = "DB3"
+        self.channels["DB2"].associated_aux_channel = "DB4"
 
-        self.channels["MB2"].associated_heater_channel = "DB4"
-        self.channels["MB2"].associated_aux_channel = "DB5"
+        self.channels["DB5"].associated_heater_channel = "DB6"
+        self.channels["DB5"].associated_aux_channel = "DB7"
 
     def reset(self):
         self._initialize_data()
