@@ -23,6 +23,14 @@ class SimulatedFinsPLC(StateMachineDevice):
         "MCP2:BANK5:SPARE_STORAGE": 19510,
         "MCP1:BANK6:SPARE_STORAGE": 19511,
         "MCP2:BANK6:SPARE_STORAGE": 19512,
+        "MCP1:BANK7:SPARE_STORAGE": 19513,
+        "MCP2:BANK7:SPARE_STORAGE": 19514,
+        "MCP1:BANK8:SPARE_STORAGE": 19515,
+        "MCP2:BANK8:SPARE_STORAGE": 19516,
+        "MCP:INLET:PRESSURE": 19517,
+        "MCP:EXTERNAL_TEMP": 19518,
+        "MASS_FLOW:GAS_LIQUEFACTION": 19521,
+        "MASS_FLOW:HE_FILLS": 19522,
         "HE_PURITY": 19533,
         "DEW_POINT": 19534
     }
@@ -51,6 +59,14 @@ class SimulatedFinsPLC(StateMachineDevice):
             19510: 0,  # mcp 2 bank 5 spare storage
             19511: 0,  # mcp 1 bank 6 spare storage
             19512: 0,  # mcp 2 bank 6 spare storage
+            19513: 0,  # mcp 1 bank 7 spare storage
+            19514: 0,  # mcp 2 bank 7 spare storage
+            19515: 0,  # mcp 1 bank 8 spare storage
+            19516: 0,  # mcp 2 bank 8 spare storage
+            19517: 0,  # mcp manifold inlet pressure from compressors
+            19518: 0,  # mcp external temperature
+            19521: 0,  # mass flow meter for gas flow liquefaction
+            19522: 0,  # mass flow meter for helium fills
             19533: 0,  # helium purity
             19534: 0,  # dew point
         }
