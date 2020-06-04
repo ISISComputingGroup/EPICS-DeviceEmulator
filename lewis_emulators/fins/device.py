@@ -45,7 +45,21 @@ class SimulatedFinsPLC(StateMachineDevice):
         "TS1:SOUTH:O2": 19669,
         "TS1:WINDOW:FLOW_METER": 19697,
         "TS1:SHUTTER:FLOW_METER": 19698,
-        "TS1:VOID:FLOW_METER": 19699
+        "TS1:VOID:FLOW_METER": 19699,
+        "GC:R108:U40": 19700,
+        "GC:R108:DEWAR_FARM": 19702,
+        "GC:R55:TOTAL": 19704,
+        "GC:R55:NORTH": 19706,
+        "GC:R55:SOUTH": 19708,
+        "GC:MICE_HALL": 19710,
+        "GC:MUON": 19712,
+        "GC:PEARL_HRPD_MARI_ENGINX": 19714,
+        "GC:SXD_AND_MERLIN": 19720,
+        "GC:CRYO_LAB": 19724,
+        "GC:MAPS_AND_VESUVIO": 19726,
+        "GC:SANDALS": 19728,
+        "GC:CRISP_AND_LOQ": 19730,
+        "GC:IRIS_AND_OSIRIS": 19734,
     }
 
     def _initialize_data(self):
@@ -93,7 +107,21 @@ class SimulatedFinsPLC(StateMachineDevice):
             19669: 0,  # TS1 south OS level
             19697: 0,  # TS1 window flow meter
             19698: 0,  # TS1 shutter flow meter
-            19699: 0  # TS1 void flow meter
+            19699: 0,  # TS1 void flow meter
+            19700: 0,  # R108 U40 gas counter
+            19702: 0,  # R108 dewar farm gas counter
+            19704: 0,  # gas counter R55 total
+            19706: 0,  # gas counter R55 north
+            19708: 0,  # gas counter R55 south
+            19710: 0,  # gas counter mice hall
+            19712: 0,  # gas counter muon
+            19714: 0,  # gas counter PEARL, HRPD, ENGIN-X, GEM and MARI
+            19720: 0,  # gas counter SXD and MERLIN
+            19724: 0,  # gas counter Cryo Lab
+            19726: 0,  # gas counter MAPS and VESUVIO
+            19728: 0,  # gas counter SANDALS
+            19730: 0,  # gas counter CRISP and LOQ
+            19734: 0  # gas counter IRIS and OSIRIS
         }
 
     def _get_state_handlers(self):
