@@ -12,7 +12,7 @@ def listen_to_tcp(tcp_conn, serial_conn):
         if len(data) > 0:
             serial_conn.writelines(tcp_data)
             print "Data on tcp: " + str(tcp_data)
-        time.sleep(0.01)
+        time.sleep(0.001)
 
 
 if __name__ == "__main__":
