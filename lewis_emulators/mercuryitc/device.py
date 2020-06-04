@@ -101,7 +101,7 @@ class SimulatedMercuryitc(StateMachineDevice):
         self.channels = {
             # Temperature channel 1
             "MB0": TemperatureChannel("MB0.T0"),
-            "DB0": HeaterChannel("DB0.H0"),
+            "MB1": HeaterChannel("DB0.H0"),
             "DB1": AuxChannel("DB1.A0"),
 
             # Temperature channel 2
@@ -119,7 +119,7 @@ class SimulatedMercuryitc(StateMachineDevice):
         }
 
         # Associate each temperature/pressure channel with a heater and an auxilary channel:
-        self.channels["MB0"].associated_heater_channel = "DB0"
+        self.channels["MB0"].associated_heater_channel = "MB1"
         self.channels["MB0"].associated_aux_channel = "DB1"
 
         self.channels["DB2"].associated_heater_channel = "DB3"

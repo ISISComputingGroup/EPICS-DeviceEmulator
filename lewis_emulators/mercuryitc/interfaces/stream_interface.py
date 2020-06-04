@@ -23,6 +23,12 @@ class MercuryitcInterface(StreamInterface):
         CmdBuilder("set_nickname").optional(ISOBUS_PREFIX)
             .escape("SET:DEV:").any_except(":").escape(":").any_except(":").escape(":NICK:").any_except(":").eos().build(),
 
+        # Calibration files
+        CmdBuilder("get_calib_file").optional(ISOBUS_PREFIX)
+            .escape("READ:DEV:").any_except(":").escape(":").any_except(":").escape(":CAL:FILE").eos().build(),
+        CmdBuilder("set_calib_file").optional(ISOBUS_PREFIX)
+            .escape("SET:DEV:").any_except(":").escape(":").any_except(":").escape(":CAL:FILE:").any_except(":").eos().build(),
+
         # Commands to read all info at once
         CmdBuilder("get_all_temp_sensor_details").optional(ISOBUS_PREFIX)
             .escape("READ:DEV:").any_except(":").escape(":TEMP").eos().build(),
@@ -38,8 +44,12 @@ class MercuryitcInterface(StreamInterface):
         # Get heater & aux card associations
         CmdBuilder("get_associated_heater").optional(ISOBUS_PREFIX)
             .escape("READ:DEV:").any_except(":").escape(":").any_except(":").escape(":LOOP:HTR").eos().build(),
+        CmdBuilder("set_associated_heater").optional(ISOBUS_PREFIX)
+            .escape("SET:DEV:").any_except(":").escape(":").any_except(":").escape(":LOOP:HTR:").any_except(":").eos().build(),
         CmdBuilder("get_associated_aux").optional(ISOBUS_PREFIX)
             .escape("READ:DEV:").any_except(":").escape(":").any_except(":").escape(":LOOP:AUX").eos().build(),
+        CmdBuilder("set_associated_aux").optional(ISOBUS_PREFIX)
+            .escape("SET:DEV:").any_except(":").escape(":").any_except(":").escape(":LOOP:AUX:").any_except(":").eos().build(),
 
         # PID settings
         CmdBuilder("get_autopid").optional(ISOBUS_PREFIX)
@@ -115,7 +125,8 @@ class MercuryitcInterface(StreamInterface):
         CmdBuilder("get_helium_probe_speed").optional(ISOBUS_PREFIX)
             .escape("READ:DEV:").any_except(":").escape(":LVL:HEL:PULS:SLOW").eos().build(),
         CmdBuilder("set_helium_probe_speed").optional(ISOBUS_PREFIX)
-            .escape("READ:DEV:").any_except(":").escape(":LVL:HEL:PULS:SLOW:").enum("ON", "OFF", "0", "1").eos().build(),
+            .escape("SET:DEV:").any_except(":").escape(":LVL:HEL:PULS:SLOW:").float().eos().build(),
+
     }
 
     in_terminator = "\n"
@@ -172,8 +183,7 @@ class MercuryitcInterface(StreamInterface):
 
     @if_connected
     def read_calib_tables(self):
-        """ This is only required to prevent an error from the labview driver. """
-        return ""
+        return "STAT:FILE:calibration_tables:LIST:fake_table_1;fake_table_2"
 
     @if_connected
     def get_all_temp_sensor_details(self, deviceid):
@@ -238,14 +248,47 @@ class MercuryitcInterface(StreamInterface):
                  ":VOLT:{:.4f}V".format(pres_chan.voltage)
 
     @if_connected
+    def get_calib_file(self, deviceid, chan_type):
+        chan = self._chan_from_id(deviceid, expected_type=chan_type)
+        return "STAT:DEV:{}:{}:CAL:FILE:{}".format(deviceid, chan_type, chan.calibration_file)
+
+    @if_connected
+    def set_calib_file(self, deviceid, chan_type, calib_file):
+        chan = self._chan_from_id(deviceid, expected_type=chan_type)
+        if not hasattr(chan, "calibration_file"):
+            raise ValueError("Unexpected channel type in set_calib_file")
+        chan.calibration_file = calib_file
+        return "STAT:SET:DEV:{}:{}:CAL:FILE:{}:VALID".format(deviceid, chan_type, chan.calibration_file)
+
+    @if_connected
     def get_associated_heater(self, deviceid, chan_type):
         chan = self._chan_from_id(deviceid, expected_type=chan_type)
         return "STAT:DEV:{}:{}:LOOP:HTR:{}".format(deviceid, chan_type, chan.associated_heater_channel)
 
     @if_connected
+    def set_associated_heater(self, deviceid, chan_type, new_heater):
+        chan = self._chan_from_id(deviceid, expected_type=chan_type)
+        if new_heater == "None":
+            chan.associated_heater_channel = None
+        else:
+            self._chan_from_id(new_heater, expected_type=ChannelTypes.HTR)
+            chan.associated_heater_channel = new_heater
+        return "STAT:SET:DEV:{}:{}:LOOP:HTR:{}:VALID".format(deviceid, chan_type, chan.associated_heater_channel)
+
+    @if_connected
     def get_associated_aux(self, deviceid, chan_type):
         chan = self._chan_from_id(deviceid, expected_type=chan_type)
         return "STAT:DEV:{}:{}:LOOP:AUX:{}".format(deviceid, chan_type, chan.associated_aux_channel)
+
+    @if_connected
+    def set_associated_aux(self, deviceid, chan_type, new_aux):
+        chan = self._chan_from_id(deviceid, expected_type=chan_type)
+        if new_aux == "None":
+            chan.associated_aux_channel = None
+        else:
+            self._chan_from_id(new_aux, expected_type=ChannelTypes.AUX)
+            chan.associated_aux_channel = new_aux
+        return "STAT:SET:DEV:{}:{}:LOOP:AUX:{}:VALID".format(deviceid, chan_type, chan.associated_aux_channel)
 
     @if_connected
     def get_autopid(self, deviceid, chan_type):
@@ -479,6 +522,6 @@ class MercuryitcInterface(StreamInterface):
     def set_helium_probe_speed(self, deviceid, sp):
         chan = self._chan_from_id(deviceid, expected_type=ChannelTypes.LVL)
 
-        chan.slow_helium_read_rate = sp in ["ON", "1"]
+        chan.slow_helium_read_rate = sp == 1
 
         return "STAT:SET:DEV:{}:LVL:HEL:PULS:SLOW:{}:VALID".format(deviceid, "ON" if chan.slow_helium_read_rate else "OFF")
