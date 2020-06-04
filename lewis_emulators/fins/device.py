@@ -31,12 +31,21 @@ class SimulatedFinsPLC(StateMachineDevice):
         "MCP:EXTERNAL_TEMP": 19518,
         "MASS_FLOW:GAS_LIQUEFACTION": 19521,
         "MASS_FLOW:HE_FILLS": 19522,
-        "KAISER_COMPR:INTERNAL_TEMP": 19523,
+        "COMPRESSOR:INTERNAL_TEMP": 19523,
         "COLDBOX:HE_TEMP": 19524,
         "COLDBOX:HE_TEMP:LIMIT": 19525,
         "TRANSPORT_DEWAR:PRESSURE": 19526,
         "HE_PURITY": 19533,
-        "DEW_POINT": 19534
+        "DEW_POINT": 19534,
+        "TS2:EAST:FLOW_METER": 19652,
+        "TS2:EAST:O2": 19653,
+        "TS2:WEST:FLOW_METER": 19662,
+        "TS2:WEST:O2": 19663,
+        "TS1:NORTH:O2": 19668,
+        "TS1:SOUTH:O2": 19669,
+        "TS1:WINDOW:FLOW_METER": 19697,
+        "TS1:SHUTTER:FLOW_METER": 19698,
+        "TS1:VOID:FLOW_METER": 19699
     }
 
     def _initialize_data(self):
@@ -77,6 +86,14 @@ class SimulatedFinsPLC(StateMachineDevice):
             19526: 0,  # Transport dewar flash pressure
             19533: 0,  # helium purity
             19534: 0,  # dew point
+            19652: 0,  # TS2 east flow meter
+            19653: 0,  # O2 level TS2 east
+            19662: 0,  # TS2 west flow meter
+            19668: 0,  # TS1 north O2 level
+            19669: 0,  # TS1 south OS level
+            19697: 0,  # TS1 window flow meter
+            19698: 0,  # TS1 shutter flow meter
+            19699: 0  # TS1 void flow meter
         }
 
     def _get_state_handlers(self):
