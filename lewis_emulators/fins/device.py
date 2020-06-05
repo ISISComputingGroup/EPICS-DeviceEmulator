@@ -7,9 +7,7 @@ class SimulatedFinsPLC(StateMachineDevice):
 
     HELIUM_RECOVERY_NODE = 58
 
-    HE_RECOVERY_DOUBLE_WORD_MEMORY_LOCATIONS = {}
-
-    PV_NAME_TO_MEMORY_MAPPING = {
+    PV_NAME_MEMORY_MAPPING = {
         "HEARTBEAT": 19500,
         "MCP:BANK1:TS2": 19501,
         "MCP:BANK1:TS1": 19502,
@@ -72,7 +70,7 @@ class SimulatedFinsPLC(StateMachineDevice):
 
         self.connected = True
 
-        self.memory = {
+        self.int16_memory = {
             19500: 0,  # heartbeat
             19501: 0,  # mcp bank 1 TS2 helium gas resupply
             19502: 0,  # mcp bank 1 TS1 helium gas resupply
@@ -107,7 +105,10 @@ class SimulatedFinsPLC(StateMachineDevice):
             19669: 0,  # TS1 south OS level
             19697: 0,  # TS1 window flow meter
             19698: 0,  # TS1 shutter flow meter
-            19699: 0,  # TS1 void flow meter
+            19699: 0  # TS1 void flow meter
+        }
+
+        self.int32_memory = {
             19700: 0,  # R108 U40 gas counter
             19702: 0,  # R108 dewar farm gas counter
             19704: 0,  # gas counter R55 total
@@ -144,5 +145,9 @@ class SimulatedFinsPLC(StateMachineDevice):
         self._initialize_data()
 
     def set_memory(self, pv_name, data):
-        memory_location = SimulatedFinsPLC.PV_NAME_TO_MEMORY_MAPPING[pv_name]
-        self.memory[memory_location] = data
+        memory_location = SimulatedFinsPLC.PV_NAME_MEMORY_MAPPING[pv_name]
+
+        if memory_location in self.int16_memory.keys():
+            self.int16_memory[memory_location] = data
+        else:
+            self.int32_memory[memory_location] = data

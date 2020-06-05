@@ -17,11 +17,11 @@ def check_is_byte(character):
 def dm_memory_area_read_response_fins_frame(device, client_network_address, client_node, client_unit_address,
                                             service_id, memory_start_address, number_of_words):
     """
-    Returns a response to a DM memory area read command.
+    Returns a response to a DM int16_memory area read command.
 
     Response structure is:
         10 bytes FINS frame header.
-        2 bytes (integer): Command code, memory area read in this case
+        2 bytes (integer): Command code, int16_memory area read in this case
         2 bytes (integer): End code. Shows errors.
         2 bytes for every word read.
 
@@ -30,18 +30,30 @@ def dm_memory_area_read_response_fins_frame(device, client_network_address, clie
     :param client_node: The FINS node of the client.
     :param client_unit_address: The FINS unit address of the client.
     :param service_id: The service ID of the original command.
-    :param memory_start_address: The memory address from where reading starts.
+    :param memory_start_address: The int16_memory address from where reading starts.
     :param number_of_words: The number of words to be read, starting from the start address, inclusive.
     :return: the response, represented as a string.
     """
 
     # The length argument asks for number of bytes, and each word has two bytes
-    return FinsResponseBuilder() \
+    fins_reply = FinsResponseBuilder() \
         .add_fins_frame_header(device.network_address, device.unit_address, client_network_address,
                                client_node, client_unit_address, service_id) \
-        .add_fins_command_and_error_codes() \
-        .add_int(device.memory[memory_start_address], number_of_words * 2) \
-        .build()
+        .add_fins_command_and_error_codes()
+
+    if number_of_words == 1:
+        return fins_reply.add_int(device.int16_memory[memory_start_address], 2).build()
+    elif number_of_words == 2:
+        data = _convert_32bit_int_to_int16_array(device.int32_memory[memory_start_address])
+        return fins_reply.add_int(data[:2], 2).add_int(data[2:], 2).build()
+
+
+def _convert_32bit_int_to_int16_array(number):
+    raw_byte_representation = int_to_raw_bytes(number, 4, False)
+
+    int16_array = raw_byte_representation[2:4] + raw_byte_representation[:2]
+
+    return int16_array
 
 
 class FinsResponseBuilder(object):
@@ -110,11 +122,11 @@ class FinsResponseBuilder(object):
 
     def add_fins_command_and_error_codes(self):
         """
-        Adds the code for the FINS memory area read command and a default error code to the builder.
+        Adds the code for the FINS int16_memory area read command and a default error code to the builder.
         :return: (ResponseBuilder) the builder with the command and error codes now added
         """
 
-        # The memory area read command code is 0101, and the 0000 is the No error code.
+        # The int16_memory area read command code is 0101, and the 0000 is the No error code.
         return self.add_int(0x0101, 2).add_int(0x0000, 2)
 
     def build(self):
