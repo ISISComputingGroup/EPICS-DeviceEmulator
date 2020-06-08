@@ -101,6 +101,7 @@ class SimulatedFinsPLC(StateMachineDevice):
             19652: 0,  # TS2 east flow meter
             19653: 0,  # O2 level TS2 east
             19662: 0,  # TS2 west flow meter
+            19663: 0,  # TS2 west O2 level
             19668: 0,  # TS1 north O2 level
             19669: 0,  # TS1 south OS level
             19697: 0,  # TS1 window flow meter
