@@ -1,4 +1,4 @@
-from lewis_emulators.utils.byte_conversions import int_to_raw_bytes, float_to_raw_bytes
+from lewis_emulators.utils.byte_conversions import int_to_raw_bytes, float_to_raw_bytes, raw_bytes_to_int
 from ..device import SimulatedFinsPLC
 
 
@@ -45,15 +45,16 @@ def dm_memory_area_read_response_fins_frame(device, client_network_address, clie
         return fins_reply.add_int(device.int16_memory[memory_start_address], 2).build()
     elif number_of_words == 2:
         data = _convert_32bit_int_to_int16_array(device.int32_memory[memory_start_address])
-        return fins_reply.add_int(data[:2], 2).add_int(data[2:], 2).build()
+        return fins_reply.add_int(data[0], 2).add_int(data[1], 2).build()
 
 
 def _convert_32bit_int_to_int16_array(number):
     raw_byte_representation = int_to_raw_bytes(number, 4, False)
 
-    int16_array = raw_byte_representation[2:4] + raw_byte_representation[:2]
+    least_significant_byte = raw_bytes_to_int(raw_byte_representation[2:4], low_bytes_first=False)
+    most_significant_byte = raw_bytes_to_int(raw_byte_representation[:2], low_bytes_first=False)
 
-    return int16_array
+    return [least_significant_byte, most_significant_byte]
 
 
 class FinsResponseBuilder(object):
