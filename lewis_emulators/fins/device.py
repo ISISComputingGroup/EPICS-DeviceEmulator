@@ -162,6 +162,13 @@ class SimulatedFinsPLC(StateMachineDevice):
         self._initialize_data()
 
     def set_memory(self, pv_name, data):
+        """
+        Sets a location in the plc emulator's memory to the given data.
+        :param pv_name: The pv name that the test wants to set. Each PV name corresponds to only one memory location in
+        the emulator.
+        :param data: The data to be put in the plc memory.
+        :return: None.
+        """
         memory_location = SimulatedFinsPLC.PV_NAME_MEMORY_MAPPING[pv_name]
 
         if memory_location in self.int16_memory.keys():
