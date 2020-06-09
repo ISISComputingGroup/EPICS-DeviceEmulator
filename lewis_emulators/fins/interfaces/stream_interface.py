@@ -82,14 +82,6 @@ class FinsPLCStreamInterface(StreamInterface):
         elif number_of_words_to_read > 2:
             raise ValueError("The int16_memory map only specifies data types that should take up two words at most.")
 
-        # if len(dm_memory_area_read_response_fins_frame(self.device, client_network_address,
-        #                                                client_node_address, client_unit_address, service_id,
-        #                                                memory_start_address, number_of_words_to_read)) < 15:
-        #     self._log_command(dm_memory_area_read_response_fins_frame(self.device, client_network_address,
-        #                                                client_node_address, client_unit_address, service_id,
-        #                                                memory_start_address, number_of_words_to_read), True)
-        #     raise ValueError("something is wrong")
-
         reply = dm_memory_area_read_response_fins_frame(self.device, client_network_address,
                                                         client_node_address, client_unit_address, service_id,
                                                         memory_start_address, number_of_words_to_read)
