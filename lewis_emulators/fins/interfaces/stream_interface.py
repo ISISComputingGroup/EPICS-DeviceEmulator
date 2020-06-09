@@ -55,7 +55,7 @@ class FinsPLCStreamInterface(StreamInterface):
         self.log.info("Service id: {}".format(service_id))
 
         if ord(command[10]) != 0x01 or ord(command[11]) != 0x01:
-            raise ValueError("The command code should be 0x0101, for int16_memory area read command!")
+            raise ValueError("The command code should be 0x0101, for memory area read command!")
 
         if ord(command[12]) != 0x82:
             raise ValueError("The emulator only supports reading words from the DM area, for which the code is 82.")
@@ -73,14 +73,14 @@ class FinsPLCStreamInterface(StreamInterface):
         number_of_words_to_read = raw_bytes_to_int(command[16:18], low_bytes_first=False)
         self.log.info("Number of words to read: {}".format(number_of_words_to_read))
 
-        # The helium recovery PLC int16_memory map has addresses that store types that take up either one word (16 bits) or
+        # The helium recovery PLC memory map has addresses that store types that take up either one word (16 bits) or
         # two. Most take up one word, so if the number of words to read is two we check that the client wants to read
-        # from a int16_memory location from where a 32 bit value starts.
+        # from a memory location from where a 32 bit value starts.
         if number_of_words_to_read == 2 and memory_start_address not in self.device.int32_memory.keys():
-            raise ValueError("The int16_memory start address {} corresponds to a single word in the int16_memory map, "
+            raise ValueError("The memory start address {} corresponds to a single word in the memory map, "
                              "not two.".format(memory_start_address))
         elif number_of_words_to_read > 2:
-            raise ValueError("The int16_memory map only specifies data types that should take up two words at most.")
+            raise ValueError("The memory map only specifies data types that should take up two words at most.")
 
         reply = dm_memory_area_read_response_fins_frame(self.device, client_network_address,
                                                         client_node_address, client_unit_address, service_id,
