@@ -68,6 +68,11 @@ class SimulatedFinsPLC(StateMachineDevice):
         "GC:WISH": 19752,
         "GC:WISH:DEWAR_FARM": 19754,
         "GC:LARMOR_AND_OFFSPEC": 19756,
+        "GC:ZOOM_SANS2D_AND_POLREF": 19758,
+        "GC:MAGNET_LAB": 19762,
+        "GC:IMAT": 19766,
+        "GC:LET_AND_NIMROD": 19768,
+        "GC:R80:WEST": 19772,
     }
 
     def _initialize_data(self):
