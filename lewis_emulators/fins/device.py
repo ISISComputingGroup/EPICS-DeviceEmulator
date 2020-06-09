@@ -7,6 +7,8 @@ class SimulatedFinsPLC(StateMachineDevice):
 
     HELIUM_RECOVERY_NODE = 58
 
+    #  a dictionary representing the mapping between pv names, and the memory addresses in the helium recovery FINS PLC
+    #  that store the data corresponding to each PV.
     PV_NAME_MEMORY_MAPPING = {
         "HEARTBEAT": 19500,
         "MCP:BANK1:TS2": 19501,
@@ -78,6 +80,7 @@ class SimulatedFinsPLC(StateMachineDevice):
 
         self.connected = True
 
+        #  represents the part of the plc memory that stores 16 bit ints.
         self.int16_memory = {
             19500: 0,  # heartbeat
             19501: 0,  # mcp bank 1 TS2 helium gas resupply
@@ -117,6 +120,7 @@ class SimulatedFinsPLC(StateMachineDevice):
             19699: 0  # TS1 void flow meter
         }
 
+        #  represents the part of the plc memory that stores 32 bit ints.
         self.int32_memory = {
             19700: 0,  # R108 U40 gas counter
             19702: 0,  # R108 dewar farm gas counter
