@@ -58,6 +58,14 @@ class SimulatedFinsPLC(StateMachineDevice):
         "GC:SANDALS": 19728,
         "GC:CRISP_AND_LOQ": 19730,
         "GC:IRIS_AND_OSIRIS": 19734,
+        "GC:INES": 19736,
+        "GC:RIKEN": 19738,
+        "GC:R80:TOTAL": 19746,
+        "GC:R53": 19748,
+        "GC:R80:EAST": 19750,
+        "GC:WISH": 19752,
+        "GC:WISH:DEWAR_FARM": 19754,
+        "GC:LARMOR_AND_OFFSPEC": 19756,
     }
 
     def _initialize_data(self):
@@ -123,7 +131,15 @@ class SimulatedFinsPLC(StateMachineDevice):
             19726: 0,  # gas counter MAPS and VESUVIO
             19728: 0,  # gas counter SANDALS
             19730: 0,  # gas counter CRISP and LOQ
-            19734: 0  # gas counter IRIS and OSIRIS
+            19734: 0,  # gas counter IRIS and OSIRIS
+            19736: 0,  # gas counter INES
+            19738: 0,  # gas counter RIKEN
+            19746: 0,  # gas counter R80 total
+            19748: 0,  # gas counter R53
+            19750: 0,  # gas counter R80 east
+            19752: 0,  # gas counter WISH
+            19754: 0,  # gas counter WISH dewar farm
+            19756: 0,  # gas counter LARMOR and OFFSPEC
         }
 
     def _get_state_handlers(self):
