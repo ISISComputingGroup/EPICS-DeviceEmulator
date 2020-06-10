@@ -96,7 +96,15 @@ class SimulatedFinsPLC(StateMachineDevice):
         "TT104:PURIFIER_TEMP": 19951,
         "TT102:PURIFIER_TEMP": 19952,
         "COLDBOX:TT108:TEMP": 19953,
-        "COLDBOX:PT112:PRESSURE": 19954
+        "COLDBOX:PT112:PRESSURE": 19954,
+        "LIQUEFIER:COLDBOX:CV103": 19955,
+        "LIQUEFIER:COLDBOX:CV111": 19956,
+        "LIQUEFIER:COLDBOX:CV112": 19957,
+        "MOTHER_DEWAR:HE_LEVEL": 19958,
+        "PURIFIER:LEVEL": 19961,
+        "IMPURE_HE_SUPPLY:PRESSURE": 19962,
+        "CMPRSSR:LOW_CNTRL_PRESSURE": 19963,
+        "CMPRSSR:HIGH_CNTRL_PRESSURE": 19964
     }
 
     def _initialize_data(self):
@@ -171,6 +179,14 @@ class SimulatedFinsPLC(StateMachineDevice):
             19952: 0,  # purifier temperature TT102
             19953: 0,  # coldbox temperature TT108
             19954: 0,  # coldbox pressure PT112
+            19955: 0,  # liquefier coldbox CV103 %
+            19956: 0,  # liqufier coldbox CV111 %
+            19957: 0,  # liquefier coldbox CV112 %
+            19958: 0,  # helium mother dewar level
+            19961: 0,  # purifier level %
+            19962: 0,  # impure helium supply pressure
+            19963: 0,  # compressor low pressure control pressure
+            19964: 0  # compressor high pressure control pressure
         }
 
         #  represents the part of the plc memory that stores 32 bit ints.
