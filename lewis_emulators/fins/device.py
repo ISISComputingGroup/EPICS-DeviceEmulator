@@ -77,7 +77,16 @@ class SimulatedFinsPLC(StateMachineDevice):
         "LIQUEFIER:COMPRESSOR:CV2150": 19872,
         "LIQUEFIER:COMPRESSOR:CV2160": 19873,
         "LIQUEFIER:COMPRESSOR:CV2250": 19874,
-        "LIQUEFIER:COLDBOX:MV108": 19875
+        "LIQUEFIER:COLDBOX:MV108": 19875,
+        "BANK1:TS2:RESPPLY:AVG_PURITY": 19929,
+        "BANK1:TS1:RESPPLY:AVG_PURITY": 19930,
+        "BANK2:IMPURE_HE:AVG_PURITY": 19931,
+        "BANK3:MAIN_STRAGE:AVG_PURITY": 19933,
+        "BANK4:DLS_STORAGE:AVG_PURITY": 19935,
+        "BANK5:SPARE_STORA:AVG_PURITY": 19937,
+        "BANK6:SPARE_STORA:AVG_PURITY": 19939,
+        "BANK7:SPARE_STORA:AVG_PURITY": 19941,
+        "BANK8:SPARE_STORA:AVG_PURITY": 19943
     }
 
     def _initialize_data(self):
@@ -133,6 +142,15 @@ class SimulatedFinsPLC(StateMachineDevice):
             19873: 0,  # liquefier compressor CV2160 %
             19874: 0,  # liquefier compressor CV2250 %
             19875: 0,  # liquefier coldbox MV108 Open/Close status
+            19929: 0,  # bank 1 TS2 helium gas resupply average purity
+            19930: 0,  # bank 1 TS1 helium gas resupply average purity
+            19931: 0,  # bank 2 impure helium average purity
+            19933: 0,  # bank 3 ISIS main helium purity average
+            19935: 0,  # bank 4 DLS main helium storage purity average
+            19937: 0,  # bank 5 ISIS helium spare storage purity average
+            19939: 0,  # bank 6 ISIS helium spare storage purity average
+            19941: 0,  # bank 7 ISIS helium spare storage purity average
+            19943: 0,  # bank 8 ISIS helium spare storage purity average
         }
 
         #  represents the part of the plc memory that stores 32 bit ints.
