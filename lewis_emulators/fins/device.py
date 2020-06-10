@@ -186,7 +186,7 @@ class SimulatedFinsPLC(StateMachineDevice):
             19953: 0,  # coldbox temperature TT108
             19954: 0,  # coldbox pressure PT112
             19955: 0,  # liquefier coldbox CV103 %
-            19956: 0,  # liqufier coldbox CV111 %
+            19956: 0,  # liquefier coldbox CV111 %
             19957: 0,  # liquefier coldbox CV112 %
             19958: 0,  # helium mother dewar level
             19961: 0,  # purifier level %
@@ -227,6 +227,11 @@ class SimulatedFinsPLC(StateMachineDevice):
             19752: 0,  # gas counter WISH
             19754: 0,  # gas counter WISH dewar farm
             19756: 0,  # gas counter LARMOR and OFFSPEC
+            19758: 0,  # gas counter ZOOM, SANS2D and POLREF
+            19762: 0,  # gas counter magnet lab
+            19766: 0,  # gas counter IMAT
+            19768: 0,  # gas counter LET and NIMROD
+            19772: 0,  # gas counter R80 west
         }
 
     def _get_state_handlers(self):
