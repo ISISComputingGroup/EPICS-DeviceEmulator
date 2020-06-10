@@ -99,12 +99,18 @@ class SimulatedFinsPLC(StateMachineDevice):
         "COLDBOX:PT112:PRESSURE": 19954,
         "LIQUEFIER:COLDBOX:CV103": 19955,
         "LIQUEFIER:COLDBOX:CV111": 19956,
-        "LIQUEFIER:COLDBOX:CV112": 19957,
         "MOTHER_DEWAR:HE_LEVEL": 19958,
         "PURIFIER:LEVEL": 19961,
         "IMPURE_HE_SUPPLY:PRESSURE": 19962,
         "CMPRSSR:LOW_CNTRL_PRESSURE": 19963,
-        "CMPRSSR:HIGH_CNTRL_PRESSURE": 19964
+        "CMPRSSR:HIGH_CNTRL_PRESSURE": 19964,
+        "CV2250": 19972,
+        "CV2150": 19974,
+        "CV2160": 19975,
+        "LIQUID_NITROGEN:STATUS": 19979,
+        "LIQUEFIER:ALARM1": 19982,
+        "LIQUEFIER:ALARM2": 19983,
+        "MCP:LIQUID_HE_INVENTORY": 19996
     }
 
     def _initialize_data(self):
@@ -186,7 +192,15 @@ class SimulatedFinsPLC(StateMachineDevice):
             19961: 0,  # purifier level %
             19962: 0,  # impure helium supply pressure
             19963: 0,  # compressor low pressure control pressure
-            19964: 0  # compressor high pressure control pressure
+            19964: 0,  # compressor high pressure control pressure
+            19966: 0,  # liquefier coldbox cv103 %
+            19972: 0,  # CV2250 %
+            19974: 0,  # CV2150 %
+            19975: 0,  # CV2160 %
+            19979: 0,  # liquid nitrogen status
+            19982: 0,  # liquefier alarm 1
+            19983: 0,  # liquefier alarm 2
+            19996: 0  # mcp liquid helium inventory
         }
 
         #  represents the part of the plc memory that stores 32 bit ints.
