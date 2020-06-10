@@ -73,6 +73,11 @@ class SimulatedFinsPLC(StateMachineDevice):
         "GC:IMAT": 19766,
         "GC:LET_AND_NIMROD": 19768,
         "GC:R80:WEST": 19772,
+        "LIQUEFIER:COLDBOX:CV112": 19871,
+        "LIQUEFIER:COMPRESSOR:CV2150": 19872,
+        "LIQUEFIER:COMPRESSOR:CV2160": 19873,
+        "LIQUEFIER:COMPRESSOR:CV2250": 19874,
+        "LIQUEFIER:COLDBOX:MV108": 19875
     }
 
     def _initialize_data(self):
@@ -122,7 +127,12 @@ class SimulatedFinsPLC(StateMachineDevice):
             19669: 0,  # TS1 south OS level
             19697: 0,  # TS1 window flow meter
             19698: 0,  # TS1 shutter flow meter
-            19699: 0  # TS1 void flow meter
+            19699: 0,  # TS1 void flow meter,
+            19871: 0,  # liquefier coldbox cv112 %
+            19872: 0,  # liquefier compressor CV2150 %
+            19873: 0,  # liquefier compressor CV2160 %
+            19874: 0,  # liquefier compressor CV2250 %
+            19875: 0,  # liquefier coldbox MV108 Open/Close status
         }
 
         #  represents the part of the plc memory that stores 32 bit ints.
