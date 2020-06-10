@@ -86,7 +86,17 @@ class SimulatedFinsPLC(StateMachineDevice):
         "BANK5:SPARE_STORA:AVG_PURITY": 19937,
         "BANK6:SPARE_STORA:AVG_PURITY": 19939,
         "BANK7:SPARE_STORA:AVG_PURITY": 19941,
-        "BANK8:SPARE_STORA:AVG_PURITY": 19943
+        "BANK8:SPARE_STORA:AVG_PURITY": 19943,
+        "COLDBOX:TURBINE_100:SPEED": 19945,
+        "COLDBOX:TURBINE_101:SPEED": 19946,
+        "COLDBOX:T106:TEMP": 19947,
+        "COLDBOX:TT111:TEMP": 19948,
+        "COLDBOX:PT102:PRESSURE": 19949,
+        "PT203:BUFFER_PRESSURE": 19950,
+        "TT104:PURIFIER_TEMP": 19951,
+        "TT102:PURIFIER_TEMP": 19952,
+        "COLDBOX:TT108:TEMP": 19953,
+        "COLDBOX:PT112:PRESSURE": 19954
     }
 
     def _initialize_data(self):
@@ -151,6 +161,16 @@ class SimulatedFinsPLC(StateMachineDevice):
             19939: 0,  # bank 6 ISIS helium spare storage purity average
             19941: 0,  # bank 7 ISIS helium spare storage purity average
             19943: 0,  # bank 8 ISIS helium spare storage purity average
+            19945: 0,  # coldbox turbine 100 speed
+            19946: 0,  # coldbox turbine 101 speed
+            19947: 0,  # coldbox tempereture T106
+            19948: 0,  # coldbox temperature TT111
+            19949: 0,  # coldbox pressure PT102
+            19950: 0,  # buffer pressure PT203
+            19951: 0,  # purifier temperature TT104
+            19952: 0,  # purifier temperature TT102
+            19953: 0,  # coldbox temperature TT108
+            19954: 0,  # coldbox pressure PT112
         }
 
         #  represents the part of the plc memory that stores 32 bit ints.
