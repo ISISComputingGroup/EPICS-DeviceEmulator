@@ -110,7 +110,13 @@ class SimulatedFinsPLC(StateMachineDevice):
         "LIQUID_NITROGEN:STATUS": 19979,
         "LIQUEFIER:ALARM1": 19982,
         "LIQUEFIER:ALARM2": 19983,
-        "MCP:LIQUID_HE_INVENTORY": 19996
+        "MCP:LIQUID_HE_INVENTORY": 19996,
+        "CV120:MODE": 19967,
+        "CV121:MODE": 19969,
+        "LOW_PRESSURE:MODE": 19971,
+        "HIGH_PRESSURE:MODE": 19973,
+        "TIC106:MODE": 19976,
+        "PIC112:MODE": 19977
     }
 
     def _initialize_data(self):
@@ -200,7 +206,13 @@ class SimulatedFinsPLC(StateMachineDevice):
             19979: 0,  # liquid nitrogen status
             19982: 0,  # liquefier alarm 1
             19983: 0,  # liquefier alarm 2
-            19996: 0  # mcp liquid helium inventory
+            19996: 0,  # mcp liquid helium inventory
+            19967: 0,  # CV120 automatic/manual
+            19969: 0,  # CV121 automatic/manual
+            19971: 0,  # low pressure automatic/manual
+            19973: 0,  # high pressure automatic/manual
+            19976: 0,  # TIC106 automatic/manual
+            19977: 0,  # PIC112 automatic/manual
         }
 
         #  represents the part of the plc memory that stores 32 bit ints.
@@ -267,3 +279,18 @@ class SimulatedFinsPLC(StateMachineDevice):
             self.int16_memory[memory_location] = data
         else:
             self.int32_memory[memory_location] = data
+
+    def set_mode(self, pv_name, mode):
+
+        memory_location = SimulatedFinsPLC.PV_NAME_MEMORY_MAPPING[pv_name]
+
+        if memory_location in self.int32_memory.keys():
+            raise ValueError("The memory location for the given pv name is a 32 bit memory location. Auto/manual mode "
+                             "pvs only have 16 bit memory locations.")
+
+        if mode == "MANUAL":
+            self.int16_memory[memory_location] = 0
+        elif mode == "AUTOMATIC":
+            self.int16_memory[memory_location] = 1
+        else:
+            raise ValueError("Mode can only be MANUAL or AUTOMATIC!")
