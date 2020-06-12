@@ -290,7 +290,7 @@ class SimulatedFinsPLC(StateMachineDevice):
 
         if mode == "MANUAL":
             self.int16_memory[memory_location] = 0
-        elif mode == "AUTOMATIC":
+        elif mode == "AUTO":
             self.int16_memory[memory_location] = 1
         else:
             raise ValueError("Mode can only be MANUAL or AUTOMATIC!")
