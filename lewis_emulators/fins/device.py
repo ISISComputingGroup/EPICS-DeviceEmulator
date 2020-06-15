@@ -116,7 +116,9 @@ class SimulatedFinsPLC(StateMachineDevice):
         "LOW_PRESSURE:MODE": 19971,
         "HIGH_PRESSURE:MODE": 19973,
         "TIC106:MODE": 19976,
-        "PIC112:MODE": 19977
+        "PIC112:MODE": 19977,
+        "CV120:POSITION": 19968,
+        "CV121:POSITION": 19970
     }
 
     def _initialize_data(self):
@@ -213,6 +215,8 @@ class SimulatedFinsPLC(StateMachineDevice):
             19973: 0,  # high pressure automatic/manual
             19976: 0,  # TIC106 automatic/manual
             19977: 0,  # PIC112 automatic/manual
+            19968: 0,  # CV120 position
+            19970: 0  # CV121 position
         }
 
         #  represents the part of the plc memory that stores 32 bit ints.
@@ -294,3 +298,19 @@ class SimulatedFinsPLC(StateMachineDevice):
             self.int16_memory[memory_location] = 1
         else:
             raise ValueError("Mode can only be MANUAL or AUTO!")
+
+    def set_position(self, pv_name, position):
+        memory_location = SimulatedFinsPLC.PV_NAME_MEMORY_MAPPING[pv_name]
+
+        if memory_location in self.int32_memory.keys():
+            raise ValueError("The memory location for the given pv name is a 32 bit memory location. Position PVs only "
+                             "have 16 bit memory locations.")
+
+        if position == "Opening":
+            self.int16_memory[memory_location] = 1
+        elif position == "Closing":
+            self.int16_memory[memory_location] = 2
+        elif position == "No movement":
+            self.int16_memory[memory_location] = 3
+        else:
+            raise ValueError("Position can only be either Opening, Closing or No movement!")
