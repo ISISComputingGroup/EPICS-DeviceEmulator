@@ -118,7 +118,8 @@ class SimulatedFinsPLC(StateMachineDevice):
         "TIC106:MODE": 19976,
         "PIC112:MODE": 19977,
         "CV120:POSITION": 19968,
-        "CV121:POSITION": 19970
+        "CV121:POSITION": 19970,
+        "PURIFIER:STATUS": 19978
     }
 
     def _initialize_data(self):
@@ -216,7 +217,8 @@ class SimulatedFinsPLC(StateMachineDevice):
             19976: 0,  # TIC106 automatic/manual
             19977: 0,  # PIC112 automatic/manual
             19968: 0,  # CV120 position
-            19970: 0  # CV121 position
+            19970: 0,  # CV121 position
+            19978: 0  # purifier status
         }
 
         #  represents the part of the plc memory that stores 32 bit ints.
@@ -247,7 +249,7 @@ class SimulatedFinsPLC(StateMachineDevice):
             19762: 0,  # gas counter magnet lab
             19766: 0,  # gas counter IMAT
             19768: 0,  # gas counter LET and NIMROD
-            19772: 0,  # gas counter R80 west
+            19772: 0  # gas counter R80 west
         }
 
     def _get_state_handlers(self):
