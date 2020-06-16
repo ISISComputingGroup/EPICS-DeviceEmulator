@@ -285,34 +285,3 @@ class SimulatedFinsPLC(StateMachineDevice):
             self.int16_memory[memory_location] = data
         else:
             self.int32_memory[memory_location] = data
-
-    def set_mode(self, pv_name, mode):
-
-        memory_location = SimulatedFinsPLC.PV_NAME_MEMORY_MAPPING[pv_name]
-
-        if memory_location in self.int32_memory.keys():
-            raise ValueError("The memory location for the given pv name is a 32 bit memory location. Auto/manual mode "
-                             "pvs only have 16 bit memory locations.")
-
-        if mode == "MANUAL":
-            self.int16_memory[memory_location] = 0
-        elif mode == "AUTO":
-            self.int16_memory[memory_location] = 1
-        else:
-            raise ValueError("Mode can only be MANUAL or AUTO!")
-
-    def set_position(self, pv_name, position):
-        memory_location = SimulatedFinsPLC.PV_NAME_MEMORY_MAPPING[pv_name]
-
-        if memory_location in self.int32_memory.keys():
-            raise ValueError("The memory location for the given pv name is a 32 bit memory location. Position PVs only "
-                             "have 16 bit memory locations.")
-
-        if position == "Opening":
-            self.int16_memory[memory_location] = 1
-        elif position == "Closing":
-            self.int16_memory[memory_location] = 2
-        elif position == "No movement":
-            self.int16_memory[memory_location] = 3
-        else:
-            raise ValueError("Position can only be either Opening, Closing or No movement!")

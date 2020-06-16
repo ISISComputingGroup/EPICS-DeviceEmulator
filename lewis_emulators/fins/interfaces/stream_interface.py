@@ -20,7 +20,9 @@ class FinsPLCStreamInterface(StreamInterface):
     do_log = False
 
     def handle_error(self, request, error):
-        print("An error occurred at request " + repr(request) + ": " + repr(error))
+        error_message = "An error occurred at request " + repr(request) + ": " + repr(error)
+        self.log.error(error_message)
+        print(error_message)
         return str(error)
 
     def any_command(self, command):
