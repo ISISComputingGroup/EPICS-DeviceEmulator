@@ -120,7 +120,8 @@ class SimulatedFinsPLC(StateMachineDevice):
         "CV120:POSITION": 19968,
         "CV121:POSITION": 19970,
         "PURIFIER:STATUS": 19978,
-        "CMPRSSR:STATUS": 19980
+        "CMPRSSR:STATUS": 19980,
+        "COLDBOX:STATUS": 19981
     }
 
     def _initialize_data(self):
@@ -220,7 +221,8 @@ class SimulatedFinsPLC(StateMachineDevice):
             19968: 0,  # CV120 position
             19970: 0,  # CV121 position
             19978: 0,  # purifier status
-            19980: 0  # compressor status
+            19980: 0,  # compressor status
+            19981: 0  # coldbox status
         }
 
         #  represents the part of the plc memory that stores 32 bit ints.
