@@ -107,8 +107,8 @@ class SimulatedFinsPLC(StateMachineDevice):
         "LIQUEFIER:ALARM1": 19982,
         "LIQUEFIER:ALARM2": 19983,
         "MCP:LIQUID_HE_INVENTORY": 19996,
-        "CV120:MODE": 19967,
-        "CV121:MODE": 19969,
+        "CNTRL_VALVE_120:MODE": 19967,
+        "CNTRL_VALVE_121:MODE": 19969,
         "LOW_PRESSURE:MODE": 19971,
         "HIGH_PRESSURE:MODE": 19973,
         "TIC106:MODE": 19976,
@@ -208,8 +208,8 @@ class SimulatedFinsPLC(StateMachineDevice):
             19982: 0,  # liquefier alarm 1
             19983: 0,  # liquefier alarm 2
             19996: 0,  # mcp liquid helium inventory
-            19967: 0,  # CV120 automatic/manual
-            19969: 0,  # CV121 automatic/manual
+            19967: 0,  # control valve 120 automatic/manual mode
+            19969: 0,  # control valve 121 automatic/manual mode
             19971: 0,  # low pressure automatic/manual
             19973: 0,  # high pressure automatic/manual
             19976: 0,  # TIC106 automatic/manual
