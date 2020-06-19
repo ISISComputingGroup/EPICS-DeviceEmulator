@@ -93,16 +93,17 @@ class SimulatedFinsPLC(StateMachineDevice):
         "PURIFIER:TT102:TEMP": 19952,
         "COLDBOX:TT108:TEMP": 19953,
         "COLDBOX:PT112:PRESSURE": 19954,
-        "COLDBOX:CV103": 19955,
-        "COLDBOX:CV111": 19956,
+        "COLDBOX:CNTRL_VALVE_103": 19955,
+        "COLDBOX:CNTRL_VALVE_111": 19956,
+        "COLDBOX:CNTRL_VALVE_112": 19957,
         "MOTHER_DEWAR:HE_LEVEL": 19958,
         "PURIFIER:LEVEL": 19961,
         "IMPURE_HE_SUPPLY:PRESSURE": 19962,
         "CMPRSSR:LOW_CNTRL_PRESSURE": 19963,
         "CMPRSSR:HIGH_CNTRL_PRESSURE": 19964,
-        "CV2250": 19972,
-        "CV2150": 19974,
-        "CV2160": 19975,
+        "CNTRL_VALVE_2250": 19972,
+        "CNTRL_VALVE_2150": 19974,
+        "CNTRL_VALVE_2160": 19975,
         "LIQUID_NITROGEN:STATUS": 19979,
         "LIQUEFIER:ALARM1": 19982,
         "LIQUEFIER:ALARM2": 19983,
@@ -201,9 +202,9 @@ class SimulatedFinsPLC(StateMachineDevice):
             19963: 0,  # compressor low pressure control pressure
             19964: 0,  # compressor high pressure control pressure
             19966: 0,  # liquefier coldbox cv103 %
-            19972: 0,  # CV2250 %
-            19974: 0,  # CV2150 %
-            19975: 0,  # CV2160 %
+            19972: 0,  # control valve 2250 %
+            19974: 0,  # control valve 2150 %
+            19975: 0,  # control valve 2160 %
             19979: 0,  # liquid nitrogen status
             19982: 0,  # liquefier alarm 1
             19983: 0,  # liquefier alarm 2
