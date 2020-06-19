@@ -73,11 +73,11 @@ class SimulatedFinsPLC(StateMachineDevice):
         "GC:IMAT": 19766,
         "GC:LET_AND_NIMROD": 19768,
         "GC:R80:WEST": 19772,
-        "LIQUEFIER:COLDBOX:CV112": 19871,
-        "LIQUEFIER:CMPRSSR:CV2150": 19872,
-        "LIQUEFIER:CMPRSSR:CV2160": 19873,
-        "LIQUEFIER:CMPRSSR:CV2250": 19874,
-        "LIQUEFIER:COLDBOX:MV108": 19875,
+        "COLDBOX:CV112:STATUS": 19871,
+        "CMPRSSR:CV2150": 19872,
+        "CMPRSSR:CV2160": 19873,
+        "CMPRSSR:CV2250": 19874,
+        "COLDBOX:MV108": 19875,
         "BANK1:TS2:RSPPL:AVG_PURITY": 19929,
         "BANK1:TS1:RSPPL:AVG_PURITY": 19930,
         "BANK2:IMPURE_HE:AVG_PURITY": 19931,
@@ -92,13 +92,13 @@ class SimulatedFinsPLC(StateMachineDevice):
         "COLDBOX:T106:TEMP": 19947,
         "COLDBOX:TT111:TEMP": 19948,
         "COLDBOX:PT102:PRESSURE": 19949,
-        "PT203:BUFFER_PRESSURE": 19950,
-        "TT104:PURIFIER_TEMP": 19951,
-        "TT102:PURIFIER_TEMP": 19952,
+        "BUFFER:PT203:PRESSURE": 19950,
+        "PURIFIER:TT104:TEMP": 19951,
+        "PURIFIER:TT102:TEMP": 19952,
         "COLDBOX:TT108:TEMP": 19953,
         "COLDBOX:PT112:PRESSURE": 19954,
-        "LIQUEFIER:COLDBOX:CV103": 19955,
-        "LIQUEFIER:COLDBOX:CV111": 19956,
+        "COLDBOX:CV103": 19955,
+        "COLDBOX:CV111": 19956,
         "MOTHER_DEWAR:HE_LEVEL": 19958,
         "PURIFIER:LEVEL": 19961,
         "IMPURE_HE_SUPPLY:PRESSURE": 19962,
@@ -189,16 +189,16 @@ class SimulatedFinsPLC(StateMachineDevice):
             19945: 0,  # coldbox turbine 100 speed
             19946: 0,  # coldbox turbine 101 speed
             19947: 0,  # coldbox tempereture T106
-            19948: 0,  # coldbox temperature TT111
-            19949: 0,  # coldbox pressure PT102
-            19950: 0,  # buffer pressure PT203
-            19951: 0,  # purifier temperature TT104
-            19952: 0,  # purifier temperature TT102
-            19953: 0,  # coldbox temperature TT108
-            19954: 0,  # coldbox pressure PT112
-            19955: 0,  # liquefier coldbox CV103 %
-            19956: 0,  # liquefier coldbox CV111 %
-            19957: 0,  # liquefier coldbox CV112 %
+            19948: 0,  # coldbox temperature transducer 111
+            19949: 0,  # coldbox pressure transducer 102
+            19950: 0,  # buffer pressure transducer 203
+            19951: 0,  # purifier temperature transducer 104
+            19952: 0,  # purifier temperature transducer 102
+            19953: 0,  # coldbox temperature transducer 108
+            19954: 0,  # coldbox pressure transducer 112
+            19955: 0,  # liquefier coldbox control valve 103 %
+            19956: 0,  # liquefier coldbox control valve 111 %
+            19957: 0,  # liquefier coldbox control valve 112 %
             19958: 0,  # helium mother dewar level
             19961: 0,  # purifier level %
             19962: 0,  # impure helium supply pressure
