@@ -73,10 +73,6 @@ class SimulatedFinsPLC(StateMachineDevice):
         "GC:IMAT": 19766,
         "GC:LET_AND_NIMROD": 19768,
         "GC:R80:WEST": 19772,
-        "COLDBOX:CV112:STATUS": 19871,
-        "CMPRSSR:CV2150": 19872,
-        "CMPRSSR:CV2160": 19873,
-        "CMPRSSR:CV2250": 19874,
         "COLDBOX:MV108": 19875,
         "BANK1:TS2:RSPPL:AVG_PURITY": 19929,
         "BANK1:TS1:RSPPL:AVG_PURITY": 19930,
@@ -121,7 +117,11 @@ class SimulatedFinsPLC(StateMachineDevice):
         "CV121:POSITION": 19970,
         "PURIFIER:STATUS": 19978,
         "CMPRSSR:STATUS": 19980,
-        "COLDBOX:STATUS": 19981
+        "COLDBOX:STATUS": 19981,
+        "CNTRL_VALVE_112:STATUS": 19871,
+        "CNTRL_VALVE_2150:STATUS": 19872,
+        "CNTRL_VALVE_2160:STATUS": 19873,
+        "CNTRL_VALVE_2250:STATUS": 19874
     }
 
     def _initialize_data(self):
@@ -172,10 +172,6 @@ class SimulatedFinsPLC(StateMachineDevice):
             19697: 0,  # TS1 window flow meter
             19698: 0,  # TS1 shutter flow meter
             19699: 0,  # TS1 void flow meter,
-            19871: 0,  # liquefier coldbox cv112 %
-            19872: 0,  # liquefier compressor CV2150 %
-            19873: 0,  # liquefier compressor CV2160 %
-            19874: 0,  # liquefier compressor CV2250 %
             19875: 0,  # liquefier coldbox MV108 Open/Close status
             19929: 0,  # bank 1 TS2 helium gas resupply average purity
             19930: 0,  # bank 1 TS1 helium gas resupply average purity
@@ -222,7 +218,11 @@ class SimulatedFinsPLC(StateMachineDevice):
             19970: 0,  # CV121 position
             19978: 0,  # purifier status
             19980: 0,  # compressor status
-            19981: 0  # coldbox status
+            19981: 0,  # coldbox status,
+            19871: 0,  # control valve 112 status
+            19872: 0,  # liquefier compressor control valve 2150 status
+            19873: 0,  # liquefier compressor control valve 2160 status
+            19874: 0  # liquefier compressor control valve 2250 status
         }
 
         #  represents the part of the plc memory that stores 32 bit ints.
