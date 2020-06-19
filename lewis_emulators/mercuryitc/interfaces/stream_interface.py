@@ -361,6 +361,8 @@ class MercuryitcInterface(StreamInterface):
     @if_connected
     def set_control_loop_setpoint(self, deviceid, chan_type, sp, unit):
         chan = self._chan_from_id(deviceid, expected_type=chan_type)
+        sp = float(sp)
+
         if chan_type == ChannelTypes.TEMP:
             chan.temperature_sp = sp
             if unit != "K":
