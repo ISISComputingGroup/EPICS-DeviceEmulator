@@ -122,7 +122,17 @@ class SimulatedFinsPLC(StateMachineDevice):
         "CNTRL_VALVE_112:STATUS": 19871,
         "CNTRL_VALVE_2150:STATUS": 19872,
         "CNTRL_VALVE_2160:STATUS": 19873,
-        "CNTRL_VALVE_2250:STATUS": 19874
+        "CNTRL_VALVE_2250:STATUS": 19874,
+        "MOTORISED_VALVE_110:STATUS": 19984,
+        "MOTORISED_VALVE_160:STATUS": 19985,
+        "MOTORISED_VALVE_163:STATUS": 19986,
+        "MOTORISED_VALVE_167:STATUS": 19987,
+        "MOTORISED_VALVE_172:STATUS": 19988,
+        "MOTORISED_VALVE_174:STATUS": 19989,
+        "MOTORISED_VALVE_175:STATUS": 19990,
+        "MOTORISED_VALVE_176:STATUS": 19991,
+        "MOTORISED_VALVE_177:STATUS": 19992,
+        "MOTORISED_VALVE_178:STATUS": 19993,
     }
 
     def _initialize_data(self):
@@ -223,7 +233,17 @@ class SimulatedFinsPLC(StateMachineDevice):
             19871: 0,  # control valve 112 status
             19872: 0,  # liquefier compressor control valve 2150 status
             19873: 0,  # liquefier compressor control valve 2160 status
-            19874: 0  # liquefier compressor control valve 2250 status
+            19874: 0,  # liquefier compressor control valve 2250 status
+            19984: 0,  # motorised valve 110 status
+            19985: 0,  # motorised valve 160 status
+            19986: 0,  # motorised valve 163 status
+            19987: 0,  # motorised valve 167 status
+            19988: 0,  # motorised valve 172 status
+            19989: 0,  # motorised valve 174 status
+            19990: 0,  # motorised valve 175 status
+            19991: 0,  # motorised valve 176 status
+            19992: 0,  # motorised valve 177 status
+            19993: 0  # motorised valve 178 status
         }
 
         #  represents the part of the plc memory that stores 32 bit ints.
