@@ -114,8 +114,8 @@ class SimulatedFinsPLC(StateMachineDevice):
         "HIGH_PRESSURE:MODE": 19973,
         "TIC106:MODE": 19976,
         "PIC112:MODE": 19977,
-        "CV120:POSITION": 19968,
-        "CV121:POSITION": 19970,
+        "CNTRL_VALVE_120:POSITION": 19968,
+        "CNTRL_VALVE_121:POSITION": 19970,
         "PURIFIER:STATUS": 19978,
         "CMPRSSR:STATUS": 19980,
         "COLDBOX:STATUS": 19981,
@@ -215,8 +215,8 @@ class SimulatedFinsPLC(StateMachineDevice):
             19973: 0,  # high pressure automatic/manual
             19976: 0,  # TIC106 automatic/manual
             19977: 0,  # PIC112 automatic/manual
-            19968: 0,  # CV120 position
-            19970: 0,  # CV121 position
+            19968: 0,  # control valve 120 position
+            19970: 0,  # control valve 121 position
             19978: 0,  # purifier status
             19980: 0,  # compressor status
             19981: 0,  # coldbox status,
