@@ -82,8 +82,10 @@ class MercuryitcInterface(StreamInterface):
         # Control loop
         CmdBuilder("get_control_loop_setpoint").optional(ISOBUS_PREFIX)
             .escape("READ:DEV:").any_except(":").escape(":").any_except(":").escape(":LOOP:TSET").eos().build(),
-        CmdBuilder("set_control_loop_setpoint").optional(ISOBUS_PREFIX)
-            .escape("SET:DEV:").any_except(":").escape(":").any_except(":").escape(":LOOP:TSET:").float().any_except(":").eos().build(),
+        CmdBuilder("set_temp_setpoint").optional(ISOBUS_PREFIX)
+            .escape("SET:DEV:").any_except(":").escape(":TEMP:LOOP:TSET:").float().escape("K").eos().build(),
+        CmdBuilder("set_pres_setpoint").optional(ISOBUS_PREFIX)
+            .escape("SET:DEV:").any_except(":").escape(":PRES:LOOP:PRST:").float().escape("mBar").eos().build(),
 
         # Heater
         CmdBuilder("get_heater_auto").optional(ISOBUS_PREFIX)
@@ -359,22 +361,16 @@ class MercuryitcInterface(StreamInterface):
         return "STAT:DEV:{}:{}:LOOP:TSET:{:.4f}{}".format(deviceid, chan_type, val, unit)
 
     @if_connected
-    def set_control_loop_setpoint(self, deviceid, chan_type, sp, unit):
-        chan = self._chan_from_id(deviceid, expected_type=chan_type)
-        sp = float(sp)
+    def set_temp_setpoint(self, deviceid, sp):
+        chan = self._chan_from_id(deviceid, expected_type=ChannelTypes.TEMP)
+        chan.temperature_sp = sp
+        return "STAT:SET:DEV:{}:TEMP:LOOP:TSET:{:.4f}K:VALID".format(deviceid, sp)
 
-        if chan_type == ChannelTypes.TEMP:
-            chan.temperature_sp = sp
-            if unit != "K":
-                raise ValueError("Invalid units")
-        elif chan_type == ChannelTypes.PRES:
-            chan.pressure_sp = sp
-            if unit != "mBar":
-                raise ValueError("Invalid units")
-        else:
-            raise ValueError("Invalid channel type")
-
-        return "STAT:SET:DEV:{}:TEMP:LOOP:TSET:{:.4f}{}:VALID".format(deviceid, chan_type, sp, unit)
+    @if_connected
+    def set_pres_setpoint(self, deviceid, sp):
+        chan = self._chan_from_id(deviceid, expected_type=ChannelTypes.PRES)
+        chan.pressure_sp = sp
+        return "STAT:SET:DEV:{}:PRES:LOOP:TSET:{:.4f}mBar:VALID".format(deviceid, sp)
 
     @if_connected
     def get_resistance(self, deviceid):
