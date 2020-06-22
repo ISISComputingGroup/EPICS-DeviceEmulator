@@ -133,6 +133,8 @@ class SimulatedFinsPLC(StateMachineDevice):
         "MOTORISED_VALVE_176:STATUS": 19991,
         "MOTORISED_VALVE_177:STATUS": 19992,
         "MOTORISED_VALVE_178:STATUS": 19993,
+        "CNTRL_VALVE_103:STATUS": 19994,
+        "CNTRL_VALVE_111:STATUS": 19995
     }
 
     def _initialize_data(self):
@@ -243,7 +245,9 @@ class SimulatedFinsPLC(StateMachineDevice):
             19990: 0,  # motorised valve 175 status
             19991: 0,  # motorised valve 176 status
             19992: 0,  # motorised valve 177 status
-            19993: 0  # motorised valve 178 status
+            19993: 0,  # motorised valve 178 status
+            19994: 0,  # control valve 103 status
+            19995: 0  # control valve 111 status
         }
 
         #  represents the part of the plc memory that stores 32 bit ints.
