@@ -59,10 +59,10 @@ class FinsPLCStreamInterface(StreamInterface):
         memory_start_address = raw_bytes_to_int(command[13:15], low_bytes_first=False)
 
         # The FINS PLC supports reading either a certain number of words, or can also read individual bits in a word.
-        # The helium recovery int16_memory map implies that that PLC uses word designated reading. When bit designated
+        # The helium recovery memory map implies that that PLC uses word designated reading. When bit designated
         # reading is not used, the 16th byte of the command is 0x00.
         if ord(command[15]) != 0x00:
-            raise ValueError("The emulator only supports word designated int16_memory reading. The bit address must "
+            raise ValueError("The emulator only supports word designated memory reading. The bit address must "
                              "be 0x00.")
 
         number_of_words_to_read = raw_bytes_to_int(command[16:18], low_bytes_first=False)
