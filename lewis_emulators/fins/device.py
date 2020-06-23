@@ -10,6 +10,9 @@ class SimulatedFinsPLC(StateMachineDevice):
     #  a dictionary representing the mapping between pv names, and the memory addresses in the helium recovery FINS PLC
     #  that store the data corresponding to each PV.
     PV_NAME_MEMORY_MAPPING = {
+
+        # pv names for memory locations that store 16 bit integers, in the order they appear in the substitutions file
+        # (except the heartbeat, which appears in the header template)
         "HEARTBEAT": 19500,
         "MCP:BANK1:TS2": 19501,
         "MCP:BANK1:TS1": 19502,
@@ -46,33 +49,6 @@ class SimulatedFinsPLC(StateMachineDevice):
         "FLOW_METER:TS1:WINDOW": 19697,
         "FLOW_METER:TS1:SHUTTER": 19698,
         "FLOW_METER:TS1:VOID": 19699,
-        "GC:R108:U40": 19700,
-        "GC:R108:DEWAR_FARM": 19702,
-        "GC:R55:TOTAL": 19704,
-        "GC:R55:NORTH": 19706,
-        "GC:R55:SOUTH": 19708,
-        "GC:MICE_HALL": 19710,
-        "GC:MUON": 19712,
-        "GC:PEARL_HRPD_MARI_ENGINX": 19714,
-        "GC:SXD_AND_MERLIN": 19720,
-        "GC:CRYO_LAB": 19724,
-        "GC:MAPS_AND_VESUVIO": 19726,
-        "GC:SANDALS": 19728,
-        "GC:CRISP_AND_LOQ": 19730,
-        "GC:IRIS_AND_OSIRIS": 19734,
-        "GC:INES": 19736,
-        "GC:RIKEN": 19738,
-        "GC:R80:TOTAL": 19746,
-        "GC:R53": 19748,
-        "GC:R80:EAST": 19750,
-        "GC:WISH": 19752,
-        "GC:WISH:DEWAR_FARM": 19754,
-        "GC:LARMOR_AND_OFFSPEC": 19756,
-        "GC:ZOOM_SANS2D_AND_POLREF": 19758,
-        "GC:MAGNET_LAB": 19762,
-        "GC:IMAT": 19766,
-        "GC:LET_AND_NIMROD": 19768,
-        "GC:R80:WEST": 19772,
         "COLDBOX:MV108": 19875,
         "BANK1:TS2:RSPPL:AVG_PURITY": 19929,
         "BANK1:TS1:RSPPL:AVG_PURITY": 19930,
@@ -108,17 +84,52 @@ class SimulatedFinsPLC(StateMachineDevice):
         "LIQUEFIER:ALARM1": 19982,
         "LIQUEFIER:ALARM2": 19983,
         "MCP:LIQUID_HE_INVENTORY": 19996,
+
+        # pv names for memory locations storing 32 bit integers, in the order they appear in the substitutions file
+        "GC:R108:U40": 19700,
+        "GC:R108:DEWAR_FARM": 19702,
+        "GC:R55:TOTAL": 19704,
+        "GC:R55:NORTH": 19706,
+        "GC:R55:SOUTH": 19708,
+        "GC:MICE_HALL": 19710,
+        "GC:MUON": 19712,
+        "GC:PEARL_HRPD_MARI_ENGINX": 19714,
+        "GC:SXD_AND_MERLIN": 19720,
+        "GC:CRYO_LAB": 19724,
+        "GC:MAPS_AND_VESUVIO": 19726,
+        "GC:SANDALS": 19728,
+        "GC:CRISP_AND_LOQ": 19730,
+        "GC:IRIS_AND_OSIRIS": 19734,
+        "GC:INES": 19736,
+        "GC:RIKEN": 19738,
+        "GC:R80:TOTAL": 19746,
+        "GC:R53": 19748,
+        "GC:R80:EAST": 19750,
+        "GC:WISH": 19752,
+        "GC:WISH:DEWAR_FARM": 19754,
+        "GC:LARMOR_AND_OFFSPEC": 19756,
+        "GC:ZOOM_SANS2D_AND_POLREF": 19758,
+        "GC:MAGNET_LAB": 19762,
+        "GC:IMAT": 19766,
+        "GC:LET_AND_NIMROD": 19768,
+        "GC:R80:WEST": 19772,
+
+        # pv names for bi records for automatic/manual modes, in the order they appear in the substitutions file
         "CNTRL_VALVE_120:MODE": 19967,
         "CNTRL_VALVE_121:MODE": 19969,
         "LOW_PRESSURE:MODE": 19971,
         "HIGH_PRESSURE:MODE": 19973,
         "TIC106:MODE": 19976,
         "PIC112:MODE": 19977,
+
+        # pv names for various other mbbi records, in the order they appear in the header template
         "CNTRL_VALVE_120:POSITION": 19968,
         "CNTRL_VALVE_121:POSITION": 19970,
         "PURIFIER:STATUS": 19978,
         "CMPRSSR:STATUS": 19980,
         "COLDBOX:STATUS": 19981,
+
+        # pv names for mbii records that store the status of valves, in the order they appear in the substitutions file
         "CNTRL_VALVE_112:STATUS": 19871,
         "CNTRL_VALVE_2150:STATUS": 19872,
         "CNTRL_VALVE_2160:STATUS": 19873,
@@ -135,6 +146,9 @@ class SimulatedFinsPLC(StateMachineDevice):
         "MOTORISED_VALVE_178:STATUS": 19993,
         "CNTRL_VALVE_103:STATUS": 19994,
         "CNTRL_VALVE_111:STATUS": 19995,
+
+        # pv names for memory locations storing floating point numbers, in the order they appear in the substitutions
+        # file
         "MASS_FLOW:HE_RSPPL:TS2:EAST": 19876,
         "MASS_FLOW:HE_RSPPL:TS2:WEST": 19878,
         "MASS_FLOW:HE_RSPPL:TS1:VOID": 19880,
@@ -286,12 +300,13 @@ class SimulatedFinsPLC(StateMachineDevice):
             19772: 0  # gas counter R80 west
         }
 
+        # represents the part of the plc memory that stores floating point numbers
         self.float_memory = {
             19876: 0,  # TS2 mass flow total helium resupply east
             19878: 0,  # TS2 mass flow total helium resupply west
             19880: 0,  # TS1 mass flow target group helium resupply void
             19882: 0,  # TS1 mass flow target group helium resupply window
-            19884: 0,  # TS1 mass flow target group helium resupply shutter
+            19884: 0  # TS1 mass flow target group helium resupply shutter
         }
 
     def _get_state_handlers(self):
