@@ -50,9 +50,17 @@ def dm_memory_area_read_response_fins_frame(device, client_network_address, clie
     #  ints. Although the 16 bit ints are in big endian, in the array the first int is the least significant int, and
     #  the second one is the most significant one.
     elif number_of_words == 2:
-        # convert 32 bit int to array of two ints
-        data = _convert_32bit_int_to_int16_array(device.int32_memory[memory_start_address])
+        data = ""
+        if memory_start_address in device.int32_memory.keys():
+            # convert 32 bit int to array of two ints
+            data = _convert_32bit_int_to_int16_array(device.int32_memory[memory_start_address])
+        elif memory_start_address in device.float_memory.keys():
+            # convert 32 bit int to array of two ints
+            data = _convert_32bit_float_to_int16_array(device.float_memory[memory_start_address])
 
+        fins_reply = fins_reply.add_int(data[0], 2).add_int(data[1], 2)
+    elif number_of_words == 4:
+        data = _convert_32bit_float_to_int16_array(device.float_memory[memory_start_address])
         fins_reply = fins_reply.add_int(data[0], 2).add_int(data[1], 2)
 
     return fins_reply.build()
@@ -63,12 +71,32 @@ def _convert_32bit_int_to_int16_array(number):
     Converts a 32 bit integer into an array of two 16 bit integer. The first 16 bit integer is the least significant
     one, and the second is the most significant. The order of the 16 bit integers in the array is little endian.
     :param number: The number to be converted. But the individual 16 bit ints are encoded in big endian.
-    :return:
+    :return: a list, with the first element being the least significant byte of the given number, and the second element
+     being the most significant byte.
     """
     if type(number) != int:
         raise TypeError("number argument must always be an integer!")
 
     raw_bytes_representation = int_to_raw_bytes(number, 4, False)
+
+    least_significant_byte = raw_bytes_to_int(raw_bytes_representation[2:4], low_bytes_first=False)
+    most_significant_byte = raw_bytes_to_int(raw_bytes_representation[:2], low_bytes_first=False)
+
+    return [least_significant_byte, most_significant_byte]
+
+
+def _convert_32bit_float_to_int16_array(number):
+    """
+    Converts a 32 bit real number into an array of two 16 bit integer. The first 16 bit integer is the least significant
+    one, and the second is the most significant. The order of the 16 bit integers in the array is little endian.
+    :param number: The number to be converted. But the individual 16 bit ints are encoded in big endian.
+    :return: a list, with the first element being the least significant byte of the given number, and the second element
+     being the most significant byte.
+    """
+    if type(number) != int and type(number) != float:
+        raise TypeError("number argument must always be a real number! {}".format(type(number)))
+
+    raw_bytes_representation = float_to_raw_bytes(number, False)
 
     least_significant_byte = raw_bytes_to_int(raw_bytes_representation[2:4], low_bytes_first=False)
     most_significant_byte = raw_bytes_to_int(raw_bytes_representation[:2], low_bytes_first=False)

@@ -134,7 +134,12 @@ class SimulatedFinsPLC(StateMachineDevice):
         "MOTORISED_VALVE_177:STATUS": 19992,
         "MOTORISED_VALVE_178:STATUS": 19993,
         "CNTRL_VALVE_103:STATUS": 19994,
-        "CNTRL_VALVE_111:STATUS": 19995
+        "CNTRL_VALVE_111:STATUS": 19995,
+        "MASS_FLOW:HE_RSPPL:TS2:EAST": 19876,
+        "MASS_FLOW:HE_RSPPL:TS2:WEST": 19878,
+        "MASS_FLOW:HE_RSPPL:TS1:VOID": 19880,
+        "MASS_FLOW:HE_RSPPL:TS1:WNDW": 19882,
+        "MASS_FLOW:HE_RSPPL:TS1:SHTR": 19884
     }
 
     def _initialize_data(self):
@@ -281,6 +286,14 @@ class SimulatedFinsPLC(StateMachineDevice):
             19772: 0  # gas counter R80 west
         }
 
+        self.float_memory = {
+            19876: 0,  # TS2 mass flow total helium resupply east
+            19878: 0,  # TS2 mass flow total helium resupply west
+            19880: 0,  # TS1 mass flow target group helium resupply void
+            19882: 0,  # TS1 mass flow target group helium resupply window
+            19884: 0,  # TS1 mass flow target group helium resupply shutter
+        }
+
     def _get_state_handlers(self):
         return {
             'default': DefaultState(),
@@ -312,5 +325,7 @@ class SimulatedFinsPLC(StateMachineDevice):
 
         if memory_location in self.int16_memory.keys():
             self.int16_memory[memory_location] = data
-        else:
+        elif memory_location in self.int32_memory.keys():
             self.int32_memory[memory_location] = data
+        else:
+            self.float_memory[memory_location] = data
