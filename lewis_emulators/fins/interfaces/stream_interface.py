@@ -70,7 +70,7 @@ class FinsPLCStreamInterface(StreamInterface):
         # The helium recovery PLC memory map has addresses that store types that take up either one word (16 bits) or
         # two. Most take up one word, so if the number of words to read is two we check that the client wants to read
         # from a memory location from where a 32 bit value starts.
-        if number_of_words_to_read == 2 and (memory_start_address not in self.device.int32_memory.keys() or
+        if number_of_words_to_read == 2 and (memory_start_address not in self.device.int32_memory.keys() and
                                              memory_start_address not in self.device.float_memory.keys()):
             raise ValueError("The memory start address {} corresponds to a single word in the memory map, "
                              "not two.".format(memory_start_address))

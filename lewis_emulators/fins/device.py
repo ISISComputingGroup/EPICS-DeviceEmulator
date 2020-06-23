@@ -251,6 +251,8 @@ class SimulatedFinsPLC(StateMachineDevice):
             19978: 0,  # purifier status
             19980: 0,  # compressor status
             19981: 0,  # coldbox status,
+
+            # the part of the plc memory storing valve statuses, in the order they appear in the memory map
             19871: 0,  # control valve 112 status
             19872: 0,  # liquefier compressor control valve 2150 status
             19873: 0,  # liquefier compressor control valve 2160 status
@@ -269,7 +271,7 @@ class SimulatedFinsPLC(StateMachineDevice):
             19995: 0  # control valve 111 status
         }
 
-        #  represents the part of the plc memory that stores 32 bit ints.
+        #  represents the part of the plc memory that stores 32 bit ints, in the order they appear in the memory map
         self.int32_memory = {
             19700: 0,  # R108 U40 gas counter
             19702: 0,  # R108 dewar farm gas counter
@@ -300,7 +302,8 @@ class SimulatedFinsPLC(StateMachineDevice):
             19772: 0  # gas counter R80 west
         }
 
-        # represents the part of the plc memory that stores floating point numbers
+        # represents the part of the plc memory that stores floating point numbers, in the order they appear in the
+        # memory map
         self.float_memory = {
             19876: 0,  # TS2 mass flow total helium resupply east
             19878: 0,  # TS2 mass flow total helium resupply west
