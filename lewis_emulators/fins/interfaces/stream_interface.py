@@ -70,12 +70,17 @@ class FinsPLCStreamInterface(StreamInterface):
         # The helium recovery PLC memory map has addresses that store types that take up either one word (16 bits) or
         # two. Most take up one word, so if the number of words to read is two we check that the client wants to read
         # from a memory location from where a 32 bit value starts.
-        if number_of_words_to_read == 2 and (memory_start_address not in self.device.int32_memory.keys() and
-                                             memory_start_address not in self.device.float_memory.keys()):
+        if number_of_words_to_read == 2 and memory_start_address not in self.device.int32_memory.keys():
             raise ValueError("The memory start address {} corresponds to a single word in the memory map, "
                              "not two.".format(memory_start_address))
-        elif number_of_words_to_read > 4:
-            raise ValueError("The memory map only specifies data types that should take up two words at most.")
+        # The PLC also stores 32 bit floating point numbers, but the asyn device support makes the IOC ask for 4 bytes
+        # instead of two.
+        elif number_of_words_to_read == 4 and memory_start_address not in self.device.float_memory.keys():
+            raise ValueError("The only commands that should ask for 4 words are for reading memory locations that "
+                             "store real numbers, which {} is not.".format(memory_start_address))
+        elif number_of_words_to_read > 4 or number_of_words_to_read == 3:
+            raise ValueError("The memory map only specifies data types for which commands should ask for one, two or "
+                             "four words at most .")
 
         self._log_command_contents(client_network_address, client_node_address, client_unit_address, service_id,
                                    memory_start_address, number_of_words_to_read)
@@ -96,30 +101,37 @@ class FinsPLCStreamInterface(StreamInterface):
         :return: None
         """
 
-        if not self.do_log:
-            return
+        if self.do_log:
+            hex_command = [hex(ord(character)) for character in fins_frame]
 
-        hex_command = [hex(ord(character)) for character in fins_frame]
-
-        if not is_reply:
-            self.log.info("command is {}".format(hex_command))
-        else:
-            self.log.info("reply is{}".format(hex_command))
+            if not is_reply:
+                self.log.info("command is {}".format(hex_command))
+            else:
+                self.log.info("reply is{}".format(hex_command))
 
     def _log_command_contents(self, client_network_address, client_node_address, client_unit_address,
                               service_id, memory_start_address, number_of_words_to_read):
+        """
+        Nicely displays the bits of information in the FINS command that will be used for building the reply as numbers.
 
-        if not self.do_log:
-            return
+        :param client_network_address: The FINS network address of the client.
+        :param client_node_address: The FINS node of the client.
+        :param client_unit_address: The FINS unit address of the client.
+        :param service_id: The service ID of the original command.
+        :param memory_start_address: The memory address from where reading starts.
+        :param number_of_words_to_read: The number of words to be read, starting from the start address, inclusive.
+        :return: Nothing
+        """
 
-        self.log.info("Server network address: {}".format(self.device.network_address))
-        self.log.info("Server Unit address: {}".format(self.device.unit_address))
-        self.log.info("Client network address: {}".format(client_network_address))
-        self.log.info("Client node address: {}".format(client_node_address))
-        self.log.info("Client unit address: {}".format(client_unit_address))
-        self.log.info("Service id: {}".format(service_id))
-        self.log.info("Memory start address: {}".format(memory_start_address))
-        self.log.info("Number of words to read: {}".format(number_of_words_to_read))
+        if self.do_log:
+            self.log.info("Server network address: {}".format(self.device.network_address))
+            self.log.info("Server Unit address: {}".format(self.device.unit_address))
+            self.log.info("Client network address: {}".format(client_network_address))
+            self.log.info("Client node address: {}".format(client_node_address))
+            self.log.info("Client unit address: {}".format(client_unit_address))
+            self.log.info("Service id: {}".format(service_id))
+            self.log.info("Memory start address: {}".format(memory_start_address))
+            self.log.info("Number of words to read: {}".format(number_of_words_to_read))
 
     @staticmethod
     def _check_fins_frame_header_validity(fins_frame_header):

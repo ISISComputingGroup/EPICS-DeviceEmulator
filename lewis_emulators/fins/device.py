@@ -10,7 +10,6 @@ class SimulatedFinsPLC(StateMachineDevice):
     #  a dictionary representing the mapping between pv names, and the memory addresses in the helium recovery FINS PLC
     #  that store the data corresponding to each PV.
     PV_NAME_MEMORY_MAPPING = {
-
         # pv names for memory locations that store 16 bit integers, in the order they appear in the substitutions file
         # (except the heartbeat, which appears in the header template)
         "HEARTBEAT": 19500,
@@ -129,7 +128,7 @@ class SimulatedFinsPLC(StateMachineDevice):
         "CMPRSSR:STATUS": 19980,
         "COLDBOX:STATUS": 19981,
 
-        # pv names for mbii records that store the status of valves, in the order they appear in the substitutions file
+        # pv names for mbbi records that store the status of valves, in the order they appear in the substitutions file
         "CNTRL_VALVE_112:STATUS": 19871,
         "CNTRL_VALVE_2150:STATUS": 19872,
         "CNTRL_VALVE_2160:STATUS": 19873,
@@ -168,6 +167,7 @@ class SimulatedFinsPLC(StateMachineDevice):
 
         #  represents the part of the plc memory that stores 16 bit ints.
         self.int16_memory = {
+            # memory locations in the order they appear in the substitutions file (except the heartbeat)
             19500: 0,  # heartbeat
             19501: 0,  # mcp bank 1 TS2 helium gas resupply
             19502: 0,  # mcp bank 1 TS1 helium gas resupply
@@ -240,17 +240,21 @@ class SimulatedFinsPLC(StateMachineDevice):
             19982: 0,  # liquefier alarm 1
             19983: 0,  # liquefier alarm 2
             19996: 0,  # mcp liquid helium inventory
+
+            # memory locations corresponding to bi records for automatic/manual mode
             19967: 0,  # control valve 120 automatic/manual mode
             19969: 0,  # control valve 121 automatic/manual mode
             19971: 0,  # low pressure automatic/manual
             19973: 0,  # high pressure automatic/manual
             19976: 0,  # TIC106 automatic/manual
             19977: 0,  # PIC112 automatic/manual
+
+            # memory locations corresponding to
             19968: 0,  # control valve 120 position
             19970: 0,  # control valve 121 position
             19978: 0,  # purifier status
             19980: 0,  # compressor status
-            19981: 0,  # coldbox status,
+            19981: 0,  # coldbox status
 
             # the part of the plc memory storing valve statuses, in the order they appear in the memory map
             19871: 0,  # control valve 112 status

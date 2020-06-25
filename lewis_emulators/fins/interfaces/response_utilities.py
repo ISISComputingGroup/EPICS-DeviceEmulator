@@ -14,8 +14,8 @@ def check_is_byte(character):
         raise ValueError("the character in the string must represent a byte value")
 
 
-def dm_memory_area_read_response_fins_frame(device, client_network_address, client_node, client_unit_address,
-                                            service_id, memory_start_address, number_of_words):
+def dm_memory_area_read_response_fins_frame(device, client_network_address, client_node_address, client_unit_address,
+                                            service_id, memory_start_address, number_of_words_to_read):
     """
     Returns a response to a DM memory area read command.
 
@@ -27,39 +27,34 @@ def dm_memory_area_read_response_fins_frame(device, client_network_address, clie
 
     :param device: The Lewis device.
     :param client_network_address: The FINS network address of the client.
-    :param client_node: The FINS node of the client.
+    :param client_node_address: The FINS node of the client.
     :param client_unit_address: The FINS unit address of the client.
     :param service_id: The service ID of the original command.
     :param memory_start_address: The memory address from where reading starts.
-    :param number_of_words: The number of words to be read, starting from the start address, inclusive.
+    :param number_of_words_to_read: The number of words to be read, starting from the start address, inclusive.
     :return: the response, represented as a string.
     """
 
     # The length argument asks for number of bytes, and each word has two bytes
     fins_reply = FinsResponseBuilder() \
         .add_fins_frame_header(device.network_address, device.unit_address, client_network_address,
-                               client_node, client_unit_address, service_id) \
+                               client_node_address, client_unit_address, service_id) \
         .add_fins_command_and_error_codes()
 
     #  The plc has 2 byte words. The command asks for 1 word if the memory address stores a 16 bit integer, or 2 words
     #  if it stores a 32 bit integer, or a real number.
-    if number_of_words == 1:
+    if number_of_words_to_read == 1:
         fins_reply = fins_reply.add_int(device.int16_memory[memory_start_address], 2)
 
     #  The FINS driver does not recognise 32 bit ints. Instead, it represents 32 bit ints as an array of two 16 bit
     #  ints. Although the 16 bit ints are in big endian, in the array the first int is the least significant int, and
     #  the second one is the most significant one.
-    elif number_of_words == 2:
-        data = ""
-        if memory_start_address in device.int32_memory.keys():
-            # convert 32 bit int to array of two ints
-            data = _convert_32bit_int_to_int16_array(device.int32_memory[memory_start_address])
-        elif memory_start_address in device.float_memory.keys():
-            # convert 32 bit int to array of two ints
-            data = _convert_32bit_float_to_int16_array(device.float_memory[memory_start_address])
-
+    elif number_of_words_to_read == 2:
+        # convert 32 bit int to array of two ints
+        data = _convert_32bit_int_to_int16_array(device.int32_memory[memory_start_address])
         fins_reply = fins_reply.add_int(data[0], 2).add_int(data[1], 2)
-    elif number_of_words == 4:
+    # The asyn device support for ai records makes the IOC ask for 4 words
+    elif number_of_words_to_read == 4:
         data = _convert_32bit_float_to_int16_array(device.float_memory[memory_start_address])
         fins_reply = fins_reply.add_int(data[0], 2).add_int(data[1], 2)
 
@@ -68,7 +63,7 @@ def dm_memory_area_read_response_fins_frame(device, client_network_address, clie
 
 def _convert_32bit_int_to_int16_array(number):
     """
-    Converts a 32 bit integer into an array of two 16 bit integer. The first 16 bit integer is the least significant
+    Converts a 32 bit integer into an array of two 16 bit integers. The first 16 bit integer is the least significant
     one, and the second is the most significant. The order of the 16 bit integers in the array is little endian.
     :param number: The number to be converted. But the individual 16 bit ints are encoded in big endian.
     :return: a list, with the first element being the least significant byte of the given number, and the second element
@@ -87,8 +82,9 @@ def _convert_32bit_int_to_int16_array(number):
 
 def _convert_32bit_float_to_int16_array(number):
     """
-    Converts a 32 bit real number into an array of two 16 bit integer. The first 16 bit integer is the least significant
-    one, and the second is the most significant. The order of the 16 bit integers in the array is little endian.
+    Converts a 32 bit real number into an array of two 16 bit integers. The first 16 bit integer is the least
+    significant one, and the second is the most significant. The order of the 16 bit integers in the array is little
+    endian.
     :param number: The number to be converted. But the individual 16 bit ints are encoded in big endian.
     :return: a list, with the first element being the least significant byte of the given number, and the second element
      being the most significant byte.
