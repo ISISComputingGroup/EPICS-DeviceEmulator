@@ -194,6 +194,13 @@ class CmdBuilder(object):
         """
         return self.arg(r".*")
 
+    def any_except(self, char):
+        """
+        Adds an argument that matches anything other than a specified character (useful for commands containing
+        delimiters)
+        """
+        return self.arg(r"[^{}]*".format(re.escape(char)))
+
     def build(self, *args, **kwargs):
         """
         Builds the CMd object based on the target and regular expression.
