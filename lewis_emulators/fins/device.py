@@ -48,7 +48,6 @@ class SimulatedFinsPLC(StateMachineDevice):
         "FLOW_METER:TS1:WINDOW": 19697,
         "FLOW_METER:TS1:SHUTTER": 19698,
         "FLOW_METER:TS1:VOID": 19699,
-        "COLDBOX:MV108": 19875,
         "BANK1:TS2:RSPPL:AVG_PURITY": 19929,
         "BANK1:TS1:RSPPL:AVG_PURITY": 19930,
         "BANK2:IMPURE_HE:AVG_PURITY": 19931,
@@ -99,7 +98,7 @@ class SimulatedFinsPLC(StateMachineDevice):
         "GC:SANDALS": 19728,
         "GC:CRISP_AND_LOQ": 19730,
         "GC:IRIS_AND_OSIRIS": 19734,
-        "GC:INES": 19736,
+        "GC:INES_AND_TOSCA": 19736,
         "GC:RIKEN": 19738,
         "GC:R80:TOTAL": 19746,
         "GC:R53": 19748,
@@ -129,6 +128,7 @@ class SimulatedFinsPLC(StateMachineDevice):
         "COLDBOX:STATUS": 19981,
 
         # pv names for mbbi records that store the status of valves, in the order they appear in the substitutions file
+        "MOTORISED_VALVE_108:STATUS": 19875,
         "CNTRL_VALVE_112:STATUS": 19871,
         "CNTRL_VALVE_2150:STATUS": 19872,
         "CNTRL_VALVE_2160:STATUS": 19873,
@@ -204,7 +204,6 @@ class SimulatedFinsPLC(StateMachineDevice):
             19697: 0,  # TS1 window flow meter
             19698: 0,  # TS1 shutter flow meter
             19699: 0,  # TS1 void flow meter,
-            19875: 0,  # liquefier coldbox MV108 Open/Close status
             19929: 0,  # bank 1 TS2 helium gas resupply average purity
             19930: 0,  # bank 1 TS1 helium gas resupply average purity
             19931: 0,  # bank 2 impure helium average purity
@@ -257,6 +256,7 @@ class SimulatedFinsPLC(StateMachineDevice):
             19981: 0,  # coldbox status
 
             # the part of the plc memory storing valve statuses, in the order they appear in the memory map
+            19875: 0,  # liquefier coldbox motorised valve 108 status
             19871: 0,  # control valve 112 status
             19872: 0,  # liquefier compressor control valve 2150 status
             19873: 0,  # liquefier compressor control valve 2160 status
@@ -291,7 +291,7 @@ class SimulatedFinsPLC(StateMachineDevice):
             19728: 0,  # gas counter SANDALS
             19730: 0,  # gas counter CRISP and LOQ
             19734: 0,  # gas counter IRIS and OSIRIS
-            19736: 0,  # gas counter INES
+            19736: 0,  # gas counter INES and TOSCA
             19738: 0,  # gas counter RIKEN
             19746: 0,  # gas counter R80 total
             19748: 0,  # gas counter R53
