@@ -78,7 +78,6 @@ class SimulatedFinsPLC(StateMachineDevice):
         "CNTRL_VALVE_2250": 19972,
         "CNTRL_VALVE_2150": 19974,
         "CNTRL_VALVE_2160": 19975,
-        "LIQUID_NITROGEN:STATUS": 19979,
         "LIQUEFIER:ALARM1": 19982,
         "LIQUEFIER:ALARM2": 19983,
         "MCP:LIQUID_HE_INVENTORY": 19996,
@@ -113,6 +112,7 @@ class SimulatedFinsPLC(StateMachineDevice):
         "GC:R80:WEST": 19772,
 
         # pv names for bi records for automatic/manual modes, in the order they appear in the substitutions file
+        "LIQUID_NITROGEN:STATUS": 19979,
         "CNTRL_VALVE_120:MODE": 19967,
         "CNTRL_VALVE_121:MODE": 19969,
         "LOW_PRESSURE:MODE": 19971,
@@ -235,7 +235,6 @@ class SimulatedFinsPLC(StateMachineDevice):
             19972: 0,  # control valve 2250 %
             19974: 0,  # control valve 2150 %
             19975: 0,  # control valve 2160 %
-            19979: 0,  # liquid nitrogen status
             19982: 0,  # liquefier alarm 1
             19983: 0,  # liquefier alarm 2
             19996: 0,  # mcp liquid helium inventory
@@ -248,7 +247,8 @@ class SimulatedFinsPLC(StateMachineDevice):
             19976: 0,  # TIC106 automatic/manual
             19977: 0,  # PIC112 automatic/manual
 
-            # memory locations corresponding to
+            # memory locations corresponding to various mbbi records
+            19979: 0,  # liquid nitrogen status
             19968: 0,  # control valve 120 position
             19970: 0,  # control valve 121 position
             19978: 0,  # purifier status
