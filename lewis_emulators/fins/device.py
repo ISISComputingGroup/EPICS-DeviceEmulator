@@ -78,8 +78,8 @@ class SimulatedFinsPLC(StateMachineDevice):
         "CNTRL_VALVE_2250": 19972,
         "CNTRL_VALVE_2150": 19974,
         "CNTRL_VALVE_2160": 19975,
-        "LIQUEFIER:ALARM1": 19982,
-        "LIQUEFIER:ALARM2": 19983,
+        "LIQUEFIER:_ALARM1": 19982,
+        "LIQUEFIER:_ALARM2": 19983,
         "MCP:LIQUID_HE_INVENTORY": 19996,
 
         # pv names for memory locations storing 32 bit integers, in the order they appear in the substitutions file
