@@ -17,7 +17,7 @@ class SimulatedSuperlogics(StateMachineDevice):
 
         """
 
-        self._disconnected = False
+        self._connected = True
         self._values_1 = [0.]*8
         self._values_2 = [0.]*8
         self._version_1 = "A1.0"
@@ -101,7 +101,7 @@ class SimulatedSuperlogics(StateMachineDevice):
         """
         :return: The firmware version of address 2 of the device
         """
-        print self._version_2
+        print(self._version_2)
         return self._version_2
 
     @version_2.setter
@@ -110,21 +110,21 @@ class SimulatedSuperlogics(StateMachineDevice):
         Set the firmware version on address 2 of this device
         :param version: the firmware version as a string
         """
-        print version
+        print(version)
         self._version_2 = version
 
     @property
-    def disconnected(self):
+    def connected(self):
         """
         Get if the current device is in a "disconnected" state
         :return: bool for if the device is disconnected
         """
-        return self._disconnected
+        return self._connected
 
-    @disconnected.setter
-    def disconnected(self, value):
+    @connected.setter
+    def connected(self, value):
         """
         Set if the device is disconnected (for testing purposes)
         :param value: bool to set whether the device is disconnected
         """
-        self._disconnected = value
+        self._connected = value
