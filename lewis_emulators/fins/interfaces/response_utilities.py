@@ -53,7 +53,8 @@ def dm_memory_area_read_response_fins_frame(device, client_network_address, clie
         # convert 32 bit int to array of two ints
         data = _convert_32bit_int_to_int16_array(device.int32_memory[memory_start_address])
         fins_reply = fins_reply.add_int(data[0], 2).add_int(data[1], 2)
-    # The asyn device support for ai records makes the IOC ask for 4 words
+    # The asyn device support for ai records makes the IOC ask for 4 words, even though the real numbers are only 2
+    # words long
     elif number_of_words_to_read == 4:
         data = _convert_32bit_float_to_int16_array(device.float_memory[memory_start_address])
         fins_reply = fins_reply.add_int(data[0], 2).add_int(data[1], 2)
