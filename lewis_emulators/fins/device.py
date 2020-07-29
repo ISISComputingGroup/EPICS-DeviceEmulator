@@ -328,17 +328,23 @@ class SimulatedFinsPLC(StateMachineDevice):
     def reset(self):
         """
         Public method that re-initializes the device's fields.
-        :return: Nothing.
+
+        Returns:
+            Nothing.
         """
         self._initialize_data()
 
     def set_memory(self, pv_name, data):
         """
         Sets a location in the plc emulator's memory to the given data.
-        :param pv_name: The pv name that the test wants to set. Each PV name corresponds to only one memory location in
-        the emulator.
-        :param data: The data to be put in the plc memory.
-        :return: None.
+
+        Args:
+            pv_name: The pv name that the test wants to set. Each PV name corresponds to only one memory location in
+                the emulator.
+            data: The data to be put in the plc memory.
+
+        Returns:
+            None.
         """
         memory_location = SimulatedFinsPLC.PV_NAME_MEMORY_MAPPING[pv_name]
 
@@ -346,5 +352,7 @@ class SimulatedFinsPLC(StateMachineDevice):
             self.int16_memory[memory_location] = data
         elif memory_location in self.int32_memory.keys():
             self.int32_memory[memory_location] = data
-        else:
+        elif memory_location in self.float_memory.keys():
             self.float_memory[memory_location] = data
+        else:
+            raise ValueError("the pv name maps to a memory address that is not recognized by the emulator memory.")
