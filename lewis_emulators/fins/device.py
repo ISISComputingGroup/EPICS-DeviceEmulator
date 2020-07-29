@@ -4,6 +4,9 @@ from lewis.devices import StateMachineDevice
 
 
 class SimulatedFinsPLC(StateMachineDevice):
+    """
+    Class represented a simulated Helium Recovery FINS PLC.
+    """
 
     HELIUM_RECOVERY_NODE = 58
 
@@ -148,11 +151,11 @@ class SimulatedFinsPLC(StateMachineDevice):
 
         # pv names for memory locations storing floating point numbers, in the order they appear in the substitutions
         # file
-        "MASS_FLOW:HE_RSPPL:TS2:EAST": 19876,
-        "MASS_FLOW:HE_RSPPL:TS2:WEST": 19878,
-        "MASS_FLOW:HE_RSPPL:TS1:VOID": 19880,
-        "MASS_FLOW:HE_RSPPL:TS1:WNDW": 19882,
-        "MASS_FLOW:HE_RSPPL:TS1:SHTR": 19884
+        "MASS_FLOW:HE_RSPPL:TS2:EAST": 19876,  # TS2 mass flow total helium resupply east
+        "MASS_FLOW:HE_RSPPL:TS2:WEST": 19878,  # TS2 mass flow total helium resupply west
+        "MASS_FLOW:HE_RSPPL:TS1:VOID": 19880,  # TS1 mass flow target group helium resupply void
+        "MASS_FLOW:HE_RSPPL:TS1:WNDW": 19882,  # TS1 mass flow target group helium resupply window
+        "MASS_FLOW:HE_RSPPL:TS1:SHTR": 19884  # TS1 mass flow target group helium resupply shutter
     }
 
     def _initialize_data(self):
@@ -307,14 +310,8 @@ class SimulatedFinsPLC(StateMachineDevice):
         }
 
         # represents the part of the plc memory that stores floating point numbers, in the order they appear in the
-        # memory map
-        self.float_memory = {
-            19876: 0,  # TS2 mass flow total helium resupply east
-            19878: 0,  # TS2 mass flow total helium resupply west
-            19880: 0,  # TS1 mass flow target group helium resupply void
-            19882: 0,  # TS1 mass flow target group helium resupply window
-            19884: 0  # TS1 mass flow target group helium resupply shutter
-        }
+        # memory map. Comments explaining what each memory location is are in the name to address mappings above.
+        self.float_memory = {address: 0 for address in range(19876, 19886, 2)}
 
     def _get_state_handlers(self):
         return {
