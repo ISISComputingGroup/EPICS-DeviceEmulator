@@ -98,6 +98,7 @@ class FinsPLCStreamInterface(StreamInterface):
     def _log_fins_frame(self, fins_frame, is_reply):
         """
         Nicely displays every byte in the command as a hexadecimal number in the emulator log.
+
         Args:
             fins_frame (string): The fins frame we want to log.
             is_reply (bool): Whether we want to log the reply or the command.
@@ -117,6 +118,7 @@ class FinsPLCStreamInterface(StreamInterface):
                               service_id, memory_start_address, number_of_words_to_read):
         """
         Nicely displays the bits of information in the FINS command that will be used for building the reply as numbers.
+
         Args:
             client_network_address (int): The FINS network address of the client.
             client_node_address (int): The FINS node of the client.
@@ -143,6 +145,7 @@ class FinsPLCStreamInterface(StreamInterface):
         """
         Checks that the FINS frame header part of the command is valid for a command sent from a client to a server
         (PLC).
+
         Args:
             fins_frame_header (string): A string where every character represents a byte from the received FINS frame
                 header.
