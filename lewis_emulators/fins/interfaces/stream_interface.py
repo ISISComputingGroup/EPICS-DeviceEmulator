@@ -30,11 +30,13 @@ class FinsPLCStreamInterface(StreamInterface):
         Handles all command sent to this emulator. It checks the validity of the command, and raises an error if it
         finds something invalid. If the command is valid, then it returns a string representing the response to the
         command.
-        :param command: A string where every character represents a byte from the received FINS command frame.
-        :return: a string where each character represents a
-        byte from the FINS response frame.
-        """
+        
+        Args:
+            command (string): A string where every character represents a byte from the received FINS command frame.
 
+        Returns:
+            string: a string where each character represents a byte from the FINS response frame.
+        """
         self._log_fins_frame(command, False)
 
         self._check_fins_frame_header_validity(command[:10])
@@ -96,11 +98,13 @@ class FinsPLCStreamInterface(StreamInterface):
     def _log_fins_frame(self, fins_frame, is_reply):
         """
         Nicely displays every byte in the command as a hexadecimal number in the emulator log.
-        :param fins_frame: The fins frame we want to log.
-        :param is_reply: Whether we want to log the reply or the command.
-        :return: None
-        """
+        Args:
+            fins_frame (string): The fins frame we want to log.
+            is_reply (bool): Whether we want to log the reply or the command.
 
+        Returns:
+            None.
+        """
         if self.do_log:
             hex_command = [hex(ord(character)) for character in fins_frame]
 
@@ -113,16 +117,17 @@ class FinsPLCStreamInterface(StreamInterface):
                               service_id, memory_start_address, number_of_words_to_read):
         """
         Nicely displays the bits of information in the FINS command that will be used for building the reply as numbers.
+        Args:
+            client_network_address (int): The FINS network address of the client.
+            client_node_address (int): The FINS node of the client.
+            client_unit_address (int): The FINS unit address of the client.
+            service_id (int): The service ID of the original command.
+            memory_start_address (int): The memory address from where reading starts.
+            number_of_words_to_read (int): The number of words to be read, starting from the start address, inclusive.
 
-        :param client_network_address: The FINS network address of the client.
-        :param client_node_address: The FINS node of the client.
-        :param client_unit_address: The FINS unit address of the client.
-        :param service_id: The service ID of the original command.
-        :param memory_start_address: The memory address from where reading starts.
-        :param number_of_words_to_read: The number of words to be read, starting from the start address, inclusive.
-        :return: Nothing
+        Returns:
+            None.
         """
-
         if self.do_log:
             self.log.info("Server network address: {}".format(self.device.network_address))
             self.log.info("Server Unit address: {}".format(self.device.unit_address))
@@ -138,10 +143,13 @@ class FinsPLCStreamInterface(StreamInterface):
         """
         Checks that the FINS frame header part of the command is valid for a command sent from a client to a server
         (PLC).
-        :param fins_frame_header: A string where every character represents a byte from the received FINS frame header.
-        :return: None
-        """
+        Args:
+            fins_frame_header (string): A string where every character represents a byte from the received FINS frame
+                header.
 
+        Returns:
+            None.
+        """
         # ICF means Information Control Field, it gives information about if the frame is for a command or a response,
         # and if a response is needed or not.
         icf = ord(fins_frame_header[0])

@@ -5,10 +5,13 @@ from ..device import SimulatedFinsPLC
 def check_is_byte(character):
     """
     Checks if the given character can represent a byte. Raises an error of it can not, otherwise returns nothing.
-    :param character: A one character string.
-    :return: None.
-    """
 
+    Args:
+        character (string): A one character string.
+
+    Returns:
+        None.
+    """
     number = ord(character)
     if 0 > number > 255:
         raise ValueError("the character in the string must represent a byte value")
@@ -21,20 +24,22 @@ def dm_memory_area_read_response_fins_frame(device, client_network_address, clie
 
     Response structure is:
         10 bytes FINS frame header.
-        2 bytes (integer): Command code, for memory area read in this case
+        2 bytes (integer): Command code, for memory area read in this case.
         2 bytes (integer): End code. Shows errors.
         2 bytes for every word read.
 
-    :param device: The Lewis device.
-    :param client_network_address: The FINS network address of the client.
-    :param client_node_address: The FINS node of the client.
-    :param client_unit_address: The FINS unit address of the client.
-    :param service_id: The service ID of the original command.
-    :param memory_start_address: The memory address from where reading starts.
-    :param number_of_words_to_read: The number of words to be read, starting from the start address, inclusive.
-    :return: the response, represented as a string.
-    """
+    Args:
+        device (device.SimulatedFinsPLC): The Lewis device.
+        client_network_address (int): The FINS network address of the client.
+        client_node_address (int): The FINS node of the client.
+        client_unit_address (int): The FINS unit address of the client.
+        service_id (int): The service ID of the original command.
+        memory_start_address (int): The memory address from where reading starts.
+        number_of_words_to_read (int): The number of words to be read, starting from the start address, inclusive.
 
+    Returns:
+        string: the response.
+    """
     # The length argument asks for number of bytes, and each word has two bytes
     fins_reply = FinsResponseBuilder() \
         .add_fins_frame_header(device.network_address, device.unit_address, client_network_address,
@@ -66,9 +71,13 @@ def _convert_32bit_int_to_int16_array(number):
     """
     Converts a 32 bit integer into an array of two 16 bit integers. The first 16 bit integer is the least significant
     one, and the second is the most significant. The order of the 16 bit integers in the array is little endian.
-    :param number: The number to be converted. But the individual 16 bit ints are encoded in big endian.
-    :return: a list, with the first element being the least significant byte of the given number, and the second element
-     being the most significant byte.
+
+    Args:
+        number (int): The number to be converted. But the individual 16 bit ints are encoded in big endian.
+
+    Returns:
+        int list: a list, with the first element being the least significant byte of the given number, and the second
+            element being the most significant byte.
     """
     if type(number) != int:
         raise TypeError("number argument must always be an integer!")
@@ -86,9 +95,13 @@ def _convert_32bit_float_to_int16_array(number):
     Converts a 32 bit real number into an array of two 16 bit integers. The first 16 bit integer is the least
     significant one, and the second is the most significant. The order of the 16 bit integers in the array is little
     endian.
-    :param number: The number to be converted. But the individual 16 bit ints are encoded in big endian.
-    :return: a list, with the first element being the least significant byte of the given number, and the second element
-     being the most significant byte.
+
+    Args:
+        number (float): The number to be converted. But the individual 16 bit ints are encoded in big endian.
+
+    Returns:
+        int list: a list, with the first element being the least significant byte of the given number, and the second
+            element being the most significant byte.
     """
     if type(number) != int and type(number) != float:
         raise TypeError("number argument must always be a real number! {}".format(type(number)))
@@ -111,21 +124,28 @@ class FinsResponseBuilder(object):
 
     def add_int(self, value, length):
         """
-        Adds an integer to the builder
-        :param value: The integer to add
-        :param length: How many bytes should the integer be represented as
-        :return: The builder
+        Adds an integer to the builder.
+
+        Args:
+            value (integer): The integer to add.
+            length (integer): How many bytes should the integer be represented as.
+
+        Returns:
+            FinsResponseBuilder: The builder.
         """
         self.response += int_to_raw_bytes(value, length, False)
         return self
 
     def add_float(self, value):
         """
-        Adds an float to the builder (4 bytes, IEEE single-precision)
-        :param value: The float to add
-        :return: The builder
-        """
+        Adds an float to the builder (4 bytes, IEEE single-precision).
 
+        Args:
+            value (double): The real number to add.
+
+        Returns:
+            response_utilities.FinsResponseBuilder: The builder.
+        """
         self.response += float_to_raw_bytes(value, False)
         return self
 
@@ -147,13 +167,16 @@ class FinsResponseBuilder(object):
             1 byte (unsigned int): Service ID. It is a number showing what process generated the command sent by the
             client.
 
-        :param emulator_network_address: The FINS network address of the emulator.
-        :param emulator_unit_address: The FINS unit address of the emulator.
-        :param client_network_address: The FINS network address of the client.
-        :param client_node: The FINS node of the client.
-        :param client_unit_address: The FINS unit address of the client.
-        :param service_id: The service ID of the original command.
-        :return: (ResponseBuilder) the builder with the fins frame header bytes.
+        Args:
+            emulator_network_address (int): The FINS network address of the emulator.
+            emulator_unit_address (int): The FINS unit address of the emulator.
+            client_network_address (int): The FINS network address of the client.
+            client_node (int): The FINS node of the client.
+            client_unit_address (int): The FINS unit address of the client.
+            service_id (int): The service ID of the original command.
+
+        Returns:
+            FinsResponseBuilder: The builder with the FINS frame header bytes.
         """
 
         return self.add_int(0xC1, 1).add_int(0x00, 1).add_int(0x02, 1) \
@@ -168,7 +191,9 @@ class FinsResponseBuilder(object):
     def add_fins_command_and_error_codes(self):
         """
         Adds the code for the FINS memory area read command and a default error code to the builder.
-        :return: (ResponseBuilder) the builder with the command and error codes now added
+
+        Returns:
+            FinsResponseBuilder: The builder with the command and error codes now added.
         """
 
         # The memory area read command code is 0101, and the 0000 is the No error code.
@@ -176,7 +201,10 @@ class FinsResponseBuilder(object):
 
     def build(self):
         """
-        Gets the response from the builder
-        :return: the response
+        Gets the response from the builder.
+
+        Returns:
+            FinsResponseBuilder: The response builder.
         """
+
         return self.response

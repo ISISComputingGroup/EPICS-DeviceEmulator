@@ -339,12 +339,16 @@ class SimulatedFinsPLC(StateMachineDevice):
         Sets a location in the plc emulator's memory to the given data.
 
         Args:
-            pv_name: The pv name that the test wants to set. Each PV name corresponds to only one memory location in
-                the emulator.
+            pv_name (string): The pv name that the test wants to set. Each PV name corresponds to only one memory
+                location in the emulator.
             data: The data to be put in the plc memory.
 
         Returns:
             None.
+
+        Raises:
+            ValueError: if the given pv name is in the name to memory address mapping, but the associated memory
+            location is not in the memory of the emulator.
         """
         memory_location = SimulatedFinsPLC.PV_NAME_MEMORY_MAPPING[pv_name]
 
