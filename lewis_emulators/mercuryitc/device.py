@@ -145,4 +145,3 @@ class SimulatedMercuryitc(StateMachineDevice):
     def backdoor_set_channel_property(self, chan_id, property_name, value):
         assert hasattr(self.channels[chan_id], property_name)
         setattr(self.channels[chan_id], property_name, value)
-        self.log.info(getattr(self.channels[chan_id], property_name))
