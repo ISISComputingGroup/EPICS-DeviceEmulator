@@ -80,12 +80,14 @@ class MercuryitcInterface(StreamInterface):
             .escape("READ:DEV:").any_except(":").escape(":PRES:SIG:VOLT").eos().build(),
 
         # Control loop
-        CmdBuilder("get_control_loop_setpoint").optional(ISOBUS_PREFIX)
-            .escape("READ:DEV:").any_except(":").escape(":").any_except(":").escape(":LOOP:TSET").eos().build(),
+        CmdBuilder("get_temp_setpoint").optional(ISOBUS_PREFIX)
+            .escape("READ:DEV:").any_except(":").escape(":TEMP:LOOP:TSET").eos().build(),
+        CmdBuilder("get_pres_setpoint").optional(ISOBUS_PREFIX)
+            .escape("READ:DEV:").any_except(":").escape(":PRES:LOOP:PRST").eos().build(),
         CmdBuilder("set_temp_setpoint").optional(ISOBUS_PREFIX)
             .escape("SET:DEV:").any_except(":").escape(":TEMP:LOOP:TSET:").float().escape("K").eos().build(),
         CmdBuilder("set_pres_setpoint").optional(ISOBUS_PREFIX)
-            .escape("SET:DEV:").any_except(":").escape(":PRES:LOOP:PRST:").float().escape("mBar").eos().build(),
+            .escape("SET:DEV:").any_except(":").escape(":PRES:LOOP:PRST:").float().escape("mB").eos().build(),
 
         # Heater
         CmdBuilder("get_heater_auto").optional(ISOBUS_PREFIX)
@@ -344,21 +346,17 @@ class MercuryitcInterface(StreamInterface):
     @if_connected
     def get_pres_measured(self, deviceid):
         chan = self._chan_from_id(deviceid, expected_type=ChannelTypes.PRES)
-        return "STAT:DEV:{}:PRES:SIG:PRES:{:.4f}mBar".format(deviceid, chan.pressure)
+        return "STAT:DEV:{}:PRES:SIG:PRES:{:.4f}mB".format(deviceid, chan.pressure)
 
     @if_connected
-    def get_control_loop_setpoint(self, deviceid, chan_type):
-        chan = self._chan_from_id(deviceid, expected_type=chan_type)
-        if chan_type == ChannelTypes.TEMP:
-            val = chan.temperature_sp
-            unit = "K"
-        elif chan_type == ChannelTypes.PRES:
-            val = chan.pressure_sp
-            unit = "mBar"
-        else:
-            raise ValueError("Invalid channel type")
+    def get_temp_setpoint(self, deviceid):
+        chan = self._chan_from_id(deviceid, expected_type=ChannelTypes.TEMP)
+        return "STAT:DEV:{}:TEMP:LOOP:TSET:{:.4f}K".format(deviceid, chan.temperature_sp)
 
-        return "STAT:DEV:{}:{}:LOOP:TSET:{:.4f}{}".format(deviceid, chan_type, val, unit)
+    @if_connected
+    def get_pres_setpoint(self, deviceid):
+        chan = self._chan_from_id(deviceid, expected_type=ChannelTypes.PRES)
+        return "STAT:DEV:{}:PRES:LOOP:PRST:{:.4f}mB".format(deviceid, chan.pressure_sp)
 
     @if_connected
     def set_temp_setpoint(self, deviceid, sp):
@@ -370,12 +368,12 @@ class MercuryitcInterface(StreamInterface):
     def set_pres_setpoint(self, deviceid, sp):
         chan = self._chan_from_id(deviceid, expected_type=ChannelTypes.PRES)
         chan.pressure_sp = sp
-        return "STAT:SET:DEV:{}:PRES:LOOP:TSET:{:.4f}mBar:VALID".format(deviceid, sp)
+        return "STAT:SET:DEV:{}:PRES:LOOP:PRST:{:.4f}mB:VALID".format(deviceid, sp)
 
     @if_connected
     def get_resistance(self, deviceid):
         chan = self._chan_from_id(deviceid, expected_type=ChannelTypes.TEMP)
-        return "STAT:DEV:{}:TEMP:SIG:RES:{:.4f}O".format(deviceid, chan.resistance)
+        return "STAT:DEV:{}:TEMP:SIG:RES:{:.4f}{}".format(deviceid, chan.resistance, self.device.resistance_suffix)
 
     @if_connected
     def get_voltage(self, deviceid):
@@ -418,7 +416,7 @@ class MercuryitcInterface(StreamInterface):
     @if_connected
     def get_gas_flow(self, deviceid):
         aux_chan = self._chan_from_id(deviceid, expected_type=ChannelTypes.AUX)
-        return "STAT:DEV:{}:AUX:SIG:PERC:{:.4f}".format(deviceid, aux_chan.gas_flow)
+        return "STAT:DEV:{}:AUX:SIG:PERC:{:.4f}%".format(deviceid, aux_chan.gas_flow)
 
     @if_connected
     def set_gas_flow(self, deviceid, chan_type, sp):

@@ -98,35 +98,37 @@ class SimulatedMercuryitc(StateMachineDevice):
     def _initialize_data(self):
         self.connected = True
 
+        self.resistance_suffix = "O"
+
         self.channels = {
             # Temperature channel 1
-            "MB0": TemperatureChannel("MB0.T0"),
-            "MB1": HeaterChannel("DB0.H0"),
-            "DB1": AuxChannel("DB1.A0"),
+            "MB0.T0": TemperatureChannel("MB0.T0"),
+            "MB1.H0": HeaterChannel("DB0.H0"),
+            "DB1.A0": AuxChannel("DB1.A0"),
 
             # Temperature channel 2
-            "DB2": TemperatureChannel("DB2.T1"),
-            "DB3": HeaterChannel("DB3.H1"),
-            "DB4": AuxChannel("DB4.A1"),
+            "DB2.T1": TemperatureChannel("DB2.T1"),
+            "DB3.H1": HeaterChannel("DB3.H1"),
+            "DB4.A1": AuxChannel("DB4.A1"),
 
             # Pressure channel 1
-            "DB5": PressureChannel("DB5.P0"),
-            "DB6": HeaterChannel("DB6.H2"),
-            "DB7": AuxChannel("DB7.A2"),
+            "DB5.P0": PressureChannel("DB5.P0"),
+            "DB6.H2": HeaterChannel("DB6.H2"),
+            "DB7.A2": AuxChannel("DB7.A2"),
 
             # Level channel 1
-            "DB8": LevelChannel("DB8.L0"),
+            "DB8.L0": LevelChannel("DB8.L0"),
         }
 
         # Associate each temperature/pressure channel with a heater and an auxilary channel:
-        self.channels["MB0"].associated_heater_channel = "MB1"
-        self.channels["MB0"].associated_aux_channel = "DB1"
+        self.channels["MB0.T0"].associated_heater_channel = "MB1.H0"
+        self.channels["MB0.T0"].associated_aux_channel = "DB1.A0"
 
-        self.channels["DB2"].associated_heater_channel = "DB3"
-        self.channels["DB2"].associated_aux_channel = "DB4"
+        self.channels["DB2.T1"].associated_heater_channel = "DB3.H1"
+        self.channels["DB2.T1"].associated_aux_channel = "DB4.A1"
 
-        self.channels["DB5"].associated_heater_channel = "DB6"
-        self.channels["DB5"].associated_aux_channel = "DB7"
+        self.channels["DB5.P0"].associated_heater_channel = "DB6.H2"
+        self.channels["DB5.P0"].associated_aux_channel = "DB7.A2"
 
     def reset(self):
         self._initialize_data()
