@@ -17,7 +17,7 @@ class FinsPLCStreamInterface(StreamInterface):
     in_terminator = ""
     out_terminator = in_terminator
 
-    do_log = False
+    do_log = True
 
     def handle_error(self, request, error):
         error_message = "An error occurred at request " + repr(request) + ": " + repr(error)
