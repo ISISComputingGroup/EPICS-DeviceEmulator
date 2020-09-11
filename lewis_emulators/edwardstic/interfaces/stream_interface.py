@@ -50,8 +50,8 @@ def reverse_dict_lookup(dictionary, value_to_find):
     Looks up the key for the supplied value in dictionary dict.
 
     Args:
-        dict: dictionary, the dictionary to do the reverse lookup
-        value: the value to find in the dictionary
+        dictionary: dictionary, the dictionary to do the reverse lookup
+        value_to_find: the value to find in the dictionary
     
     Raises:
         KeyError if value does not exist in the dictionary
@@ -118,7 +118,6 @@ class EdwardsTICStreamInterface(StreamInterface):
         self.log.info(return_string.format(stdby_state=standby_state))
 
         return return_string.format(stdby_state=standby_state)
-
 
     @conditional_reply("is_connected")
     def turbo_start_stop(self, switch):
