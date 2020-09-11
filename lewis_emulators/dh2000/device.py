@@ -3,7 +3,6 @@ from states import DefaultState
 from lewis.devices import StateMachineDevice
 
 
-
 class SimulatedDh2000(StateMachineDevice):
 
     def _initialize_data(self):
