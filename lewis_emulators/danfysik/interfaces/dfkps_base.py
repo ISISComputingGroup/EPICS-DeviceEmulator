@@ -10,6 +10,7 @@ from lewis_emulators.utils.replies import conditional_reply
 
 if_available = conditional_reply("device_available")
 
+
 @has_log
 @six.add_metaclass(abc.ABCMeta)
 class CommonStreamInterface(object):
