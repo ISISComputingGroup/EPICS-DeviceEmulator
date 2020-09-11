@@ -6,14 +6,14 @@ class UninitializedState(State):
     NAME = "UninitializedState"
 
     def on_entry(self, dt):
-        print "Entering uninitialized state"
+        print("Entering uninitialized state")
 
 
 class InitializedState(State):
     NAME = "InitializedState"
 
     def on_entry(self, dt):
-        print "Entering initialized state"
+        print("Entering initialized state")
 
 
 class MovingState(State):
@@ -27,4 +27,4 @@ class MovingState(State):
         device.c = approaches.linear(device.c, device.c_setpoint, 10, dt)
 
     def on_entry(self, dt):
-        print "Entering moving state"
+        print("Entering moving state")
