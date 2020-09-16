@@ -1,7 +1,8 @@
 from collections import OrderedDict
-from states import DefaultInitState, DefaultStoppedState, DefaultStartedState, MAX_TEMPERATURE
+from .states import DefaultInitState, DefaultStoppedState, DefaultStartedState, MAX_TEMPERATURE
 from lewis.devices import StateMachineDevice
-from chopper_type import ChopperType
+from .chopper_type import ChopperType
+
 
 class SimulatedMk2Chopper(StateMachineDevice):
 

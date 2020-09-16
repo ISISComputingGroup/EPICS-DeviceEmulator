@@ -1,5 +1,5 @@
 from collections import OrderedDict
-from states import DefaultState
+from .states import DefaultState
 from lewis.devices import StateMachineDevice
 
 
@@ -22,4 +22,3 @@ class SimulatedTTIEX355P(StateMachineDevice):
     def _get_transition_handlers(self):
         return OrderedDict([
         ])
-

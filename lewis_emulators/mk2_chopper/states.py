@@ -6,13 +6,13 @@ MAX_TEMPERATURE = 1
 
 
 def output_current_state(device, state_name):
-    print "{0}: Freq {1:.2f}, Phase {2:.2f}, Error {3:.2f}, Temperature {4:.2f}".format(
+    print("{0}: Freq {1:.2f}, Phase {2:.2f}, Error {3:.2f}, Temperature {4:.2f}".format(
         state_name.upper(),
         device.get_true_frequency(),
         device.get_true_phase_delay(),
         device.get_true_phase_error(),
         device.get_temperature(),
-    )
+    ))
 
 
 class DefaultInitState(State):

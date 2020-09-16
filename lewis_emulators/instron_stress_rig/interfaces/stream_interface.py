@@ -58,7 +58,7 @@ class InstronStreamInterface(StreamInterface):
     out_terminator = "\r\n"
 
     def handle_error(self, request, error):
-        print "An error occurred at request " + repr(request) + ": " + repr(error)
+        print("An error occurred at request " + repr(request) + ": " + repr(error))
         return str(error)
 
     def get_control_channel(self):

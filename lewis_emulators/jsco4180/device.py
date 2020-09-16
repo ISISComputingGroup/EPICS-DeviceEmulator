@@ -1,6 +1,5 @@
-import time
 from collections import OrderedDict
-from states import PumpOff, PumpOn, PumpProgram, PumpProgramReset
+from .states import PumpOff, PumpOn, PumpProgram, PumpProgramReset
 from lewis.devices import StateMachineDevice
 
 

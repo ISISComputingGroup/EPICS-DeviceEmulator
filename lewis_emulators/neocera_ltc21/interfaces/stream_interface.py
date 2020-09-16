@@ -278,4 +278,4 @@ class NeoceraStreamInterface(StreamInterface):
         :param request:
         :param error:
         """
-        print "An error occurred at request " + repr(request) + ": " + repr(error)
+        print("An error occurred at request " + repr(request) + ": " + repr(error))

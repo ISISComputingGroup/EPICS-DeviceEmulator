@@ -3,7 +3,7 @@ from collections import OrderedDict
 from lewis.core.logging import has_log
 
 from lewis_emulators.ips.modes import Activity, Control, SweepMode, Mode
-from states import HeaterOffState, HeaterOnState, MagnetQuenchedState
+from .states import HeaterOffState, HeaterOnState, MagnetQuenchedState
 from lewis.devices import StateMachineDevice
 
 

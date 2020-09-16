@@ -1,5 +1,4 @@
-from types import StringType, IntType
-from utilities import pad_string, format_int
+from .utilities import pad_string, format_int
 
 
 class Gas(object):
@@ -7,7 +6,7 @@ class Gas(object):
     A gas within the system, identified by either its name or an integer index.
     """
     def __init__(self, index, name):
-        assert type(index) is IntType and type(name) is StringType
+        assert type(index) is int and type(name) is str
         self._index = index
         self._name = name
 

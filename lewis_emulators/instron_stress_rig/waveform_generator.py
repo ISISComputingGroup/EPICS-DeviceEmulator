@@ -1,7 +1,7 @@
-from waveform_generator_states import WaveformGeneratorStates as GenStates
-from waveform_types import WaveformTypes
+from .waveform_generator_states import WaveformGeneratorStates as GenStates
+from .waveform_types import WaveformTypes
 from datetime import datetime, timedelta
-from quarter_cycle_event_detector import QuarterCycleEventDetector as QCED
+from .quarter_cycle_event_detector import QuarterCycleEventDetector as QCED
 import math
 
 

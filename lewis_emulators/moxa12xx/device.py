@@ -1,6 +1,6 @@
 from collections import OrderedDict
 from lewis.devices import StateMachineDevice
-from states import DefaultState
+from .states import DefaultState
 from lewis.core.logging import has_log
 
 import struct

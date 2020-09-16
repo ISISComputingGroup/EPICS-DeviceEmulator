@@ -2,7 +2,7 @@ from collections import OrderedDict
 from lewis.devices import StateMachineDevice
 from enum import Enum
 
-from states import DefaultState
+from .states import DefaultState
 
 
 class OnOffStates(Enum):

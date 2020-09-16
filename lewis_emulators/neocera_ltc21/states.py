@@ -1,7 +1,7 @@
 from lewis.core.statemachine import State
 from lewis.core import approaches
 
-from constants import HEATER_INDEX
+from .constants import HEATER_INDEX
 
 
 class OffState(State):

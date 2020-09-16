@@ -5,6 +5,7 @@ from .states import DefaultState
 NUMBER_OF_TEMP_CHANNELS = 8
 NUMBER_OF_SENSOR_CHANNELS = 8
 
+
 class SimulatedLakeshore218(StateMachineDevice):
     """
     Simulated Lakeshore 218

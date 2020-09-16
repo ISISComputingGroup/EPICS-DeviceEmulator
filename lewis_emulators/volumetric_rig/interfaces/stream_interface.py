@@ -583,4 +583,4 @@ class VolumetricRigStreamInterface(StreamInterface):
         if str(error) == "None of the device's commands matched.":
             return "URC,04,Unrecognised Command," + str(request)
         else:
-            print "An error occurred at request " + repr(request) + ": " + repr(error)
+            print("An error occurred at request " + repr(request) + ": " + repr(error))
