@@ -69,7 +69,7 @@ class Jsco4180StreamInterface(StreamInterface):
     @combined_checks
     def set_file_number(self, file_number):
         state = self.device.state
-        if state is not "pump_off":
+        if state != "pump_off":
             return "%%[Program is Busy]%%" + self.out_terminator
         else:
             self.device.file_number = file_number
