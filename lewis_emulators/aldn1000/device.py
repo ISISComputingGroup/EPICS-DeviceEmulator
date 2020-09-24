@@ -1,5 +1,6 @@
 from collections import OrderedDict
-from states import InfusingState, WithdrawingState, PumpingProgramStoppedState, PumpingProgramPausedState, PausePhaseState, UserWaitState
+from .states import InfusingState, WithdrawingState, PumpingProgramStoppedState, PumpingProgramPausedState, \
+    PausePhaseState, UserWaitState
 from lewis.devices import StateMachineDevice
 
 states = OrderedDict([

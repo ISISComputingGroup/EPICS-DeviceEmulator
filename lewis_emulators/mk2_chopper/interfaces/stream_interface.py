@@ -42,7 +42,7 @@ class Mk2ChopperStreamInterface(StreamInterface):
     out_terminator = "\r"
 
     def handle_error(self, request, error):
-        print "An error occurred at request " + repr(request) + ": " + repr(error)
+        print("An error occurred at request " + repr(request) + ": " + repr(error))
         return str(error)
 
     def get_demanded_frequency(self):
@@ -79,7 +79,7 @@ class Mk2ChopperStreamInterface(StreamInterface):
 
     def get_chopper_interlocks(self):
         bits = [0]*8
-        bits[0] = 1 if self._device.get_system_frequency() is 50 else 0
+        bits[0] = 1 if self._device.get_system_frequency() == 50 else 0
         bits[1] = 1 if self._device.clock_loss() else 0
         bits[2] = 1 if self._device.bearing_1_overheat() else 0
         bits[3] = 1 if self._device.bearing_2_overheat() else 0

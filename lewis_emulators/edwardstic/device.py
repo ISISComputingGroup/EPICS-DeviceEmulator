@@ -2,7 +2,7 @@ from collections import OrderedDict
 from lewis.devices import StateMachineDevice
 from enum import Enum
 
-from states import DefaultState
+from .states import DefaultState
 
 
 class OnOffStates(Enum):
@@ -112,7 +112,7 @@ class SimulatedEdwardsTIC(StateMachineDevice):
         return self._turbo_in_standby
 
     @turbo_in_standby.setter
-    def turbo_standby(self, value):
+    def turbo_in_standby(self, value):
         """
         Sets the turbo standby mode
 
@@ -153,7 +153,7 @@ class SimulatedEdwardsTIC(StateMachineDevice):
         This function doesn't exist on the real device and is only called through the back door.
 
         Args:
-            State: String, Matches an attribute of the PumpStates class
+            state: String, Matches an attribute of the PumpStates class
         """
         pump_state = getattr(PumpStates, state)
 
@@ -194,7 +194,7 @@ class SimulatedEdwardsTIC(StateMachineDevice):
         This function doesn't exist on the real device and is only called through the back door.
 
         Args:
-            value: object, an attribute of the PumpStates class
+            state: object, an attribute of the PumpStates class
         """
 
         priority_state = getattr(PriorityStates, state)
@@ -254,7 +254,7 @@ class SimulatedEdwardsTIC(StateMachineDevice):
         This function doesn't exist on the real device and is only called through the back door.
 
         Args:
-            State: String, Matches an attribute of the GaugeStates class
+            state: String, Matches an attribute of the GaugeStates class
         """
         gauge_state = getattr(GaugeStates, state)
 
@@ -289,7 +289,7 @@ class SimulatedEdwardsTIC(StateMachineDevice):
         This function doesn't exist on the real device and is only called through the back door.
 
         Args:
-            value: object, an attribute of the PumpStates class
+            state: object, an attribute of the PumpStates class
         """
 
         priority_state = getattr(PriorityStates, state)

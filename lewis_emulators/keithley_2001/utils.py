@@ -21,6 +21,7 @@ class StatusRegister(object):
         self.measurement_summary_status = False
         self.number_of_times_reset_and_cleared += 1
 
+
 class ScanTrigger(Enum):
     IMM = 0
     HOLD = 1

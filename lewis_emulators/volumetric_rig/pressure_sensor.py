@@ -1,5 +1,5 @@
-from sensor import Sensor
-from sensor_status import SensorStatus
+from .sensor import Sensor
+from .sensor_status import SensorStatus
 
 
 class PressureSensor(Sensor):

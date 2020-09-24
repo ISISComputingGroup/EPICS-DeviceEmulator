@@ -1,8 +1,8 @@
 from collections import OrderedDict
-from states import DefaultState
+from .states import DefaultState
 from lewis.devices import StateMachineDevice
-from utils import Channel, StatusRegister, ScanTrigger
-from buffer import Buffer
+from .utils import Channel, StatusRegister, ScanTrigger
+from .buffer import Buffer
 
 
 class SimulatedKeithley2001(StateMachineDevice):

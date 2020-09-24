@@ -77,6 +77,6 @@ class POLARISSampleChangerStreamInterface(StreamInterface):
         self._device.sample_retrieved = True
 
     def handle_error(self, request, error):
-        print "An error occurred at request " + repr(request) + ": " + repr(error)
+        print("An error occurred at request " + repr(request) + ": " + repr(error))
         return "??"
 

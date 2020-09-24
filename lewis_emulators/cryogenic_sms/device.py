@@ -2,8 +2,8 @@ from datetime import datetime
 
 from lewis.devices import StateMachineDevice
 from collections import OrderedDict
-from states import DefaultInitState, HoldingState, TrippedState, RampingState
-from utils import RampTarget, RampDirection
+from .states import DefaultInitState, HoldingState, TrippedState, RampingState
+from .utils import RampTarget, RampDirection
 
 
 class SimulatedCRYOSMS(StateMachineDevice):

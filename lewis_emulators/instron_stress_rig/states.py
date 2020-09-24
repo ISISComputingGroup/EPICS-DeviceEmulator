@@ -10,10 +10,11 @@ class DefaultState(State):
         device.set_current_time()
 
         if device.watchdog_refresh_time + 3 < time.time() and device.get_control_mode() != 0:
-            print "Watchdog time expired, going back to front panel control mode"
+            print("Watchdog time expired, going back to front panel control mode")
             device.set_control_mode(0)
             
         device.stop_waveform_generation_if_requested()
+
 
 class GoingToSetpointState(DefaultState):
 
@@ -27,6 +28,7 @@ class GoingToSetpointState(DefaultState):
     def on_exit(self, dt):
         device = self._context
         device.movement_type = 0
+
 
 class GeneratingWaveformState(DefaultState):
 

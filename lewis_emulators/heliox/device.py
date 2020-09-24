@@ -1,6 +1,6 @@
 from collections import OrderedDict
 from lewis.core.logging import has_log
-from states import TemperatureControlState, He3PotEmptyState
+from .states import TemperatureControlState, He3PotEmptyState
 from lewis.devices import StateMachineDevice
 
 

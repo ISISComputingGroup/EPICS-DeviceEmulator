@@ -1,7 +1,7 @@
 from lewis.core.logging import has_log
 from lewis.devices import StateMachineDevice
 from lewis.core.statemachine import State
-from states import MovingState, Errors, SampleDroppedState
+from .states import MovingState, Errors, SampleDroppedState
 from collections import OrderedDict
 
 

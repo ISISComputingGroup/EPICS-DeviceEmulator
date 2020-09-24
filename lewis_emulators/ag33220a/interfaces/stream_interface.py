@@ -116,4 +116,4 @@ class AG33220AStreamInterface(StreamInterface):
         self._device.range_auto = range_auto
 
     def handle_error(self, request, error):
-        print traceback.format_exc()
+        print(traceback.format_exc())

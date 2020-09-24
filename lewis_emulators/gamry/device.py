@@ -1,5 +1,6 @@
 from lewis.devices import Device
 
+
 class SimulatedGamry(Device):
     address = "a"
     setpoint = 0.00

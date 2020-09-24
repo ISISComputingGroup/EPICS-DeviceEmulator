@@ -24,7 +24,7 @@ class IegStreamInterface(StreamInterface):
         return val
 
     def handle_error(self, request, error):
-        print "An error occurred at request " + repr(request) + ": " + repr(error)
+        print("An error occurred at request " + repr(request) + ": " + repr(error))
         return str(error)
 
     def get_status(self):

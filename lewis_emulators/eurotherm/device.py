@@ -49,7 +49,7 @@ class SimulatedEurotherm(StateMachineDevice):
 
         Returns: the address of the device e.g. "A01"
         """
-        self._address
+        return self._address
 
     @address.setter
     def address(self, addr):

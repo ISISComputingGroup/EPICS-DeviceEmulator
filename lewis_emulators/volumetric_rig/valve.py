@@ -1,4 +1,4 @@
-from valve_status import ValveStatus
+from .valve_status import ValveStatus
 
 
 class Valve(object):

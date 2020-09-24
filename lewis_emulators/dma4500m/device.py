@@ -1,6 +1,7 @@
 from collections import OrderedDict
 
-import states
+from .states import ReadyState, MeasuringState, DoneState
+
 from lewis.devices import StateMachineDevice
 
 
@@ -72,9 +73,9 @@ class SimulatedDMA4500M(StateMachineDevice):
 
     def _get_state_handlers(self):
         return {
-            "ready": states.ReadyState(),
-            "measuring": states.MeasuringState(),
-            "done": states.DoneState(),
+            "ready": ReadyState(),
+            "measuring": MeasuringState(),
+            "done": DoneState(),
         }
 
     def _get_initial_state(self):

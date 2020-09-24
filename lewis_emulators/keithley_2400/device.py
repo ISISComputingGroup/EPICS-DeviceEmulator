@@ -1,10 +1,11 @@
 from __future__ import division
-
-from utilities import format_value
 from random import uniform
 from collections import OrderedDict
-from states import DefaultRunningState, StaticRunningState
-from control_modes import *
+
+from .utilities import format_value
+from .states import DefaultRunningState, StaticRunningState
+from .control_modes import *
+
 from lewis.devices import StateMachineDevice
 
 
@@ -140,7 +141,7 @@ class SimulatedKeithley2400(StateMachineDevice):
         if mode in mode_class.MODES:
             return True
         else:
-            print "Invalid mode, {}, received for: {}".format(mode, mode_class.__name__)
+            print("Invalid mode, {}, received for: {}".format(mode, mode_class.__name__))
             return False
 
     def set_output_mode(self, mode):
