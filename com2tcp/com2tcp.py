@@ -11,7 +11,7 @@ def listen_to_tcp(tcp_conn, serial_conn):
         tcp_data = tcp_conn.recv(1024)
         if len(data) > 0:
             serial_conn.writelines(tcp_data)
-            print "Data on tcp: " + str(tcp_data)
+            print("Data on tcp: " + str(tcp_data))
         time.sleep(0.001)
 
 
@@ -26,27 +26,27 @@ if __name__ == "__main__":
     try:
         tcp_conn = socket.create_connection(('localhost', args.tcp_port))
     except Exception as e:
-        print "Failed to connect to tcp port: " + str(e)
+        print("Failed to connect to tcp port: " + str(e))
         sys.exit()
 
     try:
         serial_conn = serial.Serial(args.com_port, args.baud)
     except Exception as e:
-        print "Failed to connect to serial port: " + str(e)
+        print("Failed to connect to serial port: " + str(e))
         sys.exit()
 
     listen_thread = threading.Thread(target=listen_to_tcp, args=(tcp_conn, serial_conn))
     listen_thread.daemon = True
     listen_thread.start()
 
-    print "Listening on " + str(args.com_port) + " and localhost:" + str(args.tcp_port)
-    print "Press Ctrl+C to stop"
+    print("Listening on " + str(args.com_port) + " and localhost:" + str(args.tcp_port))
+    print("Press Ctrl+C to stop")
 
     try:
         while True:
             if serial_conn.inWaiting():
                 data = serial_conn.read()
-                print "Data on serial: " + data
+                print("Data on serial: " + str(data))
                 tcp_conn.sendall(data)
 
             time.sleep(0.001)
