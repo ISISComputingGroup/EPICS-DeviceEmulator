@@ -1,7 +1,7 @@
 import six
-from lewis.adapters.stream import StreamInterface
 from lewis_emulators.utils.command_builder import CmdBuilder
 from lewis.core.logging import has_log
+import abc
 
 from lewis_emulators.utils.replies import conditional_reply
 
@@ -18,7 +18,8 @@ def needs_remote_mode(func):
 
 
 @has_log
-class KepcoStreamInterface(StreamInterface):
+@six.add_metaclass(abc.ABCMeta)
+class KepcoStreamInterface(object):
 
     in_terminator = "\r\n"
     out_terminator = "\r\n"
@@ -36,6 +37,7 @@ class KepcoStreamInterface(StreamInterface):
         CmdBuilder("set_output_status").escape("OUTP ").arg("0|1").build(),
         CmdBuilder("get_IDN").escape("*IDN?").build(),
         CmdBuilder("set_control_mode").escape("SYST:REM ").arg("0|1").build(),
+        CmdBuilder("reset").escape("*RST").build()
     }
 
     def handle_error(self,request, error):
@@ -92,7 +94,8 @@ class KepcoStreamInterface(StreamInterface):
 
     @if_connected
     def set_control_mode(self, mode):
-        mode = int(mode)
-        if mode not in [0, 1]:
-            raise ValueError("Invalid mode in set_control_mode: {}".format(mode))
-        self._device.remote_comms_enabled = (mode == 1)
+        raise NotImplementedError
+
+    @if_connected
+    def reset(self):
+        self._device.reset()
