@@ -98,4 +98,4 @@ class KepcoStreamInterface(object):
 
     @if_connected
     def reset(self):
-        self._device.reset()
+        raise NotImplementedError

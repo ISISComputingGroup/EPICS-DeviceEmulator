@@ -18,7 +18,16 @@ class KepcoNoRemStreamInterface(KepcoStreamInterface, StreamInterface):
 
     protocol = "no_rem"
 
+    def __init__(self):
+        super(KepcoNoRemStreamInterface, self).__init__()
+        self._idn_no_firmware = "KEPCO, BIT 4886 100-2 123456 1.8-"
+        self._firmware = 1.8
+
     @if_connected
     def set_control_mode(self, mode):
         raise ValueError("No SYST:REM command available")
+
+    @if_connected
+    def reset(self):
+        self._device.reset(self._idn_no_firmware, self._firmware)
 

@@ -2,6 +2,9 @@ from lewis.devices import StateMachineDevice
 from collections import OrderedDict
 from .states import DefaultState
 
+DEFAULT_IDN_NO_FIRMWARE = "KEPCO,BOP 50-20,E1234,"
+DEFAULT_FIRMWARE = 2.6
+
 
 class SimulatedKepco(StateMachineDevice):
     """
@@ -15,7 +18,7 @@ class SimulatedKepco(StateMachineDevice):
         self.reset_count = 0
         self._init_data()
 
-    def _init_data(self):
+    def _init_data(self, idn_no_firmware=DEFAULT_IDN_NO_FIRMWARE, firmware=DEFAULT_FIRMWARE):
         """
         Initialise device data.
         """
@@ -29,18 +32,19 @@ class SimulatedKepco(StateMachineDevice):
         self.output_status_set_count = 0
         self._output_mode = 0
         self._output_status = 0
-        self._idn = "000000000000000000000000000000000000000"
         self.connected = True
 
         self.remote_comms_enabled = True
+        self.idn_no_firmware = idn_no_firmware
+        self.firmware = firmware
 
-    def reset(self):
+    def reset(self, idn_no_firmware=DEFAULT_IDN_NO_FIRMWARE, firmware=DEFAULT_FIRMWARE):
         """
         Reset the device, reinitialising the data.
         :return:
         """
         self.reset_count += 1
-        self._init_data()
+        self._init_data(idn_no_firmware, firmware)
 
     def _get_state_handlers(self):
         """
@@ -63,17 +67,39 @@ class SimulatedKepco(StateMachineDevice):
     @property
     def idn(self):
         """
-        :return: IDN- Identificaiton String
+        :return: IDN- Identification String
+        """
+        return self._idn + str(self._firmware)
+
+    @property
+    def idn_no_firmware(self):
+        """
+        :return: IDN- Identification String
         """
         return self._idn
 
-    @idn.setter
-    def idn(self, idn):
+    @idn_no_firmware.setter
+    def idn_no_firmware(self, idn_no_firmware):
         """
-        :param idn:
-        :return: sets IDN- Identificaiton String
+        :param idn_no_firmware:
+        :return: sets IDN without the firmware- Identification String
         """
-        self._idn = idn
+        self._idn = idn_no_firmware
+
+    @property
+    def firmware(self):
+        """
+        :return: IDN- Identification String
+        """
+        return self._firmware
+
+    @firmware.setter
+    def firmware(self, firmware):
+        """
+        :param firmware:
+        :return: sets the firmware of the device (part of the IDN)
+        """
+        self._firmware = firmware
 
     @property
     def voltage(self):
