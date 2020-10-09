@@ -15,16 +15,20 @@ class SimulatedSampleChanger(StateMachineDevice):
     CAR_SPEED = 1.0/6.0  # Carousel takes 6 seconds per position (measured on actual device)
 
     def _initialize_data(self):
-        self.reset()
+        self.uninitialise()
 
-    def reset(self):
+    def uninitialise(self):
+        self.reset_from_dropped_sample()
         self.car_pos = -1
         self.car_target = -1
         self.arm_lowered = False
+
+    def reset_from_dropped_sample(self):
         self.current_err = Errors.NO_ERR
         self._position_to_drop_sample = None
         self._sample_retrieved = False
         self.drop_persistently = False
+        self.arm_lowered = True
 
     def _get_state_handlers(self):
         return {
