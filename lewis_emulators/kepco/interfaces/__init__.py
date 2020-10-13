@@ -1,4 +1,3 @@
-from .kepco_rem import KepcoRemStreamInterface
-from .kepco_no_rem import KepcoNoRemStreamInterface
+from .kepco import KepcoStreamInterface
 
-__all__ = ["KepcoRemStreamInterface", "KepcoNoRemStreamInterface"]
+__all__ = ["KepcoStreamInterface"]

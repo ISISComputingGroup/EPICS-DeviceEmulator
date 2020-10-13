@@ -2,9 +2,6 @@ from lewis.devices import StateMachineDevice
 from collections import OrderedDict
 from .states import DefaultState
 
-DEFAULT_IDN_NO_FIRMWARE = "KEPCO,BOP 50-20,E1234,"
-DEFAULT_FIRMWARE = 2.6
-
 
 class SimulatedKepco(StateMachineDevice):
     """
@@ -16,9 +13,11 @@ class SimulatedKepco(StateMachineDevice):
         Sets the initial state of the device.
         """
         self.reset_count = 0
+        self._idn_no_firmware = "KEPCO,BOP 50-20,E1234,"
+        self._firmware = 2.6
         self._init_data()
 
-    def _init_data(self, idn_no_firmware=DEFAULT_IDN_NO_FIRMWARE, firmware=DEFAULT_FIRMWARE):
+    def _init_data(self):
         """
         Initialise device data.
         """
@@ -35,16 +34,14 @@ class SimulatedKepco(StateMachineDevice):
         self.connected = True
 
         self.remote_comms_enabled = True
-        self.idn_no_firmware = idn_no_firmware
-        self.firmware = firmware
 
-    def reset(self, idn_no_firmware=DEFAULT_IDN_NO_FIRMWARE, firmware=DEFAULT_FIRMWARE):
+    def reset(self):
         """
         Reset the device, reinitialising the data.
         :return:
         """
         self.reset_count += 1
-        self._init_data(idn_no_firmware, firmware)
+        self._init_data()
 
     def _get_state_handlers(self):
         """
@@ -69,14 +66,14 @@ class SimulatedKepco(StateMachineDevice):
         """
         :return: IDN- Identification String
         """
-        return self._idn + str(self._firmware)
+        return self._idn_no_firmware + str(self._firmware)
 
     @property
     def idn_no_firmware(self):
         """
         :return: IDN- Identification String
         """
-        return self._idn
+        return self._idn_no_firmware
 
     @idn_no_firmware.setter
     def idn_no_firmware(self, idn_no_firmware):
@@ -84,7 +81,7 @@ class SimulatedKepco(StateMachineDevice):
         :param idn_no_firmware:
         :return: sets IDN without the firmware- Identification String
         """
-        self._idn = idn_no_firmware
+        self._idn_no_firmware = idn_no_firmware
 
     @property
     def firmware(self):
