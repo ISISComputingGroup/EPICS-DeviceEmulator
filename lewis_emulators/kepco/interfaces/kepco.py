@@ -72,7 +72,7 @@ class KepcoStreamInterface(StreamInterface):
     @if_connected
     @needs_remote_mode
     def set_output_mode(self, mode):
-        self._device.output_mode = mode
+        self._device.output_mode = 0 if mode.startswith("CURR") else 1
 
     @if_connected
     def read_output_mode(self):
