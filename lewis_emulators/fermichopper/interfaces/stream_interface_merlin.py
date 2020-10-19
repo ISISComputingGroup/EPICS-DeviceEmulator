@@ -98,7 +98,7 @@ class FermichopperStreamInterface(StreamInterface):
         return status
 
     def handle_error(self, request, error):
-        print "An error occurred at request " + repr(request) + ": " + repr(error)
+        print("An error occurred at request " + repr(request) + ": " + repr(error))
         return str(error)
 
     def get_all_data(self, checksum):

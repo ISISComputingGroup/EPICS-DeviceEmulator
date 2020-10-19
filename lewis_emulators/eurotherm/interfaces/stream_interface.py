@@ -4,6 +4,7 @@ from lewis_emulators.utils.replies import conditional_reply
 
 if_connected = conditional_reply("connected")
 
+
 class EurothermStreamInterface(StreamInterface):
     """
     Stream interface for the serial port

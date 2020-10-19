@@ -2,7 +2,9 @@ from collections import OrderedDict
 from lewis.core.logging import has_log
 from .states import DefaultState
 from lewis.devices import StateMachineDevice
-
+from random import randint
+import time
+import threading
 
 MAX_READ = 1500
 MIN_READ = 1000
@@ -21,6 +23,28 @@ class SimulatedKeithley2700(StateMachineDevice):
     Simulated Keithley2700 Multimeter
     """
 
+    def _simulate_readings_thread(self):
+        """
+        Generates random simulated data to put insert into the buffer.
+        """
+
+        def i_to_channel(i):
+            """
+            formats index as channel number, 101 to 110, 201 to 210
+            """
+            if i < 10:
+                return 101 + i
+            else:
+                return 191 + i
+
+        i = 0
+        while self.simulate_readings:
+            resistance = randint(1000, 2000)
+            timestamp = time.time() - self.start_time
+            self.insert_mock_data(["+{},{},+{}".format(resistance, timestamp, i_to_channel(i))])
+            i = (i + 1) % 20
+            time.sleep(0.1)
+
     def _initialize_data(self):
         """
         Initialize the device's attributes necessary for testing.
@@ -32,6 +56,11 @@ class SimulatedKeithley2700(StateMachineDevice):
         # The below attributes are not used but are needed for the stream interface
         self.bytes_available = 0
         self.bytes_used = 0
+        self.start_time = time.time()
+        self.simulate_readings = True
+        thread = threading.Thread(group=None, target=self._simulate_readings_thread)
+        thread.daemon = True
+        thread.start()
 
     def get_next_buffer_location(self):
         if not self.is_buffer_full():

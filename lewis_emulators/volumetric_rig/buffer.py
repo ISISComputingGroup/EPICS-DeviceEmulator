@@ -1,6 +1,6 @@
-from valve import Valve
-from utilities import format_int
-from two_gas_mixer import TwoGasMixer
+from .valve import Valve
+from .utilities import format_int
+from .two_gas_mixer import TwoGasMixer
 
 
 class Buffer(object):

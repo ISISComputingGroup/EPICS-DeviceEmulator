@@ -5,6 +5,7 @@ from lewis.core.logging import has_log
 
 if_connected = conditional_reply("connected")
 
+
 class CybamanStreamInterface(StreamInterface):
     """
     Stream interface for the serial port

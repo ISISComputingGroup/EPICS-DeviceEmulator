@@ -1,8 +1,7 @@
 from collections import OrderedDict
 
-from states import WarnStateCode, ErrorStateCode
-
-from states import StoppedState, MovingState
+from .states import WarnStateCode, ErrorStateCode
+from .states import StoppedState, MovingState
 from lewis.devices import StateMachineDevice
 
 HARD_LIMIT_MINIMUM = 0.0

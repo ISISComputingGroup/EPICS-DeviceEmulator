@@ -37,7 +37,7 @@ class Lakeshore460StreamInterface(StreamInterface):
         CmdBuilder("set_relative_mode_status").escape("REL ").arg("0|1").build(),
         CmdBuilder("get_relative_mode_status").escape("REL?").build(),
         CmdBuilder("get_relative_setpoint").escape("RELS?").build(),
-        CmdBuilder("set_relative_setpoint").escape("REL ").float().build(),
+        CmdBuilder("set_relative_setpoint").escape("RELS ").float().build(),
         CmdBuilder("get_relative_setpoint_multiplier").escape("RELSM?").build(),
         CmdBuilder("set_auto_mode_status").escape("AUTO ").arg("0|1").build(),
         CmdBuilder("get_auto_mode_status").escape("AUTO?").build(),
@@ -130,12 +130,10 @@ class Lakeshore460StreamInterface(StreamInterface):
         self._device.channels[self.get_channel()].filter_status = filter
 
     def set_relative_mode_status(self, rel_mode):
-        self.log.info("Setting channel {} rel mode to {}".format(self.get_channel(), rel_mode))
         self._device.channels[self.get_channel()].rel_mode_status = rel_mode
 
     def get_relative_mode_status(self):
         return_val = "{0}".format(self._device.channels[self.get_channel()].rel_mode_status)
-        self.log.info("Getting channel {} rel mode, value is{}".format(self.get_channel(), return_val))
         return return_val
 
     def set_auto_mode_status(self, auto_mode_status):

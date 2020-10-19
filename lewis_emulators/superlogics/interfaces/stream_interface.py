@@ -1,5 +1,11 @@
+from __future__ import print_function, absolute_import, division
 from lewis.adapters.stream import StreamInterface
 from lewis_emulators.utils.command_builder import CmdBuilder
+from lewis_emulators.utils.replies import conditional_reply
+
+if_connected = conditional_reply("connected")
+
+EXPECTED_ADDRESSES = ["01", "02"]
 
 
 class SuperlogicsStreamInterface(StreamInterface):
@@ -24,29 +30,31 @@ class SuperlogicsStreamInterface(StreamInterface):
             error: problem
 
         """
-        print "An error occurred at request " + repr(request) + ": " + repr(error)
+        print("An error occurred at request {}: {}".format(request, error))
 
+    @if_connected
     def get_values(self, address):
         """
         Gets the values from the device
 
         Returns: List of values, one for each connected channel
         """
-        if self._device.disconnected:
-            return None
+        if address not in EXPECTED_ADDRESSES:
+            raise ValueError("Invalid address '{}'".format(address))
 
         values = self._device.values_1 if address == "01" else self._device.values_2
         formatted_values = map(lambda s: "+{0:.2f}".format(s), values)
         return ",".join(formatted_values)
 
+    @if_connected
     def get_version(self, address):
         """
         Get the firmware version from the device
         :param address: the address to read the version from
         :return: string representing the firmware version for the address
         """
-        if self._device.disconnected:
-            return None
+        if address not in EXPECTED_ADDRESSES:
+            raise ValueError("Invalid address '{}'".format(address))
 
         version = self._device.version_1 if address == "01" else self._device.version_2
         return "!{0}{1}".format(address, version)

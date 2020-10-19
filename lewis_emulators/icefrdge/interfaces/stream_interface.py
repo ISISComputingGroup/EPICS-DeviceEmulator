@@ -6,6 +6,7 @@ from lewis_emulators.utils.replies import conditional_reply
 
 if_connected = conditional_reply("connected")
 
+
 @has_log
 class IceFridgeStreamInterface(StreamInterface):
 

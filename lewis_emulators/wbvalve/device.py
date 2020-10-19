@@ -1,5 +1,5 @@
 from collections import OrderedDict
-from states import DefaultState
+from .states import DefaultState
 from lewis.devices import StateMachineDevice
 
 
@@ -26,4 +26,3 @@ class SimulatedWbvalve(StateMachineDevice):
 
     def reset(self):
         self._initialize_data()
-

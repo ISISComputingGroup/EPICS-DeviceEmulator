@@ -1,5 +1,5 @@
-from ethernet_device import EthernetDevice
-from utilities import format_int
+from .ethernet_device import EthernetDevice
+from .utilities import format_int
 
 
 class HmiDevice(EthernetDevice):

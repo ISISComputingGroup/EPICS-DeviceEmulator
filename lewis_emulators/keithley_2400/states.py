@@ -8,6 +8,7 @@ class StaticRunningState(State):
     def in_state(self, dt):
         pass
 
+
 class DefaultRunningState(State):
     """
     The current and voltage measurements while in this state randomly fluctuate

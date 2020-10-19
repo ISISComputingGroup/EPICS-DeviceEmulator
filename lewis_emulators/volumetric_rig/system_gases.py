@@ -1,4 +1,4 @@
-from gas import Gas
+from .gas import Gas
 
 
 class SystemGases(object):

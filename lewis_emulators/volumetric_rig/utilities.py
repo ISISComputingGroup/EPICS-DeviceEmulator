@@ -14,10 +14,9 @@ def pad_string(s, length, padding_character):
 
 
 def convert_raw_to_int(raw):
-    from types import StringType, IntType
-    if type(raw) == IntType:
+    if type(raw) == int:
         return raw
-    elif type(raw) == StringType:
+    elif type(raw) == str:
         return int(raw.zfill(1))
     else:
         return 0

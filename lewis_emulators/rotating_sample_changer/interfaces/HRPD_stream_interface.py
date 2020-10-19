@@ -17,7 +17,8 @@ class HRPDSampleChangerStreamInterface(StreamInterface):
         Cmd("move_to", "^ma([0-9]{2})$", argument_mappings=[int]),
         Cmd("move_to_without_lowering", "^mn([0-9]{2})$", argument_mappings=[int]),
         Cmd("raise_arm", "^ra$"),
-        Cmd("read_variable", "^vr([0-9]{4})$", argument_mappings=[int])
+        Cmd("read_variable", "^vr([0-9]{4})$", argument_mappings=[int]),
+        Cmd("retrieve_sample", "^rt$"),
     }
 
     error_codes = {Errors.NO_ERR: 0,
@@ -87,6 +88,10 @@ class HRPDSampleChangerStreamInterface(StreamInterface):
     def raise_arm(self):
         return self._check_error_code(self._device.set_arm(False))
 
+    def retrieve_sample(self):
+        self._device.sample_retrieved = True
+        return "ok"
+
     def handle_error(self, request, error):
-        print "An error occurred at request " + repr(request) + ": " + repr(error)
+        print("An error occurred at request " + repr(request) + ": " + repr(error))
 

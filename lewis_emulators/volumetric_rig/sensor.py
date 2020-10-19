@@ -1,5 +1,5 @@
-from sensor_status import SensorStatus
-from utilities import format_float
+from .sensor_status import SensorStatus
+from .utilities import format_float
 
 
 class Sensor(object):

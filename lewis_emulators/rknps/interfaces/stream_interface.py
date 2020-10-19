@@ -9,6 +9,7 @@ if_connected = conditional_reply("connected")
 ILK_STRING = {True: "!", False: "."}
 PWR_STRING = {True: ".", False: "!"}
 
+
 @has_log
 class RknpsStreamInterface(StreamInterface):
     """

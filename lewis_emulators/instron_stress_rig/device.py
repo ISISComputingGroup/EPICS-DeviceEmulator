@@ -1,8 +1,8 @@
 from collections import OrderedDict
-from states import DefaultState, GoingToSetpointState, GeneratingWaveformState
+from .states import DefaultState, GoingToSetpointState, GeneratingWaveformState
 from lewis.devices import StateMachineDevice
-from channel import PositionChannel, StrainChannel, StressChannel
-from waveform_generator import WaveformGenerator
+from .channel import PositionChannel, StrainChannel, StressChannel
+from .waveform_generator import WaveformGenerator
 
 import time
 
@@ -188,37 +188,37 @@ class SimulatedInstron(StateMachineDevice):
         try:
             return self._waveform_generator.type[channel]
         except NameError:
-            print "Unable to get waveform generator type. Channel: {0}".format(channel)
+            print("Unable to get waveform generator type. Channel: {0}".format(channel))
 
     def set_waveform_type(self, channel, value):
         try:
             self._waveform_generator.type[channel] = value
         except NameError:
-            print "Unable to set waveform generator type. Channel: {0}, Value: {1}".format(channel, value)
+            print("Unable to set waveform generator type. Channel: {0}, Value: {1}".format(channel, value))
 
     def get_waveform_amplitude(self, channel):
         try:
             return self._waveform_generator.amplitude[channel]
         except NameError:
-            print "Unable to get waveform generator amplitude. Channel: {0}".format(channel)
+            print("Unable to get waveform generator amplitude. Channel: {0}".format(channel))
 
     def set_waveform_amplitude(self, channel, value):
         try:
             self._waveform_generator.amplitude[channel] = value
         except NameError:
-            print "Unable to set waveform generator amplitude. Channel: {0}, Value: {1}".format(channel, value)
+            print("Unable to set waveform generator amplitude. Channel: {0}, Value: {1}".format(channel, value))
 
     def get_waveform_frequency(self, channel):
         try:
             return self._waveform_generator.frequency[channel]
         except NameError:
-            print "Unable to get waveform generator frequency. Channel: {0}".format(channel)
+            print("Unable to get waveform generator frequency. Channel: {0}".format(channel))
 
     def set_waveform_frequency(self, channel, value):
         try:
             self._waveform_generator.frequency[channel] = value
         except NameError:
-            print "Unable to set waveform generator frequency. Channel: {0}, Value: {1}".format(channel, value)
+            print("Unable to set waveform generator frequency. Channel: {0}, Value: {1}".format(channel, value))
 
     def set_waveform_hold(self):
         self._waveform_generator.hold()

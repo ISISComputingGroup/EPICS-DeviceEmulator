@@ -1,7 +1,7 @@
 from collections import OrderedDict
-from states import DefaultState
+from .states import DefaultState
 from lewis.devices import StateMachineDevice
-from interfaces.stream_interface import Modes
+from .interfaces.stream_interface import Modes
 
 
 class SimulatedKeylkg(StateMachineDevice):

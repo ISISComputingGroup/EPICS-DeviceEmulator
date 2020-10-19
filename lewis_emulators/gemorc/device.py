@@ -1,5 +1,5 @@
 from collections import OrderedDict
-from states import StoppedState, OscillatingState, InitialisingState, IdleState, InitialisedState, ResetState
+from .states import StoppedState, OscillatingState, InitialisingState, IdleState, InitialisedState, ResetState
 from lewis.devices import StateMachineDevice
 
 

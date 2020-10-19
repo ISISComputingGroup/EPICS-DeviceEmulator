@@ -9,4 +9,3 @@ class DefaultState(State):
 
     def in_state(self, dt):
         pass
-

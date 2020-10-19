@@ -1,4 +1,4 @@
-from states import InitializingState, OffState, IdleState, RunState, HoldState, PurgeState, StandbyState
+from .states import InitializingState, OffState, IdleState, RunState, HoldState, PurgeState, StandbyState
 from lewis.devices import StateMachineDevice
 from collections import OrderedDict
 import time

@@ -214,7 +214,6 @@ class Sp2XXStreamInterface(StreamInterface):
         else:
             return "{}NA{}".format(self._return, self.get_run_status())
 
-
     @if_error
     @if_connected
     def get_diameter(self):
