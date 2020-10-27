@@ -93,14 +93,6 @@ class KepcoStreamInterface(StreamInterface):
 
     @if_connected
     def set_control_mode(self, mode):
-        raise NotImplementedError
-
-    @if_connected
-    def reset(self):
-        raise NotImplementedError
-
-    @if_connected
-    def set_control_mode(self, mode):
         if self._device.firmware <= 2.0:
             raise ValueError("No SYST:REM command available")
         else:
