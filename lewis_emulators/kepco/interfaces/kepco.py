@@ -1,7 +1,7 @@
 import six
-from lewis.adapters.stream import StreamInterface
 from lewis_emulators.utils.command_builder import CmdBuilder
 from lewis.core.logging import has_log
+from lewis.adapters.stream import StreamInterface
 
 from lewis_emulators.utils.replies import conditional_reply
 
@@ -36,6 +36,7 @@ class KepcoStreamInterface(StreamInterface):
         CmdBuilder("set_output_status").escape("OUTP ").arg("0|1").build(),
         CmdBuilder("get_IDN").escape("*IDN?").build(),
         CmdBuilder("set_control_mode").escape("SYST:REM ").arg("0|1").build(),
+        CmdBuilder("reset").escape("*RST").build()
     }
 
     def handle_error(self,request, error):
@@ -71,7 +72,7 @@ class KepcoStreamInterface(StreamInterface):
     @if_connected
     @needs_remote_mode
     def set_output_mode(self, mode):
-        self._device.output_mode = mode
+        self._device.output_mode = 0 if mode.startswith("CURR") else 1
 
     @if_connected
     def read_output_mode(self):
@@ -92,7 +93,14 @@ class KepcoStreamInterface(StreamInterface):
 
     @if_connected
     def set_control_mode(self, mode):
-        mode = int(mode)
-        if mode not in [0, 1]:
-            raise ValueError("Invalid mode in set_control_mode: {}".format(mode))
-        self._device.remote_comms_enabled = (mode == 1)
+        if self._device.firmware <= 2.0:
+            raise ValueError("No SYST:REM command available")
+        else:
+            mode = int(mode)
+            if mode not in [0, 1]:
+                raise ValueError("Invalid mode in set_control_mode: {}".format(mode))
+            self._device.remote_comms_enabled = (mode == 1)
+
+    @if_connected
+    def reset(self):
+        self._device.reset()

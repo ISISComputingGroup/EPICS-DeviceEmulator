@@ -12,16 +12,36 @@ class SimulatedKepco(StateMachineDevice):
         """
         Sets the initial state of the device.
         """
+        self.reset_count = 0
+        self._idn_no_firmware = "KEPCO,BOP 50-20,E1234,"
+        self._firmware = 2.6
+        self._init_data()
+
+    def _init_data(self):
+        """
+        Initialise device data.
+        """
+        self.voltage_set_count = 0
+        self.current_set_count = 0
         self._voltage = 10.0
         self._current = 10.0
         self._setpoint_voltage = 10.0
         self._setpoint_current = 10.0
+        self.output_mode_set_count = 0
+        self.output_status_set_count = 0
         self._output_mode = 0
         self._output_status = 0
-        self._idn = "000000000000000000000000000000000000000"
         self.connected = True
 
         self.remote_comms_enabled = True
+
+    def reset(self):
+        """
+        Reset the device, reinitialising the data.
+        :return:
+        """
+        self.reset_count += 1
+        self._init_data()
 
     def _get_state_handlers(self):
         """
@@ -44,17 +64,39 @@ class SimulatedKepco(StateMachineDevice):
     @property
     def idn(self):
         """
-        :return: IDN- Identificaiton String
+        :return: IDN- Identification String
         """
-        return self._idn
+        return self._idn_no_firmware + str(self._firmware)
 
-    @idn.setter
-    def idn(self, idn):
+    @property
+    def idn_no_firmware(self):
         """
-        :param idn:
-        :return: sets IDN- Identificaiton String
+        :return: IDN- Identification String
         """
-        self._idn = idn
+        return self._idn_no_firmware
+
+    @idn_no_firmware.setter
+    def idn_no_firmware(self, idn_no_firmware):
+        """
+        :param idn_no_firmware:
+        :return: sets IDN without the firmware- Identification String
+        """
+        self._idn_no_firmware = idn_no_firmware
+
+    @property
+    def firmware(self):
+        """
+        :return: IDN- Identification String
+        """
+        return self._firmware
+
+    @firmware.setter
+    def firmware(self, firmware):
+        """
+        :param firmware:
+        :return: sets the firmware of the device (part of the IDN)
+        """
+        self._firmware = firmware
 
     @property
     def voltage(self):
@@ -97,6 +139,7 @@ class SimulatedKepco(StateMachineDevice):
         :param setpoint_voltage: set the Setpoint Voltage
         :return:
         """
+        self.voltage_set_count += 1
         self._setpoint_voltage = setpoint_voltage
 
     @property
@@ -112,6 +155,7 @@ class SimulatedKepco(StateMachineDevice):
         :param setpoint_current: set the setpoint current
         :return:
         """
+        self.current_set_count += 1
         self._setpoint_current = setpoint_current
 
     @property
@@ -126,6 +170,7 @@ class SimulatedKepco(StateMachineDevice):
         """
         :param mode: Set output mode
         """
+        self.output_mode_set_count += 1
         self._output_mode = mode
 
     @property
@@ -140,7 +185,5 @@ class SimulatedKepco(StateMachineDevice):
         """
         :param status: set Output status
         """
+        self.output_status_set_count += 1
         self._output_status = status
-
-    def reset(self):
-        self._initialize_data()
