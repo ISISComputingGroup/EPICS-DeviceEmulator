@@ -3,24 +3,30 @@ from .states import DefaultState
 from collections import OrderedDict
 
 
-class SimulatedSmrtmon(StateMachineDevice):
+class SmrtmonValue:
+    def __init__(self, name):
+        self.name = name
+        self.stat = 0.0
+        self.lims = 0.0
+        self.oplm = 0.0
 
+
+class SimulatedSmrtmon(StateMachineDevice):
     def _initialize_data(self):
         """
         Initialize all of the device's attributes.
         """
-        self.stat1 = 0
-        self.oplm1 = 0
-        self.lims1 = 0
-
-    def get_stat1(self):
-        return self.stat1
-
-    def get_oplm1(self):
-        return self.oplm1
-
-    def get_lims1(self):
-        return self.lims1
+        self.temp1 = SmrtmonValue("TEMP1")
+        self.temp2 = SmrtmonValue("TEMP2")
+        self.temp3 = SmrtmonValue("TEMP3")
+        self.temp4 = SmrtmonValue("TEMP4")
+        self.temp5 = SmrtmonValue("TEMP5")
+        self.temp6 = SmrtmonValue("TEMP6")
+        self.volt1 = SmrtmonValue("VOLT1")
+        self.volt2 = SmrtmonValue("VOLT2")
+        self.volt3 = SmrtmonValue("VOLT3")
+        self.mi = 0
+        self.status = 0
 
     def _get_state_handlers(self):
         return {
