@@ -8,7 +8,7 @@ class SimulatedSmrtmon(StateMachineDevice):
         """
         Initialize all of the device's attributes.
         """
-        self._connected = True
+        self.connected = True
         self.stat = [0.0] * 11
         self.oplm = [0.0] * 9
         self.lims = [0.0] * 9
