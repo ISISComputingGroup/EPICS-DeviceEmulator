@@ -2,14 +2,15 @@ from lewis.devices import StateMachineDevice
 from .states import DefaultState
 from collections import OrderedDict
 
+
 class SimulatedSmrtmon(StateMachineDevice):
     def _initialize_data(self):
         """
         Initialize all of the device's attributes.
         """
-        self.stat = [0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0]
-        self.oplm = [0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0]
-        self.lims = [0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0]
+        self.stat = [0.0 for _ in range(0, 12)]
+        self.oplm = [0.0 for _ in range(0, 10)]
+        self.lims = [0.0 for _ in range(0, 10)]
 
     def set_stat(self, num_stat, stat_value):
         self.stat[num_stat] = stat_value
