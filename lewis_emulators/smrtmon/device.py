@@ -2,38 +2,14 @@ from lewis.devices import StateMachineDevice
 from .states import DefaultState
 from collections import OrderedDict
 
-
-class SmrtmonValue:
-    def __init__(self, name):
-        self.name = name
-        self._stat = 0.0
-        self.lims = 0.0
-        self.oplm = 0.0
-
-    @property
-    def stat(self):
-        """
-        Returns: the Setpoint Voltage
-        """
-        return self._stat
-
-    @stat.setter
-    def stat(self, stat):
-        """
-        :param setpoint_voltage: set the Setpoint Voltage
-        :return:
-        """
-        self._stat = stat
-
-
 class SimulatedSmrtmon(StateMachineDevice):
     def _initialize_data(self):
         """
         Initialize all of the device's attributes.
         """
-        self.stat = [0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0]
-        self.oplm = [0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0]
-        self.lims = [0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0]
+        self.stat = [0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0]
+        self.oplm = [0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0]
+        self.lims = [0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0]
 
     def set_stat(self, num_stat, stat_value):
         self.stat[num_stat] = stat_value
