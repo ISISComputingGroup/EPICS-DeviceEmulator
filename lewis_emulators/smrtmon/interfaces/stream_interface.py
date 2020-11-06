@@ -1,10 +1,11 @@
 from lewis.adapters.stream import StreamInterface
 from lewis_emulators.utils.command_builder import CmdBuilder
+from lewis_emulators.utils.replies import conditional_reply
 
+if_connected = conditional_reply("connected")
 
 def _split_command_output(command):
     return command.split(",")
-
 
 class SmrtmonStreamInterface(StreamInterface):
     # Commands that we expect via serial during normal operation
@@ -21,11 +22,14 @@ class SmrtmonStreamInterface(StreamInterface):
         print("An error occurred at request " + repr(request) + ": " + repr(error))
         return str(error)
 
+    @if_connected
     def get_stat(self):
         return "{},{},{},{},{},{},{},{},{},{},{}".format(*self._device.stat)
 
+    @if_connected
     def get_oplm(self):
         return "{},{},{},{},{},{},{},{},{}".format(*self._device.oplm)
 
+    @if_connected
     def get_lims(self):
         return "{},{},{},{},{},{},{},{},{}".format(*self._device.lims)
