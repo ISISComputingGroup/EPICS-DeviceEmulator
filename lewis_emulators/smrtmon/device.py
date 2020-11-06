@@ -6,9 +6,25 @@ from collections import OrderedDict
 class SmrtmonValue:
     def __init__(self, name):
         self.name = name
-        self.stat = 0.0
+        self._stat = 0.0
         self.lims = 0.0
         self.oplm = 0.0
+
+    @property
+    def stat(self):
+        """
+        Returns: the Setpoint Voltage
+        """
+        return self._stat
+
+    @stat.setter
+    def stat(self, stat):
+        """
+        :param setpoint_voltage: set the Setpoint Voltage
+        :return:
+        """
+        self._stat = stat
+
 
 
 class SimulatedSmrtmon(StateMachineDevice):
@@ -16,7 +32,7 @@ class SimulatedSmrtmon(StateMachineDevice):
         """
         Initialize all of the device's attributes.
         """
-        self.temp1 = SmrtmonValue("TEMP1")
+        self.temp1 = 0
         self.temp2 = SmrtmonValue("TEMP2")
         self.temp3 = SmrtmonValue("TEMP3")
         self.temp4 = SmrtmonValue("TEMP4")
@@ -39,3 +55,4 @@ class SimulatedSmrtmon(StateMachineDevice):
     def _get_transition_handlers(self):
         return OrderedDict([
         ])
+

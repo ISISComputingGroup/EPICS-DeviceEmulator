@@ -22,7 +22,7 @@ class SmrtmonStreamInterface(StreamInterface):
         return str(error)
 
     def get_stat(self):
-        return "{},{},{},{},{},{},{},{},{},{},{}".format(self._device.temp1.stat,
+        return "{},{},{},{},{},{},{},{},{},{},{}".format(self._device.temp1,
                                                          self._device.temp2.stat,
                                                          self._device.temp3.stat,
                                                          self._device.temp4.stat,
@@ -35,7 +35,7 @@ class SmrtmonStreamInterface(StreamInterface):
                                                          self._device.status)
 
     def get_oplm(self):
-        return "{},{},{},{},{},{},{},{},{}".format(self._device.temp1.oplm,
+        return "{},{},{},{},{},{},{},{},{}".format(self._device.temp1,
                                                    self._device.temp2.oplm,
                                                    self._device.temp3.oplm,
                                                    self._device.temp4.oplm,
@@ -46,7 +46,7 @@ class SmrtmonStreamInterface(StreamInterface):
                                                    self._device.volt3.oplm)
 
     def get_lims(self):
-        return "{},{},{},{},{},{},{},{},{}".format(self._device.temp1.lims,
+        return "{},{},{},{},{},{},{},{},{}".format(self._device.temp1,
                                                    self._device.temp2.lims,
                                                    self._device.temp3.lims,
                                                    self._device.temp4.lims,
