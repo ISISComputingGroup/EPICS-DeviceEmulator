@@ -10,8 +10,11 @@ class SimulatedSmrtmon(StateMachineDevice):
         """
         self.connected = True
         self.stat = [0.0] * 11
-        self.oplm = [0.0] * 9
-        self.lims = [0.0] * 9
+        self.oplm = [1.0] * 9
+        self.lims = [2.0] * 9
+
+    def reset_values(self):
+        self._initialize_data()
 
     def set_stat(self, num_stat, stat_value):
         self.stat[num_stat] = stat_value
