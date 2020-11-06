@@ -8,9 +8,9 @@ class SimulatedSmrtmon(StateMachineDevice):
         """
         Initialize all of the device's attributes.
         """
-        self.stat = [0.0 for _ in range(0, 12)]
-        self.oplm = [0.0 for _ in range(0, 10)]
-        self.lims = [0.0 for _ in range(0, 10)]
+        self.stat = [0.0] * 11
+        self.oplm = [0.0] * 9
+        self.lims = [0.0] * 9
 
     def set_stat(self, num_stat, stat_value):
         self.stat[num_stat] = stat_value
