@@ -26,23 +26,23 @@ class SmrtmonValue:
         self._stat = stat
 
 
-
 class SimulatedSmrtmon(StateMachineDevice):
     def _initialize_data(self):
         """
         Initialize all of the device's attributes.
         """
-        self.temp1 = 0
-        self.temp2 = SmrtmonValue("TEMP2")
-        self.temp3 = SmrtmonValue("TEMP3")
-        self.temp4 = SmrtmonValue("TEMP4")
-        self.temp5 = SmrtmonValue("TEMP5")
-        self.temp6 = SmrtmonValue("TEMP6")
-        self.volt1 = SmrtmonValue("VOLT1")
-        self.volt2 = SmrtmonValue("VOLT2")
-        self.volt3 = SmrtmonValue("VOLT3")
-        self.mi = 0
-        self.status = 0
+        self.stat = [0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0]
+        self.oplm = [0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0]
+        self.lims = [0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0]
+
+    def set_stat(self, num_stat, stat_value):
+        self.stat[num_stat] = stat_value
+
+    def set_oplm(self, num_oplm, oplm_value):
+        self.oplm[num_oplm] = oplm_value
+
+    def set_lims(self,num_lims, lims_value):
+        self.lims[num_lims] = lims_value
 
     def _get_state_handlers(self):
         return {

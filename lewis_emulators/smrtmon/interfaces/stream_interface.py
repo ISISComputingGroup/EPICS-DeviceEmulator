@@ -22,36 +22,10 @@ class SmrtmonStreamInterface(StreamInterface):
         return str(error)
 
     def get_stat(self):
-        return "{},{},{},{},{},{},{},{},{},{},{}".format(self._device.temp1,
-                                                         self._device.temp2.stat,
-                                                         self._device.temp3.stat,
-                                                         self._device.temp4.stat,
-                                                         self._device.temp5.stat,
-                                                         self._device.temp6.stat,
-                                                         self._device.volt1.stat,
-                                                         self._device.volt2.stat,
-                                                         self._device.volt3.stat,
-                                                         self._device.mi,
-                                                         self._device.status)
+        return "{},{},{},{},{},{},{},{},{},{},{}".format(*self._device.stat)
 
     def get_oplm(self):
-        return "{},{},{},{},{},{},{},{},{}".format(self._device.temp1,
-                                                   self._device.temp2.oplm,
-                                                   self._device.temp3.oplm,
-                                                   self._device.temp4.oplm,
-                                                   self._device.temp5.oplm,
-                                                   self._device.temp6.oplm,
-                                                   self._device.volt1.oplm,
-                                                   self._device.volt2.oplm,
-                                                   self._device.volt3.oplm)
+        return "{},{},{},{},{},{},{},{},{}".format(*self._device.oplm)
 
     def get_lims(self):
-        return "{},{},{},{},{},{},{},{},{}".format(self._device.temp1,
-                                                   self._device.temp2.lims,
-                                                   self._device.temp3.lims,
-                                                   self._device.temp4.lims,
-                                                   self._device.temp5.lims,
-                                                   self._device.temp6.lims,
-                                                   self._device.volt1.lims,
-                                                   self._device.volt2.lims,
-                                                   self._device.volt3.lims)
+        return "{},{},{},{},{},{},{},{},{}".format(*self._device.lims)
