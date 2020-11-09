@@ -212,7 +212,7 @@ class CRYOSMSStreamInterface(StreamInterface):
 
     def read_max_target(self):
         mode = self._get_output_mode_string()
-        return self._out_message("MAX SETTING: {:.4} {}".format(self._device.max_target, mode))
+        return self._out_message("MAX SETTING: {:.4} {}".format(float(self._device.max_target), mode))
 
     def write_max_target(self, max_target):
         self._device.max_target = abs(float(max_target))  # abs because PSU ignores sign
@@ -222,7 +222,7 @@ class CRYOSMSStreamInterface(StreamInterface):
 
     def read_mid_target(self):
         mode = self._get_output_mode_string()
-        return self._out_message("MID SETTING: {:.4} {}".format(self._device.mid_target, mode))
+        return self._out_message("MID SETTING: {:.4} {}".format(float(self._device.mid_target), mode))
 
     def write_mid_target(self, mid_target):
         self._device.mid_target = abs(float(mid_target))  # abs because PSU ignores sign
