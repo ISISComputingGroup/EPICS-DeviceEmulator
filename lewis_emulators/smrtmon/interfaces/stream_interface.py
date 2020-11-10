@@ -4,8 +4,6 @@ from lewis_emulators.utils.replies import conditional_reply
 
 if_connected = conditional_reply("connected")
 
-def _split_command_output(command):
-    return command.split(",")
 
 class SmrtmonStreamInterface(StreamInterface):
     # Commands that we expect via serial during normal operation
@@ -15,7 +13,6 @@ class SmrtmonStreamInterface(StreamInterface):
         CmdBuilder("get_lims").escape("LIMS").build(),
     }
     in_terminator = "\r"
-    # Out terminator is defined in ResponseBuilder instead as we need to add it to two messages.
     out_terminator = "\r"
 
     def handle_error(self, request, error):
