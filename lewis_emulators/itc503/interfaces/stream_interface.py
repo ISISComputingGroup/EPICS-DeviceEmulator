@@ -1,4 +1,4 @@
-from lewis.adapters.stream import StreamInterface, Cmd
+from lewis.adapters.stream import StreamInterface
 from lewis_emulators.utils.command_builder import CmdBuilder
 
 
