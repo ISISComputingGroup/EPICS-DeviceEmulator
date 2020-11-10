@@ -135,6 +135,7 @@ class SimulatedDanfysik(StateMachineDevice):
         """
         current = raw_sp / self.current_write_factor
         self.current = current
+        self.negative_polarity = (current < 0)
 
     def get_voltage(self):
         """
