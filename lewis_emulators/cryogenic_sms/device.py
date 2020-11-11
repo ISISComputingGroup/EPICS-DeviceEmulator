@@ -74,11 +74,13 @@ class SimulatedCRYOSMS(StateMachineDevice):
 
     def switch_mode(self, mode):
         if mode == "TESLA" and not self.is_output_mode_tesla:
+            # going from A to T
             self.output *= self.constant
             self.max_target *= self.constant
             self.mid_target *= self.constant
             self.is_output_mode_tesla = True
         elif mode == "AMPS" and self.is_output_mode_tesla:
+            # going from T to A
             self.output /= self.constant
             self.max_target /= self.constant
             self.mid_target /= self.constant
@@ -95,3 +97,15 @@ class SimulatedCRYOSMS(StateMachineDevice):
             return self.max_target
         elif self.ramp_target.name == "ZERO":
             return self.zero_target
+
+    def switch_direction(self, dir):
+        """
+        :param dir: output direction, can be -1, 0 or 1. If not one of these values, nothing happens
+        :return:
+        """
+        if dir == 0:
+            self.direction = RampDirection.ZERO
+        elif dir == 1:
+            self.direction = RampDirection.POSITIVE
+        elif dir == -1:
+            self.direction = RampDirection.NEGATIVE
