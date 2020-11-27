@@ -23,7 +23,7 @@ class CommonStreamInterface(object):
 
     commands = [
         CmdBuilder("get_voltage").escape("AD 2").eos().build(),
-        CmdBuilder("set_polarity").arg("\+|\-").eos().build(),
+        CmdBuilder("set_polarity").escape("PO ").arg("\+|\-").eos().build(),
         CmdBuilder("get_polarity").escape("PO").eos().build(),
         CmdBuilder("set_power_off").escape("F").eos().build(),
         CmdBuilder("set_power_on").escape("N").eos().build(),
