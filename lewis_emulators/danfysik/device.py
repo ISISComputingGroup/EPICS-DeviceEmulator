@@ -28,7 +28,7 @@ class SimulatedDanfysik(StateMachineDevice):
         self.field = 0
         self.field_sp = 0
 
-        self.absolute_current = 0
+        self.current = 0
         self.voltage = 0
         self.voltage_read_factor = 1
         self.current_read_factor = 1
@@ -85,7 +85,7 @@ class SimulatedDanfysik(StateMachineDevice):
         """
         Reset the device to the standard off configuration.
         """
-        self.absolute_current = 0
+        self.current = 0
         self.voltage = 0
         self.power = False
 
@@ -116,7 +116,7 @@ class SimulatedDanfysik(StateMachineDevice):
         Return:
              The readback value of current as raw value (parts per 100,000)
         """
-        raw_rbv = self.absolute_current / self.current_read_factor
+        raw_rbv = self.current / self.current_read_factor
         return raw_rbv
 
     def get_last_setpoint(self):
@@ -124,7 +124,7 @@ class SimulatedDanfysik(StateMachineDevice):
         Return:
              The setpoint readback value of current as raw value (parts per 1,000,000)
         """
-        raw_sp_rbv = self.absolute_current * self.current_write_factor
+        raw_sp_rbv = self.current * self.current_write_factor
         return raw_sp_rbv
 
     def set_current(self, raw_sp):
@@ -134,8 +134,7 @@ class SimulatedDanfysik(StateMachineDevice):
             raw_sp: The new value in raw (parts per 1,000,000)
         """
         current = raw_sp / self.current_write_factor
-        self.absolute_current = abs(current)
-        self.negative_polarity = (current < 0)
+        self.current = current
 
     def get_voltage(self):
         """
