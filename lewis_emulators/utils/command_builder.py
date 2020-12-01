@@ -6,6 +6,9 @@ import re
 from lewis.adapters.stream import Cmd, regex
 
 from lewis_emulators.utils.constants import STX, ACK, EOT, ETX, ENQ
+from functools import partial
+
+string_arg = partial(str, encoding="utf-8")
 
 
 class CmdBuilder(object):
@@ -92,7 +95,7 @@ class CmdBuilder(object):
         :return:  builder
         """
         self._add_to_regex("({})".format("|".join([re.escape(arg) for arg in allowed_values])), is_arg=True)
-        self.argument_mappings.append(str)
+        self.argument_mappings.append(string_arg)
         return self
 
     def spaces(self, at_least_one=False):
@@ -109,7 +112,7 @@ class CmdBuilder(object):
         self._add_to_regex(" " + wildcard, False)
         return self
 
-    def arg(self, arg_regex, argument_mapping=str):
+    def arg(self, arg_regex, argument_mapping=string_arg):
         """
         Add an argument to the command.
 

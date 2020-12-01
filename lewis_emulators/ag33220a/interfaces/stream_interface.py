@@ -1,4 +1,5 @@
 from lewis.adapters.stream import StreamInterface, Cmd
+from lewis_emulators.utils.command_builder import string_arg
 from lewis_emulators.utils.replies import conditional_reply
 import traceback
 
@@ -11,24 +12,24 @@ class AG33220AStreamInterface(StreamInterface):
 
     commands = {
         Cmd("get_amplitude", "^VOLT\?$"),
-        Cmd("set_amplitude", "^VOLT " + NUM_MIN_MAX, argument_mappings=[str]),
+        Cmd("set_amplitude", "^VOLT " + NUM_MIN_MAX, argument_mappings=[string_arg]),
         Cmd("get_frequency", "^FREQ\?$"),
-        Cmd("set_frequency", "^FREQ " + NUM_MIN_MAX, argument_mappings=[str]),
+        Cmd("set_frequency", "^FREQ " + NUM_MIN_MAX, argument_mappings=[string_arg]),
         Cmd("get_offset", "^VOLT:OFFS\?$"),
-        Cmd("set_offset", "^VOLT:OFFS " + NUM_MIN_MAX, argument_mappings=[str]),
+        Cmd("set_offset", "^VOLT:OFFS " + NUM_MIN_MAX, argument_mappings=[string_arg]),
         Cmd("get_units", "^VOLT:UNIT\?$"),
-        Cmd("set_units", "^VOLT:UNIT (VPP|VRMS|DBM)$", argument_mappings=[str]),
+        Cmd("set_units", "^VOLT:UNIT (VPP|VRMS|DBM)$", argument_mappings=[string_arg]),
         Cmd("get_function", "^FUNC\?$"),
-        Cmd("set_function", "^FUNC (SIN|SQU|RAMP|PULS|NOIS|DC|USER)$", argument_mappings=[str]),
+        Cmd("set_function", "^FUNC (SIN|SQU|RAMP|PULS|NOIS|DC|USER)$", argument_mappings=[string_arg]),
         Cmd("get_output", "^OUTP\?$"),
-        Cmd("set_output", "^OUTP (ON|OFF)$", argument_mappings=[str]),
+        Cmd("set_output", "^OUTP (ON|OFF)$", argument_mappings=[string_arg]),
         Cmd("get_idn", "^\*IDN\?$"),
         Cmd("get_voltage_high", "^VOLT:HIGH\?$"),
-        Cmd("set_voltage_high", "^VOLT:HIGH " + NUM_MIN_MAX, argument_mappings=[str]),
+        Cmd("set_voltage_high", "^VOLT:HIGH " + NUM_MIN_MAX, argument_mappings=[string_arg]),
         Cmd("get_voltage_low", "^VOLT:LOW\?$"),
-        Cmd("set_voltage_low", "^VOLT:LOW " + NUM_MIN_MAX, argument_mappings=[str]),
+        Cmd("set_voltage_low", "^VOLT:LOW " + NUM_MIN_MAX, argument_mappings=[string_arg]),
         Cmd("get_voltage_range_auto", "^VOLT:RANG:AUTO\?$"),
-        Cmd("set_voltage_range_auto", "^VOLT:RANG:AUTO (OFF|ON|ONCE)$", argument_mappings=[str]),
+        Cmd("set_voltage_range_auto", "^VOLT:RANG:AUTO (OFF|ON|ONCE)$", argument_mappings=[string_arg]),
     }
 
     in_terminator = "\n"

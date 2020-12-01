@@ -1,4 +1,6 @@
 from lewis.adapters.stream import StreamInterface, Cmd
+from lewis_emulators.utils.command_builder import CmdBuilder
+from lewis.core.logging import has_log
 from lewis_emulators.utils.replies import conditional_reply
 
 if_connected = conditional_reply("connected")
@@ -8,14 +10,15 @@ UNITS_COMM = "uiu"
 READING_COMM = "r"
 
 
+@has_log
 class CCD100StreamInterface(StreamInterface):
 
     commands = {
-        Cmd("get_sp", "^[a-h]" + SP_COMM + "\?$"),
-        Cmd("set_sp", "^([a-h])" + SP_COMM + " ([\-0-9.]+)$", argument_mappings=[str, float]),
-        Cmd("get_units", "^[a-h]" + UNITS_COMM + "\?$"),
-        Cmd("set_units", "^([a-h])" + UNITS_COMM + " ([a-z]+)$"),
-        Cmd("get_reading", "^[a-h]" + READING_COMM + "$"),
+        CmdBuilder("get_sp").char(ignore=True).escape(SP_COMM + "?").eos().build(),
+        CmdBuilder("set_sp").char().escape(SP_COMM + " ").float().eos().build(),
+        CmdBuilder("get_units").char(ignore=True).escape(UNITS_COMM + "?").eos().build(),
+        CmdBuilder("set_sp").char().escape(UNITS_COMM + " ").string().eos().build(),
+        CmdBuilder("get_reading").char(ignore=True).escape(READING_COMM).eos().build(),
     }
 
     in_terminator = "\r\n"
