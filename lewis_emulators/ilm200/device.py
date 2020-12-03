@@ -17,6 +17,9 @@ class SimulatedIlm200(StateMachineDevice):
         self.channels = {1: Channel(Channel.NITROGEN), 2: Channel(Channel.HELIUM), 3: Channel(Channel.HELIUM_CONT)}
         self.cycle = True  # Whether the device will continuously cycle through fill states
 
+        self.giving_intermittent_bad_replies = False
+        self.connected = True
+
     def _get_state_handlers(self):
         return {
             'default': DefaultState(),

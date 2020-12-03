@@ -1,6 +1,9 @@
 from lewis.adapters.stream import StreamInterface
 from lewis.core.logging import has_log
 from lewis_emulators.utils.command_builder import CmdBuilder
+from lewis_emulators.utils.replies import conditional_reply
+
+if_connected = conditional_reply("connected")
 
 
 @has_log
@@ -14,35 +17,53 @@ class Ilm200StreamInterface(StreamInterface):
         super(Ilm200StreamInterface, self).__init__()
         # All commands preceded by "@i" where i is the ISOBUS address. Has no impact on emulator so is ignored.
         self.commands = {
-            CmdBuilder(Ilm200StreamInterface.get_version).escape("@").int(ignore=True).escape("V").build(),
+            CmdBuilder(self.get_version).escape("@").int(ignore=True).escape("V").build(),
             CmdBuilder(self.get_status).escape("@").int(ignore=True).escape("X").build(),
             CmdBuilder(self.get_level).escape("@").int(ignore=True).escape("R").int().build(),
             CmdBuilder(self.set_rate_slow).escape("@").int(ignore=True).escape("S").int().build(),
             CmdBuilder(self.set_rate_fast).escape("@").int(ignore=True).escape("T").int().build(),
-            CmdBuilder(Ilm200StreamInterface.set_remote_unlocked).escape("@").int(ignore=True).escape("C3").build(),
+            CmdBuilder(self.set_remote_unlocked).escape("@").int(ignore=True).escape("C3").build(),
         }
+
+        self.get_level_counter = 0
 
     def handle_error(self, request, error):
         print("An error occurred at request " + repr(request) + ": " + repr(error))
         return str(error)
 
-    @staticmethod
-    def get_version():
+    @if_connected
+    def get_version(self):
         return "VILM200_EMULATED"
 
-    @staticmethod
-    def set_remote_unlocked():
+    @if_connected
+    def set_remote_unlocked(self):
         return "C"  # Does nothing in emulator land
 
+    @if_connected
     def set_rate_slow(self, channel):
         self._device.set_fill_rate(channel=int(channel), fast=False)
         return "S"
 
+    @if_connected
     def set_rate_fast(self, channel):
         self._device.set_fill_rate(channel=int(channel), fast=True)
         return "T"
 
+    @if_connected
     def get_level(self, channel):
+        self.get_level_counter += 1
+
+        self.log.info("bad replies = {} ({}), counter = {}".format(self.device.giving_intermittent_bad_replies, self.device.giving_intermittent_bad_replies.__class__.__name__, self.get_level_counter))
+
+        # Error every 5 messages, i.e. when get_level_counter % 5 == 0
+        # Don't want to error every other message as this might "beat" with the ioc's scan and cause e.g. channel 1 to
+        # always fail and channel 2 to never fail.
+        if self.device.giving_intermittent_bad_replies and self.get_level_counter % 5 == 0:
+            # When device is giving intermittent comms errors, we get the reply to the get_status command when we have
+            # actually asked for get_level
+            self.log.info("Responding with incorrect response to get_level (giving bad replies)")
+            return self.get_status()
+
         return "R{}".format(int(self._device.get_level(channel=int(channel))*10))
 
     def _get_channel_status(self, channel_number):
@@ -67,6 +88,7 @@ class Ilm200StreamInterface(StreamInterface):
     def _get_logic_status():
         return 0  # Describes the state of the ILM relay. Not currently used in IOC
 
+    @if_connected
     def get_status(self):
         d = self._device
         # "XabcSuuvvwwRxyz" : Described fully in ILM 200 manual section 8.2
