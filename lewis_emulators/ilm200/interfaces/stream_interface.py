@@ -28,7 +28,7 @@ class Ilm200StreamInterface(StreamInterface):
 
     @staticmethod
     def get_version():
-        return "VILM200_EMULATED"
+        return "ILM200_EMULATED"
 
     @staticmethod
     def set_remote_unlocked():
@@ -51,8 +51,8 @@ class Ilm200StreamInterface(StreamInterface):
         #  A full description of these bits can be found in the IOC or the manual
         bits = (
             channel.has_helium_current(),
-            channel.is_fill_rate_fast(),
-            not channel.is_fill_rate_fast(),
+            0 if channel.get_cryo_type() == channel.NOT_IN_USE else channel.is_fill_rate_fast(),
+            0 if channel.get_cryo_type() == channel.NOT_IN_USE else not channel.is_fill_rate_fast(),
             not channel.is_filling() or channel.start_filling(),
             channel.is_filling() or channel.start_filling(),
             channel.is_level_low(),
