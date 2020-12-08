@@ -41,6 +41,9 @@ class SimulatedIlm200(StateMachineDevice):
     def get_cryo_type(self, channel):
         return self.channels[channel].get_cryo_type()
 
+    def set_cryo_type(self, channel, cryo_type):
+        self.channels[channel].cryo_type = cryo_type
+
     def set_level(self, channel, level):
         self.channels[channel].level = level
 
