@@ -1,6 +1,5 @@
-from lewis.adapters.stream import StreamInterface, Cmd
-from .common_interface_utils import HEX_LEN_4, HEX_LEN_2
-from lewis_emulators.utils.command_builder import CmdBuilder
+from lewis.adapters.stream import StreamInterface
+from .common_interface_utils import COMMANDS
 from lewis.core.logging import has_log
 
 from ..device import ChopperParameters
@@ -51,16 +50,9 @@ class FermichopperStreamInterface(StreamInterface):
 
     protocol = "fermi_merlin"
 
-    commands = {
-        CmdBuilder("get_all_data").escape("#00000").arg(HEX_LEN_2).escape("$").build(),
-        CmdBuilder("execute_command").escape("#1").arg(HEX_LEN_4).arg(HEX_LEN_2).escape("$").build(),
-        CmdBuilder("set_speed").escape("#3").arg(HEX_LEN_4).arg(HEX_LEN_2).escape("$").build(),
-        CmdBuilder("set_delay_highword").escape("#6").arg(HEX_LEN_4).arg(HEX_LEN_2).escape("$").build(),
-        CmdBuilder("set_delay_lowword").escape("#5").arg(HEX_LEN_4).arg(HEX_LEN_2).escape("$").build(),
-        CmdBuilder("set_gate_width").escape("#9").arg(HEX_LEN_4).arg(HEX_LEN_2).escape("$").build(),
-    }
+    commands = COMMANDS
 
-    in_terminator = "\n"
+    in_terminator = "$\n"
     out_terminator = "\n"
 
     def build_status_code(self):

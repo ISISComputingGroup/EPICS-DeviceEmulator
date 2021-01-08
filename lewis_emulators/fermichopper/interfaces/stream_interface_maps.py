@@ -1,7 +1,6 @@
 from lewis.adapters.stream import StreamInterface
-from lewis_emulators.utils.command_builder import CmdBuilder
 from lewis.core.logging import has_log
-from .common_interface_utils import HEX_LEN_2, HEX_LEN_4
+from .common_interface_utils import COMMANDS
 
 from ..device import ChopperParameters
 
@@ -52,14 +51,7 @@ class FermichopperStreamInterface(StreamInterface):
 
     protocol = "fermi_maps"
 
-    commands = {
-        CmdBuilder("get_all_data").escape("#00000").arg(HEX_LEN_2).build(),
-        CmdBuilder("execute_command").escape("#1").arg(HEX_LEN_4).arg(HEX_LEN_2).build(),
-        CmdBuilder("set_speed").escape("#3").arg(HEX_LEN_4).arg(HEX_LEN_2).build(),
-        CmdBuilder("set_delay_highword").escape("#6").arg(HEX_LEN_4).arg(HEX_LEN_2).build(),
-        CmdBuilder("set_delay_lowword").escape("#5").arg(HEX_LEN_4).arg(HEX_LEN_2).build(),
-        CmdBuilder("set_gate_width").escape("#9").arg(HEX_LEN_4).arg(HEX_LEN_2).build(),
-    }
+    commands = COMMANDS
 
     in_terminator = "$"
     out_terminator = ""
