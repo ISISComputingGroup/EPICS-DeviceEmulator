@@ -1,13 +1,13 @@
 from lewis.adapters.stream import StreamInterface
 from lewis_emulators.utils.command_builder import CmdBuilder
 from lewis.core.logging import has_log
+from .common_interface_utils import HEX_LEN_2, HEX_LEN_4
 
 from ..device import ChopperParameters
 
 
 TIMING_FREQ_MHZ = 18.0
-HEX_LEN_2 = "[0-9A-F]{2}"
-HEX_LEN_4 = "[0-9A-F]{4}"
+
 
 class JulichChecksum(object):
 

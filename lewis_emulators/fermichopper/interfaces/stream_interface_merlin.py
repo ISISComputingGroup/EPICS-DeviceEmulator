@@ -1,7 +1,9 @@
 from lewis.adapters.stream import StreamInterface, Cmd
+from .common_interface_utils import HEX_LEN_4, HEX_LEN_2
+from lewis_emulators.utils.command_builder import CmdBuilder
+from lewis.core.logging import has_log
 
 from ..device import ChopperParameters
-
 
 TIMING_FREQ_MHZ = 50.4
 
@@ -44,27 +46,22 @@ class JulichChecksum(object):
         return data + JulichChecksum._calculate(data)
 
 
+@has_log
 class FermichopperStreamInterface(StreamInterface):
 
     protocol = "fermi_merlin"
 
-    # Commands that we expect via serial during normal operation
     commands = {
-        Cmd("get_all_data", "^#00000([0-9A-F]{2})\$$"),
-        Cmd("execute_command", "^#1([0-9A-F]{4})([0-9A-F]{2})\$$"),
-        Cmd("set_speed", "^#3([0-9A-F]{4})([0-9A-F]{2})\$$"),
-        Cmd("set_delay_highword", "^#6([0-9A-F]{4})([0-9A-F]{2})\$$"),
-        Cmd("set_delay_lowword", "^#5([0-9A-F]{4})([0-9A-F]{2})\$$"),
-        Cmd("set_gate_width", "^#9([0-9A-F]{4})([0-9A-F]{2})\$$"),
-        # Cmd("catch_all", "^#9.*$"), # Catch-all command for debugging
+        CmdBuilder("get_all_data").escape("#00000").arg(HEX_LEN_2).escape("$").build(),
+        CmdBuilder("execute_command").escape("#1").arg(HEX_LEN_4).arg(HEX_LEN_2).escape("$").build(),
+        CmdBuilder("set_speed").escape("#3").arg(HEX_LEN_4).arg(HEX_LEN_2).escape("$").build(),
+        CmdBuilder("set_delay_highword").escape("#6").arg(HEX_LEN_4).arg(HEX_LEN_2).escape("$").build(),
+        CmdBuilder("set_delay_lowword").escape("#5").arg(HEX_LEN_4).arg(HEX_LEN_2).escape("$").build(),
+        CmdBuilder("set_gate_width").escape("#9").arg(HEX_LEN_4).arg(HEX_LEN_2).escape("$").build(),
     }
 
     in_terminator = "\n"
     out_terminator = "\n"
-
-    # Catch all command for debugging if the IOC sends strange characters in the checksum.
-    # def catch_all(self):
-    #    pass
 
     def build_status_code(self):
         status = 0
@@ -98,7 +95,7 @@ class FermichopperStreamInterface(StreamInterface):
         return status
 
     def handle_error(self, request, error):
-        print("An error occurred at request " + repr(request) + ": " + repr(error))
+        self.log.error("An error occurred at request " + repr(request) + ": " + repr(error))
         return str(error)
 
     def get_all_data(self, checksum):
@@ -112,7 +109,7 @@ class FermichopperStreamInterface(StreamInterface):
             + JulichChecksum.append(
                 "#2{:04X}".format(self.build_status_code())) \
             + JulichChecksum.append(
-                "#3000{:01X}".format(12 - (self._device.get_speed_setpoint() / 50))) \
+                "#3000{:01X}".format(int(round(12 - (self._device.get_speed_setpoint() / 50))))) \
             + JulichChecksum.append(
                 "#4{:04X}".format(int(round(self._device.get_true_speed() * 60)))) \
             + JulichChecksum.append(
