@@ -28,6 +28,7 @@ class SimulatedLakeshore340(StateMachineDevice):
         self.max_temp = 0
         self.heater_output = 0
         self.heater_range = 0
+        self.excitations = 0
 
     def _get_state_handlers(self):
         return {'default': DefaultState()}

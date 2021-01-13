@@ -44,6 +44,9 @@ class Lakeshore340StreamInterface(StreamInterface):
 
         CmdBuilder("set_heater_range").escape("RANGE ").int().eos().build(),
         CmdBuilder("get_heater_range").escape("RANGE?").eos().build(),
+
+        CmdBuilder("get_excitation").escape("INTYPE?").eos().build(),
+        CmdBuilder("set_excitation").escape("INTYPE ").char().escape(", ").int().escape(", , , ").int().eos().build(),
     }
 
     in_terminator = "\r\n"
@@ -121,3 +124,11 @@ class Lakeshore340StreamInterface(StreamInterface):
         if not 0 <= val <= 5:
             raise ValueError("Heater range must be 0-5")
         self._device.heater_range = val
+
+    def get_excitation(self):
+        return self._device.excitations
+
+    def set_excitation(self, val):
+        if not 0 <= val <= 12:
+            raise ValueError("Excitations range must be 0-12")
+        self._device.excitations = val
