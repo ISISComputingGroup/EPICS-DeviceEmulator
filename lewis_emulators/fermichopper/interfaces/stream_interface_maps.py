@@ -1,4 +1,6 @@
-from lewis.adapters.stream import StreamInterface, Cmd
+from lewis.adapters.stream import StreamInterface
+from lewis.core.logging import has_log
+from .common_interface_utils import COMMANDS
 
 from ..device import ChopperParameters
 
@@ -31,7 +33,7 @@ class JulichChecksum(object):
         assert len(header) == 2, "Header should have length 2"
         assert len(data) == 4, "Data should have length 4"
         assert len(actual_checksum) == 2, "Actual checksum should have length 2"
-        assert JulichChecksum._calculate(list(header) + list(data)) == actual_checksum, "Checksum did not match"
+        assert JulichChecksum._calculate(header + data) == actual_checksum, "Checksum did not match"
 
     @staticmethod
     def append(data):
@@ -44,27 +46,15 @@ class JulichChecksum(object):
         return data + JulichChecksum._calculate(data)
 
 
+@has_log
 class FermichopperStreamInterface(StreamInterface):
 
     protocol = "fermi_maps"
 
-    # Commands that we expect via serial during normal operation
-    commands = {
-        Cmd("get_all_data", "^#00000([0-9A-F]{2})$"),
-        Cmd("execute_command", "^#1([0-9A-F]{4})([0-9A-F]{2})$"),
-        Cmd("set_speed", "^#3([0-9A-F]{4})([0-9A-F]{2})$"),
-        Cmd("set_delay_highword", "^#6([0-9A-F]{4})([0-9A-F]{2})$"),
-        Cmd("set_delay_lowword", "^#5([0-9A-F]{4})([0-9A-F]{2})$"),
-        Cmd("set_gate_width", "^#9([0-9A-F]{4})([0-9A-F]{2})$"),
-        # Cmd("catch_all", "^#9.*$"), # Catch-all command for debugging
-    }
+    commands = COMMANDS
 
     in_terminator = "$"
     out_terminator = ""
-
-    # Catch all command for debugging if the IOC sends strange characters in the checksum.
-    # def catch_all(self):
-    #    pass
 
     def build_status_code(self):
         status = 0
@@ -98,7 +88,7 @@ class FermichopperStreamInterface(StreamInterface):
         return status
 
     def handle_error(self, request, error):
-        print("An error occurred at request " + repr(request) + ": " + repr(error))
+        self.log.error("An error occurred at request " + repr(request) + ": " + repr(error))
         return str(error)
 
     def get_all_data(self, checksum):
@@ -112,7 +102,7 @@ class FermichopperStreamInterface(StreamInterface):
             + JulichChecksum.append(
                 "#2{:04X}".format(self.build_status_code())) \
             + JulichChecksum.append(
-                "#3{:04X}".format(self._device.get_speed_setpoint() * 60)) \
+                "#3{:04X}".format(int(round(self._device.get_speed_setpoint() * 60)))) \
             + JulichChecksum.append(
                 "#4{:04X}".format(int(round(self._device.get_true_speed() * 60)))) \
             + JulichChecksum.append(

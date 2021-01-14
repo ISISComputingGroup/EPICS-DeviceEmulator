@@ -102,7 +102,9 @@ class FZJDDFCHStreamInterface(StreamInterface):
         if self._device.disconnected:
             return None
         if self._device.error_on_set_magnetic_bearing is None:
-            self._device.magnetic_bearing_is_on = ON_OFF.keys()[ON_OFF.values().index(magnetic_bearing)]
+            # Lookup the bool representation of the string
+            inverted_on_off_dict = {str_val: bool_val for (bool_val, str_val) in ON_OFF.items()}
+            self._device.magnetic_bearing_is_on = inverted_on_off_dict[magnetic_bearing]
             reply = "{chopper_name}OK".format(chopper_name=chopper_name)
         else:
             reply = "ERROR;{}".format(self._device.error_on_set_magnetic_bearing)
@@ -125,7 +127,9 @@ class FZJDDFCHStreamInterface(StreamInterface):
         if self._device.disconnected:
             return None
         if self._device.error_on_set_drive_mode is None:
-            self._device.drive_mode_is_start = START_STOP.keys()[START_STOP.values().index(drive_mode)]
+            # Lookup the bool representation of the string
+            inverted_start_stop_dict = {str_val: bool_val for (bool_val, str_val) in START_STOP.items()}
+            self._device.drive_mode_is_start = inverted_start_stop_dict[drive_mode]
             reply = "{chopper_name}OK".format(chopper_name=chopper_name)
         else:
             reply = "ERROR;{}".format(self._device.error_on_set_drive_mode)
@@ -168,7 +172,7 @@ class FZJDDFCHStreamInterface(StreamInterface):
             "{0:3s}".format(device.chopper_name),
             "ASTA?",  # device echoes command
             "{0:3s}".format(device.chopper_name),
-            "{0:2d}".format(device.frequency_setpoint / device.frequency_reference),  # multiplier of reference frequency
+            "{0:2d}".format(device.frequency_setpoint // device.frequency_reference),  # multiplier of reference frequency
             "{0:.2f}".format(device.frequency_setpoint),
             "{0:.2f}".format(device.frequency),
             "{0:.1f}".format(device.phase_setpoint),
