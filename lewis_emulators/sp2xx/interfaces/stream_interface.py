@@ -4,7 +4,7 @@ Stream interface for the SP2xx device.
 from lewis.adapters.stream import StreamInterface
 from lewis.core.logging import has_log
 
-from lewis_emulators.utils.command_builder import CmdBuilder
+from lewis_emulators.utils.command_builder import CmdBuilder, string_arg
 from lewis_emulators.utils.replies import conditional_reply
 
 from ..util_classes import RunStatus
@@ -59,7 +59,7 @@ class Sp2XXStreamInterface(StreamInterface):
             CmdBuilder(self.get_diameter).escape("dia?").eos().build(),
             CmdBuilder(self.set_diameter).escape("dia ").float().eos().build(),
             CmdBuilder(
-                self.set_volume_or_rate).arg("vol|rate").char().escape(" ").float(str).escape(" ").string().eos().build(),
+                self.set_volume_or_rate).arg("vol|rate").char().escape(" ").float(string_arg).escape(" ").string().eos().build(),
             CmdBuilder(self.get_volume_or_rate).arg("vol|rate").char().escape("?").eos().build()
         }
 
