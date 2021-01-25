@@ -129,6 +129,6 @@ class Lakeshore340StreamInterface(StreamInterface):
         return self._device.excitationa
 
     def set_excitation_a(self, val):
-        if not 0 <= val <= 12:
-            raise ValueError("Excitations range must be 0-12")
+        if not 0 <= val <= 11:
+            raise ValueError("Excitations range must be 0-11")
         self._device.excitationa = val
