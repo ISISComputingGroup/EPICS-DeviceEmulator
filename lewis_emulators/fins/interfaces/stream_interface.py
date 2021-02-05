@@ -11,7 +11,7 @@ class FinsPLCStreamInterface(StreamInterface):
 
     # Commands that we expect via serial during normal operation. Match anything!
     commands = {
-        Cmd("any_command", "^([\s\S]*)$", return_mapping=lambda x: x),
+        Cmd("any_command", r"^([\s\S]*)$", return_mapping=lambda x: x),
     }
 
     in_terminator = ""

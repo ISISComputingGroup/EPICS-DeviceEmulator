@@ -12,11 +12,11 @@ class SkfMb350ChopperStreamInterface(StreamInterface):
 
     # Commands that we expect via serial during normal operation. Match anything!
     commands = {
-        Cmd("any_command", "^([\s\S]*)$"),
+        Cmd("any_command", r"^([\s\S]*)$", return_mapping=lambda x: x),
     }
 
     in_terminator = "\r\n"
-    out_terminator = in_terminator
+    out_terminator = b""
 
     def handle_error(self, request, error):
         error_message = "An error occurred at request " + repr(request) + ": " + repr(error)
@@ -38,15 +38,15 @@ class SkfMb350ChopperStreamInterface(StreamInterface):
             0xC0: self.get_phase_info,
         }
 
-        address = ord(command[0])
+        address = command[0]
         if not 0 <= address < 16:
             raise ValueError("Address should be in range 0-15")
 
         # Constant function code. Should always be 0x80
-        if ord(command[1]) != 0x80:
+        if command[1] != 0x80:
             raise ValueError("Function code should always be 0x80")
 
-        command_number = ord(command[2])
+        command_number = command[2]
         if command_number not in command_mapping.keys():
             raise ValueError("Command number should be in map")
 

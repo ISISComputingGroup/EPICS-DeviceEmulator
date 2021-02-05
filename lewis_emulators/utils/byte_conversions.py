@@ -1,5 +1,7 @@
 import struct
 
+BYTE = 2**8
+
 
 def _get_byteorder_name(low_byte_first):
     """
