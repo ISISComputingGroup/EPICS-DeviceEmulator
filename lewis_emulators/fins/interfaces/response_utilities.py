@@ -7,12 +7,15 @@ def check_is_byte(character):
     Checks if the given character can represent a byte. Raises an error of it can not, otherwise returns nothing.
 
     Args:
-        character (string): A one character string.
+        character (string|byte): A one character string.
 
     Returns:
         None.
     """
-    number = ord(character)
+    try:
+        number = ord(character)
+    except TypeError:
+        number = int(character)
     if 0 > number > 255:
         raise ValueError("the character in the string must represent a byte value")
 
@@ -38,7 +41,7 @@ def dm_memory_area_read_response_fins_frame(device, client_network_address, clie
         number_of_words_to_read (int): The number of words to be read, starting from the start address, inclusive.
 
     Returns:
-        string: the response.
+        bytes: the response.
     """
     # The length argument asks for number of bytes, and each word has two bytes
     fins_reply = FinsResponseBuilder() \
@@ -120,7 +123,7 @@ class FinsResponseBuilder(object):
     """
 
     def __init__(self):
-        self.response = ""
+        self.response = bytearray()
 
     def add_int(self, value, length):
         """
@@ -207,4 +210,4 @@ class FinsResponseBuilder(object):
             FinsResponseBuilder: The response builder.
         """
 
-        return self.response
+        return bytes(self.response)

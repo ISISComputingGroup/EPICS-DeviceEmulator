@@ -11,11 +11,11 @@ class FinsPLCStreamInterface(StreamInterface):
 
     # Commands that we expect via serial during normal operation. Match anything!
     commands = {
-        Cmd("any_command", "^([\s\S]*)$"),
+        Cmd("any_command", r"^([\s\S]*)$", return_mapping=lambda x: x),
     }
 
     in_terminator = ""
-    out_terminator = in_terminator
+    out_terminator = b""
 
     do_log = True
 
@@ -32,29 +32,29 @@ class FinsPLCStreamInterface(StreamInterface):
         command.
         
         Args:
-            command (string): A string where every character represents a byte from the received FINS command frame.
+            command (bytes): A string where every character represents a byte from the received FINS command frame.
 
         Returns:
-            string: a string where each character represents a byte from the FINS response frame.
+            bytes: a string where each character represents a byte from the FINS response frame.
         """
         self._log_fins_frame(command, False)
 
         self._check_fins_frame_header_validity(command[:10])
 
         # We extract information necessary for building the FINS response header
-        self.device.network_address = ord(command[3])
-        self.device.unit_address = ord(command[5])
+        self.device.network_address = command[3]
+        self.device.unit_address = command[5]
 
-        client_network_address = ord(command[6])
-        client_node_address = ord(command[7])
-        client_unit_address = ord(command[8])
+        client_network_address = command[6]
+        client_node_address = command[7]
+        client_unit_address = command[8]
 
-        service_id = ord(command[9])
+        service_id = command[9]
 
-        if ord(command[10]) != 0x01 or ord(command[11]) != 0x01:
+        if command[10] != 0x01 or command[11] != 0x01:
             raise ValueError("The command code should be 0x0101, for memory area read command!")
 
-        if ord(command[12]) != 0x82:
+        if command[12] != 0x82:
             raise ValueError("The emulator only supports reading words from the DM area, for which the code is 82.")
 
         # the address of the starting word from where reading is done. Addresses are stored in two bytes.
@@ -63,7 +63,7 @@ class FinsPLCStreamInterface(StreamInterface):
         # The FINS PLC supports reading either a certain number of words, or can also read individual bits in a word.
         # The helium recovery memory map implies that that PLC uses word designated reading. When bit designated
         # reading is not used, the 16th byte of the command is 0x00.
-        if ord(command[15]) != 0x00:
+        if command[15] != 0x00:
             raise ValueError("The emulator only supports word designated memory reading. The bit address must "
                              "be 0x00.")
 
@@ -100,14 +100,14 @@ class FinsPLCStreamInterface(StreamInterface):
         Nicely displays every byte in the command as a hexadecimal number in the emulator log.
 
         Args:
-            fins_frame (string): The fins frame we want to log.
+            fins_frame (bytes): The fins frame we want to log.
             is_reply (bool): Whether we want to log the reply or the command.
 
         Returns:
             None.
         """
         if self.do_log:
-            hex_command = [hex(ord(character)) for character in fins_frame]
+            hex_command = [hex(character) for character in fins_frame]
 
             if not is_reply:
                 self.log.info("command is {}".format(hex_command))
@@ -147,7 +147,7 @@ class FinsPLCStreamInterface(StreamInterface):
         (PLC).
 
         Args:
-            fins_frame_header (string): A string where every character represents a byte from the received FINS frame
+            fins_frame_header (bytes): A string where every character represents a byte from the received FINS frame
                 header.
 
         Returns:
@@ -155,20 +155,20 @@ class FinsPLCStreamInterface(StreamInterface):
         """
         # ICF means Information Control Field, it gives information about if the frame is for a command or a response,
         # and if a response is needed or not.
-        icf = ord(fins_frame_header[0])
+        icf = fins_frame_header[0]
         if icf != 0x80:
             raise ValueError("ICF value should always be 0x80 for a command sent to the emulator")
 
         # Reserved byte. Should always be 0x00
-        if ord(fins_frame_header[1]) != 0x00:
+        if fins_frame_header[1] != 0x00:
             raise ValueError("Reserved byte should always be 0x00.")
 
-        if ord(fins_frame_header[2]) != 0x02:
+        if fins_frame_header[2] != 0x02:
             raise ValueError("Gate count should always be 0x02.")
 
         check_is_byte(fins_frame_header[3])
 
-        if ord(fins_frame_header[4]) != SimulatedFinsPLC.HELIUM_RECOVERY_NODE:
+        if fins_frame_header[4] != SimulatedFinsPLC.HELIUM_RECOVERY_NODE:
             raise ValueError("The node address of the FINS helium recovery PLC should be {}!".format(
                 SimulatedFinsPLC.HELIUM_RECOVERY_NODE))
 
