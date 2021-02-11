@@ -53,7 +53,7 @@ class SimulatedKnr1050(StateMachineDevice):
 
     @property
     def state_num(self):
-        return states.keys().index(self.state)
+        return list(states.keys()).index(self.state)
 
     @property
     def state(self):
