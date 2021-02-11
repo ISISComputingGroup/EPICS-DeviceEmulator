@@ -188,6 +188,7 @@ class Lakeshore460StreamInterface(StreamInterface):
         """
         replies = []
         for cmd_to_find in [command, other_commands]:
+            cmd_to_find = bytes(cmd_to_find, "utf-8")
             self.log.info("Processing {} from combined command".format(cmd_to_find))
             reply = self._process_part_command(cmd_to_find)
             if reply is not None:
