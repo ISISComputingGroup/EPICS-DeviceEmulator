@@ -1,11 +1,12 @@
 from collections import OrderedDict
-from typing import Dict
+from typing import Dict, Optional
 from contextlib import contextmanager
 from lewis.core.logging import has_log
 
 from lewis.devices import StateMachineDevice
 from .states import DefaultState
 
+# Must match those in test
 itc_names = ["SORB", "1KPOT", "HE3POT_LOWT", "HE3POT_HIGHT"]
 isobus_addresses = {f"{name}_ISOBUS": i for i, name in enumerate(itc_names)}
 channels = {f"{name}_CHANNEL": i for i, name in enumerate(itc_names)}
@@ -18,9 +19,37 @@ class SimulatedITC503:
     Simulated ITC503 for the HLX503.
     """
 
-    def __init__(self, channel):
-        self.channel = channel
-        self.temp = 1.0
+    def __init__(self, channel: int):
+        self.channel: int = channel
+        self.temp: float = 0.0
+        self.reset_status()
+
+    def reset_status(self):
+        self.status: int = 0
+        self.autoheat: int = 0
+        self.autoneedlevalve: int = 0
+        self.initneedlevalve: int = 0
+        self.remote: int = 0
+        self.locked: int = 0
+        self.sweeping: int = 0
+        self.ctrlchannel: Optional[int] = None
+        self.autopid: Optional[bool] = None
+        self.tuning: Optional[bool] = None
+
+    def set_autoheat(self, autoheat: bool):
+        self.autoheat = 1 if autoheat else 0
+
+    def set_autoneedlevalve(self, autoneedlevalve: bool):
+        self.autoneedlevalve = 2 if autoneedlevalve else 0
+
+    def set_initneedlevalve(self, initneedlevalve: bool):
+        self.initneedlevalve = 4 if initneedlevalve else 0
+
+    def set_remote(self, remote: bool):
+        self.remote = 1 if remote else 0
+
+    def set_locked(self, locked: bool):
+        self.locked = 2 if locked else 0
 
     @contextmanager
     def check_channel(self, channel):
@@ -36,6 +65,18 @@ class SimulatedITC503:
     def get_temp(self, channel):
         with self.check_channel(channel):
             return self.temp
+
+    def get_status(self):
+        mode = self.autoheat + self.autoneedlevalve + self.initneedlevalve
+        control = self.remote + self.locked
+        status_string = f"X{self.status}A{mode}C{control}S{self.sweeping}"
+        if self.ctrlchannel is not None:
+            status_string += f"H{self.ctrlchannel}"
+        if self.autopid is not None:
+            status_string += f"L{int(self.autopid)}"
+        if self.tuning is not None:
+            status_string += f"N{int(self.tuning)}"
+        return status_string
 
 
 @has_log
@@ -71,11 +112,44 @@ class SimulatedHLX503(StateMachineDevice):
         """
         return OrderedDict()
 
-    def get_temp(self, isobus_address, channel):
-        temp = self.itc503s[isobus_address].get_temp(channel)
-        self.log.info(f"GET: {temp}")
-        return temp
+    def get_temp(self, isobus_address: int, channel: int) -> float:
+        return self.itc503s[isobus_address].get_temp(channel)
 
-    def set_temp(self, isobus_address, channel, temp):
-        self.log.info(f"SET: {temp}")
+    def set_temp(self, isobus_address: int, channel: int, temp: float):
         self.itc503s[isobus_address].set_temp(channel, temp)
+
+    def get_status(self, isobus_address: int) -> str:
+        return self.itc503s[isobus_address].get_status()
+
+    def set_status(self, isobus_address: int, status: int):
+        self.itc503s[isobus_address].status = status
+
+    def set_autoheat(self, isobus_address: int, autoheat: bool):
+        self.itc503s[isobus_address].set_autoheat(autoheat)
+
+    def set_autoneedlevalve(self, isobus_address: int, autoneedlevalve: bool):
+        self.itc503s[isobus_address].set_autoneedlevalve(autoneedlevalve)
+
+    def set_initneedlevalve(self, isobus_address: int, initneedlevalve: bool):
+        self.itc503s[isobus_address].set_initneedlevalve(initneedlevalve)
+
+    def set_remote(self, isobus_address: int, remote: bool):
+        self.itc503s[isobus_address].set_remote(remote)
+
+    def set_locked(self, isobus_address: int, locked: bool):
+        self.itc503s[isobus_address].set_locked(locked)
+
+    def set_sweeping(self, isobus_address: int, sweeping: int):
+        self.itc503s[isobus_address].sweeping = sweeping
+
+    def set_ctrlchannel(self, isobus_address: int, ctrlchannel: Optional[int]):
+        self.itc503s[isobus_address].ctrlchannel = ctrlchannel
+
+    def set_autopid(self, isobus_address: int, autopid: Optional[bool]):
+        self.itc503s[isobus_address].autopid = autopid
+
+    def set_tuning(self, isobus_address: int, tuning: Optional[bool]):
+        self.itc503s[isobus_address].tuning = tuning
+
+    def reset_status(self, isobus_address: int):
+        self.itc503s[isobus_address].reset_status()

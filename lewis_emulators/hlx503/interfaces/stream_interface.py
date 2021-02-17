@@ -24,7 +24,8 @@ class HLX503StreamInterface(StreamInterface):
 
         super(HLX503StreamInterface, self).__init__()
         self.commands = {
-            CmdBuilder(self.get_temp).escape("@").int().escape("R").int().eos().build()
+            CmdBuilder(self.get_temp).escape("@").int().escape("R").int().eos().build(),
+            CmdBuilder(self.get_status).escape("@").int().escape("X").eos().build(),
         }
 
     @if_connected
@@ -43,3 +44,7 @@ class HLX503StreamInterface(StreamInterface):
     def get_temp(self, isobus_address, channel):
         temp = self._device.get_temp(isobus_address, channel)
         return f"{isobus_address}{temp}"
+
+    @if_connected
+    def get_status(self, isobus_address):
+        return self._device.get_status(isobus_address)
