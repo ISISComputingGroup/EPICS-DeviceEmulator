@@ -17,13 +17,15 @@ class HLX503StreamInterface(StreamInterface):
     Stream interface for the serial port
     """
 
-    in_terminator = chr(3)
-    out_terminator = chr(3)
+    in_terminator = "\n"
+    out_terminator = "\n"
 
     def __init__(self):
 
         super(HLX503StreamInterface, self).__init__()
-        self.commands = {}
+        self.commands = {
+            CmdBuilder(self.get_temp).escape("@").int().escape("R").int().eos().build()
+        }
 
     @if_connected
     def handle_error(self, request, error):
@@ -36,3 +38,8 @@ class HLX503StreamInterface(StreamInterface):
 
         """
         self.log.error("An error occurred at request " + repr(request) + ": " + repr(error))
+
+    @if_connected
+    def get_temp(self, isobus_address, channel):
+        temp = self._device.get_temp(isobus_address, channel)
+        return f"{isobus_address}{temp}"
