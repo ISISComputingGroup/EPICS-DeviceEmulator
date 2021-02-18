@@ -26,6 +26,7 @@ class HLX503StreamInterface(StreamInterface):
         self.commands = {
             CmdBuilder(self.get_temp).escape("@").int().escape("R").int().eos().build(),
             CmdBuilder(self.set_automode).escape("@").int().escape("A").int().eos().build(),
+            CmdBuilder(self.set_autopid).escape("@").int().escape("L").int().eos().build(),
             CmdBuilder(self.get_status).escape("@").int().escape("X").eos().build(),
         }
 
@@ -52,8 +53,12 @@ class HLX503StreamInterface(StreamInterface):
 
     @if_connected
     def set_automode(self, isobus_address: int, automode: int):
-        self.log.info(f"AUTOMODE {automode}")
         autoheat = automode & 1 != 0
         self._device.set_autoheat(isobus_address, autoheat)
         autoneedle_valve = automode & 2 != 0
         self._device.set_autoneedlevalve(isobus_address, autoneedle_valve)
+
+    @if_connected
+    def set_autopid(self, isobus_address: int, autopid: int):
+        self._device.set_autopid(isobus_address, bool(autopid))
+
