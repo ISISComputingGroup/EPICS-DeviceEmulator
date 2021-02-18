@@ -7,10 +7,11 @@ from lewis.devices import StateMachineDevice
 from .states import DefaultState
 
 # Must match those in test
-itc_names = ["SORB", "1KPOT", "HE3POT_LOWT", "HE3POT_HIGHT"]
+itc_names = ["1KPOT", "HE3POT_LOWT", "HE3POT_HIGHT", "SORB"]
 isobus_addresses = {f"{name}_ISOBUS": i for i, name in enumerate(itc_names)}
 channels = {f"{name}_CHANNEL": i for i, name in enumerate(itc_names)}
-isobus_addresses_and_channels_zip = zip(isobus_addresses.values(), channels.values())
+versions = {"1KPOT_VERSION": 502, "HE3POT_LOWT_VERSION": 503, "HE3POT_HIGHT_VERSION": 503, "SORB_VERSION": 601}
+isobus_addresses_and_channels_zip = zip(isobus_addresses.values(), channels.values(), versions.values())
 itc_zip = zip(itc_names, isobus_addresses.values(), channels.values())
 
 
@@ -19,7 +20,8 @@ class SimulatedITC503:
     Simulated ITC503 for the HLX503.
     """
 
-    def __init__(self, channel: int):
+    def __init__(self, channel: int, version: int):
+        self.version: int = version
         self.channel: int = channel
         self.temp: float = 0.0
         self.reset_status()
@@ -40,7 +42,8 @@ class SimulatedITC503:
         self.autoheat = 1 if autoheat else 0
 
     def set_autoneedlevalve(self, autoneedlevalve: bool):
-        self.autoneedlevalve = 2 if autoneedlevalve else 0
+        if self.version != 601:
+            self.autoneedlevalve = 2 if autoneedlevalve else 0
 
     def set_initneedlevalve(self, initneedlevalve: bool):
         self.initneedlevalve = 4 if initneedlevalve else 0
@@ -91,7 +94,7 @@ class SimulatedHLX503(StateMachineDevice):
         """
         self.connected = True
         self.itc503s: Dict[int, SimulatedITC503] = {
-            isobus_address: SimulatedITC503(channel) for isobus_address, channel in isobus_addresses_and_channels_zip
+            isobus_address: SimulatedITC503(channel, version) for isobus_address, channel, version in isobus_addresses_and_channels_zip
         }
 
     def _get_state_handlers(self):
