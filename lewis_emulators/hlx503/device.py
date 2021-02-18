@@ -49,7 +49,7 @@ class SimulatedITC503:
         self.remote = 1 if remote else 0
 
     def set_locked(self, locked: bool):
-        self.locked = 2 if locked else 0
+        self.locked = 0 if locked else 2
 
     @contextmanager
     def check_channel(self, channel):
