@@ -44,9 +44,10 @@ class SimulatedITC503:
         self.ctrlchannel: Optional[int] = None
         self.autopid: Optional[bool] = None
         self.tuning: Optional[bool] = None
-        self.proportional = 0.0
-        self.integral = 0.0
-        self.derivative = 0.0
+        self.proportional: float = 0.0
+        self.integral: float = 0.0
+        self.derivative: float = 0.0
+        self.heater_output: float = 0.0
 
     def set_autoheat(self, autoheat: bool):
         self.autoheat = 1 if autoheat else 0
@@ -189,3 +190,9 @@ class SimulatedHLX503(StateMachineDevice):
 
     def get_derivative(self, isobus_address: int) -> float:
         return self.itc503s[isobus_address].derivative
+
+    def set_heater_output(self, isobus_address: int, heater_output: float):
+        self.itc503s[isobus_address].heater_output = heater_output
+
+    def get_heater_output(self, isobus_address: int) -> float:
+        return self.itc503s[isobus_address].heater_output

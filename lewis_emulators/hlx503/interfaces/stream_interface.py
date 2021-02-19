@@ -24,7 +24,8 @@ class HLX503StreamInterface(StreamInterface):
 
         super(HLX503StreamInterface, self).__init__()
         self.commands = {
-            CmdBuilder(self.get_temp).escape("@").int().escape("R").int().eos().build(),
+            CmdBuilder(self.get_channel_val).escape("@").int().escape("R").int().eos().build(),
+            CmdBuilder(self.set_heater_output).escape("@").int().escape("O").float().eos().build(),
             CmdBuilder(self.set_temp).escape("@").int().escape("T").float().eos().build(),
             CmdBuilder(self.set_automode).escape("@").int().escape("A").int().eos().build(),
             CmdBuilder(self.set_ctrlchannel).escape("@").int().escape("H").int().eos().build(),
@@ -49,9 +50,12 @@ class HLX503StreamInterface(StreamInterface):
         self.log.error("An error occurred at request " + repr(request) + ": " + repr(error))
 
     @if_connected
-    def get_temp(self, isobus_address: int, channel: int):
-        temp = self._device.get_temp(isobus_address, channel)
-        return f"@{isobus_address}R{temp}"
+    def get_channel_val(self, isobus_address: int, channel: int):
+        if channel == 5:
+            return_val = self._device.get_heater_output(isobus_address)
+        else:
+            return_val = self._device.get_temp(isobus_address, channel)
+        return f"@{isobus_address}R{return_val}"
 
     @if_connected
     def set_temp(self, isobus_address: int, temp: float):
@@ -95,3 +99,7 @@ class HLX503StreamInterface(StreamInterface):
     @if_connected
     def set_derivative(self, isobus_address: int, derivative: float):
         self._device.set_derivative(isobus_address, derivative)
+
+    @if_connected
+    def set_heater_output(self, isobus_address: int, output: float):
+        self._device.set_heater_output(isobus_address, output)
