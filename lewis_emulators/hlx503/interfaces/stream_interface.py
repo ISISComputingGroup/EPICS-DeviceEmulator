@@ -30,6 +30,9 @@ class HLX503StreamInterface(StreamInterface):
             CmdBuilder(self.set_ctrlchannel).escape("@").int().escape("H").int().eos().build(),
             CmdBuilder(self.set_autopid).escape("@").int().escape("L").int().eos().build(),
             CmdBuilder(self.set_ctrl_mode).escape("@").int().escape("C").int().eos().build(),
+            CmdBuilder(self.set_propotional).escape("@").int().escape("P").float().eos().build(),
+            CmdBuilder(self.set_integral).escape("@").int().escape("I").float().eos().build(),
+            CmdBuilder(self.set_derivative).escape("@").int().escape("D").float().eos().build(),
             CmdBuilder(self.get_status).escape("@").int().escape("X").eos().build(),
         }
 
@@ -80,4 +83,16 @@ class HLX503StreamInterface(StreamInterface):
     @if_connected
     def set_ctrlchannel(self, isobus_address: int, ctrlchannel: int):
         self._device.set_ctrlchannel(isobus_address, ctrlchannel)
+
+    @if_connected
+    def set_proportional(self, isobus_address: int, proportional: float):
+        self._device.set_proportional(isobus_address, proportional)
+
+    @if_connected
+    def set_integral(self, isobus_address: int, integral: float):
+        self._device.set_integral(isobus_address, integral)
+
+    @if_connected
+    def set_derivative(self, isobus_address: int, derivative: float):
+        self._device.set_derivative(isobus_address, derivative)
 

@@ -2,31 +2,23 @@ from collections import OrderedDict
 from typing import Dict, Optional
 from contextlib import contextmanager
 from dataclasses import dataclass
-from enum import Enum
 
 from lewis.core.logging import has_log
 from lewis.devices import StateMachineDevice
 from .states import DefaultState
 
 
-class Version(Enum):
-    ITC503 = 503
-    ITC502 = 502
-    ITC601 = 601
-
-
 @dataclass
 class ITC:
     name: str
-    version: Version
     channel : int
     isobus_address: int
 
 
 # Must match those in test
 itcs = [
-    ITC("1KPOT", Version.ITC502, 1, 1), ITC("HE3POT_LOWT", Version.ITC503, 2, 2),
-    ITC("HE3POT_HIGHT", Version.ITC503, 3, 3), ITC("SORB", Version.ITC601, 4, 4)
+    ITC("1KPOT", 1, 1), ITC("HE3POT_LOWT", 2, 2),
+    ITC("HE3POT_HIGHT", 3, 3), ITC("SORB", 4, 4)
 ]
 
 
@@ -35,8 +27,7 @@ class SimulatedITC503:
     Simulated ITC503 for the HLX503.
     """
 
-    def __init__(self, channel: int, version: int):
-        self.version: int = version
+    def __init__(self, channel: int):
         self.channel: int = channel
         self.temp: float = 0.0
         self.temp_sp: float = 0.0
@@ -58,12 +49,10 @@ class SimulatedITC503:
         self.autoheat = 1 if autoheat else 0
 
     def set_autoneedlevalve(self, autoneedlevalve: bool):
-        if self.version != 601:
-            self.autoneedlevalve = 2 if autoneedlevalve else 0
+        self.autoneedlevalve = 2 if autoneedlevalve else 0
 
     def set_autopid(self, autopid: Optional[bool]):
-        if self.version != 502:
-            self.autopid = autopid
+        self.autopid = autopid
 
     def set_initneedlevalve(self, initneedlevalve: bool):
         self.initneedlevalve = 4 if initneedlevalve else 0
@@ -117,7 +106,7 @@ class SimulatedHLX503(StateMachineDevice):
         """
         self.connected = True
         self.itc503s: Dict[int, SimulatedITC503] = {
-            itc.isobus_address: SimulatedITC503(itc.channel, itc.version.value) for itc in itcs
+            itc.isobus_address: SimulatedITC503(itc.channel) for itc in itcs
         }
 
     def _get_state_handlers(self):
