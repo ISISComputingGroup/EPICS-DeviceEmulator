@@ -29,11 +29,11 @@ class SimulatedITC503:
 
     def __init__(self, channel: int):
         self.channel: int = channel
-        self.temp: float = 0.0
-        self.temp_sp: float = 0.0
         self.reset_status()
 
     def reset_status(self):
+        self.temp: float = 0.0
+        self.temp_sp: float = 0.0
         self.status: int = 0
         self.autoheat: int = 0
         self.autoneedlevalve: int = 0
@@ -44,6 +44,9 @@ class SimulatedITC503:
         self.ctrlchannel: Optional[int] = None
         self.autopid: Optional[bool] = None
         self.tuning: Optional[bool] = None
+        self.proportional = 0.0
+        self.integral = 0.0
+        self.derivative = 0.0
 
     def set_autoheat(self, autoheat: bool):
         self.autoheat = 1 if autoheat else 0
@@ -74,14 +77,14 @@ class SimulatedITC503:
         self.temp_sp = temp
         self.temp = temp
 
-    def get_temp(self, channel):
+    def get_temp(self, channel) -> float:
         if channel == 0:
             return self.temp_sp
         else:
             with self.check_channel(channel):
                 return self.temp
 
-    def get_status(self):
+    def get_status(self) -> str:
         mode = self.autoheat + self.autoneedlevalve + self.initneedlevalve
         control = self.remote + self.locked
         status_string = f"X{self.status}A{mode}C{control}S{self.sweeping}"
@@ -168,3 +171,21 @@ class SimulatedHLX503(StateMachineDevice):
 
     def reset_status(self, isobus_address: int):
         self.itc503s[isobus_address].reset_status()
+
+    def set_proportional(self, isobus_address: int, proportional: float):
+        self.itc503s[isobus_address].proportional = proportional
+
+    def set_integral(self, isobus_address: int, integral: float):
+        self.itc503s[isobus_address].integral = integral
+
+    def set_derivative(self, isobus_address: int, derivative: float):
+        self.itc503s[isobus_address].derivative = derivative
+
+    def get_proportional(self, isobus_address: int) -> float:
+        return self.itc503s[isobus_address].proportional
+
+    def get_integral(self, isobus_address: int) -> float:
+        return self.itc503s[isobus_address].integral
+
+    def get_derivative(self, isobus_address: int) -> float:
+        return self.itc503s[isobus_address].derivative
