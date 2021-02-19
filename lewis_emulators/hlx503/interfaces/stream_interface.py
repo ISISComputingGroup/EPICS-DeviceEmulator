@@ -27,6 +27,7 @@ class HLX503StreamInterface(StreamInterface):
             CmdBuilder(self.get_temp).escape("@").int().escape("R").int().eos().build(),
             CmdBuilder(self.set_automode).escape("@").int().escape("A").int().eos().build(),
             CmdBuilder(self.set_autopid).escape("@").int().escape("L").int().eos().build(),
+            CmdBuilder(self.set_ctrl_mode).escape("@").int().escape("C").int().eos().build(),
             CmdBuilder(self.get_status).escape("@").int().escape("X").eos().build(),
         }
 
@@ -61,4 +62,11 @@ class HLX503StreamInterface(StreamInterface):
     @if_connected
     def set_autopid(self, isobus_address: int, autopid: int):
         self._device.set_autopid(isobus_address, bool(autopid))
+
+    @if_connected
+    def set_ctrl_mode(self, isobus_address: int, ctrl_mode: int):
+        remote = ctrl_mode & 1 != 0
+        self._device.set_remote(isobus_address, remote)
+        locked = ctrl_mode & 2 != 0
+        self._device.set_locked(isobus_address, locked)
 
