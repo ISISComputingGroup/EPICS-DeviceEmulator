@@ -25,8 +25,8 @@ class ITC:
 
 # Must match those in test
 itcs = [
-    ITC("1KPOT", Version.ITC502, 0, 0), ITC("HE3POT_LOWT", Version.ITC503, 1, 1),
-    ITC("HE3POT_HIGHT", Version.ITC503, 2, 2), ITC("SORB", Version.ITC601, 3, 3)
+    ITC("1KPOT", Version.ITC502, 1, 1), ITC("HE3POT_LOWT", Version.ITC503, 2, 2),
+    ITC("HE3POT_HIGHT", Version.ITC503, 3, 3), ITC("SORB", Version.ITC601, 4, 4)
 ]
 
 
@@ -39,6 +39,7 @@ class SimulatedITC503:
         self.version: int = version
         self.channel: int = channel
         self.temp: float = 0.0
+        self.temp_sp: float = 0.0
         self.reset_status()
 
     def reset_status(self):
@@ -80,13 +81,16 @@ class SimulatedITC503:
         else:
             raise ValueError(f"Channel {channel} incorrect. Expected {self.channel}")
 
-    def set_temp(self, channel, temp):
-        with self.check_channel(channel):
-            self.temp = temp
+    def set_temp(self, temp):
+        self.temp_sp = temp
+        self.temp = temp
 
     def get_temp(self, channel):
-        with self.check_channel(channel):
-            return self.temp
+        if channel == 0:
+            return self.temp_sp
+        else:
+            with self.check_channel(channel):
+                return self.temp
 
     def get_status(self):
         mode = self.autoheat + self.autoneedlevalve + self.initneedlevalve
@@ -137,8 +141,8 @@ class SimulatedHLX503(StateMachineDevice):
     def get_temp(self, isobus_address: int, channel: int) -> float:
         return self.itc503s[isobus_address].get_temp(channel)
 
-    def set_temp(self, isobus_address: int, channel: int, temp: float):
-        self.itc503s[isobus_address].set_temp(channel, temp)
+    def set_temp(self, isobus_address: int, temp: float):
+        self.itc503s[isobus_address].set_temp(temp)
 
     def get_status(self, isobus_address: int) -> str:
         return self.itc503s[isobus_address].get_status()
