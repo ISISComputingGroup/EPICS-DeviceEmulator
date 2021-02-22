@@ -53,6 +53,12 @@ class HLX503StreamInterface(StreamInterface):
     def get_channel_val(self, isobus_address: int, channel: int):
         if channel == 5:
             return_val = self._device.get_heater_output(isobus_address)
+        elif channel == 8:
+            return_val = self._device.get_proportional(isobus_address)
+        elif channel == 9:
+            return_val = self._device.get_integral(isobus_address)
+        elif channel == 10:
+            return_val = self._device.get_derivative(isobus_address)
         else:
             return_val = self._device.get_temp(isobus_address, channel)
         return f"@{isobus_address}R{return_val}"
