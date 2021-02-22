@@ -17,8 +17,8 @@ class HLX503StreamInterface(StreamInterface):
     Stream interface for the serial port
     """
 
-    in_terminator = "\n"
-    out_terminator = "\n"
+    in_terminator = "\r"
+    out_terminator = "\r"
 
     def __init__(self):
 
