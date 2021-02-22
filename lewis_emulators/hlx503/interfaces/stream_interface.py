@@ -34,6 +34,7 @@ class HLX503StreamInterface(StreamInterface):
             CmdBuilder(self.set_proportional).escape("@").int().escape("P").float().eos().build(),
             CmdBuilder(self.set_integral).escape("@").int().escape("I").float().eos().build(),
             CmdBuilder(self.set_derivative).escape("@").int().escape("D").float().eos().build(),
+            CmdBuilder(self.set_needle_valve_percent).escape("@").int().escape("G").float().eos().build(),
             CmdBuilder(self.get_status).escape("@").int().escape("X").eos().build(),
         }
 
@@ -53,6 +54,8 @@ class HLX503StreamInterface(StreamInterface):
     def get_channel_val(self, isobus_address: int, channel: int):
         if channel == 5:
             return_val = self._device.get_heater_output(isobus_address)
+        elif channel == 7:
+            return_val = self._device.get_needle_valve_percent(isobus_address)
         elif channel == 8:
             return_val = self._device.get_proportional(isobus_address)
         elif channel == 9:
@@ -109,3 +112,7 @@ class HLX503StreamInterface(StreamInterface):
     @if_connected
     def set_heater_output(self, isobus_address: int, output: float):
         self._device.set_heater_output(isobus_address, output)
+
+    @if_connected
+    def set_needle_valve_percent(self, isobus_address: int, percent: float):
+        self._device.set_needle_valve_percent(isobus_address, percent)

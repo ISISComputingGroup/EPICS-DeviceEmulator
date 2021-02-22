@@ -48,6 +48,7 @@ class SimulatedITC503:
         self.integral: float = 0.0
         self.derivative: float = 0.0
         self.heater_output: float = 0.0
+        self.needle_valve_percent: float = 0.0
 
     def set_autoheat(self, autoheat: bool):
         self.autoheat = 1 if autoheat else 0
@@ -196,3 +197,9 @@ class SimulatedHLX503(StateMachineDevice):
 
     def get_heater_output(self, isobus_address: int) -> float:
         return self.itc503s[isobus_address].heater_output
+
+    def set_needle_valve_percent(self, isobus_address: int, percent: float):
+        self.itc503s[isobus_address].needle_valve_percent = percent
+
+    def get_needle_valve_percent(self, isobus_address: int) -> float:
+        return self.itc503s[isobus_address].needle_valve_percent
