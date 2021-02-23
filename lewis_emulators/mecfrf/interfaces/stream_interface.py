@@ -14,7 +14,7 @@ class MecfrfStreamInterface(StreamInterface):
     commands = {}
 
     in_terminator = ""
-    out_terminator = ""
+    out_terminator = b""
 
     def __init__(self):
         super(MecfrfStreamInterface, self).__init__()
@@ -49,7 +49,7 @@ class MecfrfStreamInterface(StreamInterface):
 
     def _construct_status_message(self):
         # Fixed message "preamble"
-        msg = six.binary_type("DATA")
+        msg = b"DATA"
 
         # There are 6 integer header fields which we ignore. They are:
         # - Order number
