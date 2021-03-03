@@ -34,6 +34,9 @@ class SimulatedDanfysik(StateMachineDevice):
         self.current_read_factor = 1
         self.current_write_factor = 1
 
+        # DAC 1, DAC 2, DAC 1 absolute slew rates
+        self.slew_rate = [0, 0, 0]
+
         self.field_units = FieldUnits.GAUSS
         self.negative_polarity = False
         self.power = True
@@ -143,6 +146,12 @@ class SimulatedDanfysik(StateMachineDevice):
              The readback value of voltage scaled by the custom scale factor
         """
         return self.voltage * self.voltage_read_factor
+
+    def set_slew_rate(self, dac_num, value):
+        pass
+
+    def get_slew_rate(self, dac_num):
+        pass
 
     def _get_state_handlers(self):
         """
