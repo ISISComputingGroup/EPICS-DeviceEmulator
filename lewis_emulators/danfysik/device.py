@@ -148,10 +148,10 @@ class SimulatedDanfysik(StateMachineDevice):
         return self.voltage * self.voltage_read_factor
 
     def set_slew_rate(self, dac_num, value):
-        pass
+        self.slew_rate[dac_num-1] = value
 
     def get_slew_rate(self, dac_num):
-        pass
+        return self.slew_rate[dac_num-1]
 
     def _get_state_handlers(self):
         """

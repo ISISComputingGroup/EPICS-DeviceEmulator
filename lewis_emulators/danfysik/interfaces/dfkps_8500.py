@@ -89,9 +89,9 @@ class Danfysik8500StreamInterface(CommonStreamInterface, StreamInterface):
         return "{:03d}".format(self.address)
 
     @conditional_reply("comms_initialized")
-    def get_slew_rate(self, DAC_num):
-        return self.device.slew_rate[DAC_num-1]
+    def get_slew_rate(self, dac_num):
+        return self.device.get_slew_rate(dac_num)
 
     @conditional_reply("comms_initialized")
-    def set_slew_rate(self, DAC_num, slew_rate):
-        self.device.slew_rate[DAC_num-1] = slew_rate
+    def set_slew_rate(self, dac_num, slew_rate_value):
+        self.device.set_slew_rate(dac_num, slew_rate_value)
