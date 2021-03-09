@@ -45,6 +45,15 @@ class SimulatedKeithley2700(StateMachineDevice):
             i = (i + 1) % 20
             time.sleep(0.1)
 
+    @property
+    def simulate_readings(self):
+        return self._simulate_readings
+
+    @simulate_readings.setter
+    def simulate_readings(self, new_value):
+        self.log.info(f"Setting simulate readings to {new_value}")
+        self._simulate_readings = new_value
+
     def _initialize_data(self):
         """
         Initialize the device's attributes necessary for testing.
