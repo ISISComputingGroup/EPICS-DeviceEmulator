@@ -13,6 +13,13 @@ CONTROL_SOURCE = {0: "IMM", 1: "TIM", 2: "MAN", 3: "BUS", 4: "EXT"}
 SCAN_STATE = {0: "INT", 1: "NONE"}
 
 
+def get_key_from_value(dictionary, search_value):
+    for key, value in dictionary.items():
+        if value == search_value:
+            return key
+    raise ValueError("{} not found".format(search_value))
+
+
 @has_log
 class Keithley2700StreamInterface(StreamInterface):
     in_terminator = "\r"
@@ -179,7 +186,7 @@ class Keithley2700StreamInterface(StreamInterface):
 
     def set_measurement(self, measurement):
         if measurement in MEASUREMENT_TYPE.values():
-            self._device.measurement = MEASUREMENT_TYPE.keys()[MEASUREMENT_TYPE.values().index(measurement)]
+            self._device.measurement = get_key_from_value(MEASUREMENT_TYPE, measurement)
         else:
             raise ValueError("Invalid measurement value!")
 
@@ -188,13 +195,13 @@ class Keithley2700StreamInterface(StreamInterface):
 
     def set_buffer_feed(self, feed):
         if feed in BUFFER_SOURCE.values():
-            self._device.buffer_feed = BUFFER_SOURCE.keys()[BUFFER_SOURCE.values().index(feed)]
+            self._device.buffer_feed = get_key_from_value(BUFFER_SOURCE, feed)
         else:
             raise ValueError("Invalid feed source value!")
 
     def set_buffer_control(self, control):
         if control in BUFFER_CONTROL_MODE.values():
-            self._device.buffer_control = BUFFER_CONTROL_MODE.keys()[BUFFER_CONTROL_MODE.values().index(control)]
+            self._device.buffer_feed = get_key_from_value(BUFFER_CONTROL_MODE, control)
         else:
             raise ValueError("Invalid buffer control source value!")
 
@@ -243,7 +250,7 @@ class Keithley2700StreamInterface(StreamInterface):
 
     def set_time_stamp_format(self, timestamp_format):
         if timestamp_format in TIMESTAMP_FORMAT.values():
-            self._device.time_stamp_format = TIMESTAMP_FORMAT.keys()[TIMESTAMP_FORMAT.values().index(timestamp_format)]
+            self._device.time_stamp_format = get_key_from_value(TIMESTAMP_FORMAT, timestamp_format)
         else:
             raise ValueError("Invalid timestamp format value")
 
@@ -270,7 +277,7 @@ class Keithley2700StreamInterface(StreamInterface):
 
     def set_source(self, source):
         if source in CONTROL_SOURCE.values():
-            self._device.source = CONTROL_SOURCE.keys()[CONTROL_SOURCE.values().index(source)]
+            self._device.source = get_key_from_value(CONTROL_SOURCE, source)
         else:
             raise ValueError("Invalid control source value")
 
@@ -293,7 +300,7 @@ class Keithley2700StreamInterface(StreamInterface):
 
     def set_scan_state(self, state):
         if state in SCAN_STATE.values():
-            self._device.scan_state_status = SCAN_STATE.keys()[SCAN_STATE.values().index(state)]
+            self._device.scan_state_status = get_key_from_value(SCAN_STATE, state)
         else:
             raise ValueError("Invalid scan state source value")
 
