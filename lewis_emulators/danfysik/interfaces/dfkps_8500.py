@@ -32,6 +32,8 @@ class Danfysik8500StreamInterface(CommonStreamInterface, StreamInterface):
         CmdBuilder("get_address").escape("ADR").eos().build(),
         CmdBuilder("init_comms").escape("REM").eos().build(),
         CmdBuilder("init_comms").escape("UNLOCK").eos().build(),
+        CmdBuilder("get_slew_rate").escape("R").arg(r"[1-3]", argument_mapping=int).eos().build(),
+        CmdBuilder("set_slew_rate").escape("W").arg(r"[1-3]", argument_mapping=int).spaces().int().eos().build()
     ]
 
     @conditional_reply("device_available")
@@ -85,3 +87,11 @@ class Danfysik8500StreamInterface(CommonStreamInterface, StreamInterface):
     @conditional_reply("comms_initialized")
     def get_address(self):
         return "{:03d}".format(self.address)
+
+    @conditional_reply("comms_initialized")
+    def get_slew_rate(self, dac_num):
+        return self.device.get_slew_rate(dac_num)
+
+    @conditional_reply("comms_initialized")
+    def set_slew_rate(self, dac_num, slew_rate_value):
+        self.device.set_slew_rate(dac_num, slew_rate_value)
