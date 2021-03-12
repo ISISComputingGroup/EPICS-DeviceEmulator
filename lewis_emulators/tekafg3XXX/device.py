@@ -1,9 +1,9 @@
 from collections import OrderedDict
-from states import DefaultState
+from .states import DefaultState
 from lewis.devices import StateMachineDevice
 
 
-class SimulatedAfg3021B(StateMachineDevice):
+class SimulatedTekafg3XXX(StateMachineDevice):
 
     def _initialize_data(self):
         """
