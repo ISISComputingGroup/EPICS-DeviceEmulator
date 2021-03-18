@@ -88,7 +88,9 @@ def generate_response(address, index, correlation_num, data=None):
     int_responses = [UC_ACK, address, index, correlation_num, UC_REASON_OK]
     if data is not None:
         int_responses.append(data)
-    response = "".join(convert_to_response(x) for x in int_responses)
+    response = bytearray()
+    for int_response in int_responses:
+        response += convert_to_response(int_response)
     return convert_to_response(len(response)) + response
 
 
@@ -97,11 +99,11 @@ class AttocubeANC350StreamInterface(StreamInterface):
 
     # Commands that we expect via serial during normal operation. Match anything!
     commands = {
-        Cmd("any_command", "^([\s\S]*)$"),
+        Cmd("any_command", r"^([\s\S]*)$", return_mapping=lambda x:x),
     }
 
     in_terminator = ""
-    out_terminator = ""
+    out_terminator = b""
 
     # Due to poll rate of the driver this will get individual commands
     readtimeout = 10

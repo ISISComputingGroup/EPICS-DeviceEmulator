@@ -214,7 +214,7 @@ class CmdBuilder(object):
         """
         if self._ignore_case:
             pattern = regex(self._reg_ex)
-            pattern.compiled_pattern = re.compile(self._reg_ex, re.IGNORECASE)
+            pattern.compiled_pattern = re.compile(self._reg_ex.encode(), re.IGNORECASE)
         else:
             pattern = self._reg_ex
         return Cmd(self._target_method, pattern, argument_mappings=self.argument_mappings, *args, **kwargs)

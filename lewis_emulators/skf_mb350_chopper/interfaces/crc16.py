@@ -18,7 +18,7 @@ def crc16(data):
     """
     crc = 0xFFFF
 
-    for b in [ord(c) for c in data]:
+    for b in data:
         crc ^= b
         for _ in range(8):
             if crc & 1:

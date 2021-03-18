@@ -125,7 +125,7 @@ class ResponseBuilder(object):
     """
 
     def __init__(self):
-        self.response = ""
+        self.response = bytearray()
 
     def add_int(self, value, length, low_byte_first=True):
         """
@@ -143,7 +143,6 @@ class ResponseBuilder(object):
         """
         Adds an float to the builder (4 bytes, IEEE single-precision)
         :param value: The float to add
-        :param length: How many bytes should the integer be represented as
         :return: The builder
         """
         self.response += float_to_raw_bytes(value)
