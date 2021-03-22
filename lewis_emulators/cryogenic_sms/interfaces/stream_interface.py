@@ -165,17 +165,24 @@ class CRYOSMSStreamInterface(StreamInterface):
         return self._device.log_message
 
     def read_heater_status(self):
-        heater_value = "ON" if self._device.is_heater_on else "OFF"
-        return self._out_message("HEATER STATUS: {}".format(heater_value))
+        if self._device.is_heater_on:
+            return self._out_message("HEATER STATUS: ON")
+        elif self._device.heater_value == 0.0:
+            return self._out_message("HEATER STATUS: OFF")
+        else:
+            mode = "TESLA" if self._device.is_output_mode_tesla else "AMPS"
+            return self._out_message("HEATER STATUS: SWITCHED OFF AT {0} {1}".format(self._device.heater_value, mode))
 
     def write_heater_status(self, heater_status):
         if heater_status in ON_STATES:
             self._device.is_heater_on = True
+            self._device.heater_value = 0.0
         elif heater_status in OFF_STATES:
             self._device.is_heater_on = False
+            self._device.heater_value = self._device.output
         else:
             raise ValueError("Invalid arguments sent")
-        self._create_log_message("........ HEATER STATUS", heater_status)
+        self._create_log_message("HEATER STATUS", heater_status)
         return self._device.log_message
 
     def read_pause(self):
