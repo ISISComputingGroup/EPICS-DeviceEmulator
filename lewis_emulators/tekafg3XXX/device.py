@@ -9,7 +9,7 @@ class SimulatedTekafg3XXX(StateMachineDevice):
         """
         Initialize all of the device's attributes.
         """
-        pass
+        self.connected = True
 
     def _get_state_handlers(self):
         return {
