@@ -32,6 +32,10 @@ class SimulatedItc503(StateMachineDevice):
         # differently
         self.report_sweep_state_with_leading_zero = False
 
+    def reset_to_temp_control_state(self):
+        self.helium_3_pot_empty = False
+        self._csm.reset()
+
     def _get_state_handlers(self):
         return {
             'temperature_control': TemperatureControlState(),
@@ -46,7 +50,6 @@ class SimulatedItc503(StateMachineDevice):
         return OrderedDict([
             (('temperature_control', 'helium_3_empty'), lambda: self.helium_3_pot_empty),
             (('helium_3_empty', 'regenerating'), lambda: self.control_channel == 1 and self.temperature_sp >= 30),
-            (('temperature_control', 'regenerating'), lambda: self.control_channel == 1 and self.temperature_sp >= 30),
             (('regenerating', 'temperature_control'), lambda: self.sorb_temp >= 30 and not self.helium_3_pot_empty)
         ])
 
