@@ -21,6 +21,8 @@ class SimulatedTti355(StateMachineDevice):
         self._max_voltage = 35.0
         self._max_current = 5.0
         self.load_resistance = 10
+        self.min_voltage = None
+        self.min_current = None
 
     def reset(self):
         self._initialize_data()
@@ -57,6 +59,8 @@ class SimulatedTti355(StateMachineDevice):
         voltage = round(float(voltage), 2)
         if voltage > self._max_voltage:
             self.error = "ERR 2"
+        elif self.min_voltage is not None and voltage < self.min_voltage:
+            self.error = "ERR 2"
         else:
             self.voltage_sp = voltage
             if self.calculate_potential_current(voltage) > self.current_limit_sp and self.output_status == "OUT ON":
@@ -72,6 +76,8 @@ class SimulatedTti355(StateMachineDevice):
     def set_current_limit_sp(self, current):
         current = round(float(current), 2)
         if current > self._max_current:
+            self.error = "ERR 2"
+        elif self.min_current is not None and current < self.min_current:
             self.error = "ERR 2"
         else:
             self.current_limit_sp = current
