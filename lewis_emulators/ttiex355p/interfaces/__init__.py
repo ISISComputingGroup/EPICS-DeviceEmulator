@@ -1,3 +1,3 @@
-from .stream_interface import TTIEX355PStreamInterface
+from .stream_interface import Ttiex355pStreamInterface
 
-__all__ = ['TTIEX355PStreamInterface']
+__all__ = ['Ttiex355pStreamInterface']
