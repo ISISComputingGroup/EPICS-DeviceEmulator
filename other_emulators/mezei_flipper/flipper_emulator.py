@@ -9,6 +9,12 @@ class _FakeQtCore(object):
     def pyqtSignal(cls, *a, **k):
         return None
 
+
+class _fake_ui_flipper:
+    def setupUi(self, *a, **k):
+        pass
+
+
 fake_qt_module = types.ModuleType("PyQt5")
 fake_qt_module.QtWidgets = MagicMock()
 fake_qt_module.QtCore = _FakeQtCore
@@ -22,7 +28,7 @@ sys.modules["QPlot"] = fake_qplot_module
 sys.modules["DAQTasks_2flippers"] = MagicMock()
 
 fake_flippr_module = types.ModuleType("flippr_3")
-fake_flippr_module.Ui_Flippr = MagicMock()
+fake_flippr_module.Ui_Flippr = _fake_ui_flipper
 sys.modules["flippr_3"] = fake_flippr_module
 
 
