@@ -10,6 +10,10 @@ class SimulatedTekafg3XXX(StateMachineDevice):
         Initialize all of the device's attributes.
         """
         self.connected = True
+        self.on = True
+        self.normal_polarity = True
+        self.burst_on = True
+        self.burst_triggered = True
 
     def _get_state_handlers(self):
         return {
