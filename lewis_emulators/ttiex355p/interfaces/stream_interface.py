@@ -1,15 +1,7 @@
-from lewis.adapters.stream import StreamInterface, Cmd
+from lewis_emulators.tti355.interfaces.stream_interface import Tti355StreamInterface
 
+__all__ = ["Ttiex355pStreamInterface"]
 
-class TTIEX355PStreamInterface(StreamInterface):
+class Ttiex355pStreamInterface(Tti355StreamInterface):
 
-    # Commands that we expect via serial during normal operation
-    commands = {
-        Cmd("catch_all", "^#9.*$"),  # Catch-all command for debugging
-    }
-
-    def catch_all(self):
-        pass
-
-    def handle_error(self, request, error):
-        print("An error occurred at request " + repr(request) + ": " + repr(error))
+    protocol = "ttiex355p"
