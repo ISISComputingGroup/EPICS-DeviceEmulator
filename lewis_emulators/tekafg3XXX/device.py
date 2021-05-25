@@ -6,6 +6,7 @@ from lewis.devices import StateMachineDevice
 class SourceChannel:
     def __init__(self):
         self.on = True
+        self.function = ""  # TODO
         self.normal_polarity = True
         self.burst_on = True
         self.burst_triggered = True
