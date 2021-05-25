@@ -8,6 +8,8 @@ if_connected = conditional_reply("connected")
 STATUS_MAP = {True: "ON", False: "OFF"}
 POLARITY_MAP = {True: "NORM", False: "INV"}
 BURST_MODE_MAP = {True: "TRIG", False: "GAT"}
+SWEEP_MODE_MAP = {True: "AUTO", False: "MAN"}
+SWEEP_SPACING_MAP = {True: "LIN", False: "LOG"}
 
 
 @has_log
