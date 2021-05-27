@@ -37,16 +37,27 @@ class Tekafg3XXXStreamInterface(StreamInterface):
         """
         return "TEKTRONIX,AFG3021,C100101,SCPI:99.0 FV:1.0"
 
-    def _channel(self, channel):
-        return self.device.channels[channel]
+    def _channel(self, channel_num: int):
+        """
+        Helper method to get a channel object from the device according to number
+        """
+        return self.device.channels[channel_num]
 
     @property
-    def status(self, channel: int) -> str:
+    def status(self, channel: int) -> int:
         return self._channel(channel).status
 
     @status.setter
-    def status(self, channel: int, new_status: str):
+    def status(self, channel: int, new_status: int):
         self._channel(channel).status = new_status
+
+    @property
+    def function(self, channel: int) -> str:
+        return self._channel(channel).function
+
+    @function.setter
+    def function(self, channel: int, new_function: str):
+        self._channel(channel).function = new_function
 
     @property
     def polarity(self, channel: int) -> str:
@@ -55,22 +66,6 @@ class Tekafg3XXXStreamInterface(StreamInterface):
     @polarity.setter
     def polarity(self, channel: int, new_polarity: str):
         self._channel(channel).polarity = new_polarity
-
-    @property
-    def burst_status(self, channel: int) -> str:
-        return self._channel(channel).burst_status
-
-    @burst_status.setter
-    def burst_status(self, channel: int, new_burst_status: str):
-        self._channel(channel).burst_status = new_burst_status
-
-    @property
-    def burst_mode(self, channel: int) -> str:
-        return self._channel(channel).burst_mode
-
-    @burst_mode.setter
-    def burst_mode(self, channel: int, new_burst_mode: str):
-        self._channel(channel).burst_mode = new_burst_mode
 
     @property
     def impedance(self, channel: int) -> float:
@@ -145,6 +140,14 @@ class Tekafg3XXXStreamInterface(StreamInterface):
         self._channel(channel).frequency = new_frequency
 
     @property
+    def frequency_mode(self, channel: int) -> str:
+        return self._channel(channel).frequency_mode
+
+    @frequency_mode.setter
+    def frequency_mode(self, channel: int, new_frequency_mode: str):
+        self._channel(channel).frequency_mode = new_frequency_mode
+
+    @property
     def phase(self, channel: int) -> float:
         return self._channel(channel).frequency
 
@@ -152,5 +155,98 @@ class Tekafg3XXXStreamInterface(StreamInterface):
     def phase(self, channel: int, new_phase: float):
         self._channel(channel).phase = new_phase
 
+    @property
+    def burst_status(self, channel: int) -> str:
+        return self._channel(channel).burst_status
 
+    @burst_status.setter
+    def burst_status(self, channel: int, new_burst_status: str):
+        self._channel(channel).burst_status = new_burst_status
 
+    @property
+    def burst_mode(self, channel: int) -> str:
+        return self._channel(channel).burst_mode
+
+    @burst_mode.setter
+    def burst_mode(self, channel: int, new_burst_mode: str):
+        self._channel(channel).burst_mode = new_burst_mode
+
+    @property
+    def burst_num_cycles(self, channel: int) -> int:
+        return self._channel(channel).num_cycles
+
+    @burst_num_cycles.setter
+    def burst_num_cycles(self, channel: int, new_burst_num_cycles: int):
+        self._channel(channel).burst_num_cycles = new_burst_num_cycles
+
+    @property
+    def burst_time_delay(self, channel: int) -> int:
+        return self._channel(channel).burst_time_delay
+
+    @burst_time_delay.setter
+    def burst_time_delay(self, channel: int, new_burst_time_delay: int):
+        self._channel(channel).burst_time_delay = new_burst_time_delay
+
+    @property
+    def sweep_span(self, channel: int) -> int:
+        return self._channel(channel).num_cycles
+
+    @sweep_span.setter
+    def sweep_span(self, channel: int, new_sweep_span: int):
+        self._channel(channel).sweep_span = new_sweep_span
+
+    @property
+    def sweep_start(self, channel: int) -> int:
+        return self._channel(channel).sweep_start
+
+    @sweep_start.setter
+    def sweep_start(self, channel: int, new_sweep_start: int):
+        self._channel(channel).sweep_start = new_sweep_start
+
+    @property
+    def sweep_stop(self, channel: int) -> int:
+        return self._channel(channel).sweep_stop
+
+    @sweep_stop.setter
+    def sweep_stop(self, channel: int, new_sweep_stop: int):
+        self._channel(channel).sweep_stop = new_sweep_stop
+
+    @property
+    def sweep_hold_time(self, channel: int) -> int:
+        return self._channel(channel).sweep_hold_time
+
+    @sweep_hold_time.setter
+    def sweep_hold_time(self, channel: int, new_sweep_hold_time: int):
+        self._channel(channel).sweep_hold_time = new_sweep_hold_time
+
+    @property
+    def sweep_mode(self, channel: int) -> str:
+        return self._channel(channel).sweep_hold_time
+
+    @sweep_mode.setter
+    def sweep_mode(self, channel: int, new_sweep_mode: str):
+        self._channel(channel).sweep_mode = new_sweep_mode
+
+    @property
+    def sweep_return_time(self, channel: int) -> int:
+        return self._channel(channel).sweep_return_time
+
+    @sweep_return_time.setter
+    def sweep_return_time(self, channel: int, new_sweep_return_time: int):
+        self._channel(channel).sweep_return_time = new_sweep_return_time
+
+    @property
+    def sweep_spacing(self, channel: int) -> str:
+        return self._channel(channel).sweep_spacing
+
+    @sweep_spacing.setter
+    def sweep_spacing(self, channel: int, new_sweep_spacing: str):
+        self._channel(channel).sweep_spacing = new_sweep_spacing
+
+    @property
+    def sweep_time(self, channel: int) -> int:
+        return self._channel(channel).sweep_time
+
+    @sweep_time.setter
+    def sweep_time(self, channel: int, new_sweep_time: int):
+        self._channel(channel).sweep_time = new_sweep_time
