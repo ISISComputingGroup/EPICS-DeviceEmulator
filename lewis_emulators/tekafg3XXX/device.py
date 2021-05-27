@@ -5,14 +5,14 @@ from lewis.devices import StateMachineDevice
 
 class SourceChannel:
     def __init__(self):
-        self.on = True
-        self.function = ""  # TODO
-        self.normal_polarity = True
-        self.burst_on = True
-        self.burst_triggered = True
+        self.status = "ON"
+        self.function = "SIN"
+        self.polarity = "NORM"
+        self.burst_status = "OFF"
+        self.burst_mode = "TRIG"
         self.impedance = 0
         self.voltage = 0
-        self.voltage_units = ""  # TODO
+        self.voltage_units = "VPP"
         self.voltage_low_limit = 0
         self.voltage_low_level = 0
         self.voltage_high_limit = 0
@@ -22,14 +22,14 @@ class SourceChannel:
         self.phase = 0
         self.burst_num_cycles = 0
         self.burst_time_delay = 0
-        self.frequency_mode = ""  # TODO
+        self.frequency_mode = "FIX"
         self.sweep_span = 0
         self.sweep_start = 0
         self.sweep_stop = 0
         self.sweep_hold_time = 0
-        self.sweep_mode = True  # TODO
+        self.sweep_mode = "AUTO"
         self.sweep_return_time = 0
-        self.sweep_spacing = True  # TODO
+        self.sweep_spacing = "LIN"
         self.sweep_time = 0
 
 
@@ -40,8 +40,7 @@ class SimulatedTekafg3XXX(StateMachineDevice):
         Initialize all of the device's attributes.
         """
         self.connected = True
-        self.output_1 = SourceChannel()
-        self.output_2 = SourceChannel()
+        self.channels = {1: SourceChannel(), 2: SourceChannel()}
 
     def _get_state_handlers(self):
         return {
