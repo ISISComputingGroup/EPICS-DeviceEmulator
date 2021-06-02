@@ -192,7 +192,7 @@ class Tekafg3XXXStreamInterface(StreamInterface):
         self._channel(channel).burst_mode = new_burst_mode
 
     def get_burst_num_cycles(self, channel: int) -> int:
-        return self._channel(channel).num_cycles
+        return self._channel(channel).burst_num_cycles
 
     def set_burst_num_cycles(self, channel: int, new_burst_num_cycles: int):
         self._channel(channel).burst_num_cycles = new_burst_num_cycles
@@ -204,7 +204,7 @@ class Tekafg3XXXStreamInterface(StreamInterface):
         self._channel(channel).burst_time_delay = new_burst_time_delay
 
     def get_sweep_span(self, channel: int) -> int:
-        return self._channel(channel).num_cycles
+        return self._channel(channel).sweep_span
 
     def set_sweep_span(self, channel: int, new_sweep_span: int):
         self._channel(channel).sweep_span = new_sweep_span
