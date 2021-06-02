@@ -63,3 +63,4 @@ class MclennanStreamInterface(StreamInterface):
     def jog(self, controller, velocity):
         self.device.jog(velocity)
         return "OK"
+    
