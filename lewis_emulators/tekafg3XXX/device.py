@@ -41,6 +41,7 @@ class SimulatedTekafg3XXX(StateMachineDevice):
         """
         self.connected = True
         self.channels = {1: SourceChannel(), 2: SourceChannel()}
+        self.triggered = False
 
     def _get_state_handlers(self):
         return {

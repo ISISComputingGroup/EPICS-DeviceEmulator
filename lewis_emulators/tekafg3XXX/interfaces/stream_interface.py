@@ -18,6 +18,7 @@ class Tekafg3XXXStreamInterface(StreamInterface):
         # Commands that we expect via serial during normal operation
         self.commands = {
             CmdBuilder(self.identity).escape("*IDN?").eos().build(),
+            CmdBuilder(self.trigger).escape("*TRG").eos().build(),
             CmdBuilder(self.get_status).escape("OUTP").int().escape(":STAT?").build(),
             CmdBuilder(self.set_status).escape("OUTP").int().escape(":STAT ").int().build(),
             CmdBuilder(self.get_function).escape("SOUR").int().escape(":FUNC:SHAP?").build(),
@@ -26,8 +27,8 @@ class Tekafg3XXXStreamInterface(StreamInterface):
             CmdBuilder(self.set_polarity).escape("OUTP").int().escape(":POL ").arg("NORM|INV").build(),
             CmdBuilder(self.get_impedance).escape("OUTP").int().escape(":IMP?").build(),
             CmdBuilder(self.set_impedance).escape("OUTP").int().escape(":IMP ").float().build(),
-            CmdBuilder(self.get_voltage).escape("OUTP").int().escape(":VOLT?").build(),
-            CmdBuilder(self.set_voltage).escape("OUTP").int().escape(":VOLT ").float().build(),
+            CmdBuilder(self.get_voltage).escape("SOUR").int().escape(":VOLT?").build(),
+            CmdBuilder(self.set_voltage).escape("SOUR").int().escape(":VOLT ").float().build(),
             CmdBuilder(self.get_voltage_units).escape("SOUR").int().escape(":VOLT:UNIT?").build(),
             CmdBuilder(self.set_voltage_units).escape("SOUR").int().escape(":VOLT:UNIT ").arg("VPP|VRMS|DBM").build(),
             CmdBuilder(self.get_voltage_low_level).escape("SOUR").int().escape(":VOLT:LEV:IMM:LOW?").build(),
@@ -45,7 +46,7 @@ class Tekafg3XXXStreamInterface(StreamInterface):
             CmdBuilder(self.get_phase).escape("SOUR").int().escape(":PHASE:ADJ?").build(),
             CmdBuilder(self.set_phase).escape("SOUR").int().escape(":PHASE:ADJ ").float().build(),
             CmdBuilder(self.get_burst_status).escape("SOUR").int().escape(":BURS:STAT?").build(),
-            CmdBuilder(self.set_burst_status).escape("SOUR").int().escape(":BURS:STAT ").arg("ON|OFF").build(),
+            CmdBuilder(self.set_burst_status).escape("SOUR").int().escape(":BURS:STAT ").arg("ON|OFF|1|0").build(),
             CmdBuilder(self.get_burst_mode).escape("SOUR").int().escape(":BURS:MODE?").build(),
             CmdBuilder(self.set_burst_mode).escape("SOUR").int().escape(":BURS:MODE ").arg("TRIG|GAT").build(),
             CmdBuilder(self.get_burst_num_cycles).escape("SOUR").int().escape(":BURS:NCYC?").build(),
@@ -88,6 +89,9 @@ class Tekafg3XXXStreamInterface(StreamInterface):
         :return: identity of the device
         """
         return "TEKTRONIX,AFG3021,C100101,SCPI:99.0 FV:1.0"
+
+    def trigger(self):
+        self.device.triggered = True
 
     def _channel(self, channel_num: int):
         """
