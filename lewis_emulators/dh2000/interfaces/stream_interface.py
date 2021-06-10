@@ -1,7 +1,7 @@
 from lewis.adapters.stream import StreamInterface
-from lewis_emulators.utils.command_builder import CmdBuilder
+from lewis.utils.command_builder import CmdBuilder
 from lewis.core.logging import has_log
-from lewis_emulators.utils.replies import conditional_reply
+from lewis.utils.replies import conditional_reply
 
 
 @has_log

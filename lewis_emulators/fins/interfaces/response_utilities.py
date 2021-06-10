@@ -1,4 +1,4 @@
-from lewis_emulators.utils.byte_conversions import int_to_raw_bytes, float_to_raw_bytes, raw_bytes_to_int
+from lewis.utils.byte_conversions import int_to_raw_bytes, float_to_raw_bytes, raw_bytes_to_int
 from ..device import SimulatedFinsPLC
 
 

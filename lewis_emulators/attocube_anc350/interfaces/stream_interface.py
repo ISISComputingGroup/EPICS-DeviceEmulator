@@ -1,6 +1,6 @@
 from lewis.adapters.stream import StreamInterface, Cmd
 from lewis.core.logging import has_log
-from lewis_emulators.utils.byte_conversions import int_to_raw_bytes, raw_bytes_to_int
+from lewis.utils.byte_conversions import int_to_raw_bytes, raw_bytes_to_int
 from functools import partial
 
 BYTES_IN_INT = 4

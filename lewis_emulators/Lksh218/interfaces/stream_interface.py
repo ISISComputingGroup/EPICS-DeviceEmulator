@@ -1,5 +1,5 @@
 from lewis.adapters.stream import StreamInterface
-from lewis_emulators.utils.command_builder import CmdBuilder
+from lewis.utils.command_builder import CmdBuilder
 
 
 def if_connected(f):

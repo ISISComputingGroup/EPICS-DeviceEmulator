@@ -1,8 +1,8 @@
 
 from lewis.adapters.stream import StreamInterface
 
-from lewis_emulators.utils.command_builder import CmdBuilder
-from lewis_emulators.utils.replies import conditional_reply, timed_reply
+from lewis.utils.command_builder import CmdBuilder
+from lewis.utils.replies import conditional_reply, timed_reply
 
 if_connected = conditional_reply("connected")
 if_input_error = conditional_reply("input_correct", "%%[Error:stack underflow]%%")

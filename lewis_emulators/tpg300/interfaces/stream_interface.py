@@ -1,8 +1,8 @@
 from lewis.adapters.stream import StreamInterface
-from lewis_emulators.utils.command_builder import CmdBuilder
+from lewis.utils.command_builder import CmdBuilder
 from ..device import ReadState, Units
-from lewis_emulators.utils.replies import conditional_reply
-from lewis_emulators.utils.constants import ACK
+from lewis.utils.replies import conditional_reply
+from lewis.utils.constants import ACK
 
 
 class Tpg300StreamInterface(StreamInterface):

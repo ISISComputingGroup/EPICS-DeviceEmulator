@@ -1,6 +1,6 @@
 from lewis.adapters.stream import StreamInterface
 from lewis.core.logging import has_log
-from lewis_emulators.utils.command_builder import CmdBuilder
+from lewis.utils.command_builder import CmdBuilder
 
 
 _CONTROL_CHANNEL, _CONTROL_CHANNEL_INDEX = "B", 1

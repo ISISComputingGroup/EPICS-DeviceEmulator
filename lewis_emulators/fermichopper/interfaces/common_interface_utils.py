@@ -1,4 +1,4 @@
-from lewis_emulators.utils.command_builder import CmdBuilder
+from lewis.utils.command_builder import CmdBuilder
 
 HEX_LEN_2 = "[0-9A-F]{2}"
 HEX_LEN_4 = "[0-9A-F]{4}"

@@ -1,7 +1,7 @@
 from lewis.adapters.stream import StreamInterface
 from lewis.core.logging import has_log
 
-from lewis_emulators.utils.command_builder import CmdBuilder
+from lewis.utils.command_builder import CmdBuilder
 
 from lewis_emulators.ips.modes import Activity, Control
 from ..device import amps_to_tesla, tesla_to_amps

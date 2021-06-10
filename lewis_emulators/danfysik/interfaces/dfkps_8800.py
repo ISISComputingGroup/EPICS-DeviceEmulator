@@ -4,8 +4,8 @@ Stream device for danfysik 8800
 from lewis.adapters.stream import StreamInterface
 from lewis.core.logging import has_log
 
-from lewis_emulators.utils.command_builder import CmdBuilder
-from lewis_emulators.utils.replies import conditional_reply
+from lewis.utils.command_builder import CmdBuilder
+from lewis.utils.replies import conditional_reply
 from .dfkps_base import CommonStreamInterface
 
 
