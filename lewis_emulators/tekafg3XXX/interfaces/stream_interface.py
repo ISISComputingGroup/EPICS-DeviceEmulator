@@ -184,7 +184,7 @@ class Tekafg3XXXStreamInterface(StreamInterface):
         self._channel(channel).phase = new_phase
 
     def get_burst_status(self, channel: int) -> str:
-        return self._channel(channel).burst_status
+        return 1 if self._channel(channel).burst_status == "ON" else 0
 
     def set_burst_status(self, channel: int, new_burst_status: str):
         self._channel(channel).burst_status = new_burst_status
@@ -232,7 +232,7 @@ class Tekafg3XXXStreamInterface(StreamInterface):
         self._channel(channel).sweep_hold_time = new_sweep_hold_time
 
     def get_sweep_mode(self, channel: int) -> str:
-        return self._channel(channel).sweep_hold_time
+        return self._channel(channel).sweep_mode
 
     def set_sweep_mode(self, channel: int, new_sweep_mode: str):
         self._channel(channel).sweep_mode = new_sweep_mode
