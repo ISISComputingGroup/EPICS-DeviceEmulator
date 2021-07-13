@@ -4,8 +4,8 @@ Stream interface for the SP2xx device.
 from lewis.adapters.stream import StreamInterface
 from lewis.core.logging import has_log
 
-from lewis_emulators.utils.command_builder import CmdBuilder, string_arg
-from lewis_emulators.utils.replies import conditional_reply
+from lewis.utils.command_builder import CmdBuilder, string_arg
+from lewis.utils.replies import conditional_reply
 
 from ..util_classes import RunStatus
 from ..util_constants import DIRECTIONS

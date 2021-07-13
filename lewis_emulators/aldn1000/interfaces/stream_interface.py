@@ -1,8 +1,8 @@
 from lewis.adapters.stream import StreamInterface, Cmd
 
-from lewis_emulators.utils.command_builder import CmdBuilder
-from lewis_emulators.utils.constants import STX, ETX
-from lewis_emulators.utils.replies import conditional_reply
+from lewis.utils.command_builder import CmdBuilder
+from lewis.utils.constants import STX, ETX
+from lewis.utils.replies import conditional_reply
 
 if_input_error = conditional_reply('input_correct', STX + "01I?NA" + ETX)
 if_connected = conditional_reply("connected")

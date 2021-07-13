@@ -1,5 +1,5 @@
 from lewis.adapters.stream import StreamInterface, Cmd
-from lewis_emulators.utils.replies import conditional_reply
+from lewis.utils.replies import conditional_reply
 
 if_connected = conditional_reply("connected")
 

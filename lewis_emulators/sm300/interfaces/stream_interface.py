@@ -5,8 +5,8 @@ Stream interface for the SM 300 motor emulator
 from lewis.adapters.stream import StreamInterface
 from lewis.core.logging import has_log
 
-from lewis_emulators.utils.command_builder import CmdBuilder
-from lewis_emulators.utils.constants import EOT, ASCII_CHARS
+from lewis.utils.command_builder import CmdBuilder
+from lewis.utils.constants import EOT, ASCII_CHARS
 
 
 @has_log

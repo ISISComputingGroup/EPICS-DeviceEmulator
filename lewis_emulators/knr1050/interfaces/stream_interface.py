@@ -1,8 +1,8 @@
 from lewis.adapters.stream import StreamInterface
 
 from lewis.core.logging import has_log
-from lewis_emulators.utils.replies import conditional_reply
-from lewis_emulators.utils.command_builder import CmdBuilder
+from lewis.utils.replies import conditional_reply
+from lewis.utils.command_builder import CmdBuilder
 
 if_connected = conditional_reply('connected')
 if_input_error = conditional_reply('input_correct', "ERROR:20,Instrument in standalone mode")

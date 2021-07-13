@@ -1,4 +1,4 @@
-from lewis_emulators.utils.byte_conversions import int_to_raw_bytes, BYTE
+from lewis.utils.byte_conversions import int_to_raw_bytes, BYTE
 
 
 def crc16_matches(data, expected):
