@@ -17,8 +17,10 @@ class MclennanStreamInterface(StreamInterface):
         CmdBuilder("get_position").int().escape("OA").eos().build(),
         CmdBuilder("set_accel").int().escape("SA").int().eos().build(),
         CmdBuilder("set_decel").int().escape("SD").int().eos().build(),
+        CmdBuilder("set_creep_speed").int().escape("SC").int().eos().build(),
         CmdBuilder("reset").int().escape("RS").eos().build(),
         CmdBuilder("jog").int().escape("CV").int().eos().build(),
+        CmdBuilder("query_speeds").int().escape("QS").eos().build(),
     }
 
     in_terminator = "\r"
@@ -37,7 +39,16 @@ class MclennanStreamInterface(StreamInterface):
 
     @if_connected
     def identify(self, controller):
-        return "01: PM600 Ver 3.02"
+        return "01: PM600 Ver 3.02" if not self.device.is_pm304 else "1:Mclennan Servo Supplies Ltd. PM304 V6.15"
+
+    @if_connected
+    def query_speeds(self, controller):
+        return f"SV=16200,SC={self.device.creep_speed},SA=100000,SD=100000" if self.device.is_pm304 else f"01:SC = {self.device.creep_speed} SV = 16200 SA = 100000 SD = 100000 LD = 200000"
+
+    @if_connected
+    def set_creep_speed(self, controller, creep_speed):
+        self.device.creep_speed = creep_speed
+        return "OK"
 
     @if_connected
     def status(self, controller):
