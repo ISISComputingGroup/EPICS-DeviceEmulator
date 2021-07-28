@@ -1,5 +1,5 @@
 """
-Stream device for danfysik 9100
+Stream device for danfysik 9X00
 """
 from lewis.adapters.stream import StreamInterface
 from lewis.core.logging import has_log
@@ -10,11 +10,11 @@ from .dfkps_base import CommonStreamInterface
 
 import logging
 
-__all__ = ["Danfysik9100StreamInterface"]
+__all__ = ["Danfysik9X00StreamInterface"]
 
 
 @has_log
-class Danfysik9100StreamInterface(CommonStreamInterface, StreamInterface):
+class Danfysik9X00StreamInterface(CommonStreamInterface, StreamInterface):
     """
     Stream interface for a Danfysik model 9100.
     """
@@ -22,7 +22,7 @@ class Danfysik9100StreamInterface(CommonStreamInterface, StreamInterface):
     in_terminator = "\r"
     out_terminator = "\n\r"
 
-    protocol = 'model9100'
+    protocol = 'model9X00'
 
     # This is the address of the LOQ danfysik 8500
     PSU_ADDRESS = 75
@@ -44,36 +44,31 @@ class Danfysik9100StreamInterface(CommonStreamInterface, StreamInterface):
         """
         Respond to the get_status command (S1)
         """
-        def bit(condition):
-            return "!" if condition else "."
-
-        def ilk(name):
-            return bit(name in self.device.active_interlocks)
 
         response = "{power_off}{pol_normal}{pol_reversed}{spare}{crowbar}{imode}{is_percent}{external_interlock_0}"\
                    "{spare}{sum_interlock}{over_voltage}{dc_overcurrent}{dc_undervoltage}{spare}" \
                    "{phase_fail}{spare}{earth_leak_fail}{fan}{mps_overtemperature}" \
                    "{external_interlock_1}{external_interlock_2}{external_interlock_3}{mps_not_ready}{spare}".format(
-                        spare=bit(False),
-                        power_off=bit(not self.device.power),
-                        pol_normal=bit(not self.device.negative_polarity),
-                        pol_reversed=bit(self.device.negative_polarity),
-                        crowbar=bit(False),
-                        imode=bit(False),
-                        is_percent=bit(False),
-                        external_interlock_0=ilk("external_interlock_0"),
-                        sum_interlock=bit(len(self.device.active_interlocks) > 0),
-                        dc_overcurrent=ilk("dc_overcurrent"),
-                        over_voltage=ilk("over_voltage"),
-                        dc_undervoltage=ilk("dc_undervoltage"),
-                        phase_fail=ilk("phase_fail"),
-                        earth_leak_fail=ilk("earth_leak_fail"),
-                        fan=ilk("fan"),
-                        mps_overtemperature=ilk("mps_overtemperature"),
-                        external_interlock_1=ilk("external_interlock_1"),
-                        external_interlock_2=ilk("external_interlock_2"),
-                        external_interlock_3=ilk("external_interlock_3"),
-                        mps_not_ready=bit(not self.device.power),
+                        spare=self.bit(False),
+                        power_off=self.bit(not self.device.power),
+                        pol_normal=self.bit(not self.device.negative_polarity),
+                        pol_reversed=self.bit(self.device.negative_polarity),
+                        crowbar=self.bit(False),
+                        imode=self.bit(False),
+                        is_percent=self.bit(False),
+                        external_interlock_0=self.interlock("external_interlock_0"),
+                        sum_interlock=self.bit(len(self.device.active_interlocks) > 0),
+                        dc_overcurrent=self.interlock("dc_overcurrent"),
+                        over_voltage=self.interlock("over_voltage"),
+                        dc_undervoltage=self.interlock("dc_undervoltage"),
+                        phase_fail=self.interlock("phase_fail"),
+                        earth_leak_fail=self.interlock("earth_leak_fail"),
+                        fan=self.interlock("fan"),
+                        mps_overtemperature=self.interlock("mps_overtemperature"),
+                        external_interlock_1=self.interlock("external_interlock_1"),
+                        external_interlock_2=self.interlock("external_interlock_2"),
+                        external_interlock_3=self.interlock("external_interlock_3"),
+                        mps_not_ready=self.bit(not self.device.power),
                     )
 
         assert len(response) == 24, "length should have been 24 but was {}".format(len(response))

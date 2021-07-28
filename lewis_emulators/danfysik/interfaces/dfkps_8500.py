@@ -42,39 +42,34 @@ class Danfysik8500StreamInterface(CommonStreamInterface, StreamInterface):
         """
         Respond to the get_status command (S1)
         """
-        def bit(condition):
-            return "!" if condition else "."
-
-        def ilk(name):
-            return bit(name in self.device.active_interlocks)
 
         response = "{power_off}{pol_normal}{pol_reversed}{reg_transformer}{dac16}{dac17}{is_percent}{spare}"\
                    "{transistor_fault}{sum_interlock}{dc_overcurrent}{dc_overload}{reg_mod_fail}{prereg_fail}" \
                    "{phase_fail}{mps_waterflow_fail}{earth_leak_fail}{thermal_fail}{mps_overtemperature}" \
                    "{door_switch}{mag_waterflow_fail}{mag_overtemp}{mps_not_ready}{spare}".format(
-                        spare=bit(False),
-                        power_off=bit(not self.device.power),
-                        pol_normal=bit(not self.device.negative_polarity),
-                        pol_reversed=bit(self.device.negative_polarity),
-                        reg_transformer=bit(False),
-                        dac16=bit(False),
-                        dac17=bit(False),
-                        is_percent=bit(False),
-                        transistor_fault=ilk("transistor_fault"),
-                        sum_interlock=bit(len(self.device.active_interlocks) > 0),
-                        dc_overcurrent=ilk("dc_overcurrent"),
-                        dc_overload=ilk("dc_overload"),
-                        reg_mod_fail=ilk("reg_mod_fail"),
-                        prereg_fail=ilk("prereg_fail"),
-                        phase_fail=ilk("phase_fail"),
-                        mps_waterflow_fail=ilk("mps_waterflow_fail"),
-                        earth_leak_fail=ilk("earth_leak_fail"),
-                        thermal_fail=ilk("thermal_fail"),
-                        mps_overtemperature=ilk("mps_overtemperature"),
-                        door_switch=ilk("door_switch"),
-                        mag_waterflow_fail=ilk("mag_waterflow_fail"),
-                        mag_overtemp=ilk("mag_overtemp"),
-                        mps_not_ready=bit(not self.device.power),
+                        spare=self.bit(False),
+                        power_off=self.bit(not self.device.power),
+                        pol_normal=self.bit(not self.device.negative_polarity),
+                        pol_reversed=self.bit(self.device.negative_polarity),
+                        reg_transformer=self.bit(False),
+                        dac16=self.bit(False),
+                        dac17=self.bit(False),
+                        is_percent=self.bit(False),
+                        transistor_fault=self.interlock("transistor_fault"),
+                        sum_interlock=self.bit(len(self.device.active_interlocks) > 0),
+                        dc_overcurrent=self.interlock("dc_overcurrent"),
+                        dc_overload=self.interlock("dc_overload"),
+                        reg_mod_fail=self.interlock("reg_mod_fail"),
+                        prereg_fail=self.interlock("prereg_fail"),
+                        phase_fail=self.interlock("phase_fail"),
+                        mps_waterflow_fail=self.interlock("mps_waterflow_fail"),
+                        earth_leak_fail=self.interlock("earth_leak_fail"),
+                        thermal_fail=self.interlock("thermal_fail"),
+                        mps_overtemperature=self.interlock("mps_overtemperature"),
+                        door_switch=self.interlock("door_switch"),
+                        mag_waterflow_fail=self.interlock("mag_waterflow_fail"),
+                        mag_overtemp=self.interlock("mag_overtemp"),
+                        mps_not_ready=self.bit(not self.device.power),
                     )
 
         assert len(response) == 24, "length should have been 24 but was {}".format(len(response))
