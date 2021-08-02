@@ -98,3 +98,9 @@ class CommonStreamInterface(object):
         Initialize comms of device
         """
         self.device.comms_initialized = True
+
+    def bit(self, condition):
+        return "!" if condition else "."
+
+    def interlock(self, name):
+        return self.bit(name in self.device.active_interlocks)
