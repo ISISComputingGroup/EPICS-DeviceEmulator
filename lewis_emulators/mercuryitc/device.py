@@ -99,7 +99,6 @@ class SimulatedMercuryitc(StateMachineDevice):
         self.connected = True
 
         self.resistance_suffix = "O"
-
         self.channels = {
             # Temperature channel 1
             "MB0.T0": TemperatureChannel("MB0.T0"),
@@ -130,6 +129,8 @@ class SimulatedMercuryitc(StateMachineDevice):
         self.channels["DB5.P0"].associated_heater_channel = "DB6.H2"
         self.channels["DB5.P0"].associated_aux_channel = "DB7.A2"
 
+        self.simulating_missed_replies = False
+
     def reset(self):
         self._initialize_data()
 
@@ -145,3 +146,4 @@ class SimulatedMercuryitc(StateMachineDevice):
     def backdoor_set_channel_property(self, chan_id, property_name, value):
         assert hasattr(self.channels[chan_id], property_name)
         setattr(self.channels[chan_id], property_name, value)
+

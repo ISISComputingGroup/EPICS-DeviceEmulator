@@ -12,6 +12,8 @@ ISOBUS_PREFIX = "@1"
 
 @has_log
 class MercuryitcInterface(StreamInterface):
+    def __init__(self):
+        self.count = 1
     commands = {
         # System-level commands
         CmdBuilder("get_catalog").optional(ISOBUS_PREFIX)
@@ -136,6 +138,15 @@ class MercuryitcInterface(StreamInterface):
     in_terminator = "\n"
     out_terminator = "\n"
 
+    def counter(self):
+        if self.device.simulating_missed_replies:
+            self.count += 1
+            if not self.count % 2 == 0:
+                self.log.info("simulating failure, count = {}".format(self.count))
+                return True
+        else:
+            return False
+
     def handle_error(self, request, error):
         err_string = "command was: {}, error was: {}: {}\n".format(request, error.__class__.__name__, error)
         print(err_string)
@@ -146,7 +157,8 @@ class MercuryitcInterface(StreamInterface):
     @if_connected
     def get_catalog(self):
         resp = "STAT:SYS:CAT"
-
+        if self.counter():
+            return
         for chan_location, chan in self.device.channels.items():
             resp += ":DEV:{}:{}".format(chan_location, chan.channel_type)
 
@@ -176,21 +188,29 @@ class MercuryitcInterface(StreamInterface):
 
     @if_connected
     def get_nickname(self, deviceid, devicetype):
+        if self.counter():
+            return
         chan = self._chan_from_id(deviceid, expected_type=devicetype)
         return "STAT:DEV:{}:{}:NICK:{}".format(deviceid, devicetype, chan.nickname)
 
     @if_connected
     def set_nickname(self, deviceid, devicetype, nickname):
+        if self.counter():
+            return
         chan = self._chan_from_id(deviceid, expected_type=devicetype)
         chan.nickname = nickname
         return "STAT:SET:DEV:{}:{}:NICK:{}:VALID".format(deviceid, devicetype, chan.nickname)
 
     @if_connected
     def read_calib_tables(self):
+        if self.counter():
+            return
         return "STAT:FILE:calibration_tables:LIST:fake_table_1;fake_table_2"
 
     @if_connected
     def get_all_temp_sensor_details(self, deviceid):
+        if self.counter():
+            return
         """
         Gets the details for an entire temperature sensor all at once. This is only used by the LabVIEW VI, not by
         the IOC (the ioc queries each parameter individually)
@@ -202,26 +222,28 @@ class MercuryitcInterface(StreamInterface):
         return "STAT:DEV:{}:TEMP:".format(deviceid) + \
                ":NICK:{}".format(temp_chan.nickname) + \
                ":LOOP" + \
-                 ":AUX:{}".format(temp_chan.associated_aux_channel) + \
-                 ":D:{}".format(temp_chan.d) + \
-                 ":HTR:{}".format(temp_chan.associated_heater_channel) + \
-                 ":I:{}".format(temp_chan.i) + \
-                 ":HSET:{}".format(temp_chan.heater_percent) + \
-                 ":PIDT:{}".format("ON" if temp_chan.autopid else "OFF") + \
-                 ":ENAB:{}".format("ON" if temp_chan.heater_auto else "OFF") + \
-                 ":FAUT:{}".format("ON" if temp_chan.gas_flow_auto else "OFF") + \
-                 ":FSET:{}".format(aux_chan.gas_flow) + \
-                 ":PIDF:{}".format(temp_chan.autopid_file if temp_chan.autopid else "None") + \
-                 ":P:{}".format(temp_chan.p) + \
-                 ":TSET:{:.4f}K".format(temp_chan.temperature_sp) + \
+               ":AUX:{}".format(temp_chan.associated_aux_channel) + \
+               ":D:{}".format(temp_chan.d) + \
+               ":HTR:{}".format(temp_chan.associated_heater_channel) + \
+               ":I:{}".format(temp_chan.i) + \
+               ":HSET:{}".format(temp_chan.heater_percent) + \
+               ":PIDT:{}".format("ON" if temp_chan.autopid else "OFF") + \
+               ":ENAB:{}".format("ON" if temp_chan.heater_auto else "OFF") + \
+               ":FAUT:{}".format("ON" if temp_chan.gas_flow_auto else "OFF") + \
+               ":FSET:{}".format(aux_chan.gas_flow) + \
+               ":PIDF:{}".format(temp_chan.autopid_file if temp_chan.autopid else "None") + \
+               ":P:{}".format(temp_chan.p) + \
+               ":TSET:{:.4f}K".format(temp_chan.temperature_sp) + \
                ":CAL" + \
-                 ":FILE:{}".format(temp_chan.calibration_file) + \
+               ":FILE:{}".format(temp_chan.calibration_file) + \
                ":SIG" + \
-                 ":TEMP:{:.4f}K".format(temp_chan.temperature) + \
-                 ":RES:{:.4f}O".format(temp_chan.resistance)
+               ":TEMP:{:.4f}K".format(temp_chan.temperature) + \
+               ":RES:{:.4f}O".format(temp_chan.resistance)
 
     @if_connected
     def get_all_pressure_sensor_details(self, deviceid):
+        if self.counter():
+            return
         """
         Gets the details for an entire temperature sensor all at once. This is only used by the LabVIEW VI, not by
         the IOC (the ioc queries each parameter individually)
@@ -233,31 +255,35 @@ class MercuryitcInterface(StreamInterface):
         return "STAT:DEV:{}:PRES:".format(deviceid) + \
                ":NICK:{}".format(pres_chan.nickname) + \
                ":LOOP" + \
-                 ":AUX:{}".format(pres_chan.associated_aux_channel) + \
-                 ":D:{}".format(pres_chan.d) + \
-                 ":HTR:{}".format(pres_chan.associated_heater_channel) + \
-                 ":I:{}".format(pres_chan.i) + \
-                 ":HSET:{}".format(pres_chan.heater_percent) + \
-                 ":PIDT:{}".format("ON" if pres_chan.autopid else "OFF") + \
-                 ":ENAB:{}".format("ON" if pres_chan.heater_auto else "OFF") + \
-                 ":FAUT:{}".format("ON" if pres_chan.gas_flow_auto else "OFF") + \
-                 ":FSET:{}".format(aux_chan.gas_flow) + \
-                 ":PIDF:{}".format(pres_chan.autopid_file if pres_chan.autopid else "None") + \
-                 ":P:{}".format(pres_chan.p) + \
-                 ":TSET:{:.4f}K".format(pres_chan.pressure_sp) + \
+               ":AUX:{}".format(pres_chan.associated_aux_channel) + \
+               ":D:{}".format(pres_chan.d) + \
+               ":HTR:{}".format(pres_chan.associated_heater_channel) + \
+               ":I:{}".format(pres_chan.i) + \
+               ":HSET:{}".format(pres_chan.heater_percent) + \
+               ":PIDT:{}".format("ON" if pres_chan.autopid else "OFF") + \
+               ":ENAB:{}".format("ON" if pres_chan.heater_auto else "OFF") + \
+               ":FAUT:{}".format("ON" if pres_chan.gas_flow_auto else "OFF") + \
+               ":FSET:{}".format(aux_chan.gas_flow) + \
+               ":PIDF:{}".format(pres_chan.autopid_file if pres_chan.autopid else "None") + \
+               ":P:{}".format(pres_chan.p) + \
+               ":TSET:{:.4f}K".format(pres_chan.pressure_sp) + \
                ":CAL" + \
-                 ":FILE:{}".format(pres_chan.calibration_file) + \
+               ":FILE:{}".format(pres_chan.calibration_file) + \
                ":SIG" + \
-                 ":PRES:{:.4f}mBar".format(pres_chan.pressure) + \
-                 ":VOLT:{:.4f}V".format(pres_chan.voltage)
+               ":PRES:{:.4f}mBar".format(pres_chan.pressure) + \
+               ":VOLT:{:.4f}V".format(pres_chan.voltage)
 
     @if_connected
     def get_calib_file(self, deviceid, chan_type):
+        if self.counter():
+            return
         chan = self._chan_from_id(deviceid, expected_type=chan_type)
         return "STAT:DEV:{}:{}:CAL:FILE:{}".format(deviceid, chan_type, chan.calibration_file)
 
     @if_connected
     def set_calib_file(self, deviceid, chan_type, calib_file):
+        if self.counter():
+            return
         chan = self._chan_from_id(deviceid, expected_type=chan_type)
         if not hasattr(chan, "calibration_file"):
             raise ValueError("Unexpected channel type in set_calib_file")
@@ -266,11 +292,15 @@ class MercuryitcInterface(StreamInterface):
 
     @if_connected
     def get_associated_heater(self, deviceid, chan_type):
+        if self.counter():
+            return
         chan = self._chan_from_id(deviceid, expected_type=chan_type)
         return "STAT:DEV:{}:{}:LOOP:HTR:{}".format(deviceid, chan_type, chan.associated_heater_channel)
 
     @if_connected
     def set_associated_heater(self, deviceid, chan_type, new_heater):
+        if self.counter():
+            return
         chan = self._chan_from_id(deviceid, expected_type=chan_type)
         if new_heater == "None":
             chan.associated_heater_channel = None
@@ -281,11 +311,15 @@ class MercuryitcInterface(StreamInterface):
 
     @if_connected
     def get_associated_aux(self, deviceid, chan_type):
+        if self.counter():
+            return
         chan = self._chan_from_id(deviceid, expected_type=chan_type)
         return "STAT:DEV:{}:{}:LOOP:AUX:{}".format(deviceid, chan_type, chan.associated_aux_channel)
 
     @if_connected
     def set_associated_aux(self, deviceid, chan_type, new_aux):
+        if self.counter():
+            return
         chan = self._chan_from_id(deviceid, expected_type=chan_type)
         if new_aux == "None":
             chan.associated_aux_channel = None
@@ -296,130 +330,178 @@ class MercuryitcInterface(StreamInterface):
 
     @if_connected
     def get_autopid(self, deviceid, chan_type):
+        if self.counter():
+            return
         chan = self._chan_from_id(deviceid, expected_type=chan_type)
         return "STAT:DEV:{}:{}:LOOP:PIDT:{}".format(deviceid, chan_type, "ON" if chan.autopid else "OFF")
 
     @if_connected
     def set_autopid(self, deviceid, chan_type, sp):
+        if self.counter():
+            return
         chan = self._chan_from_id(deviceid, expected_type=chan_type)
         chan.autopid = (sp == "ON")
         return "STAT:SET:DEV:{}:{}:LOOP:PIDT:{}:VALID".format(deviceid, chan_type, sp)
 
     @if_connected
     def get_temp_p(self, deviceid, chan_type):
+        if self.counter():
+            return
         chan = self._chan_from_id(deviceid, expected_type=chan_type)
         return "STAT:DEV:{}:{}:LOOP:P:{:.4f}".format(deviceid, chan_type, chan.p)
 
     @if_connected
     def set_temp_p(self, deviceid, chan_type, p):
+        if self.counter():
+            return
         chan = self._chan_from_id(deviceid, expected_type=chan_type)
         chan.p = p
         return "STAT:SET:DEV:{}:{}:LOOP:P:{:.4f}:VALID".format(deviceid, chan_type, p)
 
     @if_connected
     def get_temp_i(self, deviceid, chan_type):
+        if self.counter():
+            return
         chan = self._chan_from_id(deviceid, expected_type=chan_type)
         return "STAT:DEV:{}:{}:LOOP:I:{:.4f}".format(deviceid, chan_type, chan.i)
 
     @if_connected
     def set_temp_i(self, deviceid, chan_type, i):
+        if self.counter():
+            return
         chan = self._chan_from_id(deviceid, expected_type=chan_type)
         chan.i = i
         return "STAT:SET:DEV:{}:{}:LOOP:I:{:.4f}:VALID".format(deviceid, chan_type, i)
 
     @if_connected
     def get_temp_d(self, deviceid, chan_type):
+        if self.counter():
+            return
         chan = self._chan_from_id(deviceid, expected_type=chan_type)
         return "STAT:DEV:{}:{}:LOOP:D:{:.4f}".format(deviceid, chan_type, chan.d)
 
     @if_connected
     def set_temp_d(self, deviceid, chan_type, d):
+        if self.counter():
+            return
         chan = self._chan_from_id(deviceid, expected_type=chan_type)
         chan.d = d
         return "STAT:SET:DEV:{}:{}:LOOP:D:{:.4f}:VALID".format(deviceid, chan_type, d)
 
     @if_connected
     def get_temp_measured(self, deviceid):
+        if self.counter():
+            return
         chan = self._chan_from_id(deviceid, expected_type=ChannelTypes.TEMP)
         return "STAT:DEV:{}:TEMP:SIG:TEMP:{:.4f}K".format(deviceid, chan.temperature)
 
     @if_connected
     def get_pres_measured(self, deviceid):
+        if self.counter():
+            return
         chan = self._chan_from_id(deviceid, expected_type=ChannelTypes.PRES)
         return "STAT:DEV:{}:PRES:SIG:PRES:{:.4f}mB".format(deviceid, chan.pressure)
 
     @if_connected
     def get_temp_setpoint(self, deviceid):
+        if self.counter():
+            return
         chan = self._chan_from_id(deviceid, expected_type=ChannelTypes.TEMP)
         return "STAT:DEV:{}:TEMP:LOOP:TSET:{:.4f}K".format(deviceid, chan.temperature_sp)
 
     @if_connected
     def get_pres_setpoint(self, deviceid):
+        if self.counter():
+            return
         chan = self._chan_from_id(deviceid, expected_type=ChannelTypes.PRES)
         return "STAT:DEV:{}:PRES:LOOP:PRST:{:.4f}mB".format(deviceid, chan.pressure_sp)
 
     @if_connected
     def set_temp_setpoint(self, deviceid, sp):
+        if self.counter():
+            return
         chan = self._chan_from_id(deviceid, expected_type=ChannelTypes.TEMP)
         chan.temperature_sp = sp
         return "STAT:SET:DEV:{}:TEMP:LOOP:TSET:{:.4f}K:VALID".format(deviceid, sp)
 
     @if_connected
     def set_pres_setpoint(self, deviceid, sp):
+        if self.counter():
+            return
         chan = self._chan_from_id(deviceid, expected_type=ChannelTypes.PRES)
         chan.pressure_sp = sp
         return "STAT:SET:DEV:{}:PRES:LOOP:PRST:{:.4f}mB:VALID".format(deviceid, sp)
 
     @if_connected
     def get_resistance(self, deviceid):
+        if self.counter():
+            return
         chan = self._chan_from_id(deviceid, expected_type=ChannelTypes.TEMP)
         return "STAT:DEV:{}:TEMP:SIG:RES:{:.4f}{}".format(deviceid, chan.resistance, self.device.resistance_suffix)
 
     @if_connected
     def get_voltage(self, deviceid):
+        if self.counter():
+            return
         chan = self._chan_from_id(deviceid, expected_type=ChannelTypes.PRES)
         return "STAT:DEV:{}:PRES:SIG:VOLT:{:.4f}V".format(deviceid, chan.voltage)
 
     @if_connected
     def get_heater_auto(self, deviceid, chan_type):
+        if self.counter():
+            return
         chan = self._chan_from_id(deviceid, expected_type=chan_type)
         return "STAT:DEV:{}:{}:LOOP:ENAB:{}".format(deviceid, chan_type, "ON" if chan.heater_auto else "OFF")
 
     @if_connected
     def set_heater_auto(self, deviceid, chan_type, sp):
+        if self.counter():
+            return
         chan = self._chan_from_id(deviceid, expected_type=chan_type)
         chan.heater_auto = (sp == "ON")
         return "STAT:SET:DEV:{}:{}:LOOP:ENAB:{}:VALID".format(deviceid, chan_type, "ON" if chan.heater_auto else "OFF")
 
     @if_connected
     def get_gas_flow_auto(self, deviceid, chan_type):
+        if self.counter():
+            return
         chan = self._chan_from_id(deviceid, expected_type=chan_type)
         return "STAT:DEV:{}:{}:LOOP:FAUT:{}".format(deviceid, chan_type, "ON" if chan.gas_flow_auto else "OFF")
 
     @if_connected
     def set_gas_flow_auto(self, deviceid, chan_type, sp):
+        if self.counter():
+            return
         chan = self._chan_from_id(deviceid, expected_type=chan_type)
         chan.gas_flow_auto = (sp == "ON")
         return "STAT:SET:DEV:{}:{}:LOOP:FAUT:{}:VALID".format(deviceid, chan_type, "ON" if chan.gas_flow_auto else "OFF")
 
     @if_connected
     def get_heater_percent(self, deviceid, chan_type):
+        if self.counter():
+            return
         chan = self._chan_from_id(deviceid, expected_type=chan_type)
         return "STAT:DEV:{}:{}:LOOP:HSET:{:.4f}".format(deviceid, chan_type, chan.heater_percent)
 
     @if_connected
     def set_heater_percent(self, deviceid, chan_type, sp):
+        if self.counter():
+            return
         chan = self._chan_from_id(deviceid, expected_type=chan_type)
         chan.heater_percent = sp
         return "STAT:SET:DEV:{}:{}:LOOP:HSET:{:.4f}:VALID".format(deviceid, chan_type, sp)
 
     @if_connected
     def get_gas_flow(self, deviceid):
+        if self.counter():
+            return
         aux_chan = self._chan_from_id(deviceid, expected_type=ChannelTypes.AUX)
         return "STAT:DEV:{}:AUX:SIG:PERC:{:.4f}%".format(deviceid, aux_chan.gas_flow)
 
     @if_connected
     def set_gas_flow(self, deviceid, chan_type, sp):
+        if self.counter():
+            return
         temp_chan = self._chan_from_id(deviceid, expected_type=chan_type)
         aux_chan = self._chan_from_id(temp_chan.associated_aux_channel, expected_type=ChannelTypes.AUX)
         aux_chan.gas_flow = sp
@@ -427,6 +509,8 @@ class MercuryitcInterface(StreamInterface):
 
     @if_connected
     def get_all_heater_details(self, deviceid):
+        if self.counter():
+            return
         """
         Gets the details for an entire heater sensor all at once. This is only used by the LabVIEW VI, not by
         the IOC (the ioc queries each parameter individually)
@@ -444,32 +528,44 @@ class MercuryitcInterface(StreamInterface):
 
     @if_connected
     def get_heater_voltage_limit(self, deviceid):
+        if self.counter():
+            return
         chan = self._chan_from_id(deviceid, expected_type=ChannelTypes.HTR)
         return "STAT:DEV:{}:HTR:VLIM:{:.4f}".format(deviceid, chan.voltage_limit)
 
     @if_connected
     def set_heater_voltage_limit(self, deviceid, sp):
+        if self.counter():
+            return
         chan = self._chan_from_id(deviceid, expected_type=ChannelTypes.HTR)
         chan.voltage_limit = sp
         return "STAT:SET:DEV:{}:HTR:VLIM:{:.4f}:VALID".format(deviceid, chan.voltage_limit)
 
     @if_connected
     def get_heater_voltage(self, deviceid):
+        if self.counter():
+            return
         chan = self._chan_from_id(deviceid, expected_type=ChannelTypes.HTR)
         return "STAT:DEV:{}:HTR:SIG:VOLT:{:.4f}V".format(deviceid, chan.voltage)
 
     @if_connected
     def get_heater_current(self, deviceid):
+        if self.counter():
+            return
         chan = self._chan_from_id(deviceid, expected_type=ChannelTypes.HTR)
         return "STAT:DEV:{}:HTR:SIG:CURR:{:.4f}A".format(deviceid, chan.current)
 
     @if_connected
     def get_heater_power(self, deviceid):
+        if self.counter():
+            return
         chan = self._chan_from_id(deviceid, expected_type=ChannelTypes.HTR)
         return "STAT:DEV:{}:HTR:SIG:POWR:{:.4f}W".format(deviceid, chan.power)
 
     @if_connected
     def get_all_aux_details(self, deviceid):
+        if self.counter():
+            return
         """
         Gets the details for an entire aux sensor all at once. This is only used by the LabVIEW VI, not by
         the IOC (the ioc queries each parameter individually)
@@ -483,6 +579,8 @@ class MercuryitcInterface(StreamInterface):
 
     @if_connected
     def get_all_level_sensor_details(self, deviceid):
+        if self.counter():
+            return
         """
         Gets the details for an entire temperature sensor all at once. This is only used by the LabVIEW VI, not by
         the IOC (the ioc queries each parameter individually)
@@ -498,24 +596,32 @@ class MercuryitcInterface(StreamInterface):
 
     @if_connected
     def get_nitrogen_level(self, deviceid):
+        if self.counter():
+            return
         chan = self._chan_from_id(deviceid, expected_type=ChannelTypes.LVL)
 
         return "STAT:DEV:{}:LVL:SIG:NIT:LEV:{:.3f}%".format(deviceid, chan.nitrogen_level)
 
     @if_connected
     def get_helium_level(self, deviceid):
+        if self.counter():
+            return
         chan = self._chan_from_id(deviceid, expected_type=ChannelTypes.LVL)
 
         return "STAT:DEV:{}:LVL:SIG:HEL:LEV:{:.3f}%".format(deviceid, chan.helium_level)
 
     @if_connected
     def get_helium_probe_speed(self, deviceid):
+        if self.counter():
+            return
         chan = self._chan_from_id(deviceid, expected_type=ChannelTypes.LVL)
 
         return "STAT:DEV:{}:LVL:HEL:PULS:SLOW:{}".format(deviceid, "ON" if chan.slow_helium_read_rate else "OFF")
 
     @if_connected
     def set_helium_probe_speed(self, deviceid, sp):
+        if self.counter():
+            return
         chan = self._chan_from_id(deviceid, expected_type=ChannelTypes.LVL)
 
         chan.slow_helium_read_rate = sp == 1
