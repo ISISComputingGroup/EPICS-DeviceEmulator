@@ -17,6 +17,8 @@ class SimulatedMclennan(StateMachineDevice):
         self.is_jogging = False
         self.velocity = 0
         self.position = 0
+        self.is_pm304 = False
+        self.creep_speed = 700
 
     def jog(self, velocity):
         self.velocity = velocity
