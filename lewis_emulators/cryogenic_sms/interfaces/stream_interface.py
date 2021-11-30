@@ -8,11 +8,11 @@ from ..utils import RampTarget, RampDirection
 ON_STATES = ["ON", "1"]
 OFF_STATES = ["OFF", "0"]
 
+
 @has_log
 class CRYOSMSStreamInterface(StreamInterface):
-
     in_terminator = "\r\n"
-    out_terminator = chr(19)
+    out_terminator = "\r\n" + chr(19)
 
     def __init__(self):
         re_set = " *S(?:ET)* *"  # Set regex for shorthand or longhand with 0 or more leading and trailing spaces
@@ -23,7 +23,7 @@ class CRYOSMSStreamInterface(StreamInterface):
             CmdBuilder(self.read_output_mode).spaces().regex("T(?:ESLA)*").spaces().eos().build(),
             CmdBuilder(self.read_output).regex(re_get).regex("O(?:UTPUT)*").spaces().eos().build(),
             CmdBuilder(self.read_ramp_status).spaces().regex("R(?:AMP)*").spaces().regex("S(?:TATUS)*").spaces().eos()
-                                             .build(),
+                .build(),
             CmdBuilder(self.read_heater_status).spaces().regex("H(?:EATER)*").spaces().eos().build(),
             CmdBuilder(self.read_max_target).regex(re_get).regex("(?:MAX|!)*").spaces().eos().build(),
             CmdBuilder(self.read_mid_target).regex(re_get).regex("(?:MID|%)*").spaces().eos().build(),
@@ -35,16 +35,16 @@ class CRYOSMSStreamInterface(StreamInterface):
 
             # Set commands
             CmdBuilder(self.write_direction).spaces().regex("D(?:IRECTION)*").spaces().arg("0|-|\+").spaces().eos()
-                                            .build(),
+                .build(),
             CmdBuilder(self.write_output_mode).spaces().regex("T(?:ESLA)*").spaces().arg("OFF|ON|0|1").spaces().eos()
-                                              .build(),
+                .build(),
             CmdBuilder(self.write_ramp_target).spaces().regex("R(?:AMP)*").spaces().arg("ZERO|MID|MAX|0|%|!")
-                                              .spaces().eos().build(),
+                .spaces().eos().build(),
             CmdBuilder(self.write_heater_status).spaces().regex("H(?:EATER)*").spaces().arg("OFF|ON|1|0").spaces()
-                                                .eos().build(),
+                .eos().build(),
             CmdBuilder(self.write_pause).spaces().regex("P(?:AUSE)*").spaces().arg("OFF|ON|0|1").spaces().eos().build(),
-            CmdBuilder(self.write_heater_value).regex(re_set).escape("H(?:EATER)*").spaces().float().spaces().eos()
-                                               .build(),
+            CmdBuilder(self.write_heater_value).regex(re_set).regex("H(?:EATER)*").spaces().float().spaces().eos()
+                .build(),
             CmdBuilder(self.write_max_target).regex(re_set).regex("(?:MAX|!)").spaces().float().spaces().eos().build(),
             CmdBuilder(self.write_mid_target).regex(re_set).regex("(?:MID|%)").spaces().float().spaces().eos().build(),
             CmdBuilder(self.write_ramp_rate).regex(re_set).regex("R(?:AMP)*").spaces().float().spaces().eos().build(),
@@ -53,14 +53,14 @@ class CRYOSMSStreamInterface(StreamInterface):
         }
 
     def _out_message(self, message):
-        return "........ {}\r\n".format(message)
+        return "........ {}".format(message)
 
     def _timestamp(self):
         return datetime.now().strftime('%H:%M:%S')
 
     def _create_log_message(self, pv, value, suffix=""):
         current_time = self._timestamp()
-        self._device.log_message = "{} {}: {}{}\r\n".format(current_time, pv, value, suffix)
+        self._device.log_message = "{} {}: {}{}".format(current_time, pv, value, suffix)
 
     def handle_error(self, request, error):
         self.log.error("Error occurred at {}: {}".format(request, error))
@@ -80,7 +80,7 @@ class CRYOSMSStreamInterface(StreamInterface):
             return self._device.zero_target
 
     def read_direction(self):
-        return "CURRENT DIRECTION: {}\r\n".format(self._device.direction.name)
+        return "CURRENT DIRECTION: {}".format(self._device.direction.name)
 
     def write_direction(self, direction):
         if direction == "+":
@@ -89,17 +89,16 @@ class CRYOSMSStreamInterface(StreamInterface):
             self._device.direction = RampDirection.NEGATIVE
         if direction == "0":
             self._device.direction = RampDirection.ZERO
-        return self._out_message("")
+        return chr(19)
 
     def read_output_mode(self):
         return self._out_message("UNITS: {}".format(self._get_output_mode_string()))
 
     def read_output(self):
         sign = -1 if self._device.direction == RampDirection.NEGATIVE else 1
-        return "{} OUTPUT: {} {} AT {} VOLTS \r\n".format(self._timestamp(),
-                                                          self._device.output * sign,
-                                                          self._get_output_mode_string(),
-                                                          self._device.heater_value)
+        return "OUTPUT: {} {} AT {} VOLTS".format(self._device.output * sign,
+                                                  self._get_output_mode_string(),
+                                                  self._device.output_voltage)
 
     def write_output_mode(self, output_mode):
         # Convert values if output mode is changing between amps(OFF) / tesla(ON)
@@ -153,8 +152,7 @@ class CRYOSMSStreamInterface(StreamInterface):
             raise ValueError("Invalid arguments sent")
         self._device.ramp_target = ramp_target
         self._device.is_paused = False
-        self._create_log_message("RAMP TARGET", ramp_target.name)
-        return self._device.log_message
+        return chr(19)
 
     def read_ramp_rate(self):
         return self._out_message("RAMP RATE: {} A/SEC".format(self._device.ramp_rate))
@@ -175,7 +173,7 @@ class CRYOSMSStreamInterface(StreamInterface):
             self._device.is_heater_on = False
         else:
             raise ValueError("Invalid arguments sent")
-        self._create_log_message("........ HEATER STATUS", heater_status)
+        self._create_log_message("HEATER STATUS", heater_status)
         return self._device.log_message
 
     def read_pause(self):
@@ -217,7 +215,7 @@ class CRYOSMSStreamInterface(StreamInterface):
     def write_max_target(self, max_target):
         self._device.max_target = abs(float(max_target))  # abs because PSU ignores sign
         units = self._get_output_mode_string()
-        self._create_log_message("MAX SETTING", max_target,  suffix=" {}\r\n".format(units))
+        self._create_log_message("MAX SETTING", max_target, suffix=" {}".format(units))
         return self._device.log_message
 
     def read_mid_target(self):

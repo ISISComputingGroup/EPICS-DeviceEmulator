@@ -30,9 +30,10 @@ class SimulatedCRYOSMS(StateMachineDevice):
         self.output = 0.0
         self.is_output_mode_tesla = False
         self.direction = RampDirection.POSITIVE
+        self.output_voltage = 0.0
 
         # heater
-        self.is_heater_on = False
+        self.is_heater_on = True
         self.heater_value = 0.0
 
         # quenched

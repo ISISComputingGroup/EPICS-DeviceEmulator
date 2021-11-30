@@ -45,7 +45,7 @@ class RampingState(State):
         device = self._context
         # to avoid tests taking forever, ignoring actual rate in favour of value that ramps between boundaries in
         # roughly 8 seconds
-        rate = 0.05
+        rate = 0.04
         target = device.ramp_target_value()
         constant = device.constant
         if device.is_output_mode_tesla:
