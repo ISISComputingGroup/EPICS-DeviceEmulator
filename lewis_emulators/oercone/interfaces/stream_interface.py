@@ -1,8 +1,8 @@
 from lewis.adapters.stream import StreamInterface, Cmd
-from lewis_emulators.utils.command_builder import CmdBuilder
+from lewis.utils.command_builder import CmdBuilder
 from lewis.core.logging import has_log
 from ..device import Units, ReadState
-from lewis_emulators.utils.constants import ACK, ENQ
+from lewis.utils.constants import ACK, ENQ
 
 
 @has_log

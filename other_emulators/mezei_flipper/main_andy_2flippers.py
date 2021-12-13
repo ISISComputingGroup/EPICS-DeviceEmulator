@@ -1,15 +1,3 @@
-#
-#
-# Note: This is the control code for the Mezei flipper, provided by the instrument scientists.
-# The only modifications made from the original are:
-# - str("something", "utf-8") -> str("something").encode("utf-8") for python 2 compatibility
-# - print exceptions when they are triggered in the command-line interface
-#
-# These minimal changes mean that we can use this as an emulator, using the exact communication code that the
-# actual flipper uses.
-#
-
-
 from DAQTasks_2flippers import *  # pylint: disable=W0614
 from flippr_3 import *  # pylint: disable=W0614
 from PyQt5 import QtWidgets, QtCore, QtNetwork
@@ -162,15 +150,15 @@ class SignalServer(object):
                     if "?" in str(data):
                         client.send(("file_p "+str(self.parent.filename_P)+":").encode('utf-8'))
                     else:
-                        data = str(data).encode("utf-8").replace(" ","")
-                        self.fn_p.emit(data.replace("file_p",""))
+                        data = str(data, 'utf-8').replace(" ", "")
+                        self.fn_p.emit(data.replace("file_p", ""))
                         client.send("file_p:".encode('utf-8'))
                 if data and "file_a" in str(data):
                     if "?" in str(data):
                         client.send(("file_a "+str(self.parent.filename_A)+":").encode('utf-8'))
                     else:
-                        data = str(data).encode('utf-8').replace(" ","")
-                        self.fn_a.emit(data.replace("file_a",""))
+                        data = str(data, 'utf-8').replace(" ", "")
+                        self.fn_a.emit(data.replace("file_a", ""))
                         client.send("file_a:".encode('utf-8'))
                 if data and "toggle" in str(data):
                     if "?" in str(data):
@@ -208,7 +196,7 @@ class SignalServer(object):
                 
 
 
-class Flippr(QtWidgets.QMainWindow, Ui_Flippr):
+class Flippr():
     """Main window implementation
 
     The class functionality can be broadly split into three components: UI, TCPIP server,
@@ -226,6 +214,7 @@ class Flippr(QtWidgets.QMainWindow, Ui_Flippr):
     """
 
     def __init__(self):
+
         QtWidgets.QMainWindow.__init__(self)
         super(Flippr, self).setupUi(self)
 

@@ -1,7 +1,7 @@
 from lewis.adapters.stream import StreamInterface
 from lewis.core.logging import has_log
 
-from lewis_emulators.utils.command_builder import CmdBuilder
+from lewis.utils.command_builder import CmdBuilder
 
 # Dictionaries for parameter states (strings required to build reply to "all status" command)
 OK_NOK = {True: "OK", False: "NOK"}

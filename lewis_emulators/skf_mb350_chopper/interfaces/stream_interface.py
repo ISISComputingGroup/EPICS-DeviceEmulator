@@ -1,7 +1,7 @@
 from lewis.adapters.stream import StreamInterface, Cmd
 from lewis.core.logging import has_log
 
-from lewis_emulators.utils.byte_conversions import raw_bytes_to_int
+from lewis.utils.byte_conversions import raw_bytes_to_int
 from .response_utilities import phase_information_response_packet, rotator_angle_response_packet, \
     phase_time_response_packet, general_status_response_packet
 from .crc16 import crc16_matches, crc16

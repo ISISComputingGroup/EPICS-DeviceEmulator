@@ -1,6 +1,6 @@
 from lewis.adapters.stream import StreamInterface
-from lewis_emulators.utils.command_builder import CmdBuilder
-from lewis_emulators.utils.replies import conditional_reply
+from lewis.utils.command_builder import CmdBuilder
+from lewis.utils.replies import conditional_reply
 from lewis_emulators.ngpspsu.interfaces.device_status import DeviceStatus
 
 if_connected = conditional_reply("connected")

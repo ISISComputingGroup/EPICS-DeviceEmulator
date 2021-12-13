@@ -2,7 +2,7 @@ from lewis.adapters.stream import StreamInterface, Cmd
 from ..control_modes import OutputMode
 from lewis.core.logging import has_log
 
-from lewis_emulators.utils.command_builder import CmdBuilder
+from lewis.utils.command_builder import CmdBuilder
 
 SCI_NOTATION_REGEX = r"[-+]?[0-9]*\.?[0-9]*e?[-+]?[0-9]+"
 

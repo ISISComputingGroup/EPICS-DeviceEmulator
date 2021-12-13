@@ -1,9 +1,9 @@
 import six
-from lewis_emulators.utils.command_builder import CmdBuilder
+from lewis.utils.command_builder import CmdBuilder
 from lewis.core.logging import has_log
 from lewis.adapters.stream import StreamInterface
 
-from lewis_emulators.utils.replies import conditional_reply
+from lewis.utils.replies import conditional_reply
 
 if_connected = conditional_reply("connected")
 

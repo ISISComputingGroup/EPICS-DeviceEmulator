@@ -1,5 +1,5 @@
 from lewis.adapters.stream import StreamInterface, Cmd
-from lewis_emulators.utils.command_builder import CmdBuilder
+from lewis.utils.command_builder import CmdBuilder
 from ..device import Direction
 
 

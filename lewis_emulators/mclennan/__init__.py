@@ -1,5 +1,5 @@
-from .device import SimulatedRknps
+from .device import SimulatedMclennan
 from ..lewis_versions import LEWIS_LATEST
 
 framework_version = LEWIS_LATEST
-__all__ = ['SimulatedRknps']
+__all__ = ['SimulatedMclennan']
