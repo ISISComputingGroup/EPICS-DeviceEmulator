@@ -1,10 +1,12 @@
 from lewis.adapters.stream import StreamInterface
 from lewis.utils.command_builder import CmdBuilder
-from ..device import ReadState, Units, FunctionsSet, FunctionsRead
+from ..device import ReadState, Units, FunctionsSet, FunctionsRead, CircuitAssignment
 from lewis.utils.replies import conditional_reply
 from lewis.utils.constants import ACK
+from lewis.core.logging import has_log
 
 
+@has_log
 class Tpg300StreamInterface(StreamInterface):
     """
     Stream interface for the serial port.
@@ -120,7 +122,7 @@ class Tpg300StreamInterface(StreamInterface):
             ASCII acknowledgement character (0x6).
         """
         self._device.readstate = ReadState["FS"+function]
-        self._device.switching_function_to_set = (low_thr, low_exp, high_thr, high_exp, assign)
+        self._device.switching_function_to_set = CircuitAssignment(low_thr, low_exp, high_thr, high_exp, assign)
         return ACK
 
     @conditional_reply("connected")
@@ -175,7 +177,7 @@ class Tpg300StreamInterface(StreamInterface):
                    ',' + str(status[3]) + ',' + str(status[4]) + ',' + str(status[5])
 
         else:
-            print("Last command was unknown. Current readstate is {}.".format(self._device.readstate))
+            self.log.info("Last command was unknown. Current readstate is {}.".format(self._device.readstate))
 
     def get_units(self):
         """
@@ -232,8 +234,8 @@ class Tpg300StreamInterface(StreamInterface):
             a string containing thresholds information
         """
         function = self.get_threshold(readstate)
-        return str(function[0]) + "E" + str(function[1]) + "," + str(function[2]) + "E" + str(function[3]) + "," + str(
-            function[4])
+        return str(function.high_threshold) + "E" + str(function.high_exponent) + "," +\
+               str(function.low_threshold) + "E" + str(function.low_exponent) + "," + str(function.circuit_assignment)
 
     def get_switching_functions_status(self):
         """

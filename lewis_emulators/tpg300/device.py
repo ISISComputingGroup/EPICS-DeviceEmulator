@@ -55,6 +55,25 @@ class ReadState(Enum):
     FSB = "FSB"
     SPS = "SPS"
 
+    """ 
+    This object represents settings for a circuit in the device.
+        these settings are: high_threshold(float), high_exponent(int),
+        low_threshold(float), low_exponent(int), circuit_assignment(1|2|2|4|A|B)
+    """
+class CircuitAssignment:
+    high_threshold = 0.0
+    high_exponent = 0
+    low_threshold = 0.0
+    low_exponent = 0
+    circuit_assignment = 1
+
+    def __init__(self, high_threshold=0.0, high_exponent=0, low_threshold=0.0, low_exponent=0, circuit_assignment=1):
+        self.high_threshold = high_threshold
+        self.high_exponent = high_exponent
+        self.low_threshold = low_threshold
+        self.low_exponent = low_exponent
+        self.circuit_assignment = circuit_assignment
+
 
 class SimulatedTpg300(StateMachineDevice):
     """
@@ -73,13 +92,9 @@ class SimulatedTpg300(StateMachineDevice):
         self.__units = Units["mbar"]
         self.__connected = None
         self.__readstate = None
-        self.__switching_function_to_set = (0.0, 0, 0.0, 0, 0)
-        self.__switching_functions = [(0.0, 0, 0.0, 0, 0),
-                                    (0.0, 0, 0.0, 0, 0),
-                                    (0.0, 0, 0.0, 0, 0),
-                                    (0.0, 0, 0.0, 0, 0),
-                                    (0.0, 0, 0.0, 0, 0),
-                                    (0.0, 0, 0.0, 0, 0)]
+        self.__switching_function_to_set = CircuitAssignment()
+        self.__switching_functions = [CircuitAssignment(), CircuitAssignment(), CircuitAssignment(),
+                                      CircuitAssignment(), CircuitAssignment(), CircuitAssignment()]
         self.__switching_functions_status = [0, 0, 0, 0, 0, 0]
         self.connect()
 
@@ -243,8 +258,7 @@ class SimulatedTpg300(StateMachineDevice):
         Returns the settings of a switching function
 
         Returns:
-            list of 6 tuples, each containing a sequence of: high_threshold (float), high_exponent(int),
-            low_threshold (float), low_exponent (int), circuit_assignment (1|2|2|4|A|B)
+            list of 6 CircuitAssignment instances
         """
         return self.__switching_functions
 
@@ -254,8 +268,7 @@ class SimulatedTpg300(StateMachineDevice):
         Sets the status of the switching functions.
 
         Args:
-            function_list: list of 6 tuples, each containing a sequence of: high_threshold (float), high_exponent(int),
-            low_threshold (float), low_exponent (int), circuit_assignment (1|2|2|4|A|B)
+            function_list: list of 6 CircuitAssignment instances
         Returns:
             None
         """
@@ -267,8 +280,7 @@ class SimulatedTpg300(StateMachineDevice):
         Returns the thresholds of the switching function that will be saved upon receiving ENQ signal.
 
         Returns:
-            list containing a sequence of: high_threshold (float), high_exponent(int),
-            low_threshold (float), low_exponent (int), circuit_assignment (1|2|2|4|A|B)
+            CircuitAssignment instance
         """
         return self.__switching_function_to_set
 
@@ -278,8 +290,7 @@ class SimulatedTpg300(StateMachineDevice):
         Sets the thresholds of the switching function that will be saved upon receiving ENQ signal.
 
         Args:
-            function: list containing a sequence of: high_threshold (float), high_exponent(int),
-            low_threshold (float), low_exponent (int), circuit_assignment (1|2|2|4|A|B)
+            function: CircuitAssignment instance
         Returns:
             None
         """
