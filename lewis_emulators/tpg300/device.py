@@ -55,19 +55,20 @@ class ReadState(Enum):
     FSB = "FSB"
     SPS = "SPS"
 
-    """ 
+
+
+
+class CircuitAssignment:
+    """
     This object represents settings for a circuit in the device.
         these settings are: high_threshold(float), high_exponent(int),
         low_threshold(float), low_exponent(int), circuit_assignment(1|2|2|4|A|B)
     """
-class CircuitAssignment:
-    high_threshold = 0.0
-    high_exponent = 0
-    low_threshold = 0.0
-    low_exponent = 0
-    circuit_assignment = 1
 
     def __init__(self, high_threshold=0.0, high_exponent=0, low_threshold=0.0, low_exponent=0, circuit_assignment=1):
+        """
+        Default constructor.
+        """
         self.high_threshold = high_threshold
         self.high_exponent = high_exponent
         self.low_threshold = low_threshold
