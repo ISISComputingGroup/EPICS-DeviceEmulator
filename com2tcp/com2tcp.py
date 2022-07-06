@@ -10,9 +10,8 @@ def listen_to_tcp(tcp_conn, serial_conn):
     while True:
         tcp_data = tcp_conn.recv(1024)
         if len(data) > 0:
-            serial_conn.writelines(tcp_data)
+            serial_conn.write(tcp_data)
             print("Data on tcp: " + str(tcp_data))
-        time.sleep(0.001)
 
 
 if __name__ == "__main__":
@@ -49,7 +48,6 @@ if __name__ == "__main__":
                 print("Data on serial: " + str(data))
                 tcp_conn.sendall(data)
 
-            time.sleep(0.001)
     except (KeyboardInterrupt, SystemExit) as e:
         pass
     finally:
