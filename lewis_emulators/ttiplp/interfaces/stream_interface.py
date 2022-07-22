@@ -19,6 +19,7 @@ class TtiplpStreamInterface(StreamInterface):
         CmdBuilder("get_overvolt").escape("OVP").int().escape("?").eos().build(),
         CmdBuilder("set_overcurr").escape("OCP").int().escape(" ").float().eos().build(),
         CmdBuilder("get_overcurr").escape("OCP").int().escape("?").eos().build(),
+        CmdBuilder("get_event_stat_reg").escape("LSR").int().escape("?").eos().build(),
     }
     
     in_terminator = "\n"
@@ -70,3 +71,11 @@ class TtiplpStreamInterface(StreamInterface):
 
     def get_overcurr(self,_):
         return "{:.4f}".format(self.device.overcurr)
+
+    def get_event_stat_reg(self,_):
+        ret = 0
+        if(self.device.is_overcurrent_tripped()):
+            ret += 8
+        if(self.device.is_overvolt_tripped()):
+            ret += 4
+        return f"{ret}"
