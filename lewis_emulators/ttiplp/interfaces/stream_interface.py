@@ -20,6 +20,7 @@ class TtiplpStreamInterface(StreamInterface):
         CmdBuilder("set_overcurr").escape("OCP").int().escape(" ").float().eos().build(),
         CmdBuilder("get_overcurr").escape("OCP").int().escape("?").eos().build(),
         CmdBuilder("get_event_stat_reg").escape("LSR").int().escape("?").eos().build(),
+        CmdBuilder("reset_trip").escape("TRIPRST").eos().build(),
     }
     
     in_terminator = "\n"
@@ -79,3 +80,6 @@ class TtiplpStreamInterface(StreamInterface):
         if(self.device.is_overvolt_tripped()):
             ret += 4
         return f"{ret}"
+
+    def reset_trip(self):
+        self.device.reset_trip()

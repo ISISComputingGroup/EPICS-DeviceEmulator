@@ -76,6 +76,10 @@ class SimulatedTtiplp(StateMachineDevice):
     def is_overvolt_tripped(self):
         return self.ovp_tripped
 
+    def reset_trip(self):
+        self.ovp_tripped = False
+        self.ocp_tripped = False
+
     def _check_trip(self):
         if (self.output == 1):
             if (self.volt_sp > self.overvolt):
