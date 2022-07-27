@@ -80,7 +80,7 @@ class CRYOSMSStreamInterface(StreamInterface):
             return self._device.zero_target
 
     def read_direction(self):
-        return "CURRENT DIRECTION: {}".format(self._device.direction.name)
+        return "........ CURRENT DIRECTION: {}".format(self._device.direction.name)
 
     def write_direction(self, direction):
         if direction == "+":
@@ -96,7 +96,7 @@ class CRYOSMSStreamInterface(StreamInterface):
 
     def read_output(self):
         sign = -1 if self._device.direction == RampDirection.NEGATIVE else 1
-        return "OUTPUT: {} {} AT {} VOLTS".format(self._device.output * sign,
+        return "........ OUTPUT: {} {} AT {} VOLTS".format(self._device.output * sign,
                                                   self._get_output_mode_string(),
                                                   self._device.output_voltage)
 
@@ -164,12 +164,18 @@ class CRYOSMSStreamInterface(StreamInterface):
 
     def read_heater_status(self):
         heater_value = "ON" if self._device.is_heater_on else "OFF"
-        return self._out_message("HEATER STATUS: {}".format(heater_value))
+        if self._device.output_persist != 0.0 and heater_value == "OFF":
+            return self._out_message("HEATER STATUS: SWITCHED OFF AT {} {}".format(self._device.output_persist,
+                                                                                   self._get_output_mode_string()))
+        else:
+            return self._out_message("HEATER STATUS: {}".format(heater_value))
 
     def write_heater_status(self, heater_status):
         if heater_status in ON_STATES:
+            self._device.output_persist = 0.0
             self._device.is_heater_on = True
         elif heater_status in OFF_STATES:
+            self._device.output_persist = self._device.output
             self._device.is_heater_on = False
         else:
             raise ValueError("Invalid arguments sent")
