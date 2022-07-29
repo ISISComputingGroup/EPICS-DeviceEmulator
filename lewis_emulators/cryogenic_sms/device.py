@@ -32,7 +32,7 @@ class SimulatedCRYOSMS(StateMachineDevice):
         self.direction = RampDirection.POSITIVE
 
         # heater
-        self.is_heater_on = False
+        self.is_heater_on = True
         self.heater_value = 0.0
 
         # quenched
