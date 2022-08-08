@@ -65,13 +65,13 @@ class TtiplpStreamInterface(StreamInterface):
         self.device.set_overvolt(float(overvolt))
 
     def get_overvolt(self,_):
-        return "{:.3f}".format(self.device.overvolt)
+        return "VP1 {:.3f}".format(self.device.overvolt)
 
     def set_overcurr(self, _, overcurr):
         self.device.set_overcurr(float(overcurr))
 
     def get_overcurr(self,_):
-        return "{:.4f}".format(self.device.overcurr)
+        return "CP1 {:.4f}".format(self.device.overcurr)
 
     def get_event_stat_reg(self,_):
         ret = 0
