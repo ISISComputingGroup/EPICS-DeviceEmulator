@@ -20,6 +20,7 @@ class SimulatedTtiplp(StateMachineDevice):
         self.overcurr = 0
         self.ocp_tripped = False
         self.ovp_tripped = False
+        self.hardware_tripped = False
 
     def reset(self):
         self._initialize_data()
@@ -75,6 +76,9 @@ class SimulatedTtiplp(StateMachineDevice):
 
     def is_overvolt_tripped(self):
         return self.ovp_tripped
+
+    def is_hardware_tripped(self):
+        return self.hardware_tripped
 
     def reset_trip(self):
         self.ovp_tripped = False
