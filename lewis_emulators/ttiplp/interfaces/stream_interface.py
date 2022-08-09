@@ -75,10 +75,14 @@ class TtiplpStreamInterface(StreamInterface):
 
     def get_event_stat_reg(self,_):
         ret = 0
-        if(self.device.is_overcurrent_tripped()):   # Bit 2
-            ret += 8
-        if(self.device.is_overvolt_tripped()):      # Bit 3
+        if(self.device.is_voltage_limited()):       # Bit 0
+            ret += 1
+        if(self.device.is_current_limited()):       # Bit 1
+            ret += 2
+        if(self.device.is_overvolt_tripped()):      # Bit 2
             ret += 4
+        if(self.device.is_overcurrent_tripped()):   # Bit 3
+            ret += 8
         if(self.device.is_hardware_tripped()):      # Bit 6
             ret += 64
         return f"{ret}"

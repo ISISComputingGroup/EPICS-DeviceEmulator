@@ -21,6 +21,8 @@ class SimulatedTtiplp(StateMachineDevice):
         self.ocp_tripped = False
         self.ovp_tripped = False
         self.hardware_tripped = False
+        self.current_limited = False
+        self.voltage_limited = False
 
     def reset(self):
         self._initialize_data()
@@ -84,11 +86,24 @@ class SimulatedTtiplp(StateMachineDevice):
         self.ovp_tripped = False
         self.ocp_tripped = False
 
+    def is_voltage_limited(self):
+        return self.voltage_limited
+
+    def is_current_limited(self):
+        return self.current_limited
+
     def _check_trip(self):
         if (self.output == 1):
+            # Trip bits
             if (self.volt_sp > self.overvolt):
                 self.output = 0
                 self.ovp_tripped = True
             if(self.curr_sp > self.overcurr):
                 self.output = 0
                 self.ocp_tripped = True
+            
+            # Limit bits
+            if(abs(self.volt_sp - self.volt) < 0.01):
+                self.voltage_limited = True
+            if(abs(self.curr_sp - self.curr) < 0.01):
+                self.current_limited = True
