@@ -25,11 +25,9 @@ class EurothermStreamInterface(StreamInterface):
         CmdBuilder("set_ramp_setpoint", arg_sep="").eot().escape("0011").stx().escape("SL").float().etx().any().build(),
     }
 
-    # The real Eurotherm uses timeouts instead of terminators to assess when a command is finished. To make this work
-    # with the emulator we manually added terminators via asyn commands to the device. Lewis will be able to handle this
-    # natively in future versions. See: https://github.com/DMSC-Instrument-Data/lewis/pull/262
-    in_terminator = "\r\n"
-    out_terminator = chr(3)
+    in_terminator = ""
+    out_terminator = "\x03"
+    readtimeout = 1
 
     def handle_error(self, request, error):
         """

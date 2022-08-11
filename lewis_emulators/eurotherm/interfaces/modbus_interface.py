@@ -1,6 +1,7 @@
 from lewis.adapters.stream import StreamInterface, Cmd
 from lewis.core.logging import has_log
 from lewis.utils.byte_conversions import int_to_raw_bytes, BYTE
+from lewis.utils.replies import conditional_reply
 
 
 def log_replies(f):
@@ -12,12 +13,7 @@ def log_replies(f):
 
 
 def bytes_to_int(bytes):
-    i = 0
-    result = 0
-    for b in bytes[::-1]:
-        result += (256**i) * b
-        i += 1
-    return result
+    return int.from_bytes(bytes, byteorder="big", signed=True)
 
 
 def crc16(data):
@@ -54,6 +50,7 @@ class EurothermModbusInterface(StreamInterface):
     }
 
     def __init__(self):
+        super().__init__()
         self.read_commands = {
             1: self.get_temperature,
             2: self.get_temperature_sp,
@@ -76,12 +73,15 @@ class EurothermModbusInterface(StreamInterface):
         return str(error)
 
     @log_replies
+    @conditional_reply("connected")
     def any_command(self, command):
         self.log.info(command)
         comms_address = command[0]
         function_code = int(command[1])
         data = command[2:-2]
         crc = command[-2:]
+
+        assert(crc16(command) == b"\x00\x00", "Invalid checksum from IOC")
 
         if len(data) != 4:
             raise ValueError(f"Invalid message length {len(data)}")
@@ -98,10 +98,15 @@ class EurothermModbusInterface(StreamInterface):
         words_to_read = bytes_to_int(data[2:4])
         self.log.info(f"Attempting to read {words_to_read} words from mem address: {mem_address}")
         reply_data = self.read_commands[mem_address]()
-        assert 0 <= reply_data <= 0xFFFF, "reply was too big to be transmitted via modbus. Bug?"
-        reply = comms_address.to_bytes(1, byteorder="big") + b"\x03\x02" + reply_data.to_bytes(2, byteorder="big")
-        checksum = crc16(reply)
-        return reply + checksum
+
+        self.log.info(f"reply_data = {reply_data}")
+        assert -0x8000 <= reply_data <= 0x7FFF, f"reply {reply_data} was outside modbus range, bug?"
+
+        reply = comms_address.to_bytes(1, byteorder="big", signed=True) \
+            + b"\x03\x02" \
+            + reply_data.to_bytes(2, byteorder="big", signed=True)
+
+        return reply + crc16(reply)
 
     def handle_write(self, data, command):
         mem_address = bytes_to_int(data[0:2])
@@ -112,10 +117,10 @@ class EurothermModbusInterface(StreamInterface):
         return command
 
     def get_temperature(self):
-        return int(self.device._current_temperature * 10)
+        return int(round(self.device.current_temperature * 10., 0))
 
     def get_temperature_sp(self):
-        return int(self.device._setpoint_temperature * 10)
+        return int(round(self.device.ramp_setpoint_temperature * 10, 0))
 
     def set_temperature_sp(self, value):
-        self.device._setpoint_temperature = value / 10.0
+        self.device.ramp_setpoint_temperature = value / 10.0
