@@ -200,8 +200,7 @@ class CRYOSMSStreamInterface(StreamInterface):
             if self._device.check_is_at_target():
                 self._create_log_message("RAMP STATUS", output)
             else:
-                output = "RAMPING FROM {:.6f} TO {:.6f} {} AT {:.6f} A/SEC".format(self._device.output,
-                                                                                target, mode, rate)
+                output = f"RAMPING FROM {self._device.output:.6f} TO {target:.6f} {mode} AT {rate:.6f} A/SEC"
                 self._create_log_message("RAMP STATUS", output)
         else:
             raise ValueError("Invalid arguments sent")
