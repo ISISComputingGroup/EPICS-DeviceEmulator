@@ -11,8 +11,9 @@ OFF_STATES = ["OFF", "0"]
 
 @has_log
 class CRYOSMSStreamInterface(StreamInterface):
+
     in_terminator = "\r\n"
-    out_terminator = "\r\n" + chr(19)
+    out_terminator = chr(19)
 
     def __init__(self):
         re_set = " *S(?:ET)* *"  # Set regex for shorthand or longhand with 0 or more leading and trailing spaces
@@ -45,6 +46,7 @@ class CRYOSMSStreamInterface(StreamInterface):
             CmdBuilder(self.write_pause).spaces().regex("P(?:AUSE)*").spaces().arg("OFF|ON|0|1").spaces().eos().build(),
             CmdBuilder(self.write_heater_value).regex(re_set).regex("H(?:EATER)*").spaces().float().spaces().eos()
                 .build(),
+
             CmdBuilder(self.write_max_target).regex(re_set).regex("(?:MAX|!)").spaces().float().spaces().eos().build(),
             CmdBuilder(self.write_mid_target).regex(re_set).regex("(?:MID|%)").spaces().float().spaces().eos().build(),
             CmdBuilder(self.write_ramp_rate).regex(re_set).regex("R(?:AMP)*").spaces().float().spaces().eos().build(),
@@ -177,7 +179,6 @@ class CRYOSMSStreamInterface(StreamInterface):
         elif heater_status in OFF_STATES:
             self._device.output_persist = self._device.output
             self._device.is_heater_on = False
-        else:
             raise ValueError("Invalid arguments sent")
         self._create_log_message("HEATER STATUS", heater_status)
         return self._device.log_message
@@ -198,8 +199,7 @@ class CRYOSMSStreamInterface(StreamInterface):
             if self._device.check_is_at_target():
                 self._create_log_message("RAMP STATUS", output)
             else:
-                output = "RAMPING FROM {:.6} TO {:.6} {} AT {:.6} A/SEC".format(self._device.output,
-                                                                                target, mode, rate)
+                output = f"RAMPING FROM {self._device.output:.6f} TO {target:.6f} {mode} AT {rate:.6f} A/SEC"
                 self._create_log_message("RAMP STATUS", output)
         else:
             raise ValueError("Invalid arguments sent")

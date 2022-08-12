@@ -80,12 +80,14 @@ class SimulatedCRYOSMS(StateMachineDevice):
             self.output *= self.constant
             self.max_target *= self.constant
             self.mid_target *= self.constant
+            self.heater_value *= self.constant
             self.is_output_mode_tesla = True
         elif mode == "AMPS" and self.is_output_mode_tesla:
             # going from T to A
             self.output /= self.constant
             self.max_target /= self.constant
             self.mid_target /= self.constant
+            self.heater_value /= self.constant
             self.is_output_mode_tesla = False
 
     def check_is_at_target(self):

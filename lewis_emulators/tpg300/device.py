@@ -12,15 +12,68 @@ class Units(Enum):
 
 
 @unique
+class FunctionsSet(Enum):
+    FS1 = 0
+    FS2 = 1
+    FS3 = 2
+    FS4 = 3
+    FSA = 4
+    FSB = 5
+
+
+@unique
+class FunctionsRead(Enum):
+    F1 = 0
+    F2 = 1
+    F3 = 2
+    F4 = 3
+    FA = 4
+    FB = 5
+
+
+@unique
 class ReadState(Enum):
     A1 = "a1"
     A2 = "a2"
     B1 = "b1"
     B2 = "b2"
     UNI = 0
-    mbar = 1
-    Torr = 2
-    Pa = 3
+    UNI1 = 1
+    UNI2 = 2
+    UNI3 = 3
+    F1 = "F1"
+    F2 = "F2"
+    F3 = "F3"
+    F4 = "F4"
+    FA = "FA"
+    FB = "FB"
+    FS1 = "FS1"
+    FS2 = "FS2"
+    FS3 = "FS3"
+    FS4 = "FS4"
+    FSA = "FSA"
+    FSB = "FSB"
+    SPS = "SPS"
+
+
+
+
+class CircuitAssignment:
+    """
+    This object represents settings for a circuit in the device.
+        these settings are: high_threshold(float), high_exponent(int),
+        low_threshold(float), low_exponent(int), circuit_assignment(1|2|2|4|A|B)
+    """
+
+    def __init__(self, high_threshold=0.0, high_exponent=0, low_threshold=0.0, low_exponent=0, circuit_assignment=1):
+        """
+        Default constructor.
+        """
+        self.high_threshold = high_threshold
+        self.high_exponent = high_exponent
+        self.low_threshold = low_threshold
+        self.low_exponent = low_exponent
+        self.circuit_assignment = circuit_assignment
 
 
 class SimulatedTpg300(StateMachineDevice):
@@ -37,10 +90,13 @@ class SimulatedTpg300(StateMachineDevice):
         self.__pressure_a2 = 0.0
         self.__pressure_b1 = 0.0
         self.__pressure_b2 = 0.0
-        self.__units = None
+        self.__units = Units["mbar"]
         self.__connected = None
         self.__readstate = None
-
+        self.__switching_function_to_set = CircuitAssignment()
+        self.__switching_functions = [CircuitAssignment(), CircuitAssignment(), CircuitAssignment(),
+                                      CircuitAssignment(), CircuitAssignment(), CircuitAssignment()]
+        self.__switching_functions_status = [0, 0, 0, 0, 0, 0]
         self.connect()
 
     @staticmethod
@@ -176,6 +232,72 @@ class SimulatedTpg300(StateMachineDevice):
         self.__units = units
 
     @property
+    def switching_functions_status(self):
+        """
+        Returns status of the switching functions.
+
+        Returns:
+            list of 6 values which can be 0 (off) or 1 (on)
+        """
+        return self.__switching_functions_status
+
+    @switching_functions_status.setter
+    def switching_functions_status(self, status):
+        """
+        Sets the status of the switching functions.
+
+        Args:
+            status: list of 6 values which can be 0 (off) or 1 (on)
+        Returns:
+            None
+        """
+        self.__switching_functions_status = status
+
+    @property
+    def switching_functions(self):
+        """
+        Returns the settings of a switching function
+
+        Returns:
+            list of 6 CircuitAssignment instances
+        """
+        return self.__switching_functions
+
+    @switching_functions.setter
+    def switching_functions(self, function_list):
+        """
+        Sets the status of the switching functions.
+
+        Args:
+            function_list: list of 6 CircuitAssignment instances
+        Returns:
+            None
+        """
+        self.__switching_functions = function_list
+
+    @property
+    def switching_function_to_set(self):
+        """
+        Returns the thresholds of the switching function that will be saved upon receiving ENQ signal.
+
+        Returns:
+            CircuitAssignment instance
+        """
+        return self.__switching_function_to_set
+
+    @switching_function_to_set.setter
+    def switching_function_to_set(self, function):
+        """
+        Sets the thresholds of the switching function that will be saved upon receiving ENQ signal.
+
+        Args:
+            function: CircuitAssignment instance
+        Returns:
+            None
+        """
+        self.__switching_function_to_set = function
+
+    @property
     def connected(self):
         """
         Returns the current connected state.
@@ -241,4 +363,15 @@ class SimulatedTpg300(StateMachineDevice):
 
         self.units = Units(unit)
 
+    def backdoor_set_switching_function_status(self, status):
+        """
+        Sets status of switching functions. Called only via the backdoor using lewis.
 
+        Args:
+            status: list of 6 values which can be 0 (off) or 1 (on)
+
+        Returns:
+            None
+        """
+
+        self.switching_functions_status = status
