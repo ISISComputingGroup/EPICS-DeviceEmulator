@@ -19,6 +19,8 @@ class TtiplpStreamInterface(StreamInterface):
         CmdBuilder("get_overvolt").escape("OVP").int().escape("?").eos().build(),
         CmdBuilder("set_overcurr").escape("OCP").int().escape(" ").float().eos().build(),
         CmdBuilder("get_overcurr").escape("OCP").int().escape("?").eos().build(),
+        CmdBuilder("get_event_stat_reg").escape("LSR").int().escape("?").eos().build(),
+        CmdBuilder("reset_trip").escape("TRIPRST").eos().build(),
     }
     
     in_terminator = "\n"
@@ -63,10 +65,27 @@ class TtiplpStreamInterface(StreamInterface):
         self.device.set_overvolt(float(overvolt))
 
     def get_overvolt(self,_):
-        return "{:.3f}".format(self.device.overvolt)
+        return "VP1 {:.3f}".format(self.device.overvolt)
 
     def set_overcurr(self, _, overcurr):
         self.device.set_overcurr(float(overcurr))
 
     def get_overcurr(self,_):
-        return "{:.4f}".format(self.device.overcurr)
+        return "CP1 {:.4f}".format(self.device.overcurr)
+
+    def get_event_stat_reg(self,_):
+        ret = 0
+        if(self.device.is_voltage_limited()):       # Bit 0
+            ret += 1
+        if(self.device.is_current_limited()):       # Bit 1
+            ret += 2
+        if(self.device.is_overvolt_tripped()):      # Bit 2
+            ret += 4
+        if(self.device.is_overcurrent_tripped()):   # Bit 3
+            ret += 8
+        if(self.device.is_hardware_tripped()):      # Bit 6
+            ret += 64
+        return f"{ret}"
+
+    def reset_trip(self):
+        self.device.reset_trip()
