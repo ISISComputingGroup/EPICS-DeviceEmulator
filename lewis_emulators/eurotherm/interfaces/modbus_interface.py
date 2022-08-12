@@ -54,10 +54,23 @@ class EurothermModbusInterface(StreamInterface):
         self.read_commands = {
             1: self.get_temperature,
             2: self.get_temperature_sp,
+            6: self.get_p,
+            8: self.get_i,
+            9: self.get_d,
+            111: self.get_high_lim,
+            112: self.get_low_lim,
+            270: self.get_autotune,
+            30: self.get_max_output,
+            3: self.get_output,
         }
 
         self.write_commands = {
             2: self.set_temperature_sp,
+            6: self.set_p,
+            8: self.set_i,
+            9: self.set_d,
+            30: self.set_max_output,
+            270: self.set_autotune,
         }
 
     in_terminator = ""
@@ -117,10 +130,49 @@ class EurothermModbusInterface(StreamInterface):
         return command
 
     def get_temperature(self):
-        return int(round(self.device.current_temperature * 10., 0))
+        return int(self.device.current_temperature * 10.)
 
     def get_temperature_sp(self):
-        return int(round(self.device.ramp_setpoint_temperature * 10, 0))
+        return int(self.device.ramp_setpoint_temperature * 10)
 
     def set_temperature_sp(self, value):
         self.device.ramp_setpoint_temperature = value / 10.0
+
+    def get_p(self):
+        return int(self.device.p)
+
+    def get_i(self):
+        return int(self.device.i)
+
+    def get_d(self):
+        return int(self.device.d)
+
+    def set_p(self, value):
+        self.device.p = value
+
+    def set_i(self, value):
+        self.device.i = value
+
+    def set_d(self, value):
+        self.device.d = value
+
+    def get_high_lim(self):
+        return int(self.device.high_lim * 10)
+
+    def get_low_lim(self):
+        return int(self.device.low_lim * 10)
+
+    def get_autotune(self):
+        return int(self.device.autotune)
+
+    def set_autotune(self, value):
+        self.device.autotune = value
+
+    def get_max_output(self):
+        return int(self.device.max_output * 10)
+
+    def set_max_output(self, value):
+        self.device.max_output = value / 10.0
+
+    def get_output(self):
+        return int(self.device.output * 10)

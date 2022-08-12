@@ -21,6 +21,14 @@ class SimulatedEurotherm(StateMachineDevice):
         self._ramping_on = False
         self._ramp_rate = 1.0
         self._address = "A1"
+        self.p = 0
+        self.i = 0
+        self.d = 0
+        self.autotune = 0
+        self.max_output = 0
+        self.output = 0
+        self.high_lim = 0
+        self.low_lim = 0
 
     def _get_state_handlers(self):
         """
