@@ -171,7 +171,7 @@ class CRYOSMSStreamInterface(StreamInterface):
             return self._out_message("HEATER STATUS: OFF")
         else:
             mode = "TESLA" if self._device.is_output_mode_tesla else "AMPS"
-            return self._out_message("HEATER STATUS: SWITCHED OFF AT {0} {1}".format(self._device.heater_value, mode))
+            return self._out_message(f"HEATER STATUS: SWITCHED OFF AT {self._device.heater_value} {mode}")
 
     def write_heater_status(self, heater_status):
         if heater_status in ON_STATES:
