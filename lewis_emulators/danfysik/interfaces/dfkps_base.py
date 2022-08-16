@@ -8,8 +8,6 @@ from lewis.core.logging import has_log
 from lewis.utils.command_builder import CmdBuilder
 from lewis.utils.replies import conditional_reply
 
-if_available = conditional_reply("device_available")
-
 
 @has_log
 @six.add_metaclass(abc.ABCMeta)
@@ -42,7 +40,6 @@ class CommonStreamInterface(object):
         """
         self.log.error("An error occurred at request " + repr(request) + ": " + repr(error))
 
-    @conditional_reply("device_available")
     @conditional_reply("comms_initialized")
     def get_current(self):
         return int(round(self.device.get_current()))
@@ -55,7 +52,6 @@ class CommonStreamInterface(object):
     def get_last_setpoint(self):
         return int(round(self.device.get_last_setpoint()))
 
-    @conditional_reply("device_available")
     @conditional_reply("comms_initialized")
     def get_voltage(self):
         return int(round(self.device.get_voltage()))
@@ -65,7 +61,7 @@ class CommonStreamInterface(object):
         """
         Unlock the device. Implementation could be put in in future.
         """
-
+        
     @conditional_reply("comms_initialized")
     def get_polarity(self):
         return "-" if self.device.negative_polarity else "+"
@@ -92,7 +88,7 @@ class CommonStreamInterface(object):
         """
         Respond to the get_status command.
         """
-    @if_available
+    @conditional_reply("comms_initialized")
     def init_comms(self):
         """
         Initialize comms of device

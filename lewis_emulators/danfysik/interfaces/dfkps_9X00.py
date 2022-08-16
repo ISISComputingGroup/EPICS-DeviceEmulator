@@ -38,7 +38,6 @@ class Danfysik9X00StreamInterface(CommonStreamInterface, StreamInterface):
         CmdBuilder("set_slew_rate").escape("W").arg(r"[1-3]", argument_mapping=int).spaces().int().eos().build()
     ]
 
-    @conditional_reply("device_available")
     @conditional_reply("comms_initialized")
     def get_status(self):
         """
