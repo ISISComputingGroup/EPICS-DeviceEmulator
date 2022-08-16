@@ -53,7 +53,7 @@ class FZJDDFCHStreamInterface(StreamInterface):
         Returns: OK or error
         """
 
-        if self._device.disconnected:
+        if self._device.connected:
             return None
         if self._device.error_on_set_frequency is None:
             self._device.frequency_setpoint = frequency * self._device.frequency_reference
@@ -76,7 +76,7 @@ class FZJDDFCHStreamInterface(StreamInterface):
         Returns: OK or error
         """
 
-        if self._device.disconnected:
+        if self._device.connected:
             return None
         if self._device.error_on_set_phase is None:
             self._device.phase_setpoint = phase
@@ -99,7 +99,7 @@ class FZJDDFCHStreamInterface(StreamInterface):
         Returns: OK or error
         """
 
-        if self._device.disconnected:
+        if self._device.connected:
             return None
         if self._device.error_on_set_magnetic_bearing is None:
             # Lookup the bool representation of the string
@@ -124,7 +124,7 @@ class FZJDDFCHStreamInterface(StreamInterface):
         Returns: OK or error
         """
 
-        if self._device.disconnected:
+        if self._device.connected:
             return None
         if self._device.error_on_set_drive_mode is None:
             # Lookup the bool representation of the string
@@ -148,7 +148,7 @@ class FZJDDFCHStreamInterface(StreamInterface):
         Returns: magnetic bearing status
         """
 
-        if self._device.disconnected:
+        if self._device.connected:
             return None
         device = self._device
         return "{0:3s};MBON?;{}".format(device.chopper_name, self._device.magnetic_bearing_status)
@@ -165,7 +165,7 @@ class FZJDDFCHStreamInterface(StreamInterface):
         """
 
         device = self._device
-        if self._device.disconnected or chopper_name != device.chopper_name:
+        if not self._device.connected or chopper_name != device.chopper_name:
             return None
 
         values = [
@@ -203,5 +203,4 @@ class FZJDDFCHStreamInterface(StreamInterface):
         ]
 
         status_string = ";".join(values)
-
         return status_string

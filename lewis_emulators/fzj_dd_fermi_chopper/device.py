@@ -47,7 +47,7 @@ class SimulatedFZJDDFCH(StateMachineDevice):
         self.error_on_set_magnetic_bearing = None
         self.error_on_set_drive_mode = None
 
-        self.disconnected = False
+        self.connected = True
 
     def _get_state_handlers(self):
         """
