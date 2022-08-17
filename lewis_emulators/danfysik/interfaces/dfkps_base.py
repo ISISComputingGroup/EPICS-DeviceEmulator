@@ -88,7 +88,7 @@ class CommonStreamInterface(object):
         """
         Respond to the get_status command.
         """
-    @conditional_reply("comms_initialized")
+
     def init_comms(self):
         """
         Initialize comms of device
