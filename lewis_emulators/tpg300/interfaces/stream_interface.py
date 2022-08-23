@@ -19,8 +19,9 @@ class Tpg300StreamInterface(StreamInterface):
         CmdBuilder("acknowledge_units").escape("UNI").eos().build(),
         CmdBuilder("acknowledge_set_units").escape("UNI").escape(",").arg("1|2|3").eos().build(),
         CmdBuilder("acknowledge_function").escape("SP").arg("1|2|3|4|A|B").eos().build(),
-        CmdBuilder("acknowledge_set_function").escape("SP").arg("1|2|3|4|A|B").escape(",").
-            float().escape("E").int().escape(",").float().escape("E").int().escape(",").int().eos().build(),
+        CmdBuilder("acknowledge_set_function").escape("SP").arg("1|2|3|4|A|B").escape(",")
+        .arg(r"[+-]?\d+.\d+", float).escape("E").arg(r"(?:-|\+)(?:[1-9]+\d*|0)", int).escape(",")
+        .arg(r"[+-]?\d+.\d+", float).escape("E").arg(r"(?:-|\+)(?:[1-9]+\d*|0)", int).escape(",").int().eos().build(),
         CmdBuilder("acknowledge_function_status").escape("SPS").eos().build(),
         CmdBuilder("handle_enquiry").enq().build()
     }
@@ -80,7 +81,7 @@ class Tpg300StreamInterface(StreamInterface):
         Returns:
             ASCII acknowledgement character (0x6).
         """
-        self._device.readstate = ReadState["UNI"+str(units)]
+        self._device.readstate = ReadState["UNI" + str(units)]
         return ACK
 
     @conditional_reply("connected")
@@ -96,7 +97,7 @@ class Tpg300StreamInterface(StreamInterface):
             ASCII acknowledgement character (0x6).
         """
 
-        self._device.readstate = ReadState["F"+function]
+        self._device.readstate = ReadState["F" + function]
         return ACK
 
     @conditional_reply("connected")
@@ -121,7 +122,7 @@ class Tpg300StreamInterface(StreamInterface):
         Returns:
             ASCII acknowledgement character (0x6).
         """
-        self._device.readstate = ReadState["FS"+function]
+        self._device.readstate = ReadState["FS" + function]
         self._device.switching_function_to_set = CircuitAssignment(low_thr, low_exp, high_thr, high_exp, assign)
         return ACK
 
@@ -173,7 +174,7 @@ class Tpg300StreamInterface(StreamInterface):
 
         elif self._device.readstate.name == "SPS":
             status = self.get_switching_functions_status()
-            return str(status[0]) + ',' + str(status[1]) + ',' + str(status[2]) +\
+            return str(status[0]) + ',' + str(status[1]) + ',' + str(status[2]) + \
                    ',' + str(status[3]) + ',' + str(status[4]) + ',' + str(status[5])
 
         else:
@@ -234,7 +235,7 @@ class Tpg300StreamInterface(StreamInterface):
             a string containing thresholds information
         """
         function = self.get_threshold(readstate)
-        return str(function.high_threshold) + "E" + str(function.high_exponent) + "," +\
+        return str(function.high_threshold) + "E" + str(function.high_exponent) + "," + \
                str(function.low_threshold) + "E" + str(function.low_exponent) + "," + str(function.circuit_assignment)
 
     def get_switching_functions_status(self):
