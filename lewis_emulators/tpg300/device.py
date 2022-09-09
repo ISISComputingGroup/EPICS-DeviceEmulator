@@ -350,7 +350,7 @@ class SimulatedTpg300(StateMachineDevice):
         """
         self.__readstate = state
 
-    def backdoor_set_unit(self, unit):
+    def backdoor_get_unit(self):
         """
         Sets unit on device. Called only via the backdoor using lewis.
 
@@ -361,7 +361,7 @@ class SimulatedTpg300(StateMachineDevice):
             None
         """
 
-        self.units = Units(unit)
+        return self.units.value
 
     def backdoor_set_switching_function_status(self, status):
         """
