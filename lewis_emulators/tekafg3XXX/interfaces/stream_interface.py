@@ -178,7 +178,7 @@ class Tekafg3XXXStreamInterface(StreamInterface):
         self._channel(channel).frequency_mode = new_frequency_mode
 
     def get_phase(self, channel: int) -> float:
-        return self._channel(channel).frequency
+        return self._channel(channel).phase
 
     def set_phase(self, channel: int, new_phase: float):
         self._channel(channel).phase = new_phase
