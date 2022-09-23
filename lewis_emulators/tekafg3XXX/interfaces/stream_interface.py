@@ -184,10 +184,10 @@ class Tekafg3XXXStreamInterface(StreamInterface):
         self._channel(channel).phase = new_phase
 
     def get_burst_status(self, channel: int) -> str:
-        return 1 if self._channel(channel).burst_status == "ON" else 0
+        return self._channel(channel).burst_status
 
     def set_burst_status(self, channel: int, new_burst_status: str):
-        self._channel(channel).burst_status = new_burst_status
+        self._channel(channel).burst_status = "ON" if new_burst_status in ["ON", "1"] else "OFF"
 
     def get_burst_mode(self, channel: int) -> str:
         return self._channel(channel).burst_mode
