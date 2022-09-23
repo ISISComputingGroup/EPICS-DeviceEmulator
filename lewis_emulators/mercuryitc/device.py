@@ -116,6 +116,11 @@ class SimulatedMercuryitc(StateMachineDevice):
             "DB6.H2": HeaterChannel("DB6.H2"),
             "DB7.A2": AuxChannel("DB7.A2"),
 
+            # Pressure channel 2
+            "DB5.P1": PressureChannel("DB5.P1"),
+            "DB6.H3": HeaterChannel("DB6.H3"),
+            "DB7.A3": AuxChannel("DB7.A3"),
+
             # Level channel 1
             "DB8.L0": LevelChannel("DB8.L0"),
         }
@@ -129,6 +134,9 @@ class SimulatedMercuryitc(StateMachineDevice):
 
         self.channels["DB5.P0"].associated_heater_channel = "DB6.H2"
         self.channels["DB5.P0"].associated_aux_channel = "DB7.A2"
+
+        self.channels["DB5.P1"].associated_heater_channel = "DB6.H3"
+        self.channels["DB5.P1"].associated_aux_channel = "DB7.A3"
 
     def reset(self):
         self._initialize_data()
