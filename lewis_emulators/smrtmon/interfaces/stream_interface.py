@@ -21,7 +21,8 @@ class SmrtmonStreamInterface(StreamInterface):
 
     @if_connected
     def get_stat(self):
-        return "{},{},{},{},{},{},{},{},{},{},{}".format(*self._device.stat)
+        # Actual device responds with the device's current time as second-to-last item
+        return "{},{},{},{},{},{},{},{},{},{},23:59:59,{}".format(*self._device.stat)
 
     @if_connected
     def get_oplm(self):
