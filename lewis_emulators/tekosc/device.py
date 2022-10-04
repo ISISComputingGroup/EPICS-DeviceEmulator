@@ -9,7 +9,7 @@ class SourceChannel:
         WFID "Ch{channel}, DC coupling, 100.0mV/div, 4.000us/div, 10000 points, Sample mode";   \
         NR_PT 20;PT_FMT Y;XUNIT "s";XINCR 4.0000E-9;XZERO -20.0000E-6;PT_OFF 0;         \
         YUNIT "V";YMULT 4.0000E-3;YOFF 0.0000;YZERO 0.0000;'
-        self.curve = f":CURVe {channel},1,4,2,4,3,0,3,3,3,3,3,3,4,3,5,6,6,7,3"
+        self.curve = f"{channel},1,4,2,4,3,0,3,3,3,3,3,3,4,3,5,6,6,7,3"
 
     def get_waveform(self):
         return self.preamble + self.curve
@@ -22,7 +22,12 @@ class SimulatedTekOsc(StateMachineDevice):
         Initialize all of the device's attributes.
         """
         self.connected = True
-        self.channels = {1: SourceChannel(1), 2: SourceChannel(2)}
+        self.channels = {
+            1: SourceChannel(1), 
+            2: SourceChannel(2),
+            3: SourceChannel(3),
+            4: SourceChannel(4),
+        }
         self.triggered = False
 
     def _get_state_handlers(self):

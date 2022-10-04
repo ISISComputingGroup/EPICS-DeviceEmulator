@@ -19,9 +19,7 @@ class TekOscStreamInterface(StreamInterface):
         # Commands that we expect via serial during normal operation
         self.commands = {
             CmdBuilder(self.identity).escape("*IDN?").eos().build(),
-            CmdBuilder(self.get_waveform).escape(":DATA:SOURCE CH").int().escape("WAVFRM?").eos().build(),
-            CmdBuilder(self.get_outpre).escape(":DATA:SOURCE CH").int().escape("WFMOUTPRE?").eos().build(),
-            CmdBuilder(self.get_curve).escape(":DATA:SOURCE CH").int().escape("CURVE?").eos().build(),
+            CmdBuilder(self.get_curve).escape(":VERBOSE 0;:HEADER 0;:DATA:SOURCE CH").int().escape(";:DATA:START 1;:DATA:STOP 10000;:DATA:ENC ASCII;:DATA:WIDTH 1;:CURVE?").eos().build(),
         }
 
     def handle_error(self, request, error):
