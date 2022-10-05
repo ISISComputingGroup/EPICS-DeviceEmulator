@@ -4,6 +4,7 @@ from lewis.core.logging import has_log
 
 from lewis.utils.command_builder import CmdBuilder
 from lewis.utils.replies import conditional_reply
+from numpy import double
 
 if_connected = conditional_reply("connected")
 
@@ -20,6 +21,10 @@ class TekOscStreamInterface(StreamInterface):
         self.commands = {
             CmdBuilder(self.identity).escape("*IDN?").eos().build(),
             CmdBuilder(self.get_curve).escape(":VERBOSE 0;:HEADER 0;:DATA:SOURCE CH").int().escape(";:DATA:START 1;:DATA:STOP 10000;:DATA:ENC ASCII;:DATA:WIDTH 1;:CURVE?").eos().build(),
+            CmdBuilder(self.get_y_mult).escape(":DATA:SOURCE CH").int().escape(";:WFMOUTPRE:YMULT?").eos().build(),
+            CmdBuilder(self.get_y_unit).escape(":DATA:SOURCE CH").int().escape(";:WFMOUTPRE:YUNIT?").eos().build(),
+            CmdBuilder(self.get_x_incr).escape(":DATA:SOURCE CH").int().escape(";:WFMOUTPRE:XINCR?").eos().build(),
+            CmdBuilder(self.get_x_unit).escape(":DATA:SOURCE CH").int().escape(";:WFMOUTPRE:XUNIT?").eos().build(),
         }
 
     def handle_error(self, request, error):
@@ -45,11 +50,17 @@ class TekOscStreamInterface(StreamInterface):
         """
         return self.device.channels[channel_num]
 
-    def get_waveform(self, channel: int) -> str:
-        return self._channel(channel).get_waveform()
-
-    def get_outpre(self, channel: int) -> str:
-        return self._channel(channel).preamble
-
     def get_curve(self, channel: int) -> str:
         return self._channel(channel).curve
+
+    def get_y_mult(self, channel: int) -> float:
+        return self._channel(channel).y_multiplier
+
+    def get_y_unit(self, channel: int) -> str:
+        return self._channel(channel).y_unit
+
+    def get_x_incr(self, channel: int) -> float:
+        return self._channel(channel).x_increment
+
+    def get_x_unit(self, channel: int) -> str:
+        return self._channel(channel).x_unit
