@@ -10,11 +10,10 @@ class SourceChannel:
         self.y_multiplier = channel*2
         self.x_unit = "\"s\""
         self.y_unit = "\"V\""
+        self.x_zero = channel*2+10
+        self.y_zero = channel*2+11
 
         self.curve = f"{channel},1,4,2,4,3,0,3,3,3,3,3,3,4,3,5,6,6,7,3"
-
-    def get_waveform(self):
-        return self.preamble + self.curve
 
 
 class SimulatedTekOsc(StateMachineDevice):

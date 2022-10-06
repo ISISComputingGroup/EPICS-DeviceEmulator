@@ -21,10 +21,12 @@ class TekOscStreamInterface(StreamInterface):
         self.commands = {
             CmdBuilder(self.identity).escape("*IDN?").eos().build(),
             CmdBuilder(self.get_curve).escape(":VERBOSE 0;:HEADER 0;:DATA:SOURCE CH").int().escape(";:DATA:START 1;:DATA:STOP 10000;:DATA:ENC ASCII;:DATA:WIDTH 1;:CURVE?").eos().build(),
-            CmdBuilder(self.get_y_mult).escape(":DATA:SOURCE CH").int().escape(";:WFMOUTPRE:YMULT?").eos().build(),
-            CmdBuilder(self.get_y_unit).escape(":DATA:SOURCE CH").int().escape(";:WFMOUTPRE:YUNIT?").eos().build(),
             CmdBuilder(self.get_x_incr).escape(":DATA:SOURCE CH").int().escape(";:WFMOUTPRE:XINCR?").eos().build(),
+            CmdBuilder(self.get_y_mult).escape(":DATA:SOURCE CH").int().escape(";:WFMOUTPRE:YMULT?").eos().build(),
             CmdBuilder(self.get_x_unit).escape(":DATA:SOURCE CH").int().escape(";:WFMOUTPRE:XUNIT?").eos().build(),
+            CmdBuilder(self.get_y_unit).escape(":DATA:SOURCE CH").int().escape(";:WFMOUTPRE:YUNIT?").eos().build(),
+            CmdBuilder(self.get_x_zero).escape(":DATA:SOURCE CH").int().escape(";:WFMOUTPRE:XZERO?").eos().build(),
+            CmdBuilder(self.get_y_zero).escape(":DATA:SOURCE CH").int().escape(";:WFMOUTPRE:YZERO?").eos().build(),
         }
 
     def handle_error(self, request, error):
@@ -53,14 +55,20 @@ class TekOscStreamInterface(StreamInterface):
     def get_curve(self, channel: int) -> str:
         return self._channel(channel).curve
 
+    def get_x_incr(self, channel: int) -> float:
+        return self._channel(channel).x_increment
+
     def get_y_mult(self, channel: int) -> float:
         return self._channel(channel).y_multiplier
+    
+    def get_x_unit(self, channel: int) -> str:
+        return self._channel(channel).x_unit
 
     def get_y_unit(self, channel: int) -> str:
         return self._channel(channel).y_unit
 
-    def get_x_incr(self, channel: int) -> float:
-        return self._channel(channel).x_increment
+    def get_x_zero(self, channel: int) -> float:
+        return self._channel(channel).x_zero
 
-    def get_x_unit(self, channel: int) -> str:
-        return self._channel(channel).x_unit
+    def get_y_zero(self, channel:int) -> float:
+        return self._channel(channel).y_zero
