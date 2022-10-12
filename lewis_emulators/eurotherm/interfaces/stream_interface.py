@@ -25,11 +25,9 @@ class EurothermStreamInterface(StreamInterface):
         CmdBuilder("set_ramp_setpoint", arg_sep="").eot().escape("0011").stx().escape("SL").float().etx().any().build(),
     }
 
-    # The real Eurotherm uses timeouts instead of terminators to assess when a command is finished. To make this work
-    # with the emulator we manually added terminators via asyn commands to the device. Lewis will be able to handle this
-    # natively in future versions. See: https://github.com/DMSC-Instrument-Data/lewis/pull/262
-    in_terminator = "\r\n"
-    out_terminator = chr(3)
+    in_terminator = ""
+    out_terminator = "\x03"
+    readtimeout = 1
 
     def handle_error(self, request, error):
         """
@@ -44,59 +42,35 @@ class EurothermStreamInterface(StreamInterface):
 
     @if_connected
     def get_proportional(self):
-        """
-        TODO: Get the proportional of the device's PID values
-        """
-        return "\x02XP0"
+        return "\x02XP{}".format(self.device.p)
 
     @if_connected
     def get_integral(self):
-        """
-        TODO: Get the integral of the device's PID values
-        """
-        return "\x02TI0"
+        return "\x02TI{}".format(self.device.i)
 
     @if_connected
     def get_derivative(self):
-        """
-        TODO: Get the derivative of the device's PID values
-        """
-        return "\x02TD0"
+        return "\x02TD{}".format(self.device.d)
 
     @if_connected
     def get_output(self):
-        """
-        TODO: Get the output of the device
-        """
-        return "\x02OP0"
+        return "\x02OP{}".format(self.device.output)
 
     @if_connected
     def get_highlim(self):
-        """
-        TODO: Get the high limit of the device
-        """
-        return "\x02HS0"
+        return "\x02HS{}".format(self.device.high_lim)
 
     @if_connected
     def get_lowlim(self):
-        """
-        TODO: Get the low limit of the device
-        """
-        return "\x02LS0"
+        return "\x02LS{}".format(self.device.low_lim)
 
     @if_connected
     def get_max_output(self):
-        """
-        TODO: Get the max output of the device
-        """
-        return "\x02HO0"
+        return "\x02HO{}".format(self.device.max_output)
 
     @if_connected
     def get_autotune(self):
-        """
-        TODO: Get the max output of the device
-        """
-        return "\x02AT0"
+        return "\x02AT{}".format(self.device.autotune)
 
     @if_connected
     def get_current_temperature(self):
