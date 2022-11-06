@@ -86,7 +86,7 @@ class SimulatedEdwardsTIC(StateMachineDevice):
         self._gauge_pressure = 0.0
         self._gauge_units = GaugeUnits.Pa
 
-        self.is_connected = True
+        self.connected = True
 
     def _get_state_handlers(self):
         return {

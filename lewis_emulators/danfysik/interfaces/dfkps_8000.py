@@ -25,6 +25,7 @@ class Danfysik8000StreamInterface(CommonStreamInterface, StreamInterface):
         CmdBuilder("init_comms").escape("UNLOCK").build(),
     ]
 
+    @conditional_reply("connected")
     @conditional_reply("comms_initialized")
     def get_status(self):
         """
