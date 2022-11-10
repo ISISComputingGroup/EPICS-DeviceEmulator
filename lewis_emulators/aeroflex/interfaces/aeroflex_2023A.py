@@ -1,4 +1,4 @@
-from lewis.adapters.stream import StreamInterface, Cmd
+from lewis.adapters.stream import StreamInterface
 from lewis.utils.command_builder import CmdBuilder
 from lewis.core.logging import has_log
 from lewis.utils.replies import conditional_reply
@@ -12,15 +12,12 @@ if_connected = conditional_reply('connected')
 class Aeroflex2023AStreamInterface(CommonStreamInterface, StreamInterface):
     protocol = 'model2023A'
     
-    cfrq_response = ':{}:VALUE {};INC {};MODE {}'
-    
     commands = CommonStreamInterface.commands
     in_terminator = CommonStreamInterface.in_terminator
     out_terminator = CommonStreamInterface.out_terminator
     
     def get_carrier_freq(self):
-        return self.cfrq_response.format(CommonStreamInterface.CAR_FREQ_COMM, self._device.carrier_freq_val, self._device.carrier_freq_inc, self._device.carrier_freq_mode)
-	
+        return f':CFRQ:VALUE {self._device.carrier_freq_val};INC {self._device.carrier_freq_inc};MODE {self._device.carrier_freq_mode}'	
         
     def reset(self):
         self._device.carrier_freq_val = 0
