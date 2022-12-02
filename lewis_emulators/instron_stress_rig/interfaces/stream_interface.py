@@ -7,6 +7,7 @@ class InstronStreamInterface(StreamInterface):
     commands = {
         Cmd("get_control_channel", "^Q300$"),
         Cmd("set_control_channel", "^C300,([1-3])$"),
+        Cmd("set_control_channel", "^C500,([1-3]);C38,1$"),  # Alternative "set channel", used by instron_arby
         Cmd("disable_watchdog", "^C904,0$"),
         Cmd("get_control_mode", "^Q909$"),
         Cmd("set_control_mode", "^P909,([0-1])$"),
@@ -16,8 +17,14 @@ class InstronStreamInterface(StreamInterface):
         Cmd("set_actuator_status", "^C23,([0-1])$"),
         Cmd("get_movement_type", "^Q1$"),
         Cmd("set_movement_type", "^C1,([0-3])$"),
+        Cmd("set_moving", "^C372$"),  # Used by instron_arby
         Cmd("get_step_time", "^Q86,([1-3])$"),
         Cmd("set_step_time", "^C86,([1-3]),([0-9]*.[0-9]*)$"),
+
+        # Complex "trigger" logic, not emulated, ignore these commands
+        Cmd("ignore", "^C916,0$"),  # Used by instron_arby
+        Cmd("ignore", "^C914,4$"),  # Used by instron_arby
+        Cmd("ignore", "^C916,2$"),  # Used by instron_arby
 
         # Channel commands
         Cmd("get_chan_waveform_type", "^Q2,([1-3])$"),
@@ -93,6 +100,9 @@ class InstronStreamInterface(StreamInterface):
 
     def set_movement_type(self, mov_type):
         self._device.set_movement_type(int(mov_type))
+
+    def set_moving(self):
+        self._device.set_movement_type(1)
 
     def get_step_time(self, channel):
         return float(self._device.get_step_time(int(channel)))
@@ -189,3 +199,6 @@ class InstronStreamInterface(StreamInterface):
 
     def set_waveform_maintain_log(self):
         self._device.set_waveform_maintain_log()
+
+    def ignore(self):
+        pass
