@@ -72,20 +72,21 @@ class FinsPLCStreamInterface(StreamInterface):
         # The helium recovery PLC memory map has addresses that store types that take up either one word (16 bits) or
         # two. Most take up one word, so if the number of words to read is two we check that the client wants to read
         # from a memory location from where a 32 bit value starts.
-        if number_of_words_to_read == 2 and memory_start_address not in self.device.int32_memory.keys():
+        if number_of_words_to_read == 2 and (memory_start_address not in self.device.int32_memory.keys() and
+                                             memory_start_address not in self.device.float_memory.keys()):
             raise ValueError("The memory start address {} corresponds to a single word in the memory map, "
                              "not two.".format(memory_start_address))
         # The PLC also stores 32 bit floating point numbers, but the asyn device support makes the IOC ask for 4 bytes
         # instead of two.
         elif number_of_words_to_read > 2:
             raise ValueError("The memory map only specifies data types for which commands should ask for one or two at most.")
-        as_float = True if memory_start_address in self.device.float_memory.keys() else False
+        is_float = True if memory_start_address in self.device.float_memory.keys() else False
         self._log_command_contents(client_network_address, client_node_address, client_unit_address, service_id,
                                    memory_start_address, number_of_words_to_read)
 
         reply = dm_memory_area_read_response_fins_frame(self.device, client_network_address,
                                                         client_node_address, client_unit_address, service_id,
-                                                        memory_start_address, number_of_words_to_read, as_float)
+                                                        memory_start_address, number_of_words_to_read, is_float)
 
         self._log_fins_frame(reply, True)
 
