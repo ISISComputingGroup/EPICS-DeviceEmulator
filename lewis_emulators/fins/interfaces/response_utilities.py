@@ -39,7 +39,7 @@ def dm_memory_area_read_response_fins_frame(device, client_network_address, clie
         service_id (int): The service ID of the original command.
         memory_start_address (int): The memory address from where reading starts.
         number_of_words_to_read (int): The number of words to be read, starting from the start address, inclusive.
-        as_float: data is a float
+        is_float: data is a float
 
     Returns:
         bytes: the response.
