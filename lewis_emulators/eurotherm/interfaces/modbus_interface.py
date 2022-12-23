@@ -61,6 +61,7 @@ class EurothermModbusInterface(StreamInterface):
             112: self.get_low_lim,
             270: self.get_autotune,
             30: self.get_max_output,
+            37: self.get_output_rate,
             3: self.get_output,
         }
 
@@ -70,6 +71,7 @@ class EurothermModbusInterface(StreamInterface):
             8: self.set_i,
             9: self.set_d,
             30: self.set_max_output,
+            37: self.set_output_rate,
             270: self.set_autotune,
         }
 
@@ -173,6 +175,12 @@ class EurothermModbusInterface(StreamInterface):
 
     def set_max_output(self, value):
         self.device.max_output = value / 10.0
+
+    def get_output_rate(self):
+        return self.device.output_rate
+
+    def set_output_rate(self, value):
+        self.device.output_rate = value
 
     def get_output(self):
         return int(self.device.output * 10)
