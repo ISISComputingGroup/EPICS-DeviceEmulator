@@ -15,6 +15,7 @@ class EurothermStreamInterface(StreamInterface):
         CmdBuilder("get_ramp_setpoint").eot().escape("0011SP").enq().build(),
         CmdBuilder("get_output").eot().escape("0011OP").enq().build(),
         CmdBuilder("get_max_output").eot().escape("0011HO").enq().build(),
+        CmdBuilder("get_output_rate").eot().escape("0011OR").enq().build(),
         CmdBuilder("get_autotune").eot().escape("0011AT").enq().build(),
         CmdBuilder("get_proportional").eot().escape("0011XP").enq().build(),
         CmdBuilder("get_derivative").eot().escape("0011TD").enq().build(),
@@ -23,6 +24,7 @@ class EurothermStreamInterface(StreamInterface):
         CmdBuilder("get_lowlim").eot().escape("0011LS").enq().build(),
 
         CmdBuilder("set_ramp_setpoint", arg_sep="").eot().escape("0011").stx().escape("SL").float().etx().any().build(),
+        CmdBuilder("set_output_rate", arg_sep="").eot().escape("0011").stx().escape("OR").float().etx().any().build(),
     }
 
     in_terminator = ""
@@ -67,6 +69,14 @@ class EurothermStreamInterface(StreamInterface):
     @if_connected
     def get_max_output(self):
         return "\x02HO{}".format(self.device.max_output)
+
+    @if_connected
+    def get_output_rate(self):
+        return "\x02OR{}".format(self.device.output_rate)
+
+    @if_connected
+    def set_output_rate(self, output_rate, _):
+        self.device.output_rate = output_rate
 
     @if_connected
     def get_autotune(self):

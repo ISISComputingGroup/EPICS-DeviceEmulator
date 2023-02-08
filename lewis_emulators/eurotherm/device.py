@@ -26,6 +26,7 @@ class SimulatedEurotherm(StateMachineDevice):
         self.d = 0
         self.autotune = 0
         self.max_output = 0
+        self._output_rate = 0
         self.output = 0
         self.high_lim = 0
         self.low_lim = 0
@@ -149,4 +150,18 @@ class SimulatedEurotherm(StateMachineDevice):
 
         """
         self._ramp_setpoint_temperature = temp
+        
+    @property
+    def output_rate(self):
+        """
+        Get the set point output rate.
+        """
+        return self._output_rate
+        
+    @output_rate.setter
+    def output_rate(self, value):
+        """
+        Set the set point output rate.
+        """
+        self._output_rate = value
 
