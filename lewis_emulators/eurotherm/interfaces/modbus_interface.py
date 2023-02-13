@@ -62,6 +62,11 @@ class EurothermModbusInterface(StreamInterface):
             270: self.get_autotune,
             30: self.get_max_output,
             3: self.get_output,
+            1025: self.get_flow,
+            1509: self.get_manual_flow,
+            1136: self.get_flow_low_lim,
+            1300: self.get_flow_sp_mode,
+            4827: self.get_valve_direction
         }
 
         self.write_commands = {
@@ -71,6 +76,9 @@ class EurothermModbusInterface(StreamInterface):
             9: self.set_d,
             30: self.set_max_output,
             270: self.set_autotune,
+            1509: self.set_manual_flow,
+            1136: self.set_flow_low_lim,
+            1300: self.set_flow_sp_mode
         }
 
     in_terminator = ""
@@ -124,8 +132,12 @@ class EurothermModbusInterface(StreamInterface):
     def handle_write(self, data, command):
         mem_address = bytes_to_int(data[0:2])
         value = bytes_to_int(data[2:4])
-        self.write_commands[mem_address](value)
-
+        self.log.info(f"Attempting to write {value} to mem address: {mem_address}")
+        try:
+            self.write_commands[mem_address](value)
+        except:
+            import traceback
+            traceback.print_exc()
         # On write, device echos command back to IOC
         return command
 
@@ -176,3 +188,27 @@ class EurothermModbusInterface(StreamInterface):
 
     def get_output(self):
         return int(self.device.output * 10)
+
+    def get_flow(self):
+        return int(self.device.flow)
+    
+    def get_manual_flow(self):
+        return int(self.device.manual_flow)
+    
+    def set_manual_flow(self, value):
+        self.device.manual_flow = value
+
+    def get_flow_low_lim(self):
+        return int(self.device.flow_low_lim)
+
+    def set_flow_low_lim(self, value):
+        self.device.flow_low_lim = value
+
+    def get_flow_sp_mode(self):
+        return int(self.device.flow_sp_mode)
+    
+    def set_flow_sp_mode(self, value):
+        self.device.flow_sp_mode = value
+
+    def get_valve_direction(self):
+        return int(self.device.valve_direction)
