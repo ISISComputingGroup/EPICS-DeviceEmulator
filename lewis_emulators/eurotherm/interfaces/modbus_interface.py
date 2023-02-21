@@ -64,9 +64,10 @@ class EurothermModbusInterface(StreamInterface):
             3: self.get_output,
             1025: self.get_flow,
             1509: self.get_manual_flow,
-            1136: self.get_flow_low_lim,
             1300: self.get_flow_sp_mode,
-            4827: self.get_valve_direction
+            4827: self.get_valve_direction,
+            1136: self.get_flow_low_lim,
+            0000: self.get_flow_high_lim
         }
 
         self.write_commands = {
@@ -201,6 +202,9 @@ class EurothermModbusInterface(StreamInterface):
     def get_flow_low_lim(self):
         return int(self.device.flow_low_lim)
 
+    def get_flow_high_lim(self):
+        return int(self.device.flow_high_lim)
+        
     def set_flow_low_lim(self, value):
         self.device.flow_low_lim = value
 

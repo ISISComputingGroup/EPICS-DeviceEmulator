@@ -34,6 +34,8 @@ class SimulatedEurotherm(StateMachineDevice):
         self.output = 0
         self.high_lim = 0
         self.low_lim = 0
+        self.flow_high_lim = 2.0
+        
 
     def _get_state_handlers(self):
         """
