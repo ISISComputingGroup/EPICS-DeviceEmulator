@@ -21,11 +21,12 @@ class SimulatedEurotherm(StateMachineDevice):
         self._ramping_on = False
         self._ramp_rate = 1.0
         self._address = "A1"
-        self._flow = 5.0
-        self._manual_flow = 6.0
-        self._flow_low_lim = 1.0
-        self._flow_sp_mode = 1
-        self._valve_direction = 1
+        self._flow = 0
+        self._manual_flow = 0
+        self._flow_low_lim = 0
+        self._flow_sp_mode = 0
+        self._valve_direction = 0
+        self._n_v_stop = 0
         self.p = 0
         self.i = 0
         self.d = 0
@@ -34,7 +35,6 @@ class SimulatedEurotherm(StateMachineDevice):
         self.output = 0
         self.high_lim = 0
         self.low_lim = 0
-        self.flow_high_lim = 2.0
         
 
     def _get_state_handlers(self):
@@ -165,6 +165,16 @@ class SimulatedEurotherm(StateMachineDevice):
         Returns: the current value of the flow rate in L/min
         """
         return self._flow
+    
+    @flow.setter
+    def flow(self, flow):
+        """
+        Sets the flow readback from the transducer
+
+        Args: 
+            flow (double) the current value of the flow rate in L/min
+        """
+        self._flow = flow
 
     @property
     def manual_flow(self):
@@ -231,3 +241,34 @@ class SimulatedEurotherm(StateMachineDevice):
         Returns: current direction of the valve (OPENING/CLOSING)
         """
         return self._valve_direction
+    
+    @valve_direction.setter
+    def valve_direction(self, dir):
+        """
+        Sets the direction of the valve 
+
+        Args: 
+            dir (int) current direction of the valve (OPENING/CLOSING)
+        """
+        self._valve_direction = dir
+    
+    @property
+    def n_v_stop(self):
+        """
+        Gets the control mode of Loop 2 
+
+        Returns: current control mode of Loop 2 (STOPPED/NOT STOPPED)
+        """
+        return self._n_v_stop
+    
+
+    
+    @n_v_stop.setter
+    def n_v_stop(self, stop_val):
+        """
+        Sets the control mode of Loop 2 
+
+        Args:
+            stop_val (int)
+        """
+        self._n_v_stop = stop_val
