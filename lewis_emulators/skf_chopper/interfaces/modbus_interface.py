@@ -16,34 +16,10 @@ def bytes_to_int(bytes):
     return int.from_bytes(bytes, byteorder="big", signed=True)
 
 
-def crc16(data):
-    """
-    CRC algorithm - translated from section 3-5 of eurotherm manual.
-    :param data: the data to checksum
-    :return: the checksum
-    """
-    crc = 0xFFFF
-
-    for b in data:
-        crc ^= b
-        for _ in range(8):
-            if crc & 1:
-                crc >>= 1
-                crc ^= 0xA001
-            else:
-                crc >>= 1
-
-            crc %= BYTE ** 2
-
-    return int_to_raw_bytes(crc, 2, low_byte_first=True)
-
-
 @has_log
 class SKFChopperModbusInterface(StreamInterface):
     """
-    This implements the modbus stream interface for a eurotherm.
-
-    Note: Eurotherm uses modbus RTU, not TCP, so cannot use lewis' normal modbus implementation here.
+    This implements the modbus stream interface for an skf chopper.
     """
     commands = {
         Cmd("any_command", r"^([\s\S]*)$", return_mapping=lambda x: x),
@@ -53,9 +29,13 @@ class SKFChopperModbusInterface(StreamInterface):
         super().__init__()
         self.read_commands = {
             353: self.get_freq,
-            462: self.get_state,
+            462: self.catch_get,
             477: self.get_speed,
-
+            240: self.catch_get,
+            347: self.catch_get,
+            362: self.catch_get,
+            360: self.catch_get,
+            0: self.catch_get
         }
 
         self.write_commands = {
@@ -63,7 +43,7 @@ class SKFChopperModbusInterface(StreamInterface):
         }
 
     in_terminator = ""
-    out_terminator = ""
+    out_terminator = b""
     readtimeout = 10
     protocol = "stream"
 
@@ -71,27 +51,28 @@ class SKFChopperModbusInterface(StreamInterface):
         error_message = "An error occurred at request " + repr(request) + ": " + repr(error)
         print(error_message)
         self.log.error(error_message)
-        return str(error)
+        return str(error).encode("utf-8")
 
     @log_replies
     @conditional_reply("connected")
     def any_command(self, command):
         self.log.info(command)
-        comms_address = command[0]
-        function_code = int(command[1])
-        data = command[2:-2]
-        crc = command[-2:]
+        transaction_id = command[0:2] if self.device._send_correct_transaction_id else 0x00
+        protocol_identifier = command[2:4]
+        length = int.from_bytes(command[4:6], "big")
+        unit = command[6]
+        function_code = int(command[7])
+        data = command[8:]
 
-        print(f"COMMAND: {command}")
+        print(f"trans id {transaction_id} protocol id {protocol_identifier} length {length} unit {unit} function code {function_code} data {data}")
 
-        #assert(crc16(command) == b"\x00\x00", "Invalid checksum from IOC")
-
-        if len(data) != 4:
-            raise ValueError(f"Invalid message length {len(data)}")
-
+        if len(command[6:]) != length:
+             raise ValueError(f"Invalid message length, expected {length} but got {len(data)}")
+    
         if function_code == 3:
-            return self.handle_read(comms_address, data)
-        elif function_code == 6:
+            return self.handle_read(transaction_id, data)
+        elif function_code == 16:
+            return command
             return self.handle_write(data, command)
         else:
             raise ValueError(f"Unknown modbus function code: {function_code}")
@@ -128,5 +109,8 @@ class SKFChopperModbusInterface(StreamInterface):
     def set_freq(self, value):
         self.device.freq = value
 
-    def get_state(self):
-        return int(self.device.state)
+    def catch_get(self):
+        return int(0)
+
+    def catch_write(self, val):
+        pass
