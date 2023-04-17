@@ -57,42 +57,56 @@ class SKFChopperModbusInterface(StreamInterface):
     @conditional_reply("connected")
     def any_command(self, command):
         self.log.info(command)
-        transaction_id = command[0:2] if self.device._send_correct_transaction_id else 0x00
-        protocol_identifier = command[2:4]
+        transaction_id = command[0:2] if self.device._send_correct_transaction_id else int(0).to_bytes(2, byteorder="big")
+        protocol_id = command[2:4]
         length = int.from_bytes(command[4:6], "big")
         unit = command[6]
         function_code = int(command[7])
         data = command[8:]
 
-        print(f"trans id {transaction_id} protocol id {protocol_identifier} length {length} unit {unit} function code {function_code} data {data}")
+        print(f"trans id {transaction_id} protocol id {protocol_id} length {length} unit {unit} function code {function_code} data {data}")
 
         if len(command[6:]) != length:
              raise ValueError(f"Invalid message length, expected {length} but got {len(data)}")
     
         if function_code == 3:
-            return self.handle_read(transaction_id, data)
+            return self.handle_read(transaction_id, protocol_id, unit, function_code, data)
         elif function_code == 16:
-            return command
-            return self.handle_write(data, command)
+            return self.handle_write(command)
         else:
             raise ValueError(f"Unknown modbus function code: {function_code}")
 
-    def handle_read(self, comms_address, data):
+    def handle_read(self, transaction_id, protocol_id, unit, function_code, data):
         mem_address = bytes_to_int(data[0:2])
         words_to_read = bytes_to_int(data[2:4])
         self.log.info(f"Attempting to read {words_to_read} words from mem address: {mem_address}")
         reply_data = self.read_commands[mem_address]()
 
         self.log.info(f"reply_data = {reply_data}")
-        assert -0x8000 <= reply_data <= 0x7FFF, f"reply {reply_data} was outside modbus range, bug?"
+        
+        data_length = 2
+        reply_data_bytes = reply_data.to_bytes(data_length, byteorder="big", signed=True)
+        function_code_bytes = function_code.to_bytes(1, byteorder="big")
+        unit_bytes = unit.to_bytes(1, byteorder="big")
 
-        reply = comms_address.to_bytes(1, byteorder="big", signed=True) \
-            + b"\x03\x02" \
-            + reply_data.to_bytes(2, byteorder="big", signed=True)
+        data_length_bytes = data_length.to_bytes(2, byteorder="big")
 
-        return reply + crc16(reply)
+        length = int(3+data_length).to_bytes(2, byteorder="big")
 
-    def handle_write(self, data, command):
+
+        reply = transaction_id \
+            + protocol_id \
+            + length \
+            + unit_bytes \
+            + function_code_bytes \
+            + data_length_bytes \
+            + reply_data_bytes
+
+        print(f"replying with {reply}")
+
+        return reply
+
+    def handle_write(self, command):
         mem_address = bytes_to_int(data[0:2])
         value = bytes_to_int(data[2:4])
         self.write_commands[mem_address](value)
