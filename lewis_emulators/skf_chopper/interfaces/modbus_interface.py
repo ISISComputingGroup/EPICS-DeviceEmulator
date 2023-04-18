@@ -1,6 +1,6 @@
 from lewis.adapters.stream import StreamInterface, Cmd
 from lewis.core.logging import has_log
-from lewis.utils.byte_conversions import int_to_raw_bytes, BYTE
+from lewis.utils.byte_conversions import int_to_raw_bytes, BYTE, float_to_raw_bytes
 from lewis.utils.replies import conditional_reply
 import struct
 
@@ -59,7 +59,7 @@ class SKFChopperModbusInterface(StreamInterface):
     @conditional_reply("connected")
     def any_command(self, command):
         self.log.info(command)
-        transaction_id = command[0:2] if self.device._send_correct_transaction_id else int(0).to_bytes(2, byteorder="big")
+        transaction_id = command[0:2] if self.device.send_ok_transid else int(0).to_bytes(2, byteorder="big")
         protocol_id = command[2:4]
         length = int.from_bytes(command[4:6], "big")
         unit = command[6]
@@ -86,8 +86,17 @@ class SKFChopperModbusInterface(StreamInterface):
 
         self.log.info(f"reply_data = {reply_data}")
         
-        data_length = 4
-        reply_data_bytes = reply_data.to_bytes(data_length, byteorder="big")
+        if type(reply_data) is float:
+            data_length = 4
+            littleendian_bytes = bytearray(float_to_raw_bytes(reply_data, low_byte_first=True))
+            print(f"first {littleendian_bytes[:2]} second {littleendian_bytes[2:]}")
+            # split up in 2-byte words, then swap endianness respectively to big endian. 
+            first_word = littleendian_bytes[:2][::-1]
+            second_word = littleendian_bytes[2:][::-1]
+            print(f"swapped first {first_word} second {second_word}")
+            reply_data_bytes = first_word + second_word
+
+
         function_code_bytes = function_code.to_bytes(1, byteorder="big")
         unit_bytes = unit.to_bytes(1, byteorder="big")
 
@@ -102,7 +111,7 @@ class SKFChopperModbusInterface(StreamInterface):
             + unit_bytes \
             + function_code_bytes \
             + data_length_bytes \
-            + b"\x00\x00\x42\x20"
+            + reply_data_bytes
 
         print(f"replying with {reply}")
         print(f"REPLY: transaction id {transaction_id} protocol id {protocol_id} length {length} unit {unit_bytes} func code {function_code_bytes} data length {data_length_bytes} reply_data {reply_data_bytes}")
@@ -122,7 +131,7 @@ class SKFChopperModbusInterface(StreamInterface):
         return int(self.device.speed)
 
     def get_freq(self):
-        return int(self.device.freq)
+        return float(self.device.freq)
 
     def set_freq(self, value):
         self.device.freq = value

@@ -21,7 +21,7 @@ class SimulatedSKFChopper(StateMachineDevice):
         self.speed = 0
         self.freq = 40 
         self.phasens = 4000
-        self._send_correct_transaction_id = True
+        self.send_ok_transid = True
 
 
     def _get_state_handlers(self):
