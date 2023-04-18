@@ -66,8 +66,6 @@ class SKFChopperModbusInterface(StreamInterface):
         function_code = int(command[7])
         data = command[8:]
 
-        print(f"trans id {transaction_id} protocol id {protocol_id} length {length} unit {unit} function code {function_code} data {data}")
-
         if len(command[6:]) != length:
              raise ValueError(f"Invalid message length, expected {length} but got {len(data)}")
     
@@ -89,11 +87,9 @@ class SKFChopperModbusInterface(StreamInterface):
         if type(reply_data) is float:
             data_length = 4
             littleendian_bytes = bytearray(float_to_raw_bytes(reply_data, low_byte_first=True))
-            print(f"first {littleendian_bytes[:2]} second {littleendian_bytes[2:]}")
             # split up in 2-byte words, then swap endianness respectively to big endian. 
             first_word = littleendian_bytes[:2][::-1]
             second_word = littleendian_bytes[2:][::-1]
-            print(f"swapped first {first_word} second {second_word}")
             reply_data_bytes = first_word + second_word
 
 
@@ -112,10 +108,6 @@ class SKFChopperModbusInterface(StreamInterface):
             + function_code_bytes \
             + data_length_bytes \
             + reply_data_bytes
-
-        print(f"replying with {reply}")
-        print(f"REPLY: transaction id {transaction_id} protocol id {protocol_id} length {length} unit {unit_bytes} func code {function_code_bytes} data length {data_length_bytes} reply_data {reply_data_bytes}")
-        print(reply_data_bytes)
 
         return reply
 
