@@ -66,7 +66,7 @@ class SKFChopperModbusInterface(StreamInterface):
         if function_code == 3:
             return self.handle_read(transaction_id, protocol_id, unit, function_code, data)
         elif function_code == 16:
-            return self.handle_write(command)
+            return self.handle_write(command, data)
         else:
             raise ValueError(f"Unknown modbus function code: {function_code}")
 
@@ -102,7 +102,7 @@ class SKFChopperModbusInterface(StreamInterface):
 
         return reply
 
-    def handle_write(self, command):
+    def handle_write(self, command, data):
         mem_address = bytes_to_int(data[0:2])
         value = bytes_to_int(data[2:4])
         self.write_commands[mem_address](value)
