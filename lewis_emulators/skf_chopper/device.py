@@ -6,7 +6,8 @@ from .states import DefaultState
 
 class SimulatedSKFChopper(StateMachineDevice):
     """
-    Simulated Eurotherm temperature sensor.
+    Simulated SKF chopper. Very basic and only provides frequency as a parameter for now
+    to perform a basic check of modbus comms. 
     """
 
     def _initialize_data(self):
@@ -15,14 +16,8 @@ class SimulatedSKFChopper(StateMachineDevice):
         """
         self.connected = True
 
-        self.state = 0
-        self.shaft_angle = 0
-        self._address = "A1"
-        self.speed = 0
         self.freq = 40 
-        self.phasens = 4000
         self.send_ok_transid = True
-
 
     def _get_state_handlers(self):
         """
@@ -43,23 +38,3 @@ class SimulatedSKFChopper(StateMachineDevice):
         Returns: the state transitions
         """
         return OrderedDict()
-
-    @property
-    def address(self):
-        """
-        Get the address of the device.
-
-        Returns: the address of the device e.g. "A01"
-        """
-        return self._address
-
-    @address.setter
-    def address(self, addr):
-        """
-        Sets the address of the device.
-
-        Args:
-            addr (str): the address of this device e.g. "A01".
-
-        """
-        self._address = addr

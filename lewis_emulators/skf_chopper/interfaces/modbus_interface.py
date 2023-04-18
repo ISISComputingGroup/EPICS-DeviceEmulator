@@ -1,8 +1,7 @@
 from lewis.adapters.stream import StreamInterface, Cmd
 from lewis.core.logging import has_log
-from lewis.utils.byte_conversions import int_to_raw_bytes, BYTE, float_to_raw_bytes
+from lewis.utils.byte_conversions import float_to_raw_bytes
 from lewis.utils.replies import conditional_reply
-import struct
 
 
 def log_replies(f):
@@ -21,6 +20,8 @@ def bytes_to_int(bytes):
 class SKFChopperModbusInterface(StreamInterface):
     """
     This implements the modbus stream interface for an skf chopper.
+    This is not a full implementation of the device and just handles frequency for now to check 
+    that modbus comms work OK.
     """
     commands = {
         Cmd("any_command", r"^([\s\S]*)$", return_mapping=lambda x: x),
@@ -31,13 +32,6 @@ class SKFChopperModbusInterface(StreamInterface):
         self.read_commands = {
             353: self.get_freq,
             345: self.get_freq,
-            462: self.catch_get,
-            477: self.get_speed,
-            240: self.catch_get,
-            347: self.catch_get,
-            362: self.catch_get,
-            360: self.catch_get,
-            0: self.catch_get
         }
 
         self.write_commands = {
@@ -95,11 +89,8 @@ class SKFChopperModbusInterface(StreamInterface):
 
         function_code_bytes = function_code.to_bytes(1, byteorder="big")
         unit_bytes = unit.to_bytes(1, byteorder="big")
-
         data_length_bytes = data_length.to_bytes(1, byteorder="big")
-
         length = int(3+data_length).to_bytes(2, byteorder="big")
-
 
         reply = transaction_id \
             + protocol_id \
@@ -115,12 +106,7 @@ class SKFChopperModbusInterface(StreamInterface):
         mem_address = bytes_to_int(data[0:2])
         value = bytes_to_int(data[2:4])
         self.write_commands[mem_address](value)
-
-        # On write, device echos command back to IOC
         return command
-
-    def get_speed(self):
-        return int(self.device.speed)
 
     def get_freq(self):
         return float(self.device.freq)
@@ -128,8 +114,3 @@ class SKFChopperModbusInterface(StreamInterface):
     def set_freq(self, value):
         self.device.freq = value
 
-    def catch_get(self):
-        return int(0)
-
-    def catch_write(self, val):
-        pass
