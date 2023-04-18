@@ -2,6 +2,7 @@ from lewis.adapters.stream import StreamInterface, Cmd
 from lewis.core.logging import has_log
 from lewis.utils.byte_conversions import int_to_raw_bytes, BYTE
 from lewis.utils.replies import conditional_reply
+import struct
 
 
 def log_replies(f):
@@ -13,7 +14,7 @@ def log_replies(f):
 
 
 def bytes_to_int(bytes):
-    return int.from_bytes(bytes, byteorder="big", signed=True)
+    return int.from_bytes(bytes, byteorder="big")
 
 
 @has_log
@@ -29,6 +30,7 @@ class SKFChopperModbusInterface(StreamInterface):
         super().__init__()
         self.read_commands = {
             353: self.get_freq,
+            345: self.get_freq,
             462: self.catch_get,
             477: self.get_speed,
             240: self.catch_get,
@@ -84,12 +86,12 @@ class SKFChopperModbusInterface(StreamInterface):
 
         self.log.info(f"reply_data = {reply_data}")
         
-        data_length = 2
-        reply_data_bytes = reply_data.to_bytes(data_length, byteorder="big", signed=True)
+        data_length = 4
+        reply_data_bytes = reply_data.to_bytes(data_length, byteorder="big")
         function_code_bytes = function_code.to_bytes(1, byteorder="big")
         unit_bytes = unit.to_bytes(1, byteorder="big")
 
-        data_length_bytes = data_length.to_bytes(2, byteorder="big")
+        data_length_bytes = data_length.to_bytes(1, byteorder="big")
 
         length = int(3+data_length).to_bytes(2, byteorder="big")
 
@@ -100,9 +102,11 @@ class SKFChopperModbusInterface(StreamInterface):
             + unit_bytes \
             + function_code_bytes \
             + data_length_bytes \
-            + reply_data_bytes
+            + b"\x00\x00\x42\x20"
 
         print(f"replying with {reply}")
+        print(f"REPLY: transaction id {transaction_id} protocol id {protocol_id} length {length} unit {unit_bytes} func code {function_code_bytes} data length {data_length_bytes} reply_data {reply_data_bytes}")
+        print(reply_data_bytes)
 
         return reply
 
