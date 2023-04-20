@@ -74,7 +74,10 @@ class SKFChopperModbusInterface(StreamInterface):
         mem_address = bytes_to_int(data[0:2])
         words_to_read = bytes_to_int(data[2:4])
         self.log.info(f"Attempting to read {words_to_read} words from mem address: {mem_address}")
-        reply_data = self.read_commands[mem_address]()
+        if mem_address in self.read_commands.keys():
+            reply_data = self.read_commands[mem_address]()
+        else:
+            reply_data = float(0.0)
 
         self.log.info(f"reply_data = {reply_data}")
         
