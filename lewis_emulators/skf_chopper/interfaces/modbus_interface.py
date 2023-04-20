@@ -1,6 +1,6 @@
 from lewis.adapters.stream import StreamInterface, Cmd
 from lewis.core.logging import has_log
-from lewis.utils.byte_conversions import float_to_raw_bytes
+from lewis.utils.byte_conversions import float_to_raw_bytes, raw_bytes_to_int
 from lewis.utils.replies import conditional_reply
 
 
@@ -10,10 +10,6 @@ def log_replies(f):
         self.log.info(f"Reply in {f.__name__}: {result}")
         return result
     return _wrapper
-
-
-def bytes_to_int(bytes):
-    return int.from_bytes(bytes, byteorder="big")
 
 
 @has_log
@@ -71,8 +67,8 @@ class SKFChopperModbusInterface(StreamInterface):
             raise ValueError(f"Unknown modbus function code: {function_code}")
 
     def handle_read(self, transaction_id, protocol_id, unit, function_code, data):
-        mem_address = bytes_to_int(data[0:2])
-        words_to_read = bytes_to_int(data[2:4])
+        mem_address = raw_bytes_to_int(data[0:2], False)
+        words_to_read = raw_bytes_to_int(data[2:4], False)
         self.log.info(f"Attempting to read {words_to_read} words from mem address: {mem_address}")
         if mem_address in self.read_commands.keys():
             reply_data = self.read_commands[mem_address]()
@@ -106,8 +102,8 @@ class SKFChopperModbusInterface(StreamInterface):
         return reply
 
     def handle_write(self, command, data):
-        mem_address = bytes_to_int(data[0:2])
-        value = bytes_to_int(data[2:4])
+        mem_address = raw_bytes_to_int(data[0:2], False)
+        value = raw_bytes_to_int(data[2:4], False)
         self.write_commands[mem_address](value)
         return command
 
