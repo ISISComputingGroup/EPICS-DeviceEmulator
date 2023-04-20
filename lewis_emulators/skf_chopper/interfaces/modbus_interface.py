@@ -26,12 +26,12 @@ class SKFChopperModbusInterface(StreamInterface):
     def __init__(self):
         super().__init__()
         self.read_commands = {
-            353: self.get_freq,
-            345: self.get_freq,
+            353: self.get_freq, # RBV
+            345: self.get_freq, # SP:RBV
         }
 
         self.write_commands = {
-            345: self.set_freq,
+            345: self.set_freq, # SP
         }
 
     in_terminator = ""
@@ -80,9 +80,16 @@ class SKFChopperModbusInterface(StreamInterface):
         if type(reply_data) is float:
             data_length = 4
             littleendian_bytes = bytearray(float_to_raw_bytes(reply_data, low_byte_first=True))
-            # split up in 2-byte words, then swap endianness respectively to big endian. 
+            # split up in 2-byte words, then swap endianness respectively to big endian.
+            # The device represents float32s in 2 words, little endian, but each of these words respectively are big endian.
+
+            # Get the first 2 bytes, then flip endianness
             first_word = littleendian_bytes[:2][::-1]
+
+            # Do the same for the remainder
             second_word = littleendian_bytes[2:][::-1]
+            
+            # Concatenate the two bytes/words 
             reply_data_bytes = first_word + second_word
 
 
