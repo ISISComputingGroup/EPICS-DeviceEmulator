@@ -192,7 +192,7 @@ class MclennanStreamInterface(StreamInterface):
 
     @if_connected
     def define_command_position(self, controller, value):
-        self.device.position = value
+        self.device.target_position = value
         return "OK"
 
     @if_connected
@@ -214,5 +214,5 @@ class MclennanStreamInterface(StreamInterface):
 
     @if_connected
     def query_position(self, controller):
-        return f"{controller:02}:CP = {self.device.position} AP = {self.device.position} IP = 1050 TP = 0 OD = -2050"
+        return f"{controller:02}:CP = {self.device.target_position} AP = {self.device.position} IP = 1050 TP = 0 OD = -2050"
 
