@@ -206,7 +206,7 @@ class MclennanStreamInterface(StreamInterface):
 
     @if_connected
     def query_current_op(self, controller):
-        return f"Mode = {self.device.current_op}"
+        return f"{controller:02}:{self.device.current_op}"
         
     @if_connected
     def query_all(self, controller):
