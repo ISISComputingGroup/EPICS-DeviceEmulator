@@ -2,7 +2,7 @@ from lewis.adapters.stream import StreamInterface, Cmd
 from lewis.core.logging import has_log
 from lewis.utils.byte_conversions import float_to_raw_bytes, raw_bytes_to_int
 from lewis.utils.replies import conditional_reply
-
+from os import urandom
 
 def log_replies(f):
     def _wrapper(self, *args, **kwargs):
@@ -36,7 +36,6 @@ class SKFChopperModbusInterface(StreamInterface):
 
     in_terminator = ""
     out_terminator = b""
-    readtimeout = 10
     protocol = "stream"
 
     def handle_error(self, request, error):
@@ -49,7 +48,7 @@ class SKFChopperModbusInterface(StreamInterface):
     @conditional_reply("connected")
     def any_command(self, command):
         self.log.info(command)
-        transaction_id = command[0:2] if self.device.send_ok_transid else int(0).to_bytes(2, byteorder="big")
+        transaction_id = command[0:2] if self.device.send_ok_transid else urandom(2)
         protocol_id = command[2:4]
         length = int.from_bytes(command[4:6], "big")
         unit = command[6]
