@@ -77,7 +77,7 @@ class SKFChopperModbusInterface(StreamInterface):
 
         self.log.info(f"reply_data = {reply_data}")
         
-        if type(reply_data) is float:
+        if isinstance(reply_data, float):
             data_length = 4
             littleendian_bytes = bytearray(float_to_raw_bytes(reply_data, low_byte_first=True))
             # split up in 2-byte words, then swap endianness respectively to big endian.
