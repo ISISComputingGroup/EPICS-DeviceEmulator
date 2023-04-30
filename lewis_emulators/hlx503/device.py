@@ -25,12 +25,17 @@ class SimulatedItc503(StateMachineDevice):
         self.onekpot_temp = 1.5
 
         self.helium_3_pot_empty = False
-        self.drift_towards = 1.5  # Drift to 1.5K ~= temperature of 1K pot.
+        self.he3pot_empty_drift_towards = 1.5  # Drift to 1.5K ~= temperature of 1K pot.
+        self.he3pot_regenerating_drift_towards = 1.0
         self.drift_rate = 1
 
         # Set by tests, affects the response format of the device. Slightly different models of ITC will respond
         # differently
         self.report_sweep_state_with_leading_zero = False
+
+    def reset_to_temp_control_state(self):
+        self.helium_3_pot_empty = False
+        self._csm.reset()
 
     def _get_state_handlers(self):
         return {
@@ -46,8 +51,7 @@ class SimulatedItc503(StateMachineDevice):
         return OrderedDict([
             (('temperature_control', 'helium_3_empty'), lambda: self.helium_3_pot_empty),
             (('helium_3_empty', 'regenerating'), lambda: self.control_channel == 1 and self.temperature_sp >= 30),
-            (('temperature_control', 'regenerating'), lambda: self.control_channel == 1 and self.temperature_sp >= 30),
-            (('regenerating', 'temperature_control'), lambda: self.sorb_temp >= 30 and not self.helium_3_pot_empty)
+            (('regenerating', 'temperature_control'), lambda: not self.helium_3_pot_empty)
         ])
 
     @property
