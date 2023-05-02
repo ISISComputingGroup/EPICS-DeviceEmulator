@@ -76,9 +76,9 @@ class CircuitAssignment:
         self.circuit_assignment = circuit_assignment
 
 
-class SimulatedTpg300(StateMachineDevice):
+class SimulatedTpgx00(StateMachineDevice):
     """
-    Simulated TPG300.
+    Simulated device for both the TPG300 and TPG500.
     """
 
     def _initialize_data(self):

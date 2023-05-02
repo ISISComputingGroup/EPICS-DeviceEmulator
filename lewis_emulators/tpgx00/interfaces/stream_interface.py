@@ -7,9 +7,9 @@ from lewis.core.logging import has_log
 
 
 @has_log
-class Tpg300StreamInterface(StreamInterface):
+class Tpgx00StreamInterfaceBase(object):
     """
-    Stream interface for the serial port.
+    Stream interface for the serial port for either a TPG300 or TPG500.
     """
 
     DEVICE_STATUS = 0
@@ -262,3 +262,11 @@ class Tpg300StreamInterface(StreamInterface):
         pressure = getattr(self._device, pressure_channel)
 
         return "{},{}".format(self.DEVICE_STATUS, pressure)
+
+   
+class Tpg300StreamInterface(Tpgx00StreamInterfaceBase, StreamInterface):
+    protocol = 'tpg300'
+
+
+class Tpg500StreamInterface(Tpgx00StreamInterfaceBase, StreamInterface):
+    protocol = 'tpg500'
