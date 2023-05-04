@@ -37,10 +37,10 @@ class ReadState(Enum):
     A2 = "a2"
     B1 = "b1"
     B2 = "b2"
-    UNI = 0
-    UNI1 = 1
-    UNI2 = 2
-    UNI3 = 3
+    UNI = "UNI"
+    UNI1 = "UNI1"
+    UNI2 = "UNI2"
+    UNI3 = "UNI3"
     F1 = "F1"
     F2 = "F2"
     F3 = "F3"
@@ -54,15 +54,13 @@ class ReadState(Enum):
     FSA = "FSA"
     FSB = "FSB"
     SPS = "SPS"
-
-
-
+    
 
 class CircuitAssignment:
     """
     This object represents settings for a circuit in the device.
         these settings are: high_threshold(float), high_exponent(int),
-        low_threshold(float), low_exponent(int), circuit_assignment(1|2|2|4|A|B)
+        low_threshold(float), low_exponent(int), circuit_assignment(1|2|3|4|A|B)
     """
 
     def __init__(self, high_threshold=0.0, high_exponent=0, low_threshold=0.0, low_exponent=0, circuit_assignment=1):
@@ -94,8 +92,14 @@ class SimulatedTpgx00(StateMachineDevice):
         self.__connected = None
         self.__readstate = None
         self.__switching_function_to_set = CircuitAssignment()
-        self.__switching_functions = [CircuitAssignment(), CircuitAssignment(), CircuitAssignment(),
-                                      CircuitAssignment(), CircuitAssignment(), CircuitAssignment()]
+        self.__switching_functions = {
+            "1" : CircuitAssignment(),
+            "2" : CircuitAssignment(),
+            "3" : CircuitAssignment(),
+            "4" : CircuitAssignment(),
+            "A" : CircuitAssignment(),
+            "B" : CircuitAssignment()
+        }
         self.__switching_functions_status = [0, 0, 0, 0, 0, 0]
         self.connect()
 

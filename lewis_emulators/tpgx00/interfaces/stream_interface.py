@@ -117,7 +117,7 @@ class Tpgx00StreamInterfaceBase(object):
 
             high_exp (int): Exponent of the upper threshold.
 
-            assign: Circuit to be assigned to this switching function.
+            assign (int): Circuit to be assigned to this switching function.
 
         Returns:
             ASCII acknowledgement character (0x6).
@@ -162,7 +162,8 @@ class Tpgx00StreamInterfaceBase(object):
             return self.get_units()
 
         elif self._device.readstate.name in units_flags:
-            return self.set_units(Units(self._device.readstate.value))
+            unit_num = self._device.readstate.value[-1]
+            return self.set_units(Units(int(unit_num)))
 
         elif self._device.readstate.name in switching_functions_read:
             return self.get_thresholds_readstate(self._device.readstate.value)
@@ -204,28 +205,31 @@ class Tpgx00StreamInterfaceBase(object):
 
     def get_threshold(self, function):
         """
-        Sets the settings of a switching function.
+        Gets the settings of a switching function.
+
+        Args:
+            function: (string) the switching function to be set
+
 
         Returns:
             tuple containing a sequence of: high_threshold (float), high_exponent(int),
-            low_threshold (float), low_exponent (int), circuit_assignment (1|2|2|4|A|B)
+            low_threshold (float), low_exponent (int), circuit_assignment (1|2|3|4|A|B)
         """
-        index = FunctionsRead[function].value
-        return self._device.switching_functions[index]
+        switching_function = function[-1]
+        return self._device.switching_functions[switching_function]
 
-    def set_threshold(self, function):
+    def set_threshold(self, function): 
         """
         Sets the settings of a switching function.
 
         Args:
-            function: tuple containing a sequence of: high_threshold (float), high_exponent(int),
-            low_threshold (float), low_exponent (int), circuit_assignment (1|2|2|4|A|B)
+            function: (string) the switching function to be set
 
         Returns:
             None.
         """
-        index = FunctionsSet[function].value
-        self._device.switching_functions[index] = self._device.switching_function_to_set
+        switching_function = function[-1]
+        self._device.switching_functions[switching_function] = self._device.switching_function_to_set
 
     def get_thresholds_readstate(self, readstate):
         """
