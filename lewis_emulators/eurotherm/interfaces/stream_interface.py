@@ -1,3 +1,5 @@
+import time
+
 from lewis.adapters.stream import StreamInterface
 from lewis.utils.command_builder import CmdBuilder
 from lewis.utils.replies import conditional_reply
@@ -89,6 +91,9 @@ class EurothermStreamInterface(StreamInterface):
 
         Returns: the current temperature formatted like the Eurotherm protocol.
         """
+        # Simulate an arbitrary reply delay.
+        # See https://github.com/ISISComputingGroup/IBEX/issues/7697.
+        time.sleep(300 / 1000)
         return "\x02PV{}".format(self._device.current_temperature)
 
     @if_connected
