@@ -207,11 +207,39 @@ class MclennanStreamInterface(StreamInterface):
     @if_connected
     def query_current_op(self, controller):
         return f"{controller:02}:{self.device.current_op}"
-        
+
+    # all replies should contain the original command string first and \r, the emulator does not do this in general but it
+    # only matters for multiline replies which this is the only such command    
     @if_connected
     def query_all(self, controller):
-        return "Mclennan Digiloop Motor Controller V2.10a(1.2)"
-
+        lines = [
+            f"{controller:02}QA", # echoed command
+            "Mclennan Digiloop Motor Controller V2.10a(1.2)",
+            f"Address = {controller}",
+            "Privilege level = 4",
+            "Mode = Aborted",
+            "Kf = 1000 Kp = 500 Ks = 2000 Kv = 1000 Kx = 0",
+            "Slew speed = 100000",
+            "Acceleration = 200000 Deceleration = 400000",
+            "Creep speed = 400 Creep steps = 0",
+            "Jog speed = 100 Joystick speed = 10000",
+            "Settling time = 200",
+            "Window = 4 Threshold = 2000",
+            "Tracking = 4000",
+            "Lower soft limit = -2147483647 Upper soft limit = 2147483647",
+            "Soft limits enabled",
+            "Lower hard limit on Upper hard limit on",
+            "Jog enabled Joystick disabled",
+            "Gbox num = 1 Gbox den = 1",
+            "Command pos = 0 Motor pos = 1",
+            "Pos error = -1 Input pos = 0",
+            "Valid sequences: none Autoexec disabled",
+            "Valid cams: none",
+            "Valid profiles: none Profile time = 1000 ms",
+            "Read port: %00000000 Last write: %00000000"
+        ]
+        return '\r'.join(lines)
+    
     @if_connected
     def query_position(self, controller):
         return f"{controller:02}:CP = {self.device.target_position} AP = {self.device.position} IP = 1050 TP = 0 OD = -2050"
