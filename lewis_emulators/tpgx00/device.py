@@ -6,29 +6,23 @@ from enum import Enum, unique
 
 @unique
 class Units(Enum):
-    mbar = 1
-    Torr = 2
-    Pa = 3
+    hPascal = object()
+    mbar    = 1
+    Torr    = 2
+    Pa      = 3
+    Micron  = object()
+    Volt    = object()
+    Ampere  = object()
 
 
 @unique
-class FunctionsSet(Enum):
-    FS1 = 0
-    FS2 = 1
-    FS3 = 2
-    FS4 = 3
-    FSA = 4
-    FSB = 5
-
-
-@unique
-class FunctionsRead(Enum):
-    F1 = 0
-    F2 = 1
-    F3 = 2
-    F4 = 3
-    FA = 4
-    FB = 5
+class GaugeStatus(Enum):
+    DATA_OK     = 0
+    UNDERRANGE  = 1
+    OVERRANGE   = 2
+    POINT_ERROR = 3
+    POINT_OFF   = 4
+    NO_HARDWARE = 5
 
 
 @unique
@@ -38,9 +32,13 @@ class ReadState(Enum):
     B1 = "b1"
     B2 = "b2"
     UNI = "UNI"
+    UNI0 = "UNI0"
     UNI1 = "UNI1"
     UNI2 = "UNI2"
     UNI3 = "UNI3"
+    UNI4 = "UNI4"
+    UNI5 = "UNI5"
+    UNI6 = "UNI6"
     F1 = "F1"
     F2 = "F2"
     F3 = "F3"
@@ -88,6 +86,10 @@ class SimulatedTpgx00(StateMachineDevice):
         self.__pressure_a2 = 0.0
         self.__pressure_b1 = 0.0
         self.__pressure_b2 = 0.0
+        self.__pressure_status_a1 = GaugeStatus["DATA_OK"]
+        self.__pressure_status_a2 = GaugeStatus["DATA_OK"]
+        self.__pressure_status_b1 = GaugeStatus["DATA_OK"]
+        self.__pressure_status_b2 = GaugeStatus["DATA_OK"]
         self.__units = Units["mbar"]
         self.__connected = None
         self.__readstate = None
@@ -212,6 +214,90 @@ class SimulatedTpgx00(StateMachineDevice):
             None
         """
         self.__pressure_b2 = value
+
+    @property
+    def pressure_status_a1(self):
+        """
+        Returns the status of the A1 pressure sensor
+
+        Returns:
+            int: A1 pressure sensor status value
+        """
+        return self.__pressure_status_a1.value
+    
+    @pressure_status_a1.setter
+    def pressure_status_a1(self, value):
+        """
+        Sets the status of the A1 pressure sensor
+        (Only used via backdoor)
+
+        Returns:
+            int: A1 pressure sensor status value
+        """
+        self.__pressure_status_a1 = value
+    
+    @property
+    def pressure_status_a2(self):
+        """
+        Returns the status of the A2 pressure sensor
+
+        Returns:
+            int: A2 pressure sensor status value
+        """
+        return self.__pressure_status_a2.value
+    
+    @pressure_status_a2.setter
+    def pressure_status_a2(self, value):
+        """
+        Sets the status of the A2 pressure sensor
+        (Only used via backdoor)
+
+        Returns:
+            int: A2 pressure sensor status value
+        """
+        self.__pressure_status_a2 = value
+
+    @property
+    def pressure_status_b1(self):
+        """
+        Returns the status of the B1 pressure sensor
+
+        Returns:
+            int: B1 pressure sensor status value
+        """
+        return self.__pressure_status_b1.value
+
+    @pressure_status_b1.setter
+    def pressure_status_b1(self, value):
+        """
+        Sets the status of the B1 pressure sensor
+        (Only used via backdoor)
+
+        Returns:
+            int: B1 pressure sensor status value
+        """
+        self.__pressure_status_b1 = value
+
+    @property
+    def pressure_status_b2(self):
+        """
+        Returns the status of the B2 pressure sensor
+
+        Returns:
+            int: B2 pressure sensor status value
+        """
+        return self.__pressure_status_b2.value
+
+    @pressure_status_b2.setter
+    def pressure_status_b2(self, value):
+        """
+        Sets the status of the B2 pressure sensor
+        (Only used via backdoor)
+
+        Returns:
+            int: B2 pressure sensor status value
+        """
+        self.__pressure_status_b2 = value
 
     @property
     def units(self):
@@ -379,3 +465,15 @@ class SimulatedTpgx00(StateMachineDevice):
         """
 
         self.switching_functions_status = status
+
+    def backdoor_set_pressure_status(self, channel, status):
+        """
+        Sets the pressure status of the specified channel
+
+        Args:
+            channel (string): the pressure channel to set to
+            status (int): pressure status (0|1|2|3|4|5)
+        
+        """
+        status_suffix = "pressure_status_{}".format(channel.lower())
+        setattr(self, status_suffix, GaugeStatus(status))

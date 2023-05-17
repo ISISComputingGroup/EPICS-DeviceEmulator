@@ -1,6 +1,6 @@
 from lewis.adapters.stream import StreamInterface
 from lewis.utils.command_builder import CmdBuilder
-from ..device import ReadState, Units, FunctionsSet, FunctionsRead, CircuitAssignment
+from ..device import ReadState, Units, GaugeStatus, CircuitAssignment
 from lewis.utils.replies import conditional_reply
 from lewis.utils.constants import ACK
 from lewis.core.logging import has_log
@@ -11,8 +11,6 @@ class Tpgx00StreamInterfaceBase(object):
     """
     Stream interface for the serial port for either a TPG300 or TPG500.
     """
-
-    DEVICE_STATUS = 0
 
     commands = {
         CmdBuilder("acknowledge_pressure").escape("P").arg("A1|A2|B1|B2").eos().build(),
@@ -142,7 +140,7 @@ class Tpgx00StreamInterfaceBase(object):
         Handles an enquiry using the last command sent.
 
         Returns:
-            String: Channel pressure if last command was in channels.
+            String: Channel pressure and status if last command was in channels.
             String: Returns the devices current units if last command is 'UNI'.
             None: Sets the devices units to 1,2, or 3 if last command is 'UNI{}' where {} is 1, 2 or 3
                 respectively.
@@ -235,6 +233,8 @@ class Tpgx00StreamInterfaceBase(object):
         """
         Helper method for getting thresholds of a function all in one string based on current readstate.
 
+        Args:
+            readstate: (string) the current read state
         Returns:
             a string containing thresholds information
         """
@@ -262,10 +262,12 @@ class Tpgx00StreamInterfaceBase(object):
             String: Device status and pressure from the channel.
         """
 
-        pressure_channel = "pressure_{}".format(channel.value)
-        pressure = getattr(self._device, pressure_channel)
+        pressure_suffix = "pressure_{}".format(channel.value)
+        status_suffix = "pressure_status_{}".format(channel.value)
+        pressure = getattr(self._device, pressure_suffix)
+        status = getattr(self._device, status_suffix)
 
-        return "{},{}".format(self.DEVICE_STATUS, pressure)
+        return "{},{}".format(status, pressure)
 
    
 class Tpg300StreamInterface(Tpgx00StreamInterfaceBase, StreamInterface):
