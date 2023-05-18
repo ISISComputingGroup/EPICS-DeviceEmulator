@@ -1,4 +1,5 @@
 from collections import OrderedDict
+from time import sleep
 
 from lewis.devices import StateMachineDevice
 from .states import DefaultState
@@ -14,6 +15,7 @@ class SimulatedEurotherm(StateMachineDevice):
         Sets the initial state of the device.
         """
         self.connected = True
+        self.delay_time = None
 
         self._current_temperature = 0.0
         self._setpoint_temperature = 0.0
@@ -30,6 +32,7 @@ class SimulatedEurotherm(StateMachineDevice):
         self.output = 0
         self.high_lim = 0
         self.low_lim = 0
+        self.error = "0"
 
     def _get_state_handlers(self):
         """
@@ -50,6 +53,13 @@ class SimulatedEurotherm(StateMachineDevice):
         Returns: the state transitions
         """
         return OrderedDict()
+    
+    def _delay(self):
+        """
+        Simulate a delay.
+        """
+        if self.delay_time is not None:
+            sleep(self.delay_time)
 
     @property
     def address(self):
@@ -78,6 +88,7 @@ class SimulatedEurotherm(StateMachineDevice):
 
         Returns: the current temperature in K.
         """
+        self._delay()
         return self._current_temperature
 
     @current_temperature.setter
@@ -98,6 +109,7 @@ class SimulatedEurotherm(StateMachineDevice):
 
         Returns: bool indicating if the device is ramping.
         """
+        self._delay()
         return self._ramping_on
 
     @ramping_on.setter
@@ -118,6 +130,7 @@ class SimulatedEurotherm(StateMachineDevice):
 
         Returns: the current ramp rate in K/min
         """
+        self._delay()
         return self._ramp_rate
 
     @ramp_rate.setter
@@ -138,6 +151,7 @@ class SimulatedEurotherm(StateMachineDevice):
 
         Returns: the current value of the setpoint temperature in K.
         """
+        self._delay()
         return self._ramp_setpoint_temperature
 
     @ramp_setpoint_temperature.setter
@@ -156,6 +170,7 @@ class SimulatedEurotherm(StateMachineDevice):
         """
         Get the set point output rate.
         """
+        self._delay()
         return self._output_rate
         
     @output_rate.setter
@@ -164,4 +179,3 @@ class SimulatedEurotherm(StateMachineDevice):
         Set the set point output rate.
         """
         self._output_rate = value
-
