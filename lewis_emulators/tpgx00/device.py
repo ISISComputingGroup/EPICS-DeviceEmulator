@@ -26,6 +26,22 @@ class GaugeStatus(Enum):
 
 
 @unique
+class SFAssignment(Enum):
+    OFF = object()
+    A1  = object()
+    A2  = object()
+    B1  = object()
+    B2  = object()
+    ON  = object()
+
+
+@unique
+class SFStatus(Enum):
+    OFF = object()
+    ON  = object()
+
+
+@unique
 class ReadState(Enum):
     A1 = "a1"
     A2 = "a2"
@@ -93,7 +109,6 @@ class SimulatedTpgx00(StateMachineDevice):
         self.__units = Units["mbar"]
         self.__connected = None
         self.__readstate = None
-        self.__switching_function_to_set = CircuitAssignment()
         self.__switching_functions = {
             "1" : CircuitAssignment(),
             "2" : CircuitAssignment(),
@@ -102,7 +117,23 @@ class SimulatedTpgx00(StateMachineDevice):
             "A" : CircuitAssignment(),
             "B" : CircuitAssignment()
         }
-        self.__switching_functions_status = [0, 0, 0, 0, 0, 0]
+        self.__switching_function_to_set = CircuitAssignment()
+        self.__switching_functions_status = {
+            "1" : SFStatus["OFF"],
+            "2" : SFStatus["OFF"],
+            "3" : SFStatus["OFF"],
+            "4" : SFStatus["OFF"],
+            "A" : SFStatus["OFF"],
+            "B" : SFStatus["OFF"]
+        }
+        self.__switching_function_assignment = {
+            "1" : SFAssignment["OFF"],
+            "2" : SFAssignment["OFF"],
+            "3" : SFAssignment["OFF"],
+            "4" : SFAssignment["OFF"],
+            "A" : SFAssignment["OFF"],
+            "B" : SFAssignment["OFF"],
+        }
         self.connect()
 
     @staticmethod
@@ -327,21 +358,23 @@ class SimulatedTpgx00(StateMachineDevice):
         Returns status of the switching functions.
 
         Returns:
-            list of 6 values which can be 0 (off) or 1 (on)
+            a dictionary of 6 Enum members which can be SFStatus.OFF (off) or SFStatus.ON (on)
         """
         return self.__switching_functions_status
 
     @switching_functions_status.setter
-    def switching_functions_status(self, status):
+    def switching_functions_status(self, statuses):
         """
         Sets the status of the switching functions.
 
         Args:
-            status: list of 6 values which can be 0 (off) or 1 (on)
+            status: list of 6 values which can be 'OFF' or 'ON'
         Returns:
             None
         """
-        self.__switching_functions_status = status
+        for (key, status) in zip(self.__switching_functions_status.keys(), statuses):
+            self.__switching_functions_status[key] = SFStatus[status]
+        
 
     @property
     def switching_functions(self):
@@ -386,6 +419,17 @@ class SimulatedTpgx00(StateMachineDevice):
             None
         """
         self.__switching_function_to_set = function
+
+    @property
+    def switching_function_assignment(self, function):
+        """
+        Returns the assignment of the current switching function
+
+        Args:
+            function: (string) the switching function to retrieve the switching function assignment for.
+        """
+        return self.__switching_function_assignment[function]
+
 
     @property
     def connected(self):
@@ -453,18 +497,17 @@ class SimulatedTpgx00(StateMachineDevice):
 
         return self.units.value
 
-    def backdoor_set_switching_function_status(self, status):
+    def backdoor_set_switching_function_status(self, statuses):
         """
         Sets status of switching functions. Called only via the backdoor using lewis.
 
         Args:
-            status: list of 6 values which can be 0 (off) or 1 (on)
+            status: list of 6 values which can be 'OFF' or 'ON'
 
         Returns:
             None
         """
-
-        self.switching_functions_status = status
+        self.switching_functions_status = statuses
 
     def backdoor_set_pressure_status(self, channel, status):
         """
@@ -474,6 +517,8 @@ class SimulatedTpgx00(StateMachineDevice):
             channel (string): the pressure channel to set to
             status (int): pressure status (0|1|2|3|4|5)
         
+        Returns:
+            None
         """
         status_suffix = "pressure_status_{}".format(channel.lower())
         setattr(self, status_suffix, GaugeStatus(status))

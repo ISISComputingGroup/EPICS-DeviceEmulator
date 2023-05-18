@@ -1,9 +1,10 @@
 from lewis.adapters.stream import StreamInterface
 from lewis.utils.command_builder import CmdBuilder
-from ..device import ReadState, Units, GaugeStatus, CircuitAssignment
+from ..device import ReadState, Units, CircuitAssignment
 from lewis.utils.replies import conditional_reply
 from lewis.utils.constants import ACK
 from lewis.core.logging import has_log
+from enum import Enum, unique
 
 
 @has_log
@@ -173,8 +174,7 @@ class Tpgx00StreamInterfaceBase(object):
 
         elif self._device.readstate.name == "SPS":
             status = self.get_switching_functions_status()
-            return str(status[0]) + ',' + str(status[1]) + ',' + str(status[2]) + \
-                   ',' + str(status[3]) + ',' + str(status[4]) + ',' + str(status[5])
+            return ','.join(status)
 
         else:
             self.log.info("Last command was unknown. Current readstate is {}.".format(self._device.readstate))
@@ -207,8 +207,6 @@ class Tpgx00StreamInterfaceBase(object):
 
         Args:
             function: (string) the switching function to be set
-
-
         Returns:
             tuple containing a sequence of: high_threshold (float), high_exponent(int),
             low_threshold (float), low_exponent (int), circuit_assignment (1|2|3|4|A|B)
@@ -247,9 +245,9 @@ class Tpgx00StreamInterfaceBase(object):
         Returns statuses of switching functions
 
         Returns:
-            a list of 6 zeros or ones (on/off) for each function
+            a dictionary of 6 Enum members (SFStatus.ON/SFStatus.OFF) corresponding to each switching function
         """
-        return self._device.switching_functions_status
+        return self.getSFStatus(self._device.switching_functions_status)
 
     def get_pressure(self, channel):
         """
@@ -274,5 +272,26 @@ class Tpg300StreamInterface(Tpgx00StreamInterfaceBase, StreamInterface):
     protocol = 'tpg300'
 
 
+    @unique
+    class SFStatus300(Enum):
+        OFF = 0
+        ON  = 1
+
+    def getSFStatus(self, enums):
+        # translate raw SFStatus enums into values correct for TPG300
+        translated_vals = [str(self.SFStatus300[enum.name].value) for enum in enums.values()]
+        return translated_vals
+        
+
 class Tpg500StreamInterface(Tpgx00StreamInterfaceBase, StreamInterface):
     protocol = 'tpg500'
+
+    @unique
+    class SFStatus500(Enum):
+        OFF = 0
+        ON  = 1
+
+    def getSFStatus(self, enums):
+        # translate raw SFStatus enums into values correct for TPG500
+        translated_vals = [str(self.SFStatus500[enum.name].value) for enum in enums.values()]
+        return translated_vals
