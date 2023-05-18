@@ -1,5 +1,3 @@
-import time
-
 from lewis.adapters.stream import StreamInterface
 from lewis.utils.command_builder import CmdBuilder
 from lewis.utils.replies import conditional_reply
@@ -13,24 +11,27 @@ class EurothermStreamInterface(StreamInterface):
     """
 
     commands = {
-        CmdBuilder("get_current_temperature").eot().escape("0011PV").enq().build(),
-        CmdBuilder("get_ramp_setpoint").eot().escape("0011SP").enq().build(),
-        CmdBuilder("get_output").eot().escape("0011OP").enq().build(),
-        CmdBuilder("get_max_output").eot().escape("0011HO").enq().build(),
-        CmdBuilder("get_output_rate").eot().escape("0011OR").enq().build(),
-        CmdBuilder("get_autotune").eot().escape("0011AT").enq().build(),
-        CmdBuilder("get_proportional").eot().escape("0011XP").enq().build(),
-        CmdBuilder("get_derivative").eot().escape("0011TD").enq().build(),
-        CmdBuilder("get_integral").eot().escape("0011TI").enq().build(),
-        CmdBuilder("get_highlim").eot().escape("0011HS").enq().build(),
-        CmdBuilder("get_lowlim").eot().escape("0011LS").enq().build(),
+        CmdBuilder("get_current_temperature").eot().regex(".{4}PV").enq().build(),
+        CmdBuilder("get_setpoint").eot().regex(".{4}SL").enq().build(),
+        CmdBuilder("get_ramp_setpoint").eot().regex(".{4}SP").enq().build(),
+        CmdBuilder("get_output").eot().regex(".{4}OP").enq().build(),
+        CmdBuilder("get_max_output").eot().regex(".{4}HO").enq().build(),
+        CmdBuilder("get_output_rate").eot().regex(".{4}OR").enq().build(),
+        CmdBuilder("get_autotune").eot().regex(".{4}AT").enq().build(),
+        CmdBuilder("get_proportional").eot().regex(".{4}XP").enq().build(),
+        CmdBuilder("get_derivative").eot().regex(".{4}TD").enq().build(),
+        CmdBuilder("get_integral").eot().regex(".{4}TI").enq().build(),
+        CmdBuilder("get_highlim").eot().regex(".{4}HS").enq().build(),
+        CmdBuilder("get_lowlim").eot().regex(".{4}LS").enq().build(),
+        CmdBuilder("get_error").eot().regex(".{4}EE").enq().build(),
 
-        CmdBuilder("set_ramp_setpoint", arg_sep="").eot().escape("0011").stx().escape("SL").float().etx().any().build(),
-        CmdBuilder("set_output_rate", arg_sep="").eot().escape("0011").stx().escape("OR").float().etx().any().build(),
+        CmdBuilder("set_ramp_setpoint", arg_sep="").eot().regex(".{4}").stx().escape("SL").float().etx().any().build(),
+        CmdBuilder("set_output_rate", arg_sep="").eot().regex(".{4}").stx().escape("OR").float().etx().any().build(),
     }
 
+    # Add terminating characters manually for each command, as write and read commands use different formatting for their 'in' commands.
     in_terminator = ""
-    out_terminator = "\x03"
+    out_terminator = ""
     readtimeout = 1
 
     def handle_error(self, request, error):
@@ -45,44 +46,49 @@ class EurothermStreamInterface(StreamInterface):
         self.log.error("An error occurred at request " + repr(request) + ": " + repr(error))
 
     @if_connected
+    def get_setpoint(self):
+        return "\x02SL{}\x03".format(self.device._setpoint_temperature)
+
+    @if_connected
     def get_proportional(self):
-        return "\x02XP{}".format(self.device.p)
+        return "\x02XP{}\x03".format(self.device.p)
 
     @if_connected
     def get_integral(self):
-        return "\x02TI{}".format(self.device.i)
+        return "\x02TI{}\x03".format(self.device.i)
 
     @if_connected
     def get_derivative(self):
-        return "\x02TD{}".format(self.device.d)
+        return "\x02TD{}\x03".format(self.device.d)
 
     @if_connected
     def get_output(self):
-        return "\x02OP{}".format(self.device.output)
+        return "\x02OP{}\x03".format(self.device.output)
 
     @if_connected
     def get_highlim(self):
-        return "\x02HS{}".format(self.device.high_lim)
+        return "\x02HS{}\x03".format(self.device.high_lim)
 
     @if_connected
     def get_lowlim(self):
-        return "\x02LS{}".format(self.device.low_lim)
+        return "\x02LS{}\x03".format(self.device.low_lim)
 
     @if_connected
     def get_max_output(self):
-        return "\x02HO{}".format(self.device.max_output)
+        return "\x02HO{}\x03".format(self.device.max_output)
 
     @if_connected
     def get_output_rate(self):
-        return "\x02OR{}".format(self.device.output_rate)
+        return "\x02OR{}\x03".format(self.device.output_rate)
 
     @if_connected
     def set_output_rate(self, output_rate, _):
         self.device.output_rate = output_rate
+        return "\x06"
 
     @if_connected
     def get_autotune(self):
-        return "\x02AT{}".format(self.device.autotune)
+        return "\x02AT{}\x03".format(self.device.autotune)
 
     @if_connected
     def get_current_temperature(self):
@@ -91,10 +97,7 @@ class EurothermStreamInterface(StreamInterface):
 
         Returns: the current temperature formatted like the Eurotherm protocol.
         """
-        # Simulate an arbitrary reply delay.
-        # See https://github.com/ISISComputingGroup/IBEX/issues/7697.
-        time.sleep(300 / 1000)
-        return "\x02PV{}".format(self._device.current_temperature)
+        return "\x02PV{}\x03".format(self._device.current_temperature)
 
     @if_connected
     def get_ramp_setpoint(self):
@@ -103,7 +106,7 @@ class EurothermStreamInterface(StreamInterface):
 
         Returns: the current set point temperature formatted like the Eurotherm protocol.
         """
-        return "\x02SP{}".format(self._device.ramp_setpoint_temperature)
+        return "\x02SP{}\x03".format(self._device.ramp_setpoint_temperature)
 
     @if_connected
     def set_ramp_setpoint(self, temperature, _):
@@ -116,3 +119,13 @@ class EurothermStreamInterface(StreamInterface):
 
         """
         self._device.ramp_setpoint_temperature = temperature
+        return "\x06"
+
+    @if_connected
+    def get_error(self):
+        """
+        Get the error.
+
+        Returns: the current error code in HEX.
+        """
+        return "\x02EE>0x{}\x03".format(self._device.error)
