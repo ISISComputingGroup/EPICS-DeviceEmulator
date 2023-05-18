@@ -213,7 +213,6 @@ class MclennanStreamInterface(StreamInterface):
     @if_connected
     def query_all(self, controller):
         lines = [
-            f"{controller:02}QA", # echoed command
             "Mclennan Digiloop Motor Controller V2.10a(1.2)",
             f"Address = {controller}",
             "Privilege level = 4",
@@ -238,7 +237,7 @@ class MclennanStreamInterface(StreamInterface):
             "Valid profiles: none Profile time = 1000 ms",
             "Read port: %00000000 Last write: %00000000"
         ]
-        return '\r'.join(lines)
+        return f'{controller:02}QA\r' + '\r\n'.join(lines)
     
     @if_connected
     def query_position(self, controller):
