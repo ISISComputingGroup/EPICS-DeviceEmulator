@@ -1,6 +1,6 @@
 from lewis.adapters.stream import StreamInterface, Cmd
 from lewis.core.logging import has_log
-from lewis.utils.byte_conversions import float_to_raw_bytes, raw_bytes_to_int
+from lewis.utils.byte_conversions import float_to_raw_bytes, raw_bytes_to_int, int_to_raw_bytes
 from lewis.utils.replies import conditional_reply
 from os import urandom
 
@@ -28,6 +28,16 @@ class SKFChopperModbusInterface(StreamInterface):
         self.read_commands = {
             353: self.get_freq, # RBV
             345: self.get_freq, # SP:RBV
+            905: self.get_v13_norm,
+            906: self.get_w13_norm,
+            907: self.get_v24_norm,
+            908: self.get_w24_norm,
+            909: self.get_z12_norm,
+            910: self.get_v13_fsv,
+            911: self.get_w13_fsv,
+            912: self.get_v24_fsv,
+            913: self.get_w24_fsv,
+            914: self.get_z12_fsv,
         }
 
         self.write_commands = {
@@ -90,6 +100,12 @@ class SKFChopperModbusInterface(StreamInterface):
             
             # Concatenate the two bytes/words 
             reply_data_bytes = first_word + second_word
+        elif isinstance(reply_data, int):
+            data_length = 4
+            littleendian_bytes = bytearray(int_to_raw_bytes(reply_data, data_length, low_byte_first=True))
+            first_word = littleendian_bytes[:2][::-1]
+            second_word = littleendian_bytes[2:][::-1]
+            reply_data_bytes = first_word + second_word
 
 
         function_code_bytes = function_code.to_bytes(1, byteorder="big")
@@ -115,6 +131,36 @@ class SKFChopperModbusInterface(StreamInterface):
 
     def get_freq(self):
         return float(self.device.freq)
+    
+    def get_v13_norm(self):
+        return self.device.v13_norm
+    
+    def get_w13_norm(self):
+        return self.device.w13_norm
+    
+    def get_v24_norm(self):
+        return self.device.v24_norm
+    
+    def get_w24_norm(self):
+        return self.device.w24_norm
+    
+    def get_z12_norm(self):
+        return self.device.z12_norm
+    
+    def get_v13_fsv(self):
+        return self.device.v13_fsv
+    
+    def get_w13_fsv(self):
+        return self.device.w13_fsv
+    
+    def get_v24_fsv(self):
+        return self.device.v24_fsv
+    
+    def get_w24_fsv(self):
+        return self.device.w24_fsv
+    
+    def get_z12_fsv(self):
+        return self.device.z12_fsv
 
     def set_freq(self, value):
         self.device.freq = value
