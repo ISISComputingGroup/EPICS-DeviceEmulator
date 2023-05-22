@@ -19,6 +19,17 @@ class SimulatedSKFChopper(StateMachineDevice):
         self.freq = 40 
         self.send_ok_transid = True
 
+        self.v13_norm = 0
+        self.w13_norm = 0
+        self.v24_norm = 0
+        self.w24_norm = 0
+        self.z12_norm = 0
+        self.v13_fsv = 0
+        self.w13_fsv = 0
+        self.v24_fsv = 0
+        self.w24_fsv = 0
+        self.z12_fsv = 0
+
     def _get_state_handlers(self):
         """
         Returns: states and their names
