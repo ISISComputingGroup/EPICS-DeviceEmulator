@@ -7,32 +7,36 @@ from enum import Enum, unique
 @unique
 class Units(Enum):
     hPascal = object()
-    mbar    = 1
-    Torr    = 2
-    Pa      = 3
+    mbar    = object()
+    Torr    = object()
+    Pa      = object()
     Micron  = object()
     Volt    = object()
     Ampere  = object()
 
 
 @unique
-class GaugeStatus(Enum):
-    DATA_OK     = 0
-    UNDERRANGE  = 1
-    OVERRANGE   = 2
-    POINT_ERROR = 3
-    POINT_OFF   = 4
-    NO_HARDWARE = 5
+class ChannelStatus(Enum):
+    DATA_OK     = object()
+    UNDERRANGE  = object()
+    OVERRANGE   = object()
+    POINT_ERROR = object()
+    POINT_OFF   = object()
+    NO_HARDWARE = object()
 
 
 @unique
 class SFAssignment(Enum):
-    OFF = object()
-    A1  = object()
-    A2  = object()
-    B1  = object()
-    B2  = object()
-    ON  = object()
+    OFF         = object()
+    A1          = object()
+    A2          = object()
+    B1          = object()
+    B2          = object()
+    A1_SELF_MON = object()
+    A2_SELF_MON = object()
+    B1_SELF_MON = object()
+    B2_SELF_MON = object()
+    ON          = object()
 
 
 @unique
@@ -43,31 +47,31 @@ class SFStatus(Enum):
 
 @unique
 class ReadState(Enum):
-    A1 = "a1"
-    A2 = "a2"
-    B1 = "b1"
-    B2 = "b2"
-    UNI = "UNI"
-    UNI0 = "UNI0"
-    UNI1 = "UNI1"
-    UNI2 = "UNI2"
-    UNI3 = "UNI3"
-    UNI4 = "UNI4"
-    UNI5 = "UNI5"
-    UNI6 = "UNI6"
-    F1 = "F1"
-    F2 = "F2"
-    F3 = "F3"
-    F4 = "F4"
-    FA = "FA"
-    FB = "FB"
-    FS1 = "FS1"
-    FS2 = "FS2"
-    FS3 = "FS3"
-    FS4 = "FS4"
-    FSA = "FSA"
-    FSB = "FSB"
-    SPS = "SPS"
+    A1   = object()
+    A2   = object()
+    B1   = object()
+    B2   = object()
+    UNI  = object()
+    UNI0 = object()
+    UNI1 = object()
+    UNI2 = object()
+    UNI3 = object()
+    UNI4 = object()
+    UNI5 = object()
+    UNI6 = object()
+    F1   = object()
+    F2   = object()
+    F3   = object()
+    F4   = object()
+    FA   = object()
+    FB   = object()
+    FS1  = object()
+    FS2  = object()
+    FS3  = object()
+    FS4  = object()
+    FSA  = object()
+    FSB  = object()
+    SPS  = object()
     
 
 class CircuitAssignment:
@@ -102,10 +106,10 @@ class SimulatedTpgx00(StateMachineDevice):
         self.__pressure_a2 = 0.0
         self.__pressure_b1 = 0.0
         self.__pressure_b2 = 0.0
-        self.__pressure_status_a1 = GaugeStatus["DATA_OK"]
-        self.__pressure_status_a2 = GaugeStatus["DATA_OK"]
-        self.__pressure_status_b1 = GaugeStatus["DATA_OK"]
-        self.__pressure_status_b2 = GaugeStatus["DATA_OK"]
+        self.__pressure_status_a1 = ChannelStatus["DATA_OK"]
+        self.__pressure_status_a2 = ChannelStatus["DATA_OK"]
+        self.__pressure_status_b1 = ChannelStatus["DATA_OK"]
+        self.__pressure_status_b2 = ChannelStatus["DATA_OK"]
         self.__units = Units["mbar"]
         self.__connected = None
         self.__readstate = None
@@ -252,9 +256,9 @@ class SimulatedTpgx00(StateMachineDevice):
         Returns the status of the A1 pressure sensor
 
         Returns:
-            int: A1 pressure sensor status value
+            Enum memeber: A1 pressure sensor status 
         """
-        return self.__pressure_status_a1.value
+        return self.__pressure_status_a1
     
     @pressure_status_a1.setter
     def pressure_status_a1(self, value):
@@ -262,8 +266,10 @@ class SimulatedTpgx00(StateMachineDevice):
         Sets the status of the A1 pressure sensor
         (Only used via backdoor)
 
+        Args:
+            value: Enum member to be set as the status
         Returns:
-            int: A1 pressure sensor status value
+            None
         """
         self.__pressure_status_a1 = value
     
@@ -273,9 +279,9 @@ class SimulatedTpgx00(StateMachineDevice):
         Returns the status of the A2 pressure sensor
 
         Returns:
-            int: A2 pressure sensor status value
+            Enum memeber: A2 pressure sensor status
         """
-        return self.__pressure_status_a2.value
+        return self.__pressure_status_a2
     
     @pressure_status_a2.setter
     def pressure_status_a2(self, value):
@@ -283,8 +289,10 @@ class SimulatedTpgx00(StateMachineDevice):
         Sets the status of the A2 pressure sensor
         (Only used via backdoor)
 
+        Args:
+            value: Enum member to be set as the status
         Returns:
-            int: A2 pressure sensor status value
+            None
         """
         self.__pressure_status_a2 = value
 
@@ -294,9 +302,9 @@ class SimulatedTpgx00(StateMachineDevice):
         Returns the status of the B1 pressure sensor
 
         Returns:
-            int: B1 pressure sensor status value
+            Enum memeber: B1 pressure sensor status
         """
-        return self.__pressure_status_b1.value
+        return self.__pressure_status_b1
 
     @pressure_status_b1.setter
     def pressure_status_b1(self, value):
@@ -304,8 +312,10 @@ class SimulatedTpgx00(StateMachineDevice):
         Sets the status of the B1 pressure sensor
         (Only used via backdoor)
 
+        Args:
+            value: Enum member to be set as the status
         Returns:
-            int: B1 pressure sensor status value
+            None
         """
         self.__pressure_status_b1 = value
 
@@ -315,9 +325,9 @@ class SimulatedTpgx00(StateMachineDevice):
         Returns the status of the B2 pressure sensor
 
         Returns:
-            int: B2 pressure sensor status value
+            Enum memeber: B2 pressure sensor status
         """
-        return self.__pressure_status_b2.value
+        return self.__pressure_status_b2
 
     @pressure_status_b2.setter
     def pressure_status_b2(self, value):
@@ -325,8 +335,10 @@ class SimulatedTpgx00(StateMachineDevice):
         Sets the status of the B2 pressure sensor
         (Only used via backdoor)
 
+        Args:
+            value: Enum member to be set as the status
         Returns:
-            int: B2 pressure sensor status value
+            None
         """
         self.__pressure_status_b2 = value
 
@@ -477,25 +489,22 @@ class SimulatedTpgx00(StateMachineDevice):
         Sets the readstate of the device
 
         Args:
-            state: Enum readstate of the device to be set
+            state: (string) readstate name of the device to be set
 
         Returns:
             None
         """
-        self.__readstate = state
+        self.__readstate = ReadState[state]
 
     def backdoor_get_unit(self):
         """
         Sets unit on device. Called only via the backdoor using lewis.
 
-        Args:
-            unit: integer 1, 2, or 3
-
         Returns:
-            None
+            unit: Unit enum name
         """
 
-        return self.units.value
+        return self.units.name
 
     def backdoor_set_switching_function_status(self, statuses):
         """
@@ -515,10 +524,10 @@ class SimulatedTpgx00(StateMachineDevice):
 
         Args:
             channel (string): the pressure channel to set to
-            status (int): pressure status (0|1|2|3|4|5)
+            status (string): the name of the pressure status Enum to be set
         
         Returns:
             None
         """
         status_suffix = "pressure_status_{}".format(channel.lower())
-        setattr(self, status_suffix, GaugeStatus(status))
+        setattr(self, status_suffix, ChannelStatus[status])
