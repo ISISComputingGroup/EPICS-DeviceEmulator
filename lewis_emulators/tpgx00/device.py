@@ -78,10 +78,10 @@ class CircuitAssignment:
     """
     This object represents settings for a circuit in the device.
         these settings are: high_threshold(float), high_exponent(int),
-        low_threshold(float), low_exponent(int), circuit_assignment(1|2|3|4|A|B)
+        low_threshold(float), low_exponent(int), circuit_assignment(SFAssignment enum member)
     """
 
-    def __init__(self, high_threshold=0.0, high_exponent=0, low_threshold=0.0, low_exponent=0, circuit_assignment=1):
+    def __init__(self, high_threshold=0.0, high_exponent=0, low_threshold=0.0, low_exponent=0, circuit_assignment="A1"):
         """
         Default constructor.
         """
@@ -89,7 +89,7 @@ class CircuitAssignment:
         self.high_exponent = high_exponent
         self.low_threshold = low_threshold
         self.low_exponent = low_exponent
-        self.circuit_assignment = circuit_assignment
+        self.circuit_assignment = SFAssignment[circuit_assignment]
 
 
 class SimulatedTpgx00(StateMachineDevice):

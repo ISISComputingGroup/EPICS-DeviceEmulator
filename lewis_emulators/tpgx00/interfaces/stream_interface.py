@@ -4,7 +4,7 @@ from ..device import CircuitAssignment
 from lewis.utils.replies import conditional_reply
 from lewis.utils.constants import ACK
 from lewis.core.logging import has_log
-from enum import Enum, unique
+from enum import Enum
 
 
 @has_log
@@ -121,7 +121,7 @@ class Tpgx00StreamInterfaceBase(object):
             ASCII acknowledgement character (0x6).
         """
         self._device.readstate = "FS" + function
-        self._device.switching_function_to_set = CircuitAssignment(low_thr, low_exp, high_thr, high_exp, assign)
+        self._device.switching_function_to_set = CircuitAssignment(low_thr, low_exp, high_thr, high_exp, self.get_sf_assignment_name(assign))
         return ACK
 
     @conditional_reply("connected")
@@ -208,7 +208,7 @@ class Tpgx00StreamInterfaceBase(object):
             function: (string) the switching function to be set
         Returns:
             tuple containing a sequence of: high_threshold (float), high_exponent(int),
-            low_threshold (float), low_exponent (int), circuit_assignment (1|2|3|4|A|B)
+            low_threshold (float), low_exponent (int), circuit_assignment (SFAssignment enum member)
         """
         switching_function = function[-1]
         return self._device.switching_functions[switching_function]
@@ -237,7 +237,7 @@ class Tpgx00StreamInterfaceBase(object):
         """
         function = self.get_threshold(self.get_readstate_val(readstate))
         return str(function.high_threshold) + "E" + str(function.high_exponent) + "," + \
-               str(function.low_threshold) + "E" + str(function.low_exponent) + "," + str(function.circuit_assignment)
+               str(function.low_threshold) + "E" + str(function.low_exponent) + "," + str(self.get_sf_assignment_val(function.circuit_assignment))
 
 
     def get_switching_functions_status(self):
@@ -294,6 +294,19 @@ class Tpg300StreamInterface(Tpgx00StreamInterfaceBase, StreamInterface):
         NO_HARDWARE = 5
 
 
+    class SFAssignment300(Enum):
+        OFF         = 0
+        A1          = 1
+        A2          = 2
+        B1          = 3
+        B2          = 4
+        A1_SELF_MON = 5
+        A2_SELF_MON = 6
+        B1_SELF_MON = 7
+        B2_SELF_MON = 8
+        ON          = "Invalid assignment"
+
+    
     class ReadState300(Enum):
         A1 = "A1"
         A2 = "A2"
@@ -333,6 +346,12 @@ class Tpg300StreamInterface(Tpgx00StreamInterfaceBase, StreamInterface):
     
     def get_channel_status_val(self, status_enum):
         return self.ChannelStatus300[status_enum.name].value
+
+    def get_sf_assignment_name(self, assignment_num):
+        return self.SFAssignment300(assignment_num).name
+    
+    def get_sf_assignment_val(self, assignment_enum):
+        return self.SFAssignment300[assignment_enum.name].value
     
     def get_readstate_enum(self, state_str):
         return self.ReadState300(state_str)
@@ -367,6 +386,19 @@ class Tpg500StreamInterface(Tpgx00StreamInterfaceBase, StreamInterface):
         POINT_ERROR = 3
         POINT_OFF   = 4
         NO_HARDWARE = 5
+
+    
+    class SFAssignment500(Enum):
+        OFF         = 0
+        A1          = 1
+        A2          = 2
+        B1          = 3
+        B2          = 4
+        A1_SELF_MON = "Invalid assignment"
+        A2_SELF_MON = "Invalid assignment"
+        B1_SELF_MON = "Invalid assignment"
+        B2_SELF_MON = "Invalid assignment"
+        ON          = 5
 
 
     class ReadState500(Enum):
@@ -408,6 +440,12 @@ class Tpg500StreamInterface(Tpgx00StreamInterfaceBase, StreamInterface):
     
     def get_channel_status_val(self, status_enum):
         return self.ChannelStatus500[status_enum.name].value
+
+    def get_sf_assignment_name(self, assignment_num):
+        return self.SFAssignment500(assignment_num).name
+    
+    def get_sf_assignment_val(self, assignment_enum):
+        return self.SFAssignment500[assignment_enum.name].value
     
     def get_readstate_enum(self, state_str):
         return self.ReadState500(state_str)
