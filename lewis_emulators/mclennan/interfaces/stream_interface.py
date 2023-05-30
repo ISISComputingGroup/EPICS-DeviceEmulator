@@ -38,6 +38,7 @@ class MclennanStreamInterface(StreamInterface):
         CmdBuilder("move_absolute").int().escape("MA").int().eos().build(),
         CmdBuilder("set_velocity").int().escape("SV").int().eos().build(),
         CmdBuilder("home").int().escape("HD").int().eos().build(),
+        CmdBuilder("clear_datum").int().escape("CD").eos().build(),
         CmdBuilder("define_command_position").int().escape("CP").int().eos().build(),
         CmdBuilder("define_actual_position").int().escape("AP").int().eos().build(),
         CmdBuilder("query_mode").int().escape("QM").eos().build(),
@@ -188,6 +189,10 @@ class MclennanStreamInterface(StreamInterface):
     @if_connected
     def home(self, controller, dir):
         self.device.home()
+        return "OK"
+
+    @if_connected
+    def clear_datum(self, controller):
         return "OK"
 
     @if_connected
