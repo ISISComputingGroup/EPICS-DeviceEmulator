@@ -16,7 +16,7 @@ class Tpgx00StreamInterfaceBase(object):
     commands = {
         CmdBuilder("acknowledge_pressure").escape("P").arg("A1|A2|B1|B2").eos().build(),
         CmdBuilder("acknowledge_units").escape("UNI").eos().build(),
-        CmdBuilder("acknowledge_set_units").escape("UNI").escape(",").arg("1|2|3").eos().build(),
+        CmdBuilder("acknowledge_set_units").escape("UNI").escape(",").arg("0|1|2|3|4|5|6").eos().build(),
         CmdBuilder("acknowledge_function").escape("SP").arg("1|2|3|4|A|B").eos().build(),
         CmdBuilder("acknowledge_set_function").escape("SP").arg("1|2|3|4|A|B").escape(",")
         .arg(r"[+-]?\d+.\d+", float).escape("E").arg(r"(?:-|\+)(?:[1-9]+\d*|0)", int).escape(",")
@@ -151,7 +151,7 @@ class Tpgx00StreamInterfaceBase(object):
         channels = ("A1", "A2", "B1", "B2")
         switching_functions_read = ("F1", "F2", "F3", "F4", "FA", "FB")
         switching_functions_set = ("FS1", "FS2", "FS3", "FS4", "FSA", "FSB")
-        units_flags = ("UNI1", "UNI2", "UNI3")
+        units_flags = ("UNI0", "UNI1", "UNI2", "UNI3", "UNI4", "UNI5", "UNI6")
 
         if self._device.readstate.name in channels:
             return self.get_pressure(self._device.readstate)
