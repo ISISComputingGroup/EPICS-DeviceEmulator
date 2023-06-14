@@ -233,7 +233,7 @@ class Tpgx00StreamInterfaceBase(object):
         Args:
             readstate: (ReadState member) the current read state
         Returns:
-            a string containing thresholds information
+            a string containing the lower and higher threshold and the switching f-n assignment
         """
         function = self.get_threshold(self.get_readstate_val(readstate))
         return str(function.high_threshold) + "E" + str(function.high_exponent) + "," + \
@@ -418,8 +418,8 @@ class Tpg500StreamInterface(Tpgx00StreamInterfaceBase, StreamInterface):
         F2 = "F2"
         F3 = "F3"
         F4 = "F4"
-        FA = "FA"
-        FB = "FB"
+        FA = "Invalid command"
+        FB = "Invalid command"
         FS1 = "FS1"
         FS2 = "FS2"
         FS3 = "FS3"
@@ -452,3 +452,19 @@ class Tpg500StreamInterface(Tpgx00StreamInterfaceBase, StreamInterface):
     
     def get_readstate_val(self, readstate_enum):
         return self.ReadState500[readstate_enum.name].value
+    
+    def get_thresholds_readstate(self, readstate):
+        """
+        Helper method for getting thresholds of a function all in one string based on current readstate.
+
+        Args:
+            readstate: (ReadState member) the current read state
+        Returns:
+            a string containing the lower and higher threshold, the switching f-n assignment and the
+            ON-timer value.
+        """
+        function = self.get_threshold(self.get_readstate_val(readstate))
+        return str(function.high_threshold) + "E" + str(function.high_exponent) + "," + \
+               str(function.low_threshold) + "E" + str(function.low_exponent) + "," + \
+               str(self.get_sf_assignment_val(function.circuit_assignment))+ "," + \
+               str(self._device.on_timer)

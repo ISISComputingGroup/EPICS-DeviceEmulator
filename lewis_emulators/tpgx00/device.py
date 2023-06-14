@@ -138,6 +138,7 @@ class SimulatedTpgx00(StateMachineDevice):
             "A" : SFAssignment["OFF"],
             "B" : SFAssignment["OFF"],
         }
+        self.__on_timer = 0
         self.connect()
 
     @staticmethod
@@ -442,6 +443,15 @@ class SimulatedTpgx00(StateMachineDevice):
         """
         return self.__switching_function_assignment[function]
 
+    @property
+    def on_timer(self):
+        """
+        Returns the ON-Timer property
+
+        Returns:
+            int: (0-100) ON-Timer value
+        """
+        return self.__on_timer
 
     @property
     def connected(self):
@@ -498,20 +508,30 @@ class SimulatedTpgx00(StateMachineDevice):
 
     def backdoor_get_unit(self):
         """
-        Sets unit on device. Called only via the backdoor using lewis.
+        Gets unit on device. Called only via the backdoor using lewis.
 
         Returns:
-            unit: Unit enum name
+            unit (string): Unit enum name
         """
 
         return self.units.name
+    
+    def backdoor_get_switching_fn(self):
+        """
+        Gets the current switching function in use on the device. 
+        Called only via the backdoor using lewis.
 
+        Returns:
+            string: SFAssignment member name
+        """
+        return self.switching_function_to_set.circuit_assignment.name
+    
     def backdoor_set_switching_function_status(self, statuses):
         """
         Sets status of switching functions. Called only via the backdoor using lewis.
 
         Args:
-            status: list of 6 values which can be 'OFF' or 'ON'
+            status: list of 6 values (strings) which can be 'OFF' or 'ON'
 
         Returns:
             None
