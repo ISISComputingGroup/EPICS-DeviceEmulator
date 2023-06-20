@@ -46,6 +46,15 @@ class SFStatus(Enum):
 
 
 @unique
+class ErrorStatus(Enum):
+    NO_ERROR      = object()
+    DEVICE_ERROR  = object()
+    NO_HARDWARE   = object()
+    INVALID_PARAM = object()
+    SYNTAX_ERROR  = object()
+
+
+@unique
 class ReadState(Enum):
     A1   = object()
     A2   = object()
@@ -72,6 +81,7 @@ class ReadState(Enum):
     FSA  = object()
     FSB  = object()
     SPS  = object()
+    ERR  = object()
     
 
 class CircuitAssignment:
@@ -139,6 +149,7 @@ class SimulatedTpgx00(StateMachineDevice):
             "B" : SFAssignment["OFF"],
         }
         self.__on_timer = 0
+        self.__error_status = ErrorStatus["NO_ERROR"]
         self.connect()
 
     @staticmethod
@@ -452,6 +463,29 @@ class SimulatedTpgx00(StateMachineDevice):
             int: (0-100) ON-Timer value
         """
         return self.__on_timer
+    
+    @property 
+    def error_status(self):
+        """
+        Returns the error status of the device
+        
+        Returns:
+            Enum: ErrorStatus code of the device
+        """
+        return self.__error_status
+    
+    @error_status.setter
+    def error_status(self, error):
+        """
+        Sets the error status of the device. Called only via the backdoor using lewis.
+        
+        Args:
+            string: (0000|1000|0100|0010|0001) four-character error status code
+    
+        Returns:
+            None
+        """
+        self.__error_status = ErrorStatus[error]
 
     @property
     def connected(self):
@@ -540,7 +574,7 @@ class SimulatedTpgx00(StateMachineDevice):
 
     def backdoor_set_pressure_status(self, channel, status):
         """
-        Sets the pressure status of the specified channel
+        Sets the pressure status of the specified channel. Called only via the backdoor using lewis.
 
         Args:
             channel (string): the pressure channel to set to
@@ -551,3 +585,14 @@ class SimulatedTpgx00(StateMachineDevice):
         """
         status_suffix = "pressure_status_{}".format(channel.lower())
         setattr(self, status_suffix, ChannelStatus[status])
+
+    def backdoor_set_error_status(self, error):
+        """
+        Sets the current error status on the device. Called only via the backdoor using lewis.
+
+        Args:
+            status (string): the enum name of the error status to be set.
+        Returns:
+            None
+        """
+        self.error_status = error

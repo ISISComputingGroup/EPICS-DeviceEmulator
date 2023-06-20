@@ -22,6 +22,7 @@ class Tpgx00StreamInterfaceBase(object):
         .arg(r"[+-]?\d+.\d+", float).escape("E").arg(r"(?:-|\+)(?:[1-9]+\d*|0)", int).escape(",")
         .arg(r"[+-]?\d+.\d+", float).escape("E").arg(r"(?:-|\+)(?:[1-9]+\d*|0)", int).escape(",").int().eos().build(),
         CmdBuilder("acknowledge_function_status").escape("SPS").eos().build(),
+        CmdBuilder("acknowledge_error").escape("ERR").eos().build(),
         CmdBuilder("handle_enquiry").enq().build()
     }
 
@@ -134,6 +135,17 @@ class Tpgx00StreamInterfaceBase(object):
         """
         self._device.readstate = "SPS"
         return ACK
+    
+    @conditional_reply("connected")
+    def acknowledge_error(self):
+        """
+        Acknowledge that the request to check the device error status was received.
+
+        Returns:
+            ASCII acknowledgement character (0x6).
+        """
+        self._device.readstate = "ERR"
+        return ACK
 
     def handle_enquiry(self):
         """
@@ -175,6 +187,9 @@ class Tpgx00StreamInterfaceBase(object):
         elif self._device.readstate.name == "SPS":
             status = self.get_switching_functions_status()
             return ','.join(status)
+        
+        elif self._device.readstate.name == "ERR":
+            return self.get_error_status()
 
         else:
             self.log.info("Last command was unknown. Current readstate is {}.".format(self._device.readstate))
@@ -264,7 +279,16 @@ class Tpgx00StreamInterfaceBase(object):
         pressure = getattr(self._device, pressure_suffix)
         status = getattr(self._device, status_suffix)
         return "{},{}".format(self.get_channel_status_val(status), pressure)
+    
+    def get_error_status(self):
+        """
+        Gets the device error status.
 
+        Returns:
+            String: (0000|1000|0100|0010|0001) four-character error status code
+        """
+        return self.get_error_status_val(self.device.error_status)
+    
    
 class Tpg300StreamInterface(Tpgx00StreamInterfaceBase, StreamInterface):
     protocol = 'tpg300'
@@ -307,6 +331,14 @@ class Tpg300StreamInterface(Tpgx00StreamInterfaceBase, StreamInterface):
         ON          = "Invalid assignment"
 
     
+    class ErrorStatus300(Enum):
+        NO_ERROR      = "0000"
+        DEVICE_ERROR  = "1000"
+        NO_HARDWARE   = "0100"
+        INVALID_PARAM = "0010"
+        SYNTAX_ERROR  = "0001"
+
+
     class ReadState300(Enum):
         A1 = "A1"
         A2 = "A2"
@@ -352,6 +384,9 @@ class Tpg300StreamInterface(Tpgx00StreamInterfaceBase, StreamInterface):
     
     def get_sf_assignment_val(self, assignment_enum):
         return self.SFAssignment300[assignment_enum.name].value
+    
+    def get_error_status_val(self, error_enum):
+        return self.ErrorStatus300[error_enum.name].value
     
     def get_readstate_enum(self, state_str):
         return self.ReadState300(state_str)
@@ -400,6 +435,14 @@ class Tpg500StreamInterface(Tpgx00StreamInterfaceBase, StreamInterface):
         B2_SELF_MON = "Invalid assignment"
         ON          = 5
 
+    
+    class ErrorStatus500(Enum):
+        NO_ERROR      = "0000"
+        DEVICE_ERROR  = "1000"
+        NO_HARDWARE   = "0100"
+        INVALID_PARAM = "0010"
+        SYNTAX_ERROR  = "0001"
+
 
     class ReadState500(Enum):
         A1 = "a1"
@@ -446,6 +489,9 @@ class Tpg500StreamInterface(Tpgx00StreamInterfaceBase, StreamInterface):
     
     def get_sf_assignment_val(self, assignment_enum):
         return self.SFAssignment500[assignment_enum.name].value
+    
+    def get_error_status_val(self, error_enum):
+        return self.ErrorStatus500[error_enum.name].value
     
     def get_readstate_enum(self, state_str):
         return self.ReadState500(state_str)
