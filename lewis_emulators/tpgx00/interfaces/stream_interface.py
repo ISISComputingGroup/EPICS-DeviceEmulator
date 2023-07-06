@@ -29,10 +29,10 @@ class Tpgx00StreamInterfaceBase(object):
     in_terminator = "\r\n"
     out_terminator = "\r\n"
 
-    @staticmethod
-    def handle_error(request, error):
+    def handle_error(self, request, error):
         """
-        Prints an error message if a command is not recognised.
+        Prints an error message if a command is not recognised, and sets the device
+        error status accordingly.
 
         Args:
             request : Request.
@@ -40,7 +40,7 @@ class Tpgx00StreamInterfaceBase(object):
         Returns:
             None.
         """
-
+        self._device.error_status = "SYNTAX_ERROR"
         print("An error occurred at request {}: {}".format(request, error))
 
     @conditional_reply("connected")

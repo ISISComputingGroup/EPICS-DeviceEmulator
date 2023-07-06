@@ -480,7 +480,7 @@ class SimulatedTpgx00(StateMachineDevice):
         Sets the error status of the device. Called only via the backdoor using lewis.
         
         Args:
-            string: (0000|1000|0100|0010|0001) four-character error status code
+            string: the enum name of the error status to be set
     
         Returns:
             None
