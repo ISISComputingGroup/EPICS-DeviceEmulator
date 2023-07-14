@@ -21,12 +21,12 @@ class SimulatedEurotherm(StateMachineDevice):
         self._ramping_on = False
         self._ramp_rate = 1.0
         self._address = "A1"
-        self._flow = 0
-        self._manual_flow = 0
-        self._flow_low_lim = 0
-        self._flow_sp_mode = 0
-        self._valve_direction = 0
-        self._n_v_stop = 0
+        self._needlevalve_flow = 0
+        self._needlevalve_manual_flow = 0
+        self._needlevalve_flow_low_lim = 0
+        self._needlevalve_flow_sp_mode = 0
+        self._needlevalve_direction = 0
+        self._needlevalve_stop = 0
         self.p = 0
         self.i = 0
         self.d = 0
@@ -158,117 +158,115 @@ class SimulatedEurotherm(StateMachineDevice):
         self._ramp_setpoint_temperature = temp
     
     @property
-    def flow(self):
+    def needlevalve_flow(self):
         """
         Get the flow readback from the transducer
 
         Returns: the current value of the flow rate in L/min
         """
-        return self._flow
+        return self._needlevalve_flow
     
-    @flow.setter
-    def flow(self, flow):
+    @needlevalve_flow.setter
+    def needlevalve_flow(self, flow):
         """
         Sets the flow readback from the transducer
 
         Args: 
             flow (double) the current value of the flow rate in L/min
         """
-        self._flow = flow
+        self._needlevalve_flow = flow
 
     @property
-    def manual_flow(self):
+    def needlevalve_manual_flow(self):
         """
         Get the manual flow setpoint
 
         Returns: the current value of the manual flow setpoint
         """
-        return self._manual_flow
+        return self._needlevalve_manual_flow
 
-    @manual_flow.setter
-    def manual_flow(self, flow_val):
+    @needlevalve_manual_flow.setter
+    def needlevalve_manual_flow(self, flow_val):
         """
         Sets the manual flow setpoint
 
         Args:
             flow_val (float): set the manual flow setpoint in L/min
         """
-        self._manual_flow = flow_val
+        self._needlevalve_manual_flow = flow_val
     
     @property
-    def flow_low_lim(self):
+    def needlevalve_flow_low_lim(self):
         """
         Get the low setpoint limit for flow control
 
         Returns: the current value of the manual flow setpoint
         """
-        return self._flow_low_lim
+        return self._needlevalve_flow_low_lim
 
-    @flow_low_lim.setter
-    def flow_low_lim(self, low_lim):
+    @needlevalve_flow_low_lim.setter
+    def needlevalve_flow_low_lim(self, low_lim):
         """
         Sets the low setpoint limit for flow control
 
         Args:
             low_lim (float): set the low setpoint limit in L/min
         """
-        self._flow_low_lim = low_lim
+        self._needlevalve_flow_low_lim = low_lim
 
     @property
-    def flow_sp_mode(self):
+    def needlevalve_flow_sp_mode(self):
         """
         Get the mode of the flow setpoint 
 
         Returns: current mode of the flow setpoint (AUTO/MANUAL)
         """
-        return self._flow_sp_mode
+        return self._needlevalve_flow_sp_mode
 
-    @flow_sp_mode.setter
-    def flow_sp_mode(self, mode):
+    @needlevalve_flow_sp_mode.setter
+    def needlevalve_flow_sp_mode(self, mode):
         """
         Sets the mode of the flow setpoint 
 
         Args:
             mode (int)
         """
-        self._flow_sp_mode = mode
+        self._needlevalve_flow_sp_mode = mode
 
     @property
-    def valve_direction(self):
+    def needlevalve_direction(self):
         """
         Get the direction of the valve 
 
         Returns: current direction of the valve (OPENING/CLOSING)
         """
-        return self._valve_direction
+        return self._needlevalve_direction
     
-    @valve_direction.setter
-    def valve_direction(self, dir):
+    @needlevalve_direction.setter
+    def needlevalve_direction(self, dir):
         """
         Sets the direction of the valve 
 
         Args: 
             dir (int) current direction of the valve (OPENING/CLOSING)
         """
-        self._valve_direction = dir
+        self._needlevalve_direction = dir
     
     @property
-    def n_v_stop(self):
+    def needlevalve_stop(self):
         """
         Gets the control mode of Loop 2 
 
         Returns: current control mode of Loop 2 (STOPPED/NOT STOPPED)
         """
-        return self._n_v_stop
+        return self._needlevalve_stop
     
-
-    
-    @n_v_stop.setter
-    def n_v_stop(self, stop_val):
+    @needlevalve_stop.setter
+    def needlevalve_stop(self, stop_val):
         """
         Sets the control mode of Loop 2 
 
         Args:
             stop_val (int)
         """
-        self._n_v_stop = stop_val
+        self._needlevalve_stop = stop_val

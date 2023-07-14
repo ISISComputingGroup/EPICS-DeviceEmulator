@@ -51,6 +51,7 @@ class EurothermModbusInterface(StreamInterface):
 
     def __init__(self):
         super().__init__()
+        # Modbus addresses for the needle valve were obtained from Jamie, full info can be found on the manuals share
         self.read_commands = {
             1: self.get_temperature,
             2: self.get_temperature_sp,
@@ -62,12 +63,12 @@ class EurothermModbusInterface(StreamInterface):
             270: self.get_autotune,
             30: self.get_max_output,
             3: self.get_output,
-            1025: self.get_flow,
-            1509: self.get_manual_flow,
-            1300: self.get_flow_sp_mode,
-            4827: self.get_valve_direction,
-            1136: self.get_flow_low_lim,
-            1292: self.get_n_v_stop
+            1025: self.get_nv_flow,
+            1509: self.get_nv_manual_flow,
+            1300: self.get_nv_flow_sp_mode,
+            4827: self.get_nv_direction,
+            1136: self.get_nv_flow_low_lim,
+            1292: self.get_nv_stop
         }
 
         self.write_commands = {
@@ -77,10 +78,10 @@ class EurothermModbusInterface(StreamInterface):
             9: self.set_d,
             30: self.set_max_output,
             270: self.set_autotune,
-            1509: self.set_manual_flow,
-            1136: self.set_flow_low_lim,
-            1300: self.set_flow_sp_mode,
-            1292: self.set_n_v_stop
+            1509: self.set_nv_manual_flow,
+            1136: self.set_nv_flow_low_lim,
+            1300: self.set_nv_flow_sp_mode,
+            1292: self.set_nv_stop
         }
 
     in_terminator = ""
@@ -191,33 +192,33 @@ class EurothermModbusInterface(StreamInterface):
     def get_output(self):
         return int(self.device.output * 10)
 
-    def get_flow(self):
-        return int(self.device.flow)
+    def get_nv_flow(self):
+        return int(self.device.needlevalve_flow)
     
-    def get_manual_flow(self):
-        return int(self.device.manual_flow)
+    def get_nv_manual_flow(self):
+        return int(self.device.needlevalve_manual_flow)
     
-    def set_manual_flow(self, value):
-        self.device.manual_flow = value
+    def set_nv_manual_flow(self, value):
+        self.device.needlevalve_manual_flow = value
 
-    def get_flow_low_lim(self):
-        return int(self.device.flow_low_lim)
+    def get_nv_flow_low_lim(self):
+        return int(self.device.needlevalve_flow_low_lim)
         
-    def set_flow_low_lim(self, value):
-        self.device.flow_low_lim = value
+    def set_nv_flow_low_lim(self, value):
+        self.device.needlevalve_flow_low_lim = value
 
-    def get_flow_sp_mode(self):
-        return int(self.device.flow_sp_mode)
+    def get_nv_flow_sp_mode(self):
+        return int(self.device.needlevalve_flow_sp_mode)
     
-    def set_flow_sp_mode(self, value):
-        self.device.flow_sp_mode = value
+    def set_nv_flow_sp_mode(self, value):
+        self.device.needlevalve_flow_sp_mode = value
 
-    def get_valve_direction(self):
-        return int(self.device.valve_direction)
+    def get_nv_direction(self):
+        return int(self.device.needlevalve_direction)
 
-    def set_n_v_stop(self, value):
-        self.device.n_v_stop = value
+    def set_nv_stop(self, value):
+        self.device.needlevalve_stop = value
     
-    def get_n_v_stop(self):
-        return int(self.device.n_v_stop)
+    def get_nv_stop(self):
+        return int(self.device.needlevalve_stop)
     
