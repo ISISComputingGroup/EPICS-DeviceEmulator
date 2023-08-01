@@ -141,8 +141,7 @@ class EurothermModbusInterface(StreamInterface):
         try:
             self.write_commands[mem_address](value)
         except:
-            import traceback
-            traceback.print_exc()
+            return None
         # On write, device echos command back to IOC
         return command
 
