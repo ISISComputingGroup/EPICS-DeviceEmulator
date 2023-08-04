@@ -13,20 +13,22 @@ class Tpgx00StreamInterfaceBase(object):
     Stream interface for the serial port for either a TPG300 or TPG500.
     """
 
+    ack_terminator = "\r\n"  # Acknowledged commands are terminated by this
+
     commands = {
-        CmdBuilder("acknowledge_pressure").escape("P").arg("A1|A2|B1|B2").eos().build(),
-        CmdBuilder("acknowledge_units").escape("UNI").eos().build(),
-        CmdBuilder("acknowledge_set_units").escape("UNI").escape(",").arg("0|1|2|3|4|5|6").eos().build(),
-        CmdBuilder("acknowledge_function").escape("SP").arg("1|2|3|4|A|B").eos().build(),
+        CmdBuilder("acknowledge_pressure").escape("P").arg("A1|A2|B1|B2").escape(ack_terminator).eos().build(),
+        CmdBuilder("acknowledge_units").escape("UNI").escape(ack_terminator).eos().build(),
+        CmdBuilder("acknowledge_set_units").escape("UNI").escape(",").arg("0|1|2|3|4|5|6").escape(ack_terminator).eos().build(),
+        CmdBuilder("acknowledge_function").escape("SP").arg("1|2|3|4|A|B").escape(ack_terminator).eos().build(),
         CmdBuilder("acknowledge_set_function").escape("SP").arg("1|2|3|4|A|B").escape(",")
         .arg(r"[+-]?\d+.\d+", float).escape("E").arg(r"(?:-|\+)(?:[1-9]+\d*|0)", int).escape(",")
-        .arg(r"[+-]?\d+.\d+", float).escape("E").arg(r"(?:-|\+)(?:[1-9]+\d*|0)", int).escape(",").int().eos().build(),
-        CmdBuilder("acknowledge_function_status").escape("SPS").eos().build(),
-        CmdBuilder("acknowledge_error").escape("ERR").eos().build(),
-        CmdBuilder("handle_enquiry").enq().build()
+        .arg(r"[+-]?\d+.\d+", float).escape("E").arg(r"(?:-|\+)(?:[1-9]+\d*|0)", int).escape(",").int().escape(ack_terminator).eos().build(),
+        CmdBuilder("acknowledge_function_status").escape("SPS").escape(ack_terminator).eos().build(),
+        CmdBuilder("acknowledge_error").escape("ERR").escape(ack_terminator).eos().build(),
+        CmdBuilder("handle_enquiry").enq().build()  # IMPORTANT: <ENQ> is not terminated with usual terminator
     }
 
-    in_terminator = "\r\n"
+    in_terminator = ""  # Overwrite the default terminator
     out_terminator = "\r\n"
 
     def handle_error(self, request, error):
