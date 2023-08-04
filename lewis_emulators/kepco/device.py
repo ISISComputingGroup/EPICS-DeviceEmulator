@@ -32,6 +32,10 @@ class SimulatedKepco(StateMachineDevice):
         self._output_mode = 0
         self._output_status = 0
         self.connected = True
+        self.auto_voltage_range = 1
+        self.auto_current_range = 1
+        self._voltage_range = 1
+        self._current_range = 1
 
         self.remote_comms_enabled = True
 
@@ -187,3 +191,33 @@ class SimulatedKepco(StateMachineDevice):
         """
         self.output_status_set_count += 1
         self._output_status = status
+
+    @property
+    def voltage_range(self):
+        """
+        Returns: the Voltage range
+        """
+        return self._voltage_range
+
+    @voltage_range.setter
+    def voltage_range(self, range):
+        """
+        :param range: the Voltage range
+        """
+        self._voltage_range = range
+        self.auto_voltage_range = 0
+
+    @property
+    def current_range(self):
+        """
+        Returns: the Currrent range
+        """
+        return self._current_range
+
+    @current_range.setter
+    def current_range(self, range):
+        """
+        :param range: the Current range
+        """
+        self._current_range = range
+        self.auto_current_range = 0
