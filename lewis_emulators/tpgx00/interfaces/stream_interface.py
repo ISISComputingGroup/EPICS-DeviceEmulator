@@ -28,8 +28,10 @@ class Tpgx00StreamInterfaceBase(object):
         CmdBuilder("handle_enquiry").enq().build()  # IMPORTANT: <ENQ> is not terminated with usual terminator
     }
 
-    in_terminator = ""  # Overwrite the default terminator
+    # Override StreamInterface attributes:
+    in_terminator = ""  # Override the default terminator
     out_terminator = "\r\n"
+    readtimeout = 1
 
     def handle_error(self, request, error):
         """
