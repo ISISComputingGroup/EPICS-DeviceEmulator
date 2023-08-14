@@ -36,7 +36,13 @@ class KepcoStreamInterface(StreamInterface):
         CmdBuilder("set_output_status").escape("OUTP ").arg("0|1").build(),
         CmdBuilder("get_IDN").escape("*IDN?").build(),
         CmdBuilder("set_control_mode").escape("SYST:REM ").arg("0|1").build(),
-        CmdBuilder("reset").escape("*RST").build()
+        CmdBuilder("reset").escape("*RST").build(),
+        CmdBuilder("get_current_range").escape("CURR:RANG?").build(),
+        CmdBuilder("get_voltage_range").escape("VOLT:RANG?").build(),
+        CmdBuilder("set_current_range").escape("CURR:RANG ").int().build(),
+        CmdBuilder("set_voltage_range").escape("VOLT:RANG ").int().build(),
+        CmdBuilder("set_auto_current_range").escape("CURR:RANG:AUTO ").int().build(),
+        CmdBuilder("set_auto_voltage_range").escape("VOLT:RANG:AUTO ").int().build(),
     }
 
     def handle_error(self,request, error):
@@ -72,7 +78,7 @@ class KepcoStreamInterface(StreamInterface):
     @if_connected
     @needs_remote_mode
     def set_output_mode(self, mode):
-        self._device.output_mode = 0 if mode.startswith("CURR") else 1
+        self._device.output_mode = 0 if mode.startswith("VOLT") else 1
 
     @if_connected
     def read_output_mode(self):
@@ -104,3 +110,40 @@ class KepcoStreamInterface(StreamInterface):
     @if_connected
     def reset(self):
         self._device.reset()
+
+    @if_connected
+    def get_current_range(self):
+        return f"{self._device.current_range}"
+        
+    @if_connected
+    def get_voltage_range(self):
+        return f"{self._device.voltage_range}"
+
+    @if_connected
+    def set_current_range(self, range):
+        if range == 1 or range == 4:
+            self._device.current_range = range
+        else:
+            raise ValueError(f"Invalid current range {range}")
+       
+    @if_connected
+    def set_voltage_range(self, range):
+        if range == 1 or range == 4:
+            self._device.voltage_range = range
+        else:
+            raise ValueError(f"Invalid voltage range {range}")
+
+    @if_connected
+    def set_auto_current_range(self, range):
+        if range == 0 or range == 1:
+            self._device.auto_current_range = range
+        else:
+            raise ValueError(f"Invalid auto current range {range}")
+       
+    @if_connected
+    def set_auto_voltage_range(self, range):
+        if range == 0 or range == 1:
+            self._device.auto_voltage_range = range
+        else:
+            raise ValueError(f"Invalid auto voltage range {range}")
+
