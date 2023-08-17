@@ -89,7 +89,7 @@ class EurothermModbusInterface(StreamInterface):
     in_terminator = ""
     out_terminator = ""
     readtimeout = 10
-
+    
     protocol = "eurotherm_modbus"
 
     def handle_error(self, request, error):
@@ -146,13 +146,13 @@ class EurothermModbusInterface(StreamInterface):
         return command
 
     def get_temperature(self):
-        return int(self.device.current_temperature * 10.)
+        return int(self.device.current_temperature * self.device.scaling)
 
     def get_temperature_sp(self):
-        return int(self.device.ramp_setpoint_temperature * 10)
+        return int(self.device.ramp_setpoint_temperature * self.device.scaling)
 
     def set_temperature_sp(self, value):
-        self.device.ramp_setpoint_temperature = value / 10.0
+        self.device.ramp_setpoint_temperature = value / self.device.scaling
 
     def get_p(self):
         return int(self.device.p)
@@ -173,10 +173,10 @@ class EurothermModbusInterface(StreamInterface):
         self.device.d = value
 
     def get_high_lim(self):
-        return int(self.device.high_lim * 10)
+        return int(self.device.high_lim * self.device.scaling)
 
     def get_low_lim(self):
-        return int(self.device.low_lim * 10)
+        return int(self.device.low_lim * self.device.scaling)
 
     def get_autotune(self):
         return int(self.device.autotune)
@@ -185,10 +185,10 @@ class EurothermModbusInterface(StreamInterface):
         self.device.autotune = value
 
     def get_max_output(self):
-        return int(self.device.max_output * 10)
+        return int(self.device.max_output * self.device.scaling)
 
     def set_max_output(self, value):
-        self.device.max_output = value / 10.0
+        self.device.max_output = value / self.device.scaling
 
     def get_output_rate(self):
         return self.device.output_rate
@@ -197,7 +197,7 @@ class EurothermModbusInterface(StreamInterface):
         self.device.output_rate = value
 
     def get_output(self):
-        return int(self.device.output * 10)
+        return int(self.device.output * self.device.scaling)
 
     def get_nv_flow(self):
         return int(self.device.needlevalve_flow)

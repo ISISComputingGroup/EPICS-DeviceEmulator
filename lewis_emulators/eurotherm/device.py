@@ -39,6 +39,7 @@ class SimulatedEurotherm(StateMachineDevice):
         self.high_lim = 0
         self.low_lim = 0
         self.error = "0"
+        self.scaling = 1.0
 
     def _get_state_handlers(self):
         """
