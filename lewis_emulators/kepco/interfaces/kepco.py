@@ -20,7 +20,7 @@ def needs_remote_mode(func):
 @has_log
 class KepcoStreamInterface(StreamInterface):
 
-    in_terminator = "\r\n"
+    in_terminator = "\n"
     out_terminator = "\r\n"
 
     commands = {
