@@ -21,7 +21,7 @@ def check_is_byte(character):
 
 
 def dm_memory_area_read_response_fins_frame(device, client_network_address, client_node_address, client_unit_address,
-                                            service_id, memory_start_address, number_of_words_to_read):
+                                            service_id, memory_start_address, number_of_words_to_read, is_float):
     """
     Returns a response to a DM memory area read command.
 
@@ -39,6 +39,7 @@ def dm_memory_area_read_response_fins_frame(device, client_network_address, clie
         service_id (int): The service ID of the original command.
         memory_start_address (int): The memory address from where reading starts.
         number_of_words_to_read (int): The number of words to be read, starting from the start address, inclusive.
+        is_float: data is a float
 
     Returns:
         bytes: the response.
@@ -57,15 +58,15 @@ def dm_memory_area_read_response_fins_frame(device, client_network_address, clie
     #  The FINS driver does not recognise 32 bit ints. Instead, it represents 32 bit ints as an array of two 16 bit
     #  ints. Although the 16 bit ints are in big endian, in the array the first int is the least significant int, and
     #  the second one is the most significant one.
+    elif is_float:
+        data = _convert_32bit_float_to_int16_array(device.float_memory[memory_start_address])
+        fins_reply = fins_reply.add_int(data[0], 2).add_int(data[1], 2)
     elif number_of_words_to_read == 2:
         # convert 32 bit int to array of two ints
         data = _convert_32bit_int_to_int16_array(device.int32_memory[memory_start_address])
         fins_reply = fins_reply.add_int(data[0], 2).add_int(data[1], 2)
     # The asyn device support for ai records makes the IOC ask for 4 words, even though the real numbers are only 2
     # words long
-    elif number_of_words_to_read == 4:
-        data = _convert_32bit_float_to_int16_array(device.float_memory[memory_start_address])
-        fins_reply = fins_reply.add_int(data[0], 2).add_int(data[1], 2)
 
     return fins_reply.build()
 

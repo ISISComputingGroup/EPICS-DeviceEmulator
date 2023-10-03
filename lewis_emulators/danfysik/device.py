@@ -23,7 +23,7 @@ class SimulatedDanfysik(StateMachineDevice):
         Sets the initial state of the device.
         """
         self.comms_initialized = False
-        self.device_available = True
+        self.connected = True
 
         self.field = 0
         self.field_sp = 0

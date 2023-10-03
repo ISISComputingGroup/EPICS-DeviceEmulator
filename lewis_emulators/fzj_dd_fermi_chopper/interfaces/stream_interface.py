@@ -1,5 +1,6 @@
 from lewis.adapters.stream import StreamInterface
 from lewis.core.logging import has_log
+from lewis.utils.replies import conditional_reply
 
 from lewis.utils.command_builder import CmdBuilder
 
@@ -41,6 +42,7 @@ class FZJDDFCHStreamInterface(StreamInterface):
 
         self.log.error("An error occurred at request " + repr(request) + ": " + repr(error))
 
+    @conditional_reply("connected")
     def set_frequency(self, chopper_name, frequency):
 
         """
@@ -52,9 +54,6 @@ class FZJDDFCHStreamInterface(StreamInterface):
 
         Returns: OK or error
         """
-
-        if self._device.disconnected:
-            return None
         if self._device.error_on_set_frequency is None:
             self._device.frequency_setpoint = frequency * self._device.frequency_reference
             reply = "{chopper_name}OK".format(chopper_name=chopper_name)
@@ -64,6 +63,7 @@ class FZJDDFCHStreamInterface(StreamInterface):
         self.log.info(reply)
         return reply
 
+    @conditional_reply("connected")
     def set_phase(self, chopper_name, phase):
 
         """
@@ -75,9 +75,6 @@ class FZJDDFCHStreamInterface(StreamInterface):
 
         Returns: OK or error
         """
-
-        if self._device.disconnected:
-            return None
         if self._device.error_on_set_phase is None:
             self._device.phase_setpoint = phase
             reply = "{chopper_name}OK".format(chopper_name=chopper_name)
@@ -87,6 +84,7 @@ class FZJDDFCHStreamInterface(StreamInterface):
         self.log.info(reply)
         return reply
 
+    @conditional_reply("connected")
     def set_magnetic_bearing(self, chopper_name, magnetic_bearing):
 
         """
@@ -98,9 +96,6 @@ class FZJDDFCHStreamInterface(StreamInterface):
 
         Returns: OK or error
         """
-
-        if self._device.disconnected:
-            return None
         if self._device.error_on_set_magnetic_bearing is None:
             # Lookup the bool representation of the string
             inverted_on_off_dict = {str_val: bool_val for (bool_val, str_val) in ON_OFF.items()}
@@ -112,6 +107,7 @@ class FZJDDFCHStreamInterface(StreamInterface):
         self.log.info(reply)
         return reply
 
+    @conditional_reply("connected")
     def set_drive_mode(self, chopper_name, drive_mode):
 
         """
@@ -123,9 +119,6 @@ class FZJDDFCHStreamInterface(StreamInterface):
 
         Returns: OK or error
         """
-
-        if self._device.disconnected:
-            return None
         if self._device.error_on_set_drive_mode is None:
             # Lookup the bool representation of the string
             inverted_start_stop_dict = {str_val: bool_val for (bool_val, str_val) in START_STOP.items()}
@@ -137,6 +130,7 @@ class FZJDDFCHStreamInterface(StreamInterface):
         self.log.info(reply)
         return reply
 
+    @conditional_reply("connected")
     def get_magnetic_bearing_status(self, chopper_name):
 
         """
@@ -147,12 +141,10 @@ class FZJDDFCHStreamInterface(StreamInterface):
 
         Returns: magnetic bearing status
         """
-
-        if self._device.disconnected:
-            return None
         device = self._device
         return "{0:3s};MBON?;{}".format(device.chopper_name, self._device.magnetic_bearing_status)
 
+    @conditional_reply("connected")
     def get_all_status(self, chopper_name):
 
         """
@@ -165,7 +157,7 @@ class FZJDDFCHStreamInterface(StreamInterface):
         """
 
         device = self._device
-        if self._device.disconnected or chopper_name != device.chopper_name:
+        if chopper_name != device.chopper_name:
             return None
 
         values = [
@@ -203,5 +195,4 @@ class FZJDDFCHStreamInterface(StreamInterface):
         ]
 
         status_string = ";".join(values)
-
         return status_string

@@ -38,7 +38,7 @@ class Danfysik9X00StreamInterface(CommonStreamInterface, StreamInterface):
         CmdBuilder("set_slew_rate").escape("W").arg(r"[1-3]", argument_mapping=int).spaces().int().eos().build()
     ]
 
-    @conditional_reply("device_available")
+    @conditional_reply("connected")
     @conditional_reply("comms_initialized")
     def get_status(self):
         """
@@ -77,14 +77,17 @@ class Danfysik9X00StreamInterface(CommonStreamInterface, StreamInterface):
     def set_address(self, value):
         self.device.set_address(value)
 
+    @conditional_reply("connected")
     @conditional_reply("comms_initialized")
     def get_address(self):
         return "{:03d}".format(self.address)
 
+    @conditional_reply("connected")
     @conditional_reply("comms_initialized")
     def get_slew_rate(self, dac_num):
         return self.device.get_slew_rate(dac_num)
 
+    @conditional_reply("connected")
     @conditional_reply("comms_initialized")
     def set_slew_rate(self, dac_num, slew_rate_value):
         self.device.set_slew_rate(dac_num, slew_rate_value)

@@ -49,6 +49,25 @@ class Moxa1240ModbusInterface(GenericMoxa12XXInterface):
 
 
 @has_log
+class Moxa1242ModbusInterface(GenericMoxa12XXInterface):
+    """
+    Creates modbus data registers for a Moxa e1242 and makes them available to the lewis device.
+
+    """
+
+    protocol = "MOXA_1242"
+
+    # Moxa 1242 has 4 16-bit floats held in 4 (0x4) Input Registers (ir). The other register values are not tested.
+    # The layout of these registers is described in Appendix A of the moxa e1200 series manual.
+
+    ir = ModbusBasicDataBank(0, start_addr=0x200, last_addr=0x204)
+    
+    # Moxa 1242 has 8 (0x08) Discrete Input registers (di). The other register values are not tested.
+    # The layout of these registers is described in Appendix A of the moxa e1200 series manual.
+
+    di = ModbusBasicDataBank(False, last_addr=0x08)
+
+@has_log
 class Moxa1262ModbusInterface(GenericMoxa12XXInterface):
     """
     Creates modbus data registers for a Moxa e1240 and makes them available to the lewis device.

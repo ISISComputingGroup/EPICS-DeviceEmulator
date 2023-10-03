@@ -103,13 +103,13 @@ class EdwardsTICStreamInterface(StreamInterface):
 
         self.log.info("An error occurred at request {}: {}".format(request, error))
 
-    @conditional_reply("is_connected")
+    @conditional_reply("connected")
     def turbo_set_standby(self, switch):
         self._device.turbo_set_standby(switch)
 
         return "*C908 0"
 
-    @conditional_reply("is_connected")
+    @conditional_reply("connected")
     def turbo_get_standby(self):
         return_string = "=V908 {stdby_state};0;0"
 
@@ -119,14 +119,14 @@ class EdwardsTICStreamInterface(StreamInterface):
 
         return return_string.format(stdby_state=standby_state)
 
-    @conditional_reply("is_connected")
+    @conditional_reply("connected")
     def turbo_start_stop(self, switch):
         self.log.info("turbo start stop command received")
         self._device.turbo_start_stop(switch)
 
         return "*C904 0"
 
-    @conditional_reply("is_connected")
+    @conditional_reply("connected")
     def get_turbo_state(self):
         state_string = "=V904 {turbo_state};{alert};{priority}"
 
@@ -134,7 +134,7 @@ class EdwardsTICStreamInterface(StreamInterface):
                                    alert=self._device.turbo_alert,
                                    priority=PRIORITYSTATES_MAP[self._device.turbo_priority])
 
-    @conditional_reply("is_connected")
+    @conditional_reply("connected")
     def get_turbo_status(self):
         output_string = "*C904 {state};{alert};{priority}"
 
@@ -144,43 +144,43 @@ class EdwardsTICStreamInterface(StreamInterface):
 
         return output_string.format(state=state, alert=alert, priority=priority)
 
-    @conditional_reply("is_connected")
+    @conditional_reply("connected")
     def turbo_get_speed(self):
         return "=V905 1;0;0"
 
-    @conditional_reply("is_connected")
+    @conditional_reply("connected")
     def turbo_get_sft(self):
         return "=S905 1;0"
 
-    @conditional_reply("is_connected")
+    @conditional_reply("connected")
     def turbo_get_power(self):
         return "=V906 1;0;0"
 
-    @conditional_reply("is_connected")
+    @conditional_reply("connected")
     def turbo_get_norm(self):
         return "=V907 4;0;0"
 
-    @conditional_reply("is_connected")
+    @conditional_reply("connected")
     def turbo_get_cycle(self):
         return "=V909 1;0;0;0"
 
-    @conditional_reply("is_connected")
+    @conditional_reply("connected")
     def backing_get_status(self):
         return "=V910 1;0;0"
 
-    @conditional_reply("is_connected")
+    @conditional_reply("connected")
     def backing_start_stop(self, switch):
         return "*C910 0"
 
-    @conditional_reply("is_connected")
+    @conditional_reply("connected")
     def backing_get_speed(self):
         return "=V911 1;0;0"
 
-    @conditional_reply("is_connected")
+    @conditional_reply("connected")
     def backing_get_power(self):
         return "=V912 1;0;0"
 
-    @conditional_reply("is_connected")
+    @conditional_reply("connected")
     def get_gauge(self, gauge_id):
         state_string = "=V91{gauge_id} {pressure};{units};{gauge_state};{alert};{priority}"
 

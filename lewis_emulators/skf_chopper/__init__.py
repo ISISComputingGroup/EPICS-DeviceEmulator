@@ -1,5 +1,5 @@
-from .device import SimulatedSuperlogics
+from .device import SimulatedSKFChopper
 from ..lewis_versions import LEWIS_LATEST
 
 framework_version = LEWIS_LATEST
-__all__ = ['SimulatedSuperlogics']
+__all__ = ['SimulatedSKFChopper']
