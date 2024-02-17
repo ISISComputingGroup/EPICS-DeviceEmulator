@@ -68,7 +68,10 @@ class EurothermModbusInterface(StreamInterface):
             1509: self.get_nv_manual_flow,
             1300: self.get_nv_flow_sp_mode,
             4827: self.get_nv_direction,
+            1135: self.get_nv_flow_high_lim,
             1136: self.get_nv_flow_low_lim,
+            4963: self.get_nv_min_auto_flow_bl_temp,
+            4965: self.get_nv_auto_flow_scale,
             1292: self.get_nv_stop
         }
 
@@ -81,8 +84,11 @@ class EurothermModbusInterface(StreamInterface):
             37: self.set_output_rate,
             270: self.set_autotune,
             1509: self.set_nv_manual_flow,
-            1136: self.set_nv_flow_low_lim,
             1300: self.set_nv_flow_sp_mode,
+            1135: self.set_nv_flow_high_lim,
+            1136: self.set_nv_flow_low_lim,
+            4963: self.set_nv_min_auto_flow_bl_temp,
+            4965: self.set_nv_auto_flow_scale,
             1292: self.set_nv_stop
         }
 
@@ -213,6 +219,24 @@ class EurothermModbusInterface(StreamInterface):
         
     def set_nv_flow_low_lim(self, value):
         self.device.needlevalve_flow_low_lim = value
+
+    def get_nv_flow_high_lim(self):
+        return int(self.device.needlevalve_flow_high_lim)
+        
+    def set_nv_flow_high_lim(self, value):
+        self.device.needlevalve_flow_high_lim = value
+
+    def get_nv_min_auto_flow_bl_temp(self):
+        return int(self.device.needlevalve_min_auto_flow_bl_temp)
+        
+    def set_nv_min_auto_flow_bl_temp(self, value):
+        self.device.needlevalve_min_auto_flow_bl_temp = value
+
+    def get_nv_auto_flow_scale(self):
+        return int(self.device.needlevalve_auto_flow_scale)
+        
+    def set_nv_auto_flow_scale(self, value):
+        self.device.needlevalve_auto_flow_scale = value
 
     def get_nv_flow_sp_mode(self):
         return int(self.device.needlevalve_flow_sp_mode)

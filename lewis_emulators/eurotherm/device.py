@@ -26,6 +26,9 @@ class SimulatedEurotherm(StateMachineDevice):
         self._needlevalve_flow = 0
         self._needlevalve_manual_flow = 0
         self._needlevalve_flow_low_lim = 0
+        self._needlevalve_flow_high_lim = 0
+        self._needlevalve_min_auto_flow_bl_temp = 0
+        self._needlevalve_auto_flow_scale = 0
         self._needlevalve_flow_sp_mode = 0
         self._needlevalve_direction = 0
         self._needlevalve_stop = 0
@@ -243,6 +246,63 @@ class SimulatedEurotherm(StateMachineDevice):
             low_lim (float): set the low setpoint limit in L/min
         """
         self._needlevalve_flow_low_lim = low_lim
+
+    @property
+    def needlevalve_flow_high_lim(self):
+        """
+        Get the low setpoint limit for flow control
+
+        Returns: the current value of the manual flow setpoint
+        """
+        return self._needlevalve_flow_high_lim
+
+    @needlevalve_flow_high_lim.setter
+    def needlevalve_flow_high_lim(self, high_lim):
+        """
+        Sets the high setpoint limit for flow control
+
+        Args:
+            high_lim (float): set the high setpoint limit in L/min
+        """
+        self._needlevalve_flow_high_lim = high_lim
+
+    @property
+    def needlevalve_auto_flow_scale(self):
+        """
+        Get the auto_flow_scale
+
+        Returns: the current value of the manual flow setpoint
+        """
+        return self._needlevalve_auto_flow_scale
+
+    @needlevalve_auto_flow_scale.setter
+    def needlevalve_auto_flow_scale(self, value):
+        """
+        Sets the auto_flow_scale
+
+        Args:
+            value (float): set the high setpoint limit in L/min
+        """
+        self._needlevalve_auto_flow_scale = value
+
+    @property
+    def needlevalve_min_auto_flow_bl_temp(self):
+        """
+        Get min_auto_flow_bl_tempw setpoint
+
+        Returns: current mode of the fmin_auto_flow_bl_temp
+        """
+        return self._needlevalve_min_auto_flow_bl_temp
+
+    @needlevalve_min_auto_flow_bl_temp.setter
+    def needlevalve_min_auto_flow_bl_temp(self, value):
+        """
+        Sets the  min_auto_flow_bl_temp setpoint
+
+        Args:
+            value (int)
+        """
+        self._needlevalve_min_auto_flow_bl_temp = value
 
     @property
     def needlevalve_flow_sp_mode(self):
