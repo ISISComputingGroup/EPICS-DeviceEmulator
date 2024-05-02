@@ -23,35 +23,44 @@ class MclennanStreamInterface(StreamInterface):
         CmdBuilder("jog").int().escape("CV").int().eos().build(),
         CmdBuilder("query_speeds").int().escape("QS").eos().build(),
         CmdBuilder("set_mode").int().escape("CM").int().eos().build(),
-        CmdBuilder("set_encoder_ratio").int().escape("ER").int().escape("/").int().eos().build(),
+        CmdBuilder("set_encoder_ratio").int().escape(
+            "ER").int().escape("/").int().eos().build(),
         CmdBuilder("set_window").int().escape("WI").int().eos().build(),
         CmdBuilder("set_timeout").int().escape("TO").int().eos().build(),
-        CmdBuilder("set_tracking_window").int().escape("TR").int().eos().build(),
-        CmdBuilder("enable_soft_limits").int().escape("SL").int().eos().build(),
+        CmdBuilder("set_tracking_window").int().escape(
+            "TR").int().eos().build(),
+        CmdBuilder("enable_soft_limits").int().escape(
+            "SL").int().eos().build(),
         CmdBuilder("set_backoff").int().escape("BO").int().eos().build(),
         CmdBuilder("set_creep_steps").int().escape("CR").int().eos().build(),
         CmdBuilder("set_settle_time").int().escape("SE").int().eos().build(),
-        CmdBuilder("set_abort_mode").int().escape("AM").arg("[0-1]{8}").eos().build(),
-        CmdBuilder("set_datum_mode").int().escape("DM").arg("[0-1]{8}").eos().build(),
+        CmdBuilder("set_abort_mode").int().escape(
+            "AM").arg("[0-1]{8}").eos().build(),
+        CmdBuilder("set_datum_mode").int().escape(
+            "DM").arg("[0-1]{8}").eos().build(),
         CmdBuilder("set_home_pos").int().escape("SH").int().eos().build(),
         CmdBuilder("move_relative").int().escape("MR").int().eos().build(),
         CmdBuilder("move_absolute").int().escape("MA").int().eos().build(),
         CmdBuilder("set_velocity").int().escape("SV").int().eos().build(),
         CmdBuilder("home").int().escape("HD").int().eos().build(),
+        CmdBuilder("set_ba").int().escape("BA").eos().build(),
         CmdBuilder("clear_datum").int().escape("CD").eos().build(),
-        CmdBuilder("define_command_position").int().escape("CP").int().eos().build(),
-        CmdBuilder("define_actual_position").int().escape("AP").int().eos().build(),
+        CmdBuilder("define_command_position").int().escape(
+            "CP").int().eos().build(),
+        CmdBuilder("define_actual_position").int().escape(
+            "AP").int().eos().build(),
         CmdBuilder("query_mode").int().escape("QM").eos().build(),
-        CmdBuilder("query_current_op").int().escape("CO").eos().build(),        
-        CmdBuilder("query_all").int().escape("QA").eos().build(),        
-        CmdBuilder("query_position").int().escape("QP").eos().build(),        
+        CmdBuilder("query_current_op").int().escape("CO").eos().build(),
+        CmdBuilder("query_all").int().escape("QA").eos().build(),
+        CmdBuilder("query_position").int().escape("QP").eos().build(),
     }
 
     in_terminator = "\r"
     out_terminator = "\r\n"
 
     def handle_error(self, request, error):
-        err_string = "command was: {}, error was: {}: {}\n".format(request, error.__class__.__name__, error)
+        err_string = "command was: {}, error was: {}: {}\n".format(
+            request, error.__class__.__name__, error)
         print(err_string)
         self.log.error(err_string)
         return err_string
@@ -110,7 +119,7 @@ class MclennanStreamInterface(StreamInterface):
     def jog(self, controller, velocity):
         self.device.jog(velocity)
         return "OK"
-    
+
     @if_connected
     def set_mode(self, controller, mode):
         self.device.mode[controller] = mode
@@ -192,6 +201,11 @@ class MclennanStreamInterface(StreamInterface):
         return "OK"
 
     @if_connected
+    def set_ba(self, controller):
+        self.device.has_sent_BA = True
+        return "OK"
+
+    @if_connected
     def clear_datum(self, controller):
         return "OK"
 
@@ -204,7 +218,7 @@ class MclennanStreamInterface(StreamInterface):
     def define_actual_position(self, controller, value):
         self.device.position = value
         return "OK"
-        
+
     @if_connected
     def query_mode(self, controller):
         return f"{controller:02}:CM = {self.device.mode[controller]} AM = {self.device.abort_mode[controller]} DM = {self.device.datum_mode[controller]} JM = 11000000"
@@ -214,7 +228,7 @@ class MclennanStreamInterface(StreamInterface):
         return f"{controller:02}:{self.device.current_op}"
 
     # all replies should contain the original command string first and \r, the emulator does not do this in general but it
-    # only matters for multiline replies which this is the only such command    
+    # only matters for multiline replies which this is the only such command
     @if_connected
     def query_all(self, controller):
         lines = [
@@ -243,8 +257,7 @@ class MclennanStreamInterface(StreamInterface):
             "Read port: %00000000 Last write: %00000000"
         ]
         return f'{controller:02}QA\r' + '\r\n'.join(lines)
-    
+
     @if_connected
     def query_position(self, controller):
         return f"{controller:02}:CP = {self.device.target_position} AP = {self.device.position} IP = 1050 TP = 0 OD = -2050"
-

@@ -5,7 +5,7 @@ from lewis.devices import StateMachineDevice
 
 states = OrderedDict([("Stopped", StoppedState()),
                       ("Moving", MovingState()),
-                      ("Homing", HomingState()),                      
+                      ("Homing", HomingState()),
                       ("Jogging", JoggingState())])
 
 
@@ -20,6 +20,7 @@ class SimulatedMclennan(StateMachineDevice):
         self.is_moving = False
         self.is_homing = False
         self.is_pm304 = False
+        self.has_sent_BA = False
         self.is_idle = True
         self.jog_velocity = 0
         self.position = 0
@@ -46,7 +47,7 @@ class SimulatedMclennan(StateMachineDevice):
         self.abort_mode = {}
         self.datum_mode = {}
         self.home_pos = {}
-        for i in range(1,10):
+        for i in range(1, 10):
             self.velocity[i] = 0
             self.creep_speed[i] = 700
             self.accl[i] = 1000
@@ -87,7 +88,6 @@ class SimulatedMclennan(StateMachineDevice):
         self.is_homing = False
         self.is_idle = True
         self.current_op = "Idle"
-
 
     def _get_state_handlers(self):
         return states
