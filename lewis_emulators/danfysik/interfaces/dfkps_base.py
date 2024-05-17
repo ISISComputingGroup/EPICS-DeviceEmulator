@@ -2,7 +2,6 @@
 Stream device for danfysik
 """
 import abc
-import six
 
 from lewis.core.logging import has_log
 from lewis.utils.command_builder import CmdBuilder
@@ -11,8 +10,7 @@ from lewis.utils.replies import conditional_reply
 
 
 @has_log
-@six.add_metaclass(abc.ABCMeta)
-class CommonStreamInterface(object):
+class CommonStreamInterface(object, metaclass=abc.ABCMeta):
     """
     Common part of the stream interface for a Danfysik.
     """

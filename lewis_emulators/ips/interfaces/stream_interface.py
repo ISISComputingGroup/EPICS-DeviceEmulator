@@ -6,8 +6,6 @@ from lewis.utils.command_builder import CmdBuilder
 from lewis_emulators.ips.modes import Activity, Control
 from ..device import amps_to_tesla, tesla_to_amps
 
-from six import iteritems
-
 MODE_MAPPING = {
     0: Activity.HOLD,
     1: Activity.TO_SETPOINT,
@@ -95,7 +93,7 @@ class IpsStreamInterface(StreamInterface):
         resp = "X{x1}{x2}A{a}C{c}H{h}M{m1}{m2}P{p1}{p2}"
 
         def translate_activity():
-            for k, v in iteritems(MODE_MAPPING):
+            for k, v in MODE_MAPPING.items():
                 if v == self.device.activity:
                     return k
             else:

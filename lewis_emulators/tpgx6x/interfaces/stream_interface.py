@@ -1,5 +1,4 @@
 import abc
-import six
 from lewis.adapters.stream import StreamInterface
 from lewis.utils.command_builder import CmdBuilder
 
@@ -7,8 +6,7 @@ from lewis.utils.command_builder import CmdBuilder
 ACK = chr(6)
 
 
-@six.add_metaclass(abc.ABCMeta)
-class TpgStreamInterfaceBase(object):
+class TpgStreamInterfaceBase(object, metaclass=abc.ABCMeta):
     """
     Stream interface for the serial port for either a TPG26x or TPG36x.
     """

@@ -1,4 +1,3 @@
-import six
 from lewis.adapters.stream import StreamInterface
 from lewis.utils.command_builder import CmdBuilder
 from lewis.utils.replies import conditional_reply
@@ -54,7 +53,7 @@ class MKS_PR4000B_StreamInterface(StreamInterface):
 
         getter_factory, setter_factory = self._get_getter_and_setter_factories()
 
-        for command_name, emulator_name in six.iteritems(numeric_get_and_set_commands):
+        for command_name, emulator_name in numeric_get_and_set_commands.items():
             self.commands.update({
                 CmdBuilder(setter_factory(emulator_name)).escape(command_name).int().escape(",").float().eos().build(),
                 CmdBuilder(getter_factory(emulator_name)).escape("?{}".format(command_name)).int().eos().build(),

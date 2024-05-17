@@ -1,4 +1,3 @@
-import six
 from lewis.adapters.stream import StreamInterface, Cmd
 import threading
 import struct

@@ -1,4 +1,4 @@
-import six
+from functools import wraps
 from lewis.utils.command_builder import CmdBuilder
 from lewis.core.logging import has_log
 from lewis.adapters.stream import StreamInterface
@@ -9,7 +9,7 @@ if_connected = conditional_reply("connected")
 
 
 def needs_remote_mode(func):
-    @six.wraps(func)
+    wraps(func)
     def _wrapper(self, *args, **kwargs):
         if not self._device.remote_comms_enabled:
             raise ValueError("Not in remote mode")
