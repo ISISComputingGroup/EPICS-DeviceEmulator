@@ -1,4 +1,5 @@
 from collections import OrderedDict
+from functools import wraps
 
 from .states import DefaultState
 from lewis.devices import StateMachineDevice
@@ -6,7 +7,6 @@ from lewis.core.logging import has_log
 
 import random
 
-import six
 
 
 def truncate_if_set(f):
@@ -15,7 +15,7 @@ def truncate_if_set(f):
 
     """
 
-    @six.wraps(f)
+    @wraps(f)
     def wrapper(self, *args, **kwargs):
         output = f(self, *args, **kwargs)
 
@@ -33,7 +33,7 @@ def fake_auto_send(f):
 
     """
 
-    @six.wraps(f)
+    @wraps(f)
     def wrapper(self, *args, **kwargs):
         output = f(self, *args, **kwargs)
 
