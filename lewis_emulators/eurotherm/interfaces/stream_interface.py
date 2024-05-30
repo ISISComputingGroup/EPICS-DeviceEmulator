@@ -4,7 +4,7 @@ from lewis.utils.replies import conditional_reply
 
 if_connected = conditional_reply("connected")
 
-
+#TODO: add address params to methods 
 class EurothermStreamInterface(StreamInterface):
     """
     Stream interface for the serial port
@@ -103,13 +103,16 @@ class EurothermStreamInterface(StreamInterface):
         return self.make_read_reply("AT", self.device.autotune)
 
     @if_connected
-    def get_current_temperature(self):
+    def get_current_temperature(self, addr):
         """
         Get the current temperature of the device.
 
         Returns: the current temperature formatted like the Eurotherm protocol.
         """
-        return self.make_read_reply("PV", self._device.current_temperature)
+        try:
+            return self.make_read_reply("PV", self._device.current_temperature(addr))
+        except:
+            return None
 
     @if_connected
     def get_ramp_setpoint(self):
