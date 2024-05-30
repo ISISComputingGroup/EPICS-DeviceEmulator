@@ -24,6 +24,7 @@ class EurothermStreamInterface(StreamInterface):
         CmdBuilder("get_highlim").eot().regex("[0-9]{4}HS").enq().build(),
         CmdBuilder("get_lowlim").eot().regex("[0-9]{4}LS").enq().build(),
         CmdBuilder("get_error").eot().regex("[0-9]{4}EE").enq().build(),
+        CmdBuilder("get address").eot().digit().digit().digit().digit().enq().build(),
 
         CmdBuilder("set_ramp_setpoint", arg_sep="").eot().regex("[0-9]{4}").stx().escape("SL").float().etx().any().build(),
         CmdBuilder("set_output_rate", arg_sep="").eot().regex("[0-9]{4}").stx().escape("OR").float().etx().any().build(),
@@ -95,7 +96,7 @@ class EurothermStreamInterface(StreamInterface):
 
     @if_connected
     def set_output_rate(self, output_rate, _):
-        self.device.output_rate = output_rate
+        self.device.set_output_rate = output_rate
         return "\x06"
 
     @if_connected
@@ -133,7 +134,7 @@ class EurothermStreamInterface(StreamInterface):
             _: argument captured by the command.
 
         """
-        self._device.ramp_setpoint_temperature = temperature
+        self._device.set_ramp_setpoint_temperature = temperature
         return "\x06"
 
     @if_connected
