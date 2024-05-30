@@ -9,33 +9,32 @@ class SimulatedEurotherm(StateMachineDevice):
     """
     Simulated Eurotherm temperature sensor.
     """
+
     def _initialize_data(self):
         """
         Sets the initial state of the device.
         """
-        
-        self.sensors = {"0011": self.EurothermSensor(), "0022": self.EurothermSensor(), "0033": self.EurothermSensor()}
-        for sensor in self.sensors:
-            sensor._initialize_data()
+        self.connected = True
+        self.sensors = {
+            11 : SimulatedEurotherm.EurothermSensor(), 
+            22 : SimulatedEurotherm.EurothermSensor(), 
+            33 : SimulatedEurotherm.EurothermSensor()
+        }
+        for key, value in self.sensors.items():
+            value.initialize_data()
 
-    def _get_state_handlers(self, addr):
+    def _get_state_handlers(self):
         """
         Returns: states and their names
         """
-        euro = self.sensors[addr]
-        if not euro.connected:
-            raise ValueError
         return {
             DefaultState.NAME: DefaultState()
         }
     
-    def _get_initial_state(self, addr):
+    def _get_initial_state(self):
         """
         Returns: the name of the initial state
         """
-        euro = self.sensors[addr]
-        if not euro.connected:
-            raise ValueError
         return DefaultState.NAME
     
     def _get_transition_handlers(self):
@@ -409,6 +408,42 @@ class SimulatedEurotherm(StateMachineDevice):
         if not euro. connected:
             raise ValueError
         euro._needlevalve_stop = stop_val
+
+    def high_lim(self, addr):
+        """
+        Gets the high limit
+        """
+        euro = self.sensors[addr]
+        if not euro.connected:
+            raise ValueError
+        return euro.high_lim
+
+    def set_high_lim(self, addr, hi_lim):
+        """
+        Sets the high limit
+        """
+        euro = self.sensors[addr]
+        if not euro.connected:
+            raise ValueError
+        euro.high_lim = hi_lim
+
+    def output(self, addr):
+        """
+        Gets the output value
+        """
+        euro = self.sensors[addr]
+        if not euro.connected: 
+            raise ValueError
+        return euro.output
+    
+    def set_output(self, addr, output):
+        """
+        Sets the output value
+        """
+        euro = self.sensors[addr]
+        if not euro.connected:
+            raise ValueError
+        euro.output = output
 
     class EurothermSensor():
         """
