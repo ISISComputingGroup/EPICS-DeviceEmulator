@@ -427,6 +427,24 @@ class SimulatedEurotherm(StateMachineDevice):
             raise ValueError
         euro.high_lim = hi_lim
 
+    def low_lim(self, addr):
+        """
+        Gets the low limit
+        """
+        euro = self.sensors[addr]
+        if not euro.connected:
+            raise ValueError
+        return euro.low_lim
+
+    def set_low_lim(self, addr, lo_lim):
+        """
+        Sets the low limit
+        """
+        euro = self.sensors[addr]
+        if not euro.connected:
+            raise ValueError
+        euro.low_lim = lo_lim
+
     def output(self, addr):
         """
         Gets the output value
