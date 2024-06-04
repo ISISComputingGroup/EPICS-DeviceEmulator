@@ -50,6 +50,31 @@ class SimulatedEurotherm(StateMachineDevice):
         if self.delay_time is not None:
             sleep(self.delay_time)
 
+    def setpoint_temperature(self, addr):
+        """
+        Get current temperature of the device.
+
+        Returns: the current temperature in K.
+        """
+        self._delay()
+        euro = self.sensors[addr]
+        if not euro.connected:
+            raise ValueError             
+        return euro.setpoint_temperature
+
+    def set_setpoint_temperature(self, addr, temp):
+        """
+        Set the current temperature of the device.
+
+        Args:
+            temp: the current temperature of the device in K.
+
+        """
+        euro = self.sensors[addr]
+        if not euro.connected:
+            raise ValueError 
+        euro.setpoint_temperature = temp
+    
     def current_temperature(self, addr):
         """
         Get current temperature of the device.
@@ -59,7 +84,7 @@ class SimulatedEurotherm(StateMachineDevice):
         self._delay()
         euro = self.sensors[addr]
         if not euro.connected:
-            raise ValueError #not sure if this is right            
+            raise ValueError            
         return euro.current_temperature
         
 
@@ -111,7 +136,7 @@ class SimulatedEurotherm(StateMachineDevice):
         euro = self.sensors[addr]
         if not euro.connected:
             raise ValueError            
-        return euro._ramping_on
+        return euro.ramping_on
     
     def set_ramping_on(self, addr, toggle):
         """
@@ -124,7 +149,7 @@ class SimulatedEurotherm(StateMachineDevice):
         euro = self.sensors[addr]
         if not euro.connected:
             raise ValueError
-        euro._ramping_on = toggle
+        euro.ramping_on = toggle
 
     def ramp_rate(self, addr):
         """
@@ -136,7 +161,7 @@ class SimulatedEurotherm(StateMachineDevice):
         euro = self.sensors[addr]
         if not euro.connected:
             raise ValueError #not sure if this is right
-        return euro._ramp_rate
+        return euro.ramp_rate
 
     
     def set_ramp_rate(self, addr, ramp_rate):
@@ -150,7 +175,7 @@ class SimulatedEurotherm(StateMachineDevice):
         euro = self.sensors[addr]
         if not euro.connected:
             raise ValueError
-        euro._ramp_rate = ramp_rate
+        euro.ramp_rate = ramp_rate
 
     def ramp_setpoint_temperature(self, addr):
         """
@@ -162,7 +187,7 @@ class SimulatedEurotherm(StateMachineDevice):
         euro = self.sensors[addr]
         if not euro.connected:
             raise ValueError
-        return euro._ramp_setpoint_temperature
+        return euro.ramp_setpoint_temperature
 
     def set_ramp_setpoint_temperature(self, addr, temp):
         """
@@ -175,28 +200,7 @@ class SimulatedEurotherm(StateMachineDevice):
         euro = self.sensors[addr]
         if not euro.connected:
             raise ValueError
-        euro._ramp_setpoint_temperature = temp
-
-   
-    def output_rate(self, addr):
-        """
-        Get the set point output rate.
-        """
-        self._delay()
-        euro = self.sensors[addr]
-        if not euro.connected:
-            raise ValueError
-        return euro._output_rate
-        
-    def set_output_rate(self, addr, value):
-        """
-        Set the set point output rate.
-        """
-        euro = self.sensors[addr]
-        if not euro.connected:
-            raise ValueError
-        euro._output_rate = value
-
+        euro.ramp_setpoint_temperature = temp
 
     def needlevalve_flow(self, addr):
         """
@@ -207,7 +211,7 @@ class SimulatedEurotherm(StateMachineDevice):
         euro = self.sensors[addr]
         if not euro.connected:
             raise ValueError
-        return euro._needlevalve_flow
+        return euro.needlevalve_flow
     
     def set_needlevalve_flow(self, addr, flow):
         """
@@ -219,7 +223,7 @@ class SimulatedEurotherm(StateMachineDevice):
         euro = self.sensors[addr]
         if not euro.connected:
             raise ValueError
-        euro._needlevalve_flow = flow
+        euro.needlevalve_flow = flow
 
     def needlevalve_manual_flow(self, addr):
         """
@@ -230,7 +234,7 @@ class SimulatedEurotherm(StateMachineDevice):
         euro = self.sensors[addr]
         if not euro.connected:
             raise ValueError
-        return euro._needlevalve_manual_flow
+        return euro.needlevalve_manual_flow
 
     def set_needlevalve_manual_flow(self, addr, flow_val):
         """
@@ -242,7 +246,7 @@ class SimulatedEurotherm(StateMachineDevice):
         euro = self.sensors[addr]
         if not euro. connected:
             raise ValueError
-        euro._needlevalve_manual_flow = flow_val
+        euro.needlevalve_manual_flow = flow_val
 
     def needlevalve_flow_low_lim(self, addr):
         """
@@ -253,7 +257,7 @@ class SimulatedEurotherm(StateMachineDevice):
         euro = self.sensors[addr]
         if not euro. connected:
             raise ValueError
-        return euro._needlevalve_flow_low_lim
+        return euro.needlevalve_flow_low_lim
 
     def set_needlevalve_flow_low_lim(self, addr, low_lim):
         """
@@ -265,7 +269,7 @@ class SimulatedEurotherm(StateMachineDevice):
         euro = self.sensors[addr]
         if not euro. connected:
             raise ValueError
-        euro._needlevalve_flow_low_lim = low_lim
+        euro.needlevalve_flow_low_lim = low_lim
 
     def needlevalve_flow_high_lim(self, addr):
         """
@@ -276,7 +280,7 @@ class SimulatedEurotherm(StateMachineDevice):
         euro = self.sensors[addr]
         if not euro. connected:
             raise ValueError
-        return euro._needlevalve_flow_high_lim
+        return euro.needlevalve_flow_high_lim
 
     
     def set_needlevalve_flow_high_lim(self, addr, high_lim):
@@ -289,7 +293,7 @@ class SimulatedEurotherm(StateMachineDevice):
         euro = self.sensors[addr]
         if not euro. connected:
             raise ValueError
-        euro._needlevalve_flow_high_lim = high_lim
+        euro.needlevalve_flow_high_lim = high_lim
 
     
     def needlevalve_auto_flow_scale(self, addr):
@@ -304,7 +308,7 @@ class SimulatedEurotherm(StateMachineDevice):
         return euro._needlevalve_auto_flow_scale
 
     
-    def needlevalve_auto_flow_scale(self, addr, value):
+    def set_needlevalve_auto_flow_scale(self, addr, value):
         """
         Sets the auto_flow_scale
 
@@ -314,7 +318,7 @@ class SimulatedEurotherm(StateMachineDevice):
         euro = self.sensors[addr]
         if not euro. connected:
             raise ValueError
-        euro._needlevalve_auto_flow_scale = value
+        euro.needlevalve_auto_flow_scale = value
 
     
     def needlevalve_min_auto_flow_bl_temp(self, addr):
@@ -326,7 +330,7 @@ class SimulatedEurotherm(StateMachineDevice):
         euro = self.sensors[addr]
         if not euro. connected:
             raise ValueError
-        return euro._needlevalve_min_auto_flow_bl_temp
+        return euro.needlevalve_min_auto_flow_bl_temp
 
     def set_needlevalve_min_auto_flow_bl_temp(self, addr, value):
         """
@@ -338,7 +342,7 @@ class SimulatedEurotherm(StateMachineDevice):
         euro = self.sensors[addr]
         if not euro. connected:
             raise ValueError
-        euro._needlevalve_min_auto_flow_bl_temp = value
+        euro.needlevalve_min_auto_flow_bl_temp = value
 
     def needlevalve_flow_sp_mode(self, addr):
         """
@@ -349,7 +353,7 @@ class SimulatedEurotherm(StateMachineDevice):
         euro = self.sensors[addr]
         if not euro. connected:
             raise ValueError
-        return euro._needlevalve_flow_sp_mode
+        return euro.needlevalve_flow_sp_mode
 
     def set_needlevalve_flow_sp_mode(self, addr, mode):
         """
@@ -361,7 +365,7 @@ class SimulatedEurotherm(StateMachineDevice):
         euro = self.sensors[addr]
         if not euro. connected:
             raise ValueError
-        euro._needlevalve_flow_sp_mode = mode
+        euro.needlevalve_flow_sp_mode = mode
 
     def needlevalve_direction(self, addr):
         """
@@ -372,7 +376,7 @@ class SimulatedEurotherm(StateMachineDevice):
         euro = self.sensors[addr]
         if not euro. connected:
             raise ValueError
-        return euro._needlevalve_direction
+        return euro.needlevalve_direction
     
     def set_needlevalve_direction(self, addr, dir):
         """
@@ -384,7 +388,7 @@ class SimulatedEurotherm(StateMachineDevice):
         euro = self.sensors[addr]
         if not euro. connected:
             raise ValueError
-        euro._needlevalve_direction = dir
+        euro.needlevalve_direction = dir
     
     def needlevalve_stop(self, addr):
         """
@@ -395,7 +399,7 @@ class SimulatedEurotherm(StateMachineDevice):
         euro = self.sensors[addr]
         if not euro. connected:
             raise ValueError
-        return euro._needlevalve_stop
+        return euro.needlevalve_stop
     
     def set_needlevalve_stop(self, addr, stop_val):
         """
@@ -407,7 +411,7 @@ class SimulatedEurotherm(StateMachineDevice):
         euro = self.sensors[addr]
         if not euro. connected:
             raise ValueError
-        euro._needlevalve_stop = stop_val
+        euro.needlevalve_stop = stop_val
 
     def high_lim(self, addr):
         """
@@ -463,6 +467,97 @@ class SimulatedEurotherm(StateMachineDevice):
             raise ValueError
         euro.output = output
 
+    def max_output(self, addr):
+        """
+        Gets the max output value
+        """
+        euro = self.sensors[addr]
+        if not euro.connected:
+            raise ValueError
+        return euro.max_output
+    
+    def set_max_output(self, addr, max):
+        """
+        Sets the max_output value
+        """
+        euro = self.sensors[addr]
+        if not euro.connected:
+            raise ValueError
+        euro.max_output = max
+
+    def output_rate(self, addr):
+            """
+            Get the set point output rate.
+            """
+            self._delay()
+            euro = self.sensors[addr]
+            if not euro.connected:
+                raise ValueError
+            return euro.output_rate
+            
+    def set_output_rate(self, addr, value):
+        """
+        Set the set point output rate.
+        """
+        euro = self.sensors[addr]
+        if not euro.connected:
+            raise ValueError
+        euro.output_rate = value
+
+    def error(self, addr):
+        """
+        Gets the error status
+        """
+        euro = self.sensors[addr]
+        if not euro.connected:
+            raise ValueError
+        return euro.error
+    
+    def set_error(self, addr, error):
+        """
+        Sets the error status
+        """
+        euro = self.sensors[addr]
+        if not euro.connected:
+            raise ValueError
+        euro.error = error
+
+    def scaling(self, addr):
+        """
+        Gets the scaling factor
+        """
+        euro = self.sensors[addr]
+        if not euro.connected:
+            raise ValueError
+        return euro.scaling
+    
+    def set_scaling(self, addr, scaling):
+        """
+        Sets the scaling factor
+        """
+        euro = self.sensors[addr]
+        if not euro.connected:
+            raise ValueError
+        euro.scaling = scaling
+
+    def autotune(self, addr):
+        """
+        Gets the autotune value
+        """
+        euro = self.sensors[addr]
+        if not euro.connected:
+            raise ValueError
+        return euro.autotune
+    
+    def set_autotune(self, addr, autotune):
+        """
+        Sets the autotune value
+        """
+        euro = self.sensors[addr]
+        if not euro.connected:
+            raise ValueError
+        euro.autotune = autotune
+
     class EurothermSensor():
         """
         Eurotherm Sensor method
@@ -471,36 +566,23 @@ class SimulatedEurotherm(StateMachineDevice):
         def initialize_data(self):
             self.connected = True
             self.delay_time = None
-            self._current_temperature = 0.0
-            self._setpoint_temperature = 0.0
-            self._ramp_setpoint_temperature = 0.0
-            self._ramping_on = False
-            self._ramp_rate = 1.0
-            self._address = None
-            self._needlevalve_flow = 0
-            self._needlevalve_manual_flow = 0
-            self._needlevalve_flow_low_lim = 0
-            self._needlevalve_flow_high_lim = 0
-            self._needlevalve_min_auto_flow_bl_temp = 0
-            self._needlevalve_auto_flow_scale = 0
-            self._needlevalve_flow_sp_mode = 0
-            self._needlevalve_direction = 0
-            self._needlevalve_stop = 0
+            self.current_temperature = 0.0
+            self.setpoint_temperature = 0.0
+            self.address = None
             self.p = 0
             self.i = 0
             self.d = 0
             self.autotune = 0
-            self.max_output = 0
-            self._output_rate = 0
             self.output = 0
+            self.output_rate = 0
+            self.max_output = 0
             self.high_lim = 0
             self.low_lim = 0
             self.error = "0"
             self.scaling = 1.0
-            self.ramping_on = None
-            self.ramp_rate = 0
-            self.ramp_setpoint_temperature = 0
-            self.output_rate = 0
+            self.ramping_on = False
+            self.ramp_rate = 1.0
+            self.ramp_setpoint_temperature = 0.0
             self.needlevalve_flow = 0
             self.needlevalve_manual_flow = 0
             self.needlevalve_flow_low_lim = 0
