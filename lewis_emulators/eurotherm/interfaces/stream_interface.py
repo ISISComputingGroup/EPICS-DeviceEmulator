@@ -26,8 +26,8 @@ class EurothermStreamInterface(StreamInterface):
         CmdBuilder("get_error").eot().int().regex("EE").enq().build(),
         CmdBuilder("get_address").eot().int().regex("").enq().build(),
 
-        CmdBuilder("set_ramp_setpoint", arg_sep="").eot().regex("[0-9]{4}").stx().escape("SL").float().etx().any().build(),
-        CmdBuilder("set_output_rate", arg_sep="").eot().regex("[0-9]{4}").stx().escape("OR").float().etx().any().build(),
+        CmdBuilder("set_ramp_setpoint", arg_sep="").eot().int().stx().escape("SL").float().etx().any().build(),
+        CmdBuilder("set_output_rate", arg_sep="").eot().int().stx().escape("OR").float().etx().any().build(),
     }
 
     # Add terminating characters manually for each command, as write and read commands use different formatting for their 'in' commands.
@@ -63,12 +63,12 @@ class EurothermStreamInterface(StreamInterface):
         """
         Get the address of the specific Eurotherm sensor, i.e. A01 or 0011
         """
-        return self.make_read_reply(self._device.address())
+        return self.make_read_reply(self.device.address())
     
     @if_connected
     def get_setpoint(self, addr):
         try:
-            return self.make_read_reply("SL", self._device.setpoint_temperature(addr))
+            return self.make_read_reply("SL", self.device.setpoint_temperature(addr))
         except:
             return None
 
@@ -101,32 +101,32 @@ class EurothermStreamInterface(StreamInterface):
             return None
 
     @if_connected
-    def get_highlim(self):
+    def get_highlim(self, addr):
         try:
-            return self.make_read_reply("HS", self.device.high_lim)
+            return self.make_read_reply("HS", self.device.high_lim(addr))
         except:
             return None
 
     @if_connected
-    def get_lowlim(self):
-        return self.make_read_reply("LS", self.device.low_lim)
+    def get_lowlim(self, addr):
+        try:
+            return self.make_read_reply("LS", self.device.low_lim(addr))
+        except:
+            return None
 
     @if_connected
-    def get_max_output(self):
-        return self.make_read_reply("HO", self.device.max_output)
-
+    def get_max_output(self, addr):
+        try:
+            return self.make_read_reply("HO", self.device.max_output(addr))
+        except:
+            return None
+        
     @if_connected
-    def get_output_rate(self):
-        return self.make_read_reply("OR", self.device.output_rate)
-
-    @if_connected
-    def set_output_rate(self, output_rate, _):
-        self.device.set_output_rate = output_rate
-        return "\x06"
-
-    @if_connected
-    def get_autotune(self):
-        return self.make_read_reply("AT", self.device.autotune)
+    def get_autotune(self, addr):
+        try:
+            return self.make_read_reply("AT", self.device.autotune(addr))
+        except:
+            return None
 
     @if_connected
     def get_current_temperature(self, addr):
@@ -136,21 +136,39 @@ class EurothermStreamInterface(StreamInterface):
         Returns: the current temperature formatted like the Eurotherm protocol.
         """
         try:
-            return self.make_read_reply("PV", self._device.current_temperature(addr))
+            return self.make_read_reply("PV", self.device.current_temperature(addr))
         except:
             return None
 
     @if_connected
-    def get_ramp_setpoint(self):
+    def get_output_rate(self, addr):
+        try:
+            return self.make_read_reply("OR", self.device.output_rate(addr))
+        except:
+            return None
+
+    @if_connected
+    def set_output_rate(self, addr, output_rate, _):
+        try:
+            self.device.set_output_rate(addr, output_rate)
+            return "\x06"
+        except:
+            return None
+
+    @if_connected
+    def get_ramp_setpoint(self, addr):
         """
         Get the set point temperature.
 
         Returns: the current set point temperature formatted like the Eurotherm protocol.
         """
-        return self.make_read_reply("SP", self._device.ramp_setpoint_temperature)
+        try:
+            return self.make_read_reply("SP", self.device.ramp_setpoint_temperature(addr))
+        except: 
+            return None
 
     @if_connected
-    def set_ramp_setpoint(self, temperature, _):
+    def set_ramp_setpoint(self, addr, temperature, _):
         """
         Set the set point temperature.
 
@@ -159,15 +177,18 @@ class EurothermStreamInterface(StreamInterface):
             _: argument captured by the command.
 
         """
-        self._device.set_ramp_setpoint_temperature = temperature
-        return "\x06"
+        try:
+            self.device.set_ramp_setpoint_temperature(addr, temperature)
+            return "\x06"
+        except:
+            return None
 
     @if_connected
-    def get_error(self):
+    def get_error(self, addr):
         """
         Get the error.
 
         Returns: the current error code in HEX.
         """
-        reply = "\x02EE>0x{}\x03".format(self._device.error)
+        reply = "\x02EE>0x{}\x03".format(self.device.error(addr))
         return f"{reply}{self.make_checksum(reply[1:])}"
