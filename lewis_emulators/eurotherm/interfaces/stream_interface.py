@@ -43,7 +43,7 @@ class EurothermStreamInterface(StreamInterface):
         return chr(checksum)
     
     def make_read_reply(self, command, value):
-        reply = f"\x02{command}{value}\x03"
+        reply = f"\x02{command}{str(value)}\x03"
         # checksum calculated on characters after \x02 but up to and including \x03 
         return f"{reply}{self.make_checksum(reply[1:])}"
 
