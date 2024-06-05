@@ -15,6 +15,7 @@ class SimulatedEurotherm(StateMachineDevice):
         Sets the initial state of the device.
         """
         self.connected = True
+        self.delay_time = None
         self.sensors = {
             1111 : SimulatedEurotherm.EurothermSensor(), 
             2222 : SimulatedEurotherm.EurothermSensor(), 
@@ -566,7 +567,6 @@ class SimulatedEurotherm(StateMachineDevice):
 
         def __init__(self):
             self.connected = True
-            self.delay_time = None
             self.current_temperature = 0.0
             self.setpoint_temperature = 0.0
             self.address = None
