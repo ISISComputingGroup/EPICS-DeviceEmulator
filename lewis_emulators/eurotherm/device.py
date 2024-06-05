@@ -7,7 +7,7 @@ from .states import DefaultState
 
 class SimulatedEurotherm(StateMachineDevice):
     """
-    Simulated Eurotherm temperature sensor.
+    Simulated Eurotherm device.
     """
 
     def _initialize_data(self):
@@ -16,12 +16,13 @@ class SimulatedEurotherm(StateMachineDevice):
         """
         self.connected = True
         self.sensors = {
-            11 : SimulatedEurotherm.EurothermSensor(), 
-            22 : SimulatedEurotherm.EurothermSensor(), 
-            33 : SimulatedEurotherm.EurothermSensor()
+            1111 : SimulatedEurotherm.EurothermSensor(), 
+            2222 : SimulatedEurotherm.EurothermSensor(), 
+            3333 : SimulatedEurotherm.EurothermSensor(),
+            4444: SimulatedEurotherm.EurothermSensor(),
+            5555: SimulatedEurotherm.EurothermSensor(),
+            6666: SimulatedEurotherm.EurothermSensor()
         }
-        for key, value in self.sensors.items():
-            value.initialize_data()
 
     def _get_state_handlers(self):
         """
@@ -486,14 +487,14 @@ class SimulatedEurotherm(StateMachineDevice):
         euro.max_output = max
 
     def output_rate(self, addr):
-            """
-            Get the set point output rate.
-            """
-            self._delay()
-            euro = self.sensors[addr]
-            if not euro.connected:
-                raise ValueError
-            return euro.output_rate
+        """
+        Get the set point output rate.
+        """
+        self._delay()
+        euro = self.sensors[addr]
+        if not euro.connected:
+            raise ValueError
+        return euro.output_rate
             
     def set_output_rate(self, addr, value):
         """
@@ -560,10 +561,10 @@ class SimulatedEurotherm(StateMachineDevice):
 
     class EurothermSensor():
         """
-        Eurotherm Sensor method
+        Eurotherm temperature sensor method
         """
 
-        def initialize_data(self):
+        def __init__(self):
             self.connected = True
             self.delay_time = None
             self.current_temperature = 0.0
