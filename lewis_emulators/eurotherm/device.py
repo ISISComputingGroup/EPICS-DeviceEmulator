@@ -62,7 +62,7 @@ class SimulatedEurotherm(StateMachineDevice):
         addr = int(addr)
         euro = self.sensors[addr]
         if not euro.connected:
-            raise ValueError             
+            raise ValueError            
         return euro.setpoint_temperature
 
     def set_setpoint_temperature(self, addr, value):
@@ -158,7 +158,7 @@ class SimulatedEurotherm(StateMachineDevice):
 
         """
         addr = int(addr)
-        
+        value = bool(value)
         euro = self.sensors[addr]
         if not euro.connected:
             raise ValueError
