@@ -1,7 +1,7 @@
-from lewis.adapters.stream import StreamInterface, Cmd
-import threading
 import struct
+import threading
 
+from lewis.adapters.stream import StreamInterface
 
 EXPECTED_MESSAGE_LENGTH = 188
 

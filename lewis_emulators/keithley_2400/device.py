@@ -1,12 +1,13 @@
 from __future__ import division
-from random import uniform
-from collections import OrderedDict
 
-from .utilities import format_value
-from .states import DefaultRunningState, StaticRunningState
-from .control_modes import *
+from collections import OrderedDict
+from random import uniform
 
 from lewis.devices import StateMachineDevice
+
+from .control_modes import *
+from .states import DefaultRunningState, StaticRunningState
+from .utilities import format_value
 
 
 class SimulatedKeithley2400(StateMachineDevice):
@@ -21,8 +22,7 @@ class SimulatedKeithley2400(StateMachineDevice):
     INITIAL_SOURCE_VOLTAGE = 0.8
 
     def _initialize_data(self):
-        """
-        Initialize all of the device's attributes.
+        """Initialize all of the device's attributes.
         """
         self.random_output = True
 
@@ -88,9 +88,8 @@ class SimulatedKeithley2400(StateMachineDevice):
         )
 
     def _format_power_output(self, value, as_string, offset=0.0):
-        """
-        Some properties like output mode and offset compensation affect the output without affecting the underlying
-         model. Those adjustments are applied here.
+        """Some properties like output mode and offset compensation affect the output without affecting the underlying
+        model. Those adjustments are applied here.
         """
         output_value = value
         if self._offset_compensation_mode == OffsetCompensationMode.ON:
@@ -117,8 +116,7 @@ class SimulatedKeithley2400(StateMachineDevice):
         return self._format_power_output(self._resistance(), as_string)
 
     def update(self, dt):
-        """
-        Update the current and voltage values based on the current mode and time elapsed.
+        """Update the current and voltage values based on the current mode and time elapsed.
         """
 
         def update_value(value):
@@ -138,15 +136,13 @@ class SimulatedKeithley2400(StateMachineDevice):
             self.voltage = new_voltage
 
     def reset(self):
-        """
-        Set all the attributes back to their initial values.
+        """Set all the attributes back to their initial values.
         """
         self._initialize_data()
 
     @staticmethod
     def _check_mode(mode, mode_class):
-        """
-        Make sure the mode requested exists in the related class.
+        """Make sure the mode requested exists in the related class.
         """
         if mode in mode_class.MODES:
             return True

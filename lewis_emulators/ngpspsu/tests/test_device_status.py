@@ -1,12 +1,12 @@
 import unittest
-from hamcrest import assert_that, is_, equal_to
 
-from lewis_emulators.ngpspsu.interfaces.device_status import convert_to_hexadecimal, DeviceStatus
+from hamcrest import assert_that, equal_to, is_
+
+from lewis_emulators.ngpspsu.interfaces.device_status import DeviceStatus, convert_to_hexadecimal
 
 
 class DeviceStatusTests(unittest.TestCase):
-    """
-    Tests that the device status is correctly converted.
+    """Tests that the device status is correctly converted.
     """
 
     def test_that_GIVEN_a_blank_device_status_THEN_all_hex_characters_zero(self):
@@ -104,8 +104,7 @@ class DeviceStatusTests(unittest.TestCase):
 
 
 class ConvertBitsToHexTests(unittest.TestCase):
-    """
-    Tests for converting a word of 4 bits to the
+    """Tests for converting a word of 4 bits to the
     corresponding hexadecimal character.
     """
 

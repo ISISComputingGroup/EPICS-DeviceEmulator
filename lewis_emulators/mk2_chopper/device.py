@@ -1,13 +1,14 @@
 from collections import OrderedDict
-from .states import DefaultInitState, DefaultStoppedState, DefaultStartedState, MAX_TEMPERATURE
+
 from lewis.devices import StateMachineDevice
+
 from .chopper_type import ChopperType
+from .states import MAX_TEMPERATURE, DefaultInitState, DefaultStartedState, DefaultStoppedState
 
 
 class SimulatedMk2Chopper(StateMachineDevice):
     def _initialize_data(self):
-        """
-        Initialize all of the device's attributes.
+        """Initialize all of the device's attributes.
         """
         self._type = ChopperType(50, ChopperType.INDRAMAT)
 

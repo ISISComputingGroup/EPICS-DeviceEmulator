@@ -6,8 +6,7 @@ if_connected = conditional_reply("connected")
 
 
 class EurothermStreamInterface(StreamInterface):
-    """
-    Stream interface for the serial port
+    """Stream interface for the serial port
     """
 
     commands = {
@@ -62,8 +61,7 @@ class EurothermStreamInterface(StreamInterface):
         return f"{reply}{self.make_checksum(reply[1:])}"
 
     def handle_error(self, request, error):
-        """
-        If command is not recognised print and error
+        """If command is not recognised print and error
 
         Args:
             request: requested string
@@ -119,8 +117,7 @@ class EurothermStreamInterface(StreamInterface):
 
     @if_connected
     def get_current_temperature(self):
-        """
-        Get the current temperature of the device.
+        """Get the current temperature of the device.
 
         Returns: the current temperature formatted like the Eurotherm protocol.
         """
@@ -128,8 +125,7 @@ class EurothermStreamInterface(StreamInterface):
 
     @if_connected
     def get_ramp_setpoint(self):
-        """
-        Get the set point temperature.
+        """Get the set point temperature.
 
         Returns: the current set point temperature formatted like the Eurotherm protocol.
         """
@@ -137,8 +133,7 @@ class EurothermStreamInterface(StreamInterface):
 
     @if_connected
     def set_ramp_setpoint(self, temperature, _):
-        """
-        Set the set point temperature.
+        """Set the set point temperature.
 
         Args:
             temperature: the temperature to set the setpoint to.
@@ -150,8 +145,7 @@ class EurothermStreamInterface(StreamInterface):
 
     @if_connected
     def get_error(self):
-        """
-        Get the error.
+        """Get the error.
 
         Returns: the current error code in HEX.
         """

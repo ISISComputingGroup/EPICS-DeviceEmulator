@@ -1,8 +1,10 @@
 from collections import OrderedDict
-from lewis.core.logging import has_log
-from .states import DefaultState
-from lewis.devices import StateMachineDevice
 from enum import Enum
+
+from lewis.core.logging import has_log
+from lewis.devices import StateMachineDevice
+
+from .states import DefaultState
 
 
 class Direction(Enum):
@@ -13,8 +15,7 @@ class Direction(Enum):
 @has_log
 class SimulatedWm323(StateMachineDevice):
     def _initialize_data(self):
-        """
-        Initialize all of the device's attributes.
+        """Initialize all of the device's attributes.
         """
         self.speed = 0
         self.direction = Direction.CCW

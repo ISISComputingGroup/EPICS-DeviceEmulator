@@ -1,5 +1,4 @@
 from lewis.adapters.stream import StreamInterface
-
 from lewis.utils.command_builder import CmdBuilder
 
 

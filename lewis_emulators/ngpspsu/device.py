@@ -1,12 +1,13 @@
 from collections import OrderedDict
-from .states import DefaultState
+
 from lewis.devices import StateMachineDevice
+
+from .states import DefaultState
 
 
 class SimulatedNgpspsu(StateMachineDevice):
     def _initialize_data(self):
-        """
-        Initialize all of the device's attributes.
+        """Initialize all of the device's attributes.
         """
         self._model_no_and_firmware = "NGPS 100-50:0.9.01"
         self._voltage = 0.0
@@ -49,13 +50,11 @@ class SimulatedNgpspsu(StateMachineDevice):
     @property
     def model_number_and_firmware(self):
         """Returns the model number and firmware version."""
-
         return self._model_no_and_firmware
 
     @property
     def status(self):
         """Returns the status of the device."""
-
         return self._status
 
     @property
@@ -66,17 +65,14 @@ class SimulatedNgpspsu(StateMachineDevice):
     @property
     def voltage_setpoint(self):
         """Returns last voltage setpoint to 6 decimal places."""
-
         return "{0:.6f}".format(self._voltage_setpoint)
 
     def try_setting_voltage_setpoint(self, value):
-        """
-        Sets the voltage setpoint.
+        """Sets the voltage setpoint.
 
         Returns:
             string: "#AK" if successful, #NK:%i if not (%i is an error code.).
         """
-
         if not self._status["ON/OFF"]:
             return "#NAK:13"
         else:
@@ -93,17 +89,14 @@ class SimulatedNgpspsu(StateMachineDevice):
     @property
     def current_setpoint(self):
         """Returns current setpoint to 6 decimal places."""
-
         return "{0:.6f}".format(self._current_setpoint)
 
     def try_setting_current_setpoint(self, value):
-        """
-        Sets the current setpoint.
+        """Sets the current setpoint.
 
         Returns:
             string: "#AK" if successful, #NK:%i if not (%i is an error code).
         """
-
         if not self._status["ON/OFF"]:
             return "#NAK:13"
         else:
@@ -113,13 +106,11 @@ class SimulatedNgpspsu(StateMachineDevice):
             return "#AK"
 
     def start_device(self):
-        """
-        Starts the device.
+        """Starts the device.
 
         Returns:
             string: "#AK" if successful, #NK:%i if not (%i is an error code).
         """
-
         if self._status["ON/OFF"]:
             return "#NAK:09"
         else:
@@ -127,13 +118,11 @@ class SimulatedNgpspsu(StateMachineDevice):
             return "#AK"
 
     def stop_device(self):
-        """
-        Stops the device.
+        """Stops the device.
 
         Returns:
             string: "#AK" if successful, #NK:%i if not (%i is an error code).
         """
-
         if not self._status["ON/OFF"]:
             return "#NAK:13"
         else:
@@ -143,13 +132,11 @@ class SimulatedNgpspsu(StateMachineDevice):
             return "#AK"
 
     def reset_device(self):
-        """
-        Resets the device.
+        """Resets the device.
 
         Returns:
             string: "#AK" if successful, #NK:%i if not (%i is an error code).
         """
-
         for key in self._status:
             if key == "Control mode":
                 self._status[key] = "Remote"
@@ -166,33 +153,27 @@ class SimulatedNgpspsu(StateMachineDevice):
 
     @property
     def connected(self):
-        """
-        Connected status of the device.
+        """Connected status of the device.
 
         Returns:
             True if the device is connected. False otherwise.
         """
-
         return self._connected
 
     def connect(self):
         """Connects the device."""
-
         self._connected = True
 
     def disconnect(self):
         """Disconnects the device."""
-
         self._connected = False
 
     def fault(self, fault_name):
-        """
-        Sets the status depending on the fault. Set only via the backdoor.
+        """Sets the status depending on the fault. Set only via the backdoor.
 
         Raises:
             ValueError if fault_name is not a recognised fault.
         """
-
         if fault_name in self._status:
             self._status[fault_name] = True
         else:

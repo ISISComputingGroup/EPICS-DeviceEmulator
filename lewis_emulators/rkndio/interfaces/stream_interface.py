@@ -23,12 +23,12 @@ class RkndioStreamInterface(StreamInterface):
     out_terminator = "\r\n"
 
     def handle_error(self, request, error):
-        """
-        Prints an error message if a command is not recognised.
+        """Prints an error message if a command is not recognised.
 
         Args:
             request : Request.
             error: The error that has occurred.
+
         Returns:
             None.
         """

@@ -1,9 +1,8 @@
 from lewis.adapters.stream import StreamInterface
 from lewis.core.logging import has_log
-from .common_interface_utils import COMMANDS
 
 from ..device import ChopperParameters
-
+from .common_interface_utils import COMMANDS
 
 TIMING_FREQ_MHZ = 18.0
 
@@ -11,8 +10,7 @@ TIMING_FREQ_MHZ = 18.0
 class JulichChecksum(object):
     @staticmethod
     def _calculate(alldata):
-        """
-        Calculates the Julich checksum of the given data
+        """Calculates the Julich checksum of the given data
         :param alldata: the input data (list of chars, length 5)
         :return: the Julich checksum of the given input data
         """
@@ -27,8 +25,7 @@ class JulichChecksum(object):
 
     @staticmethod
     def verify(header, data, actual_checksum):
-        """
-        Verifies that the checksum of received data is correct.
+        """Verifies that the checksum of received data is correct.
         :param header: The leading # and the first byte (str, length 2)
         :param data: The data bytes (str, length 4)
         :param actual_checksum: The transmitted checksum (str, length 2)
@@ -42,8 +39,7 @@ class JulichChecksum(object):
 
     @staticmethod
     def append(data):
-        """
-        Utility method for appending the Julich checksum to the input data
+        """Utility method for appending the Julich checksum to the input data
         :param data: the input data
         :return: the input data with it's checksum appended
         """

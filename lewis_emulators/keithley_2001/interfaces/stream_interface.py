@@ -69,20 +69,17 @@ class Keithley2001StreamInterface(StreamInterface):
     # Commands used on setup
     @conditional_reply("_connected")
     def get_idn(self):
-        """
-        Returns the devices IDN string.
+        """Returns the devices IDN string.
 
         Returns:
             string: The device's IDN.
         """
-
         idn = self._device.idn
         return idn
 
     @conditional_reply("_connected")
     def get_elements(self):
-        """
-        Returns the lists of elements of a reading in alphabetical order from the device.
+        """Returns the lists of elements of a reading in alphabetical order from the device.
 
         """
         elements = [element for element, value in self._device.elements.items() if value]
@@ -90,8 +87,7 @@ class Keithley2001StreamInterface(StreamInterface):
 
     @conditional_reply("_connected")
     def set_elements(self, string):
-        """
-        Sets the elements a reading has.
+        """Sets the elements a reading has.
 
         Args:
             string: String of comma separated elements of a reading. Valid elements are:
@@ -112,8 +108,7 @@ class Keithley2001StreamInterface(StreamInterface):
 
     @conditional_reply("_connected")
     def _generate_readback_format(self):
-        """
-        Generates the readback format for buffer readings.
+        """Generates the readback format for buffer readings.
         """
         readback_elements = []
 
@@ -131,29 +126,25 @@ class Keithley2001StreamInterface(StreamInterface):
 
     @conditional_reply("_connected")
     def reset_device(self):
-        """
-        Resets device.
+        """Resets device.
         """
         self._device.reset_device()
 
     @conditional_reply("_connected")
     def set_buffer_source(self, source):
-        """
-        Sets the buffer source.
+        """Sets the buffer source.
         """
         self._device.buffer.source = source
 
     @conditional_reply("_connected")
     def get_buffer_source(self):
-        """
-        Gets the buffer source.
+        """Gets the buffer source.
         """
         return self._device.buffer.source
 
     @conditional_reply("_connected")
     def set_buffer_egroup(self, egroup):
-        """
-        Sets the buffer element group.
+        """Sets the buffer element group.
         """
         self._device.number_of_times_ioc_has_been_reset += 1
 
@@ -161,15 +152,13 @@ class Keithley2001StreamInterface(StreamInterface):
 
     @conditional_reply("_connected")
     def get_buffer_egroup(self):
-        """
-        Gets the buffer element group.
+        """Gets the buffer element group.
         """
         return self._device.buffer.egroup
 
     @conditional_reply("_connected")
     def set_continuous_initialization(self, value):
-        """
-        Sets continuous scanning status to ON or OFF.
+        """Sets continuous scanning status to ON or OFF.
 
         Thus is called continuous initialization mode in the Keithley 2001 manual.
 
@@ -185,8 +174,7 @@ class Keithley2001StreamInterface(StreamInterface):
 
     @conditional_reply("_connected")
     def get_continuous_initialization_status(self):
-        """
-        Gets the continuous scanning status.
+        """Gets the continuous scanning status.
 
         Thus is the continuous initialization mode in the Keithley 2001 manual.
         """
@@ -199,29 +187,23 @@ class Keithley2001StreamInterface(StreamInterface):
 
     @conditional_reply("_connected")
     def set_buffer_full_status(self):
+        """Sets the buffer full status of the status register to true.
         """
-        Sets the buffer full status of the status register to true.
-        """
-
         self._device.status_register.buffer_full = True
 
     @conditional_reply("_connected")
     def set_measure_summary_status(self):
+        """Sets the measurement summary status of the status register to true.
         """
-        Sets the measurement summary status of the status register to true.
-        """
-
         self._device.status_register.measurement_summary_status = True
 
     @conditional_reply("_connected")
     def get_measurement_status(self):
-        """
-        Returns the measurement status of the device.
+        """Returns the measurement status of the device.
 
         Returns:
             string: integer which represents the measurement status register status in bits.
         """
-
         status = 0
         if self._device.status_register.buffer_full:
             status += 512
@@ -230,8 +212,7 @@ class Keithley2001StreamInterface(StreamInterface):
 
     @conditional_reply("_connected")
     def get_service_request_status(self):
-        """
-        Returns the measurement status of the device.
+        """Returns the measurement status of the device.
 
         Returns:
             string: integer which represents the service register status in bits.
@@ -244,16 +225,13 @@ class Keithley2001StreamInterface(StreamInterface):
 
     @conditional_reply("_connected")
     def reset_and_clear_status_registers(self):
+        """Resets and clears the status registers of the device.
         """
-        Resets and clears the status registers of the device.
-        """
-
         self._device.status_register.reset_and_clear()
 
     @conditional_reply("_connected")
     def set_scan_count(self, value):
-        """
-        Sets the scan count.
+        """Sets the scan count.
 
         Args:
             value (int): Number of times to scan.
@@ -262,8 +240,7 @@ class Keithley2001StreamInterface(StreamInterface):
 
     @conditional_reply("_connected")
     def get_scan_count(self):
-        """
-        Returns the number of times the device is set to scan.
+        """Returns the number of times the device is set to scan.
 
         Returns:
             string: Number of times the device is set to scan.
@@ -272,20 +249,17 @@ class Keithley2001StreamInterface(StreamInterface):
 
     @conditional_reply("_connected")
     def get_scan_trigger(self):
-        """
-        Returns the scan trigger type.
+        """Returns the scan trigger type.
 
         Returns:
             string: Scan trigger mode. One of IMM, HOLD, MAN, BUS, TLINK, EXT, TIM.
         """
-
         return self._device.scan_trigger_type
 
     # Reading a single channel
     @conditional_reply("_connected")
     def set_read_channel(self, channel):
-        """
-        Sets the channels to read from in single read mode.
+        """Sets the channels to read from in single read mode.
 
         Args:
             channel string): String representation of a channel number between 1 and 10.
@@ -294,8 +268,7 @@ class Keithley2001StreamInterface(StreamInterface):
 
     @conditional_reply("_connected")
     def read_single_channel(self):
-        """
-        Takes a single reading from the closed channel on the device.
+        """Takes a single reading from the closed channel on the device.
 
         Returns:
             string: Formatted string of channel data.
@@ -307,43 +280,37 @@ class Keithley2001StreamInterface(StreamInterface):
     # Setting up for a scan
     @conditional_reply("_connected")
     def set_buffer_mode(self, mode):
-        """
-        Sets the buffer mode.
+        """Sets the buffer mode.
         """
         self._device.buffer.mode = mode
 
     @conditional_reply("_connected")
     def get_buffer_mode(self):
-        """
-        Gets the buffer mode.
+        """Gets the buffer mode.
         """
         return self._device.buffer.mode
 
     @conditional_reply("_connected")
     def set_buffer_size(self, size):
-        """
-        Sets the buffer mode.
+        """Sets the buffer mode.
         """
         self._device.buffer.size = int(size)
 
     @conditional_reply("_connected")
     def get_buffer_size(self):
-        """
-        Gets the buffer mode.
+        """Gets the buffer mode.
         """
         return self._device.buffer.size
 
     @conditional_reply("_connected")
     def clear_buffer(self):
-        """
-        Clears the buffer.
+        """Clears the buffer.
         """
         self._device.buffer.clear_buffer()
 
     @conditional_reply("_connected")
     def set_scan_channels(self, channels):
-        """
-        Sets the channels to scan.
+        """Sets the channels to scan.
 
         Args:
             channels (string): Comma separated list of channel number to read from.
@@ -353,19 +320,16 @@ class Keithley2001StreamInterface(StreamInterface):
 
     @conditional_reply("_connected")
     def get_scan_channels(self):
-        """
-        Returns the channels set to scan.
+        """Returns the channels set to scan.
 
         Returns:
             string: comman separated list of channels set to scan
         """
-
         return "(@" + ",".join(self._device.buffer.scan_channels) + ")"
 
     @conditional_reply("_connected")
     def set_measurement_scan_count(self, value):
-        """
-        Sets the measurement scan count.
+        """Sets the measurement scan count.
 
         Args:
             value (int): Number of times to trigger measurements.
@@ -374,8 +338,7 @@ class Keithley2001StreamInterface(StreamInterface):
 
     @conditional_reply("_connected")
     def get_measurement_scan_count(self):
-        """
-        Gets the measurement scan count.
+        """Gets the measurement scan count.
 
         Returns:
             value (int): Number of times to trigger measurements
@@ -384,26 +347,22 @@ class Keithley2001StreamInterface(StreamInterface):
 
     @conditional_reply("_connected")
     def scan_channels(self):
-        """
-        Sets the device to scan.
+        """Sets the device to scan.
 
         """
         self._device.scan_channels()
 
     @conditional_reply("_connected")
     def get_buffer_date(self):
-        """
-        Returns the buffer data.
+        """Returns the buffer data.
 
         Returns:
             list of strings: List of readings from channels.
         """
-
         return ",".join(map(self._format_buffer_readings, self._device.buffer.buffer))
 
     def _format_buffer_readings(self, reading):
-        """
-        Formats a reading.
+        """Formats a reading.
 
         Args:
             reading: dictionary with keys
@@ -426,12 +385,10 @@ class Keithley2001StreamInterface(StreamInterface):
 
     @conditional_reply("_connected")
     def get_error(self):
-        """
-        Returns the error code and message.
+        """Returns the error code and message.
 
         Returns:
             (string): Returns the error string formed of
                 error code, error message.
         """
-
         return ",".join(["{}".format(self._device.error[0]), self._device.error[1]])

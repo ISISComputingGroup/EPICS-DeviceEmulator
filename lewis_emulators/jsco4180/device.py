@@ -1,7 +1,8 @@
 from collections import OrderedDict
-from .states import PumpOff, PumpOn, PumpProgram, PumpProgramReset
+
 from lewis.devices import StateMachineDevice
 
+from .states import PumpOff, PumpOn, PumpProgram, PumpProgramReset
 
 states = OrderedDict(
     [
@@ -15,8 +16,7 @@ states = OrderedDict(
 
 class SimulatedJsco4180(StateMachineDevice):
     def _initialize_data(self):
-        """
-        Initialize all of the device's attributes.
+        """Initialize all of the device's attributes.
         """
         self.connected = True
         self.input_correct = True

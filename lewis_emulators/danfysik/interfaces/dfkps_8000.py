@@ -1,12 +1,11 @@
-"""
-Stream device for danfysik 8000
+"""Stream device for danfysik 8000
 """
 
 from lewis.adapters.stream import StreamInterface
 from lewis.core.logging import has_log
-
 from lewis.utils.command_builder import CmdBuilder
 from lewis.utils.replies import conditional_reply
+
 from .dfkps_base import CommonStreamInterface
 
 __all__ = ["Danfysik8000StreamInterface"]
@@ -14,8 +13,7 @@ __all__ = ["Danfysik8000StreamInterface"]
 
 @has_log
 class Danfysik8000StreamInterface(CommonStreamInterface, StreamInterface):
-    """
-    Stream interface for a Danfysik model 8000.
+    """Stream interface for a Danfysik model 8000.
     """
 
     protocol = "model8000"
@@ -29,10 +27,8 @@ class Danfysik8000StreamInterface(CommonStreamInterface, StreamInterface):
     @conditional_reply("connected")
     @conditional_reply("comms_initialized")
     def get_status(self):
+        """Respond to the get_status command (S1)
         """
-        Respond to the get_status command (S1)
-        """
-
         response = (
             "{power_off}{pol_normal}{pol_reversed}{reg_transformer}{dac16}{dac17}{is_percent}{spare}"
             "{transistor_fault}{sum_interlock}{dc_overcurrent}{dc_overload}{reg_mod_fail}{prereg_fail}"

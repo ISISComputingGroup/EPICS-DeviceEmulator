@@ -1,9 +1,11 @@
-from __future__ import absolute_import, division, unicode_literals, print_function
+from __future__ import absolute_import, division, print_function, unicode_literals
 
 from collections import OrderedDict
+
 from lewis.core.logging import has_log
-from .states import DefaultState
 from lewis.devices import StateMachineDevice
+
+from .states import DefaultState
 
 
 class ChannelTypes(object):
@@ -22,8 +24,7 @@ class Channel(object):
 
 
 class TempPressureCommonChannel(Channel):
-    """
-    Holds attributes common to temperature and pressure channels
+    """Holds attributes common to temperature and pressure channels
     """
 
     def __init__(self, channel_type, nickname):

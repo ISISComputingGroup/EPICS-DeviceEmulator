@@ -1,10 +1,9 @@
-from lewis.core.statemachine import State
 from lewis.core import approaches
+from lewis.core.statemachine import State
 
 
 class MovingState(State):
-    """
-    Device is in moving state.
+    """Device is in moving state.
     """
 
     NAME = "Moving"

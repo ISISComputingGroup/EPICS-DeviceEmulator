@@ -1,4 +1,4 @@
-from lewis.adapters.stream import StreamInterface, Cmd
+from lewis.adapters.stream import Cmd, StreamInterface
 
 
 class IrisCryoValveStreamInterface(StreamInterface):

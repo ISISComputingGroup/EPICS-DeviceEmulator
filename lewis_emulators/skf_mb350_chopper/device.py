@@ -2,15 +2,13 @@ from collections import OrderedDict
 
 from lewis.devices import StateMachineDevice
 
-from .states import DefaultState, StoppingState, GoingState
+from .states import DefaultState, GoingState, StoppingState
 
 
 class SimulatedSkfMb350Chopper(StateMachineDevice):
     def _initialize_data(self):
+        """Initialize all of the device's attributes.
         """
-        Initialize all of the device's attributes.
-        """
-
         self._started = False
         self.phase = 0
         self.frequency = 0

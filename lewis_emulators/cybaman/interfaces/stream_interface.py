@@ -1,14 +1,12 @@
-from lewis.adapters.stream import StreamInterface, Cmd
-from lewis.utils.replies import conditional_reply
-
+from lewis.adapters.stream import Cmd, StreamInterface
 from lewis.core.logging import has_log
+from lewis.utils.replies import conditional_reply
 
 if_connected = conditional_reply("connected")
 
 
 class CybamanStreamInterface(StreamInterface):
-    """
-    Stream interface for the serial port
+    """Stream interface for the serial port
     """
 
     FLOAT = "([-+]?[0-9]*\.?[0-9]*)"
@@ -38,8 +36,7 @@ class CybamanStreamInterface(StreamInterface):
 
     @has_log
     def handle_error(self, request, error):
-        """
-        If command is not recognised print and error.
+        """If command is not recognised print and error.
 
         :param request: requested string
         :param error: problem

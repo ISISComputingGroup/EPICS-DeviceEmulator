@@ -1,8 +1,8 @@
-from lewis.adapters.stream import StreamInterface, Cmd
-from ..control_modes import OutputMode
+from lewis.adapters.stream import Cmd, StreamInterface
 from lewis.core.logging import has_log
-
 from lewis.utils.command_builder import CmdBuilder
+
+from ..control_modes import OutputMode
 
 SCI_NOTATION_REGEX = r"[-+]?[0-9]*\.?[0-9]*e?[-+]?[0-9]+"
 
@@ -105,8 +105,7 @@ class Keithley2400StreamInterface(StreamInterface):
     out_terminator = "\r\n"
 
     def get_values(self):
-        """
-        Get the current, voltage and resistance readings
+        """Get the current, voltage and resistance readings
 
         :return: A string of 3 doubles: voltage, current, resistance. In that order
         """
@@ -123,15 +122,13 @@ class Keithley2400StreamInterface(StreamInterface):
         )
 
     def reset(self):
-        """
-        Resets the device.
+        """Resets the device.
         """
         self._device.reset()
         return "*RST"
 
     def identify(self):
-        """
-        Replies with the device's identity.
+        """Replies with the device's identity.
         """
         return "Keithley 2400 Source Meter emulator"
 
@@ -144,8 +141,7 @@ class Keithley2400StreamInterface(StreamInterface):
         return "Voltage set to: " + str(value)
 
     def _set_mode(self, set_method, mode, command):
-        """
-        The generic form of how mode sets are executed and responded to.
+        """The generic form of how mode sets are executed and responded to.
         """
         set_method(mode)
 

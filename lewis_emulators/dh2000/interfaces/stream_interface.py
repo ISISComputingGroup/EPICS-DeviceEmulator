@@ -1,6 +1,6 @@
 from lewis.adapters.stream import StreamInterface
-from lewis.utils.command_builder import CmdBuilder
 from lewis.core.logging import has_log
+from lewis.utils.command_builder import CmdBuilder
 from lewis.utils.replies import conditional_reply
 
 
@@ -21,16 +21,15 @@ class Dh2000StreamInterface(StreamInterface):
 
     @staticmethod
     def handle_error(request, error):
-        """
-        Prints an error message if a command is not recognised.
+        """Prints an error message if a command is not recognised.
 
         Args:
             request : Request.
             error: The error that has occurred.
+
         Returns:
             None.
         """
-
         print("An error occurred at request {}: {}".format(request, error))
 
     @conditional_reply("is_connected")

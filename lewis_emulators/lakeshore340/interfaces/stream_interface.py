@@ -2,7 +2,6 @@ from lewis.adapters.stream import StreamInterface
 from lewis.core.logging import has_log
 from lewis.utils.command_builder import CmdBuilder
 
-
 _CONTROL_CHANNEL, _CONTROL_CHANNEL_INDEX = "B", 1
 _SENSOR_UNITS = 1
 _POWERUPENABLE = 1

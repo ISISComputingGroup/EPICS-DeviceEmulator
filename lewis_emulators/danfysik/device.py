@@ -1,12 +1,12 @@
 from collections import OrderedDict
 
 from lewis.devices import StateMachineDevice
+
 from .states import DefaultState
 
 
 class FieldUnits(object):
-    """
-    Field units.
+    """Field units.
     """
 
     OERSTED = object()
@@ -15,13 +15,11 @@ class FieldUnits(object):
 
 
 class SimulatedDanfysik(StateMachineDevice):
-    """
-    Simulated Danfysik.
+    """Simulated Danfysik.
     """
 
     def _initialize_data(self):
-        """
-        Sets the initial state of the device.
+        """Sets the initial state of the device.
         """
         self.comms_initialized = False
         self.connected = True
@@ -49,8 +47,7 @@ class SimulatedDanfysik(StateMachineDevice):
         self.address = 75
 
     def enable_interlock(self, name):
-        """
-        Adds an interlock to the list of enabled interlock
+        """Adds an interlock to the list of enabled interlock
         Args:
             name: the name of the interlock to enable.
         """
@@ -58,8 +55,7 @@ class SimulatedDanfysik(StateMachineDevice):
             self.active_interlocks.append(name)
 
     def disable_interlock(self, name):
-        """
-        Removes an interlock from the list of enabled interlocks
+        """Removes an interlock from the list of enabled interlocks
         Args:
             name: the name of the interlock to disable.
         """
@@ -67,13 +63,11 @@ class SimulatedDanfysik(StateMachineDevice):
             self.active_interlocks.remove(name)
 
     def set_address(self, value):
-        """
-        Changes the currently addressed PSU
+        """Changes the currently addressed PSU
 
         Args:
             value: int, the address to set the PSU to.
         """
-
         self.currently_addressed_psu = value
 
         self.log.info("Address set to, {}".format(value))
@@ -86,54 +80,50 @@ class SimulatedDanfysik(StateMachineDevice):
             self.log.info("Device up")
 
     def reset(self):
-        """
-        Reset the device to the standard off configuration.
+        """Reset the device to the standard off configuration.
         """
         self.absolute_current = 0
         self.voltage = 0
         self.power = False
 
     def reinitialise(self):
-        """
-        Reinitialise the device state (this is mainly used via the backdoor to clean up between tests)
+        """Reinitialise the device state (this is mainly used via the backdoor to clean up between tests)
         """
         self._initialize_data()
 
     def set_current_read_factor(self, factor):
-        """
-        Set the scale factor between current and raw when reading a value.
+        """Set the scale factor between current and raw when reading a value.
+
         Args:
             factor: The scale factor to apply.
         """
         self.current_read_factor = factor
 
     def set_current_write_factor(self, factor):
-        """
-        Set the scale factor between current and raw when writing a value.
+        """Set the scale factor between current and raw when writing a value.
+
         Args:
             factor: The scale factor to apply.
         """
         self.current_write_factor = factor
 
     def get_current(self):
-        """
-        Return:
-             The readback value of current as raw value (parts per 100,000)
+        """Return:
+        The readback value of current as raw value (parts per 100,000)
         """
         raw_rbv = self.absolute_current / self.current_read_factor
         return raw_rbv
 
     def get_last_setpoint(self):
-        """
-        Return:
-             The setpoint readback value of current as raw value (parts per 1,000,000)
+        """Return:
+        The setpoint readback value of current as raw value (parts per 1,000,000)
         """
         raw_sp_rbv = self.absolute_current * self.current_write_factor
         return raw_sp_rbv
 
     def set_current(self, raw_sp):
-        """
-        Set a new value for current.
+        """Set a new value for current.
+
         Args:
             raw_sp: The new value in raw (parts per 1,000,000)
         """
@@ -142,9 +132,8 @@ class SimulatedDanfysik(StateMachineDevice):
         self.negative_polarity = current < 0
 
     def get_voltage(self):
-        """
-        Return:
-             The readback value of voltage scaled by the custom scale factor
+        """Return:
+        The readback value of voltage scaled by the custom scale factor
         """
         return self.voltage * self.voltage_read_factor
 
@@ -155,19 +144,16 @@ class SimulatedDanfysik(StateMachineDevice):
         return self.slew_rate[dac_num - 1]
 
     def _get_state_handlers(self):
-        """
-        Returns: states and their names
+        """Returns: states and their names
         """
         return {DefaultState.NAME: DefaultState()}
 
     def _get_initial_state(self):
-        """
-        Returns: the name of the initial state
+        """Returns: the name of the initial state
         """
         return DefaultState.NAME
 
     def _get_transition_handlers(self):
-        """
-        Returns: the state transitions
+        """Returns: the state transitions
         """
         return OrderedDict()

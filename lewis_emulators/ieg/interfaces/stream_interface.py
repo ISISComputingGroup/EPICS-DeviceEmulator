@@ -1,5 +1,4 @@
-from lewis.adapters.stream import StreamInterface, Cmd
-from lewis.core.logging import has_log
+from lewis.adapters.stream import Cmd, StreamInterface
 
 
 class IegStreamInterface(StreamInterface):
@@ -60,8 +59,7 @@ class IegStreamInterface(StreamInterface):
 
 
 class ResponseBuilder(object):
-    """
-    Response builder for the IEG.
+    """Response builder for the IEG.
 
     Outputs:
     - An ACK packet before the response, properly terminated.
@@ -75,8 +73,7 @@ class ResponseBuilder(object):
     data_block_sep = ","
 
     def __init__(self):
-        """
-        Initialize a new response.
+        """Initialize a new response.
         """
         self.response = "{pack_start}ACK{pack_end}{pack_start}".format(
             pack_start=self.packet_start, pack_end=self.packet_end
@@ -86,8 +83,7 @@ class ResponseBuilder(object):
         self.valid = False
 
     def add_data_block(self, *data):
-        """
-        Adds a data block.
+        """Adds a data block.
         The elements are converted to strings and added to the response in order.
         If the preceding character is not already a separator nor the start of the data block a separator is added first
         :param data: data to add to the response
@@ -107,8 +103,7 @@ class ResponseBuilder(object):
         return self
 
     def build(self):
-        """
-        Extract the response from the builder
+        """Extract the response from the builder
         :return: (str) response
         """
         assert self.valid, "At least one data block must be added before calling build"

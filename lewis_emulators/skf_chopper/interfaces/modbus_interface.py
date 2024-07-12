@@ -1,8 +1,9 @@
-from lewis.adapters.stream import StreamInterface, Cmd
-from lewis.core.logging import has_log
-from lewis.utils.byte_conversions import float_to_raw_bytes, raw_bytes_to_int, int_to_raw_bytes
-from lewis.utils.replies import conditional_reply
 from os import urandom
+
+from lewis.adapters.stream import Cmd, StreamInterface
+from lewis.core.logging import has_log
+from lewis.utils.byte_conversions import float_to_raw_bytes, int_to_raw_bytes, raw_bytes_to_int
+from lewis.utils.replies import conditional_reply
 
 
 def log_replies(f):
@@ -16,8 +17,7 @@ def log_replies(f):
 
 @has_log
 class SKFChopperModbusInterface(StreamInterface):
-    """
-    This implements the modbus stream interface for an skf chopper.
+    """This implements the modbus stream interface for an skf chopper.
     This is not a full implementation of the device and just handles frequency for now to check
     that modbus comms work OK.
     """
@@ -116,7 +116,7 @@ class SKFChopperModbusInterface(StreamInterface):
                 data_length = 2
                 reply_data_bytes = int_to_raw_bytes(reply_data, data_length, low_byte_first=False)
         else:
-            raise ValueError(f"Unknown data type or data length")
+            raise ValueError("Unknown data type or data length")
 
         function_code_bytes = function_code.to_bytes(1, byteorder="big")
         unit_bytes = unit.to_bytes(1, byteorder="big")

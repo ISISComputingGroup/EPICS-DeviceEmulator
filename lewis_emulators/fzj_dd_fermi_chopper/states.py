@@ -5,8 +5,7 @@ from lewis.core.statemachine import State
 
 
 class StartedState(State):
-    """
-    Device is in started state.
+    """Device is in started state.
     """
 
     NAME = "Started"
@@ -18,8 +17,7 @@ class StartedState(State):
 
 
 class StoppedState(State):
-    """
-    Device is in stopped state.
+    """Device is in stopped state.
     """
 
     NAME = "Stopped"

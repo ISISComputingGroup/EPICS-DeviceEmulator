@@ -1,7 +1,9 @@
 from collections import OrderedDict
+
 from lewis.core.logging import has_log
-from .states import DefaultState
 from lewis.devices import StateMachineDevice
+
+from .states import DefaultState
 
 
 class Sensor(object):
@@ -36,8 +38,7 @@ class Sensor(object):
 @has_log
 class Simulated_MKS_PR4000B(StateMachineDevice):
     def _initialize_data(self):
-        """
-        Initialize all of the device's attributes.
+        """Initialize all of the device's attributes.
         """
         self.channels = {
             1: Sensor(),

@@ -1,5 +1,6 @@
-from lewis.adapters.stream import StreamInterface, Cmd
 from threading import Timer
+
+from lewis.adapters.stream import Cmd, StreamInterface
 from lewis.core.logging import has_log
 
 START_COMM = "START01"

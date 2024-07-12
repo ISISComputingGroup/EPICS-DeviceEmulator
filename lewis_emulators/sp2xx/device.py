@@ -1,23 +1,21 @@
-"""
-Items associated with WPI SP2XX syringe pump
+"""Items associated with WPI SP2XX syringe pump
 """
 
 from collections import OrderedDict
-from .states import DefaultState
+
 from lewis.devices import StateMachineDevice
 
-from .util_classes import RunStatus, ErrorType
-from .util_constants import NO_ERROR, DIRECTIONS, MODES
+from .states import DefaultState
+from .util_classes import ErrorType, RunStatus
+from .util_constants import DIRECTIONS, MODES, NO_ERROR
 
 
 class SimulatedSp2XX(StateMachineDevice):
-    """
-    Simulation of the WPI SP2XX syringe pump
+    """Simulation of the WPI SP2XX syringe pump
     """
 
     def _initialize_data(self):
-        """
-        Initialize all of the device's attributes.
+        """Initialize all of the device's attributes.
         """
         self._running_status = RunStatus.Stopped
         self._direction = DIRECTIONS["I"]
@@ -48,21 +46,18 @@ class SimulatedSp2XX(StateMachineDevice):
 
     @property
     def running(self):
-        """
-        Returns True if the device is running and False otherwise.
+        """Returns True if the device is running and False otherwise.
         """
         return self._running
 
     @property
     def direction(self):
-        """
-        Returns the direction the pump is set to.
+        """Returns the direction the pump is set to.
         """
         return self._direction
 
     def set_direction_via_the_backdoor(self, direction_symbol):
-        """
-        Sets the direction via the backdoor. Only called using lewis via the backdoor.
+        """Sets the direction via the backdoor. Only called using lewis via the backdoor.
 
         Args:
             direction_symbol: Infusion or Withdrawal.
@@ -73,8 +68,7 @@ class SimulatedSp2XX(StateMachineDevice):
         self._direction = DIRECTIONS[direction_symbol]
 
     def reverse_direction(self):
-        """
-        Reverses the direction of the device and change mode and status accordingly. But only if it is in
+        """Reverses the direction of the device and change mode and status accordingly. But only if it is in
         Infusion or withdrawal mode and running. Other reverse can not be sent.
 
         Returns:
@@ -95,8 +89,7 @@ class SimulatedSp2XX(StateMachineDevice):
         return did_reverse
 
     def start_device(self):
-        """
-        Starts the device running to present settings.
+        """Starts the device running to present settings.
 
         Returns:
             None
@@ -105,38 +98,31 @@ class SimulatedSp2XX(StateMachineDevice):
         self._running_status = RunStatus[self._direction.name]
 
     def stop_device(self):
-        """
-        Stops the device running.
+        """Stops the device running.
 
         Returns:
             None
         """
-
         self._running = False
         self._running_status = RunStatus.Stopped
 
     @property
     def running_status(self):
+        """Returns the running status of the device.
         """
-        Returns the running status of the device.
-        """
-
         return self._running_status
 
     @property
     def mode(self):
-        """
-        Returns the mode the device is in.
+        """Returns the mode the device is in.
 
         Returns:
             _mode: Mode class that the device is in.
         """
-
         return self._mode
 
     def set_mode(self, mode_symbol):
-        """
-        Sets the mode of the device.
+        """Sets the mode of the device.
 
         Args:
             mode_symbol: one of i, w, w/i, i/w, con.
@@ -155,15 +141,13 @@ class SimulatedSp2XX(StateMachineDevice):
 
     @property
     def last_error(self):
-        """
-        Returns the last error type.
+        """Returns the last error type.
 
         """
         return self._last_error
 
     def throw_error_via_the_backdoor(self, error_name, error_value, error_alarm_severity):
-        """
-        Throws an error of type error_type. Set only via the backdoor
+        """Throws an error of type error_type. Set only via the backdoor
 
         Args:
             error_name: Name of the error to throw.
@@ -177,8 +161,7 @@ class SimulatedSp2XX(StateMachineDevice):
         self._last_error = new_error
 
     def clear_last_error(self):
-        """
-        Clears the last error.
+        """Clears the last error.
 
         Returns:
             None.
@@ -187,14 +170,12 @@ class SimulatedSp2XX(StateMachineDevice):
 
     @property
     def diameter(self):
-        """
-        Returns: the diameter of the syringe set on the device
+        """Returns: the diameter of the syringe set on the device
         """
         return self._diameter
 
     def successfully_set_diameter(self, value):
-        """
-        Sets the diameter after checking the input value. Must be in the form nn.nn.
+        """Sets the diameter after checking the input value. Must be in the form nn.nn.
 
         Returns:
             True if the diameter has been set and False otherwise.
@@ -208,14 +189,12 @@ class SimulatedSp2XX(StateMachineDevice):
 
     @property
     def connected(self):
-        """
-        Returns True if the device is connected and False if disconnected.
+        """Returns True if the device is connected and False if disconnected.
         """
         return self._connected
 
     def connect(self):
-        """
-        Connects the device.
+        """Connects the device.
 
         Returns:
             None
@@ -223,8 +202,7 @@ class SimulatedSp2XX(StateMachineDevice):
         self._connected = True
 
     def discconnect(self):
-        """
-        Disconnects the device.
+        """Disconnects the device.
 
         Returns:
             None

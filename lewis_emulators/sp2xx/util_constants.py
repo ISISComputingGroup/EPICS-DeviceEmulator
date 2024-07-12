@@ -1,4 +1,4 @@
-from .util_classes import Mode, Direction, ErrorType
+from .util_classes import Direction, ErrorType, Mode
 
 infusion_mode = Mode("i", "I", "Infusion")
 withdrawal_mode = Mode("w", "W", "Withdrawal")

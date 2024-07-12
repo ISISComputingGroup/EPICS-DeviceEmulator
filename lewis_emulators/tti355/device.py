@@ -1,13 +1,14 @@
 from collections import OrderedDict
-from .states import DefaultState
-from lewis.devices import StateMachineDevice
 from random import random
+
+from lewis.devices import StateMachineDevice
+
+from .states import DefaultState
 
 
 class SimulatedTti355(StateMachineDevice):
     def _initialize_data(self):
-        """
-        Initialize all of the device's attributes.
+        """Initialize all of the device's attributes.
         """
         self.identity = "Thurlby Thandar,EL302P,0,v1.14"
         self.voltage = 0.00

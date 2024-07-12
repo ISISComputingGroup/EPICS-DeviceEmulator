@@ -1,10 +1,10 @@
-from lewis.utils.byte_conversions import int_to_raw_bytes, float_to_raw_bytes, raw_bytes_to_int
+from lewis.utils.byte_conversions import float_to_raw_bytes, int_to_raw_bytes, raw_bytes_to_int
+
 from ..device import SimulatedFinsPLC
 
 
 def check_is_byte(character):
-    """
-    Checks if the given character can represent a byte. Raises an error of it can not, otherwise returns nothing.
+    """Checks if the given character can represent a byte. Raises an error of it can not, otherwise returns nothing.
 
     Args:
         character (string|byte): A one character string.
@@ -30,8 +30,7 @@ def dm_memory_area_read_response_fins_frame(
     number_of_words_to_read,
     is_float,
 ):
-    """
-    Returns a response to a DM memory area read command.
+    """Returns a response to a DM memory area read command.
 
     Response structure is:
         10 bytes FINS frame header.
@@ -88,8 +87,7 @@ def dm_memory_area_read_response_fins_frame(
 
 
 def _convert_32bit_int_to_int16_array(number):
-    """
-    Converts a 32 bit integer into an array of two 16 bit integers. The first 16 bit integer is the least significant
+    """Converts a 32 bit integer into an array of two 16 bit integers. The first 16 bit integer is the least significant
     one, and the second is the most significant. The order of the 16 bit integers in the array is little endian.
 
     Args:
@@ -111,8 +109,7 @@ def _convert_32bit_int_to_int16_array(number):
 
 
 def _convert_32bit_float_to_int16_array(number):
-    """
-    Converts a 32 bit real number into an array of two 16 bit integers. The first 16 bit integer is the least
+    """Converts a 32 bit real number into an array of two 16 bit integers. The first 16 bit integer is the least
     significant one, and the second is the most significant. The order of the 16 bit integers in the array is little
     endian.
 
@@ -135,16 +132,14 @@ def _convert_32bit_float_to_int16_array(number):
 
 
 class FinsResponseBuilder(object):
-    """
-    Response builder which formats the responses as bytes.
+    """Response builder which formats the responses as bytes.
     """
 
     def __init__(self):
         self.response = bytearray()
 
     def add_int(self, value, length):
-        """
-        Adds an integer to the builder.
+        """Adds an integer to the builder.
 
         Args:
             value (integer): The integer to add.
@@ -157,8 +152,7 @@ class FinsResponseBuilder(object):
         return self
 
     def add_float(self, value):
-        """
-        Adds an float to the builder (4 bytes, IEEE single-precision).
+        """Adds an float to the builder (4 bytes, IEEE single-precision).
 
         Args:
             value (double): The real number to add.
@@ -178,8 +172,7 @@ class FinsResponseBuilder(object):
         client_unit_address,
         service_id,
     ):
-        """
-        Makes a FINS frame header with the given data for a response to a client's command.
+        """Makes a FINS frame header with the given data for a response to a client's command.
 
         The header bytes are as follows:
             1 byte (unsigned int): Information Control Field. It is always 0xC1 for a response.
@@ -205,7 +198,6 @@ class FinsResponseBuilder(object):
         Returns:
             FinsResponseBuilder: The builder with the FINS frame header bytes.
         """
-
         return (
             self.add_int(0xC1, 1)
             .add_int(0x00, 1)
@@ -220,22 +212,18 @@ class FinsResponseBuilder(object):
         )
 
     def add_fins_command_and_error_codes(self):
-        """
-        Adds the code for the FINS memory area read command and a default error code to the builder.
+        """Adds the code for the FINS memory area read command and a default error code to the builder.
 
         Returns:
             FinsResponseBuilder: The builder with the command and error codes now added.
         """
-
         # The memory area read command code is 0101, and the 0000 is the No error code.
         return self.add_int(0x0101, 2).add_int(0x0000, 2)
 
     def build(self):
-        """
-        Gets the response from the builder.
+        """Gets the response from the builder.
 
         Returns:
             FinsResponseBuilder: The response builder.
         """
-
         return bytes(self.response)

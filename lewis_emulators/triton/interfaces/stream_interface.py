@@ -3,6 +3,7 @@ from datetime import datetime
 from lewis.adapters.stream import StreamInterface
 from lewis.core.logging import has_log
 from lewis.utils.command_builder import CmdBuilder
+
 from lewis_emulators.triton.device import HEATER_NAME
 
 

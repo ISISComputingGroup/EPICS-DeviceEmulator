@@ -1,6 +1,5 @@
 from lewis.adapters.stream import StreamInterface
 from lewis.core.logging import has_log
-
 from lewis.utils.command_builder import CmdBuilder
 
 PREFIXES = [
@@ -15,8 +14,7 @@ PREFIXES = [
 
 @has_log
 class HlgStreamInterface(StreamInterface):
-    """
-    Stream interface for the serial port
+    """Stream interface for the serial port
     """
 
     commands = {
@@ -29,8 +27,7 @@ class HlgStreamInterface(StreamInterface):
     out_terminator = "\r\n"
 
     def handle_error(self, request, error):
-        """
-        If command is not recognised print and error
+        """If command is not recognised print and error
 
         Args:
             request: requested string
@@ -40,8 +37,7 @@ class HlgStreamInterface(StreamInterface):
         self.log.error("An error occurred at request " + repr(request) + ": " + repr(error))
 
     def set_verbosity(self, verbosity):
-        """
-        Set the verbosity of the output from the device
+        """Set the verbosity of the output from the device
 
         Args:
             verbosity: 0 normal, 1 labview style (more verbose)
@@ -59,8 +55,7 @@ class HlgStreamInterface(StreamInterface):
         return self._format_output("CV{0}".format(verbosity), "Verbose=", out_verbose)
 
     def set_prefix(self, prefix):
-        """
-        Set the prefix the device returns
+        """Set the prefix the device returns
         Args:
             prefix: prefix id 0-5 see PREFIXES for details
 
@@ -75,8 +70,7 @@ class HlgStreamInterface(StreamInterface):
         return self._format_output("CP{0}".format(prefix), "Verbose=", str(prefix))
 
     def get_level(self):
-        """
-        Gets the current level
+        """Gets the current level
 
         Returns: level in correct units or None if no level is set
 
@@ -89,8 +83,7 @@ class HlgStreamInterface(StreamInterface):
             )
 
     def _format_output(self, echo, verbose_prefix, data):
-        """
-        Format the output of a command depending on verbosity and prefix settings of device
+        """Format the output of a command depending on verbosity and prefix settings of device
         Args:
             echo: string to echo back to user
             verbose_prefix: prefix for value in normal verbose mode

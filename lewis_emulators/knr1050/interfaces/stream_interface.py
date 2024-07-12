@@ -1,8 +1,7 @@
 from lewis.adapters.stream import StreamInterface
-
 from lewis.core.logging import has_log
-from lewis.utils.replies import conditional_reply
 from lewis.utils.command_builder import CmdBuilder
+from lewis.utils.replies import conditional_reply
 
 if_connected = conditional_reply("connected")
 if_input_error = conditional_reply("input_correct", "ERROR:20,Instrument in standalone mode")
@@ -47,8 +46,7 @@ class Knr1050StreamInterface(StreamInterface):
         }
 
     def handle_error(self, request, error):
-        """
-        If command is not recognised print and error
+        """If command is not recognised print and error
         Args:
             request: requested string
             error: problem
@@ -57,8 +55,8 @@ class Knr1050StreamInterface(StreamInterface):
 
     @if_connected
     def start_pump(self, flow_rate, a, b, c, d):
-        """
-        Executes ramp starting from current execution time.
+        """Executes ramp starting from current execution time.
+
         Args:
             flow_rate (float): the flow rate in ul/min
             a (int): concentration A
@@ -81,8 +79,7 @@ class Knr1050StreamInterface(StreamInterface):
 
     @if_connected
     def stop_pump(self):
-        """
-        Stop mode: Stop time table and data acquisition.
+        """Stop mode: Stop time table and data acquisition.
         """
         self.device.pump_on = False
         self.device.keep_last_values = False
@@ -93,8 +90,7 @@ class Knr1050StreamInterface(StreamInterface):
 
     @if_connected
     def stop_klv(self):
-        """
-        Stop mode: Keep last values.
+        """Stop mode: Keep last values.
         """
         self.device.keep_last_values = True
         return "OK"
@@ -106,8 +102,7 @@ class Knr1050StreamInterface(StreamInterface):
 
     @if_connected
     def set_pressure_limits(self, low, high):
-        """
-        Set the pressure limits on the device
+        """Set the pressure limits on the device
         Args:
             low (int): The lower bound
             high (int): The upper bound

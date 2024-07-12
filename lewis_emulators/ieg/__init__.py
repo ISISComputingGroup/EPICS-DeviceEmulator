@@ -1,5 +1,5 @@
-from .device import SimulatedIeg
 from ..lewis_versions import LEWIS_LATEST
+from .device import SimulatedIeg
 
 framework_version = LEWIS_LATEST
 __all__ = ["SimulatedIeg"]

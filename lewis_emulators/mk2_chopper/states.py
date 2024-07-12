@@ -1,5 +1,5 @@
-from lewis.core.statemachine import State
 from lewis.core import approaches
+from lewis.core.statemachine import State
 
 # Would rather this were in device but causes Lewis to fail
 MAX_TEMPERATURE = 1

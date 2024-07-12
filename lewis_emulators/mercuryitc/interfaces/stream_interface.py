@@ -1,9 +1,9 @@
 from lewis.adapters.stream import StreamInterface
 from lewis.core.logging import has_log
-
-from lewis_emulators.mercuryitc.device import ChannelTypes
 from lewis.utils.command_builder import CmdBuilder
 from lewis.utils.replies import conditional_reply
+
+from lewis_emulators.mercuryitc.device import ChannelTypes
 
 if_connected = conditional_reply("connected")
 
@@ -441,8 +441,7 @@ class MercuryitcInterface(StreamInterface):
         return resp
 
     def _chan_from_id(self, deviceid, expected_type=None):
-        """
-        Gets a channel object from a provided device identifier.
+        """Gets a channel object from a provided device identifier.
 
         Args:
             deviceid: the device identifier e.g. "MB0", "DB1"
@@ -482,11 +481,9 @@ class MercuryitcInterface(StreamInterface):
 
     @if_connected
     def get_all_temp_sensor_details(self, deviceid):
-        """
-        Gets the details for an entire temperature sensor all at once. This is only used by the LabVIEW VI, not by
+        """Gets the details for an entire temperature sensor all at once. This is only used by the LabVIEW VI, not by
         the IOC (the ioc queries each parameter individually)
         """
-
         temp_chan = self._chan_from_id(deviceid, expected_type=ChannelTypes.TEMP)
         aux_chan = self._chan_from_id(
             temp_chan.associated_aux_channel, expected_type=ChannelTypes.AUX
@@ -517,11 +514,9 @@ class MercuryitcInterface(StreamInterface):
 
     @if_connected
     def get_all_pressure_sensor_details(self, deviceid):
-        """
-        Gets the details for an entire temperature sensor all at once. This is only used by the LabVIEW VI, not by
+        """Gets the details for an entire temperature sensor all at once. This is only used by the LabVIEW VI, not by
         the IOC (the ioc queries each parameter individually)
         """
-
         pres_chan = self._chan_from_id(deviceid, expected_type=ChannelTypes.PRES)
         aux_chan = self._chan_from_id(
             pres_chan.associated_aux_channel, expected_type=ChannelTypes.AUX
@@ -748,11 +743,9 @@ class MercuryitcInterface(StreamInterface):
 
     @if_connected
     def get_all_heater_details(self, deviceid):
-        """
-        Gets the details for an entire heater sensor all at once. This is only used by the LabVIEW VI, not by
+        """Gets the details for an entire heater sensor all at once. This is only used by the LabVIEW VI, not by
         the IOC (the ioc queries each parameter individually)
         """
-
         chan = self._chan_from_id(deviceid, expected_type=ChannelTypes.HTR)
 
         return (
@@ -793,8 +786,7 @@ class MercuryitcInterface(StreamInterface):
 
     @if_connected
     def get_all_aux_details(self, deviceid):
-        """
-        Gets the details for an entire aux sensor all at once. This is only used by the LabVIEW VI, not by
+        """Gets the details for an entire aux sensor all at once. This is only used by the LabVIEW VI, not by
         the IOC (the ioc queries each parameter individually)
         """
         chan = self._chan_from_id(deviceid, expected_type=ChannelTypes.AUX)
@@ -805,11 +797,9 @@ class MercuryitcInterface(StreamInterface):
 
     @if_connected
     def get_all_level_sensor_details(self, deviceid):
-        """
-        Gets the details for an entire temperature sensor all at once. This is only used by the LabVIEW VI, not by
+        """Gets the details for an entire temperature sensor all at once. This is only used by the LabVIEW VI, not by
         the IOC (the ioc queries each parameter individually)
         """
-
         lvl_chan = self._chan_from_id(deviceid, expected_type=ChannelTypes.LVL)
 
         return (

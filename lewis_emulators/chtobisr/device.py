@@ -1,12 +1,13 @@
 from collections import OrderedDict
-from .states import DefaultState
-from lewis.devices import StateMachineDevice
+
 from lewis.core.logging import has_log
+from lewis.devices import StateMachineDevice
+
+from .states import DefaultState
 
 
 def build_code(codes_dict):
-    """
-    Builds a code based on a codes dictionary
+    """Builds a code based on a codes dictionary
     :param codes_dict: A dictionary with the code and whether it's flagged or not.
     :return: The full code
     """
@@ -20,15 +21,12 @@ def build_code(codes_dict):
 
 
 class SimulatedChtobisr(StateMachineDevice):
-    """
-    Class to simulate Coherent OBIS Laser Remote
+    """Class to simulate Coherent OBIS Laser Remote
     """
 
     def _initialize_data(self):
+        """Initialize all of the device's attributes.
         """
-        Initialize all of the device's attributes.
-        """
-
         self.connected = True
         self.id = "Coherent OBIS Laser Remote - EMULATOR"
         self.interlock = "OFF"  # "OFF" -> OPEN, "ON" -> CLOSED
@@ -91,8 +89,7 @@ class SimulatedChtobisr(StateMachineDevice):
 
     @has_log
     def backdoor_set_interlock(self, value):
-        """
-            Sets interlock via backdoor
+        """Sets interlock via backdoor
         :param value: "ON" or "OFF"
         :return: none
         """
@@ -102,10 +99,8 @@ class SimulatedChtobisr(StateMachineDevice):
             self.interlock = value
 
     def reset(self):
+        """Resets all parameters by calling initialize function
         """
-        Resets all parameters by calling initialize function
-        """
-
         self._initialize_data()
 
     def build_status_code(self):
@@ -126,8 +121,7 @@ class SimulatedChtobisr(StateMachineDevice):
 
     @has_log
     def backdoor_set_status(self, statusname, value):
-        """
-            Sets status code via backdoor
+        """Sets status code via backdoor
         :param statusname: name of status attribute
         :param value: true or false
         :return: none
@@ -139,8 +133,7 @@ class SimulatedChtobisr(StateMachineDevice):
 
     @has_log
     def backdoor_set_fault(self, faultname, value):
-        """
-            Sets fault code via backdoor
+        """Sets fault code via backdoor
         :param faultname: name of fault attribute
         :param value: true or false
         :return: none

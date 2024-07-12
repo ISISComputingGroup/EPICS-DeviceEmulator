@@ -1,4 +1,4 @@
-from lewis.adapters.stream import StreamInterface, Cmd
+from lewis.adapters.stream import Cmd, StreamInterface
 from lewis.utils.replies import conditional_reply
 
 if_connected = conditional_reply("connected")

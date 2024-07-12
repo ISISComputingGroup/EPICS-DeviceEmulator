@@ -1,7 +1,8 @@
+import argparse
 import sys
 import types
+
 from mock import MagicMock
-import argparse
 
 
 class _FakeQtCore(object):
@@ -33,8 +34,7 @@ sys.modules["flippr_3"] = fake_flippr_module
 
 
 class _UpdatedValue(object):
-    """
-    This class fake-implements the interface of pyqtsignal (emit()) and the "parent" object (value())
+    """This class fake-implements the interface of pyqtsignal (emit()) and the "parent" object (value())
     """
 
     def __init__(self, init_val):
@@ -51,8 +51,7 @@ class _UpdatedValue(object):
 
 
 class _Parent(object):
-    """
-    Fake "parent" object. I don't know what type this is meant to have, but all that it actually requires is some
+    """Fake "parent" object. I don't know what type this is meant to have, but all that it actually requires is some
     member attributes which have a .value() method.
     """
 

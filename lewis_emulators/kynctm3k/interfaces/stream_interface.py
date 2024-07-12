@@ -1,4 +1,4 @@
-from lewis.adapters.stream import StreamInterface, Cmd
+from lewis.adapters.stream import Cmd, StreamInterface
 from lewis.core.logging import has_log
 from lewis.utils.command_builder import CmdBuilder
 

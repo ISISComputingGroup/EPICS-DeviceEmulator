@@ -1,8 +1,7 @@
 from lewis.adapters.stream import StreamInterface
 from lewis.core.logging import has_log
-from lewis.utils.replies import conditional_reply
-
 from lewis.utils.command_builder import CmdBuilder
+from lewis.utils.replies import conditional_reply
 
 # Dictionaries for parameter states (strings required to build reply to "all status" command)
 OK_NOK = {True: "OK", False: "NOK"}
@@ -13,8 +12,7 @@ CW_CCW = {True: "CLOCK", False: "ANTICLOCK"}
 
 @has_log
 class FZJDDFCHStreamInterface(StreamInterface):
-    """
-    Stream interface for the Ethernet port
+    """Stream interface for the Ethernet port
     """
 
     commands = {
@@ -30,20 +28,17 @@ class FZJDDFCHStreamInterface(StreamInterface):
     out_terminator = "\r\n"
 
     def handle_error(self, request, error):
-        """
-        If command is not recognised, print and error
+        """If command is not recognised, print and error
 
         Args:
             request: requested string
             error: problem
         """
-
         self.log.error("An error occurred at request " + repr(request) + ": " + repr(error))
 
     @conditional_reply("connected")
     def set_frequency(self, chopper_name, frequency):
-        """
-        Sets the frequency setpoint by multiplying input value by reference frequency
+        """Sets the frequency setpoint by multiplying input value by reference frequency
 
         Args:
             chopper_name: Chopper name (C01, C02, C2B, C03)
@@ -62,8 +57,7 @@ class FZJDDFCHStreamInterface(StreamInterface):
 
     @conditional_reply("connected")
     def set_phase(self, chopper_name, phase):
-        """
-        Sets the phase setpoint
+        """Sets the phase setpoint
 
         Args:
             chopper_name:  Chopper name (C01, C02, C2B, C03)
@@ -82,8 +76,7 @@ class FZJDDFCHStreamInterface(StreamInterface):
 
     @conditional_reply("connected")
     def set_magnetic_bearing(self, chopper_name, magnetic_bearing):
-        """
-        Sets the state of the magnetic bearings
+        """Sets the state of the magnetic bearings
 
         Args:
             chopper_name:  Chopper name (C01, C02, C2B, C03)
@@ -104,8 +97,7 @@ class FZJDDFCHStreamInterface(StreamInterface):
 
     @conditional_reply("connected")
     def set_drive_mode(self, chopper_name, drive_mode):
-        """
-        Sets the drive mode
+        """Sets the drive mode
 
         Args:
             chopper_name:   Chopper name (C01, C02, C2B, C03)
@@ -128,8 +120,7 @@ class FZJDDFCHStreamInterface(StreamInterface):
 
     @conditional_reply("connected")
     def get_magnetic_bearing_status(self, chopper_name):
-        """
-        Gets the magnetic bearing status
+        """Gets the magnetic bearing status
 
         Args:
             chopper_name:  Chopper name (e.g. C01, C02, C2B, C03)
@@ -137,19 +128,17 @@ class FZJDDFCHStreamInterface(StreamInterface):
         Returns: magnetic bearing status
         """
         device = self._device
-        return "{0:3s};MBON?;{}".format(device.chopper_name, self._device.magnetic_bearing_status)
+        return "{0:3s};MBON?;{}".format(device.chopper_name, )
 
     @conditional_reply("connected")
     def get_all_status(self, chopper_name):
-        """
-        Gets the status as a single string
+        """Gets the status as a single string
 
         Args:
             chopper_name:  Chopper name (e.g. C01, C02, C2B, C03)
 
         Returns: string containing values for all parameters
         """
-
         device = self._device
         if chopper_name != device.chopper_name:
             return None

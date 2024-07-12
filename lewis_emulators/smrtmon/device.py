@@ -1,12 +1,13 @@
-from lewis.devices import StateMachineDevice
-from .states import DefaultState
 from collections import OrderedDict
+
+from lewis.devices import StateMachineDevice
+
+from .states import DefaultState
 
 
 class SimulatedSmrtmon(StateMachineDevice):
     def _initialize_data(self):
-        """
-        Initialize all of the device's attributes.
+        """Initialize all of the device's attributes.
         """
         self.connected = True
         self.stat = [0.0] * 11

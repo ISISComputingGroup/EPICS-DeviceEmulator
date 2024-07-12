@@ -1,10 +1,10 @@
-from lewis.adapters.stream import StreamInterface, Cmd
+from lewis.adapters.stream import Cmd, StreamInterface
+
 from ..chopper_type import ChopperType
 
 
 def filled_int(val, length):
-    """
-    Takes a value and returns a zero padded representation of the integer component.
+    """Takes a value and returns a zero padded representation of the integer component.
 
     :param val: The original value.
     :param length: Minimum length of the returned string

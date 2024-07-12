@@ -1,13 +1,14 @@
 from collections import OrderedDict
-from .states import DefaultState
-from lewis.devices import StateMachineDevice
 from random import random as rnd
+
+from lewis.devices import StateMachineDevice
+
+from .states import DefaultState
 
 
 class SimulatedTtiplp(StateMachineDevice):
     def _initialize_data(self):
-        """
-        Initialize all of the device's attributes.
+        """Initialize all of the device's attributes.
         """
         self.ident = "THURLBY THANDAR, PL303-P, 490296, 3.02-4.06"
         self.volt = 0

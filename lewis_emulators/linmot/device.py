@@ -1,8 +1,8 @@
 from collections import OrderedDict
 
-from .states import WarnStateCode, ErrorStateCode
-from .states import StoppedState, MovingState
 from lewis.devices import StateMachineDevice
+
+from .states import ErrorStateCode, MovingState, StoppedState, WarnStateCode
 
 HARD_LIMIT_MINIMUM = 0.0
 HARD_LIMIT_MAXIMUM = 5000.0
@@ -17,8 +17,7 @@ states = OrderedDict([("Stopped", StoppedState()), ("Moving", MovingState())])
 
 class SimulatedLinmot(StateMachineDevice):
     def _initialize_data(self):
-        """
-        Initialize all of the device's attributes.
+        """Initialize all of the device's attributes.
         """
         self.position = 0
         self.target_position = 0
@@ -52,8 +51,7 @@ class SimulatedLinmot(StateMachineDevice):
 
     @property
     def device_error(self):
-        """
-        Is the device errored due to being outside of the hard limits
+        """Is the device errored due to being outside of the hard limits
 
         Return(s):
             (bool): True if device in errored state
@@ -62,8 +60,7 @@ class SimulatedLinmot(StateMachineDevice):
 
     @property
     def motor_warn_status_int(self):
-        """
-        Return the integer value of the warn status enum
+        """Return the integer value of the warn status enum
 
         The state machine attempts to replicate the devices warn status codes. This is done via
         an enum, WarnStateCode, in the states.py: The enum is used for readability but the device
@@ -75,8 +72,7 @@ class SimulatedLinmot(StateMachineDevice):
         return self.motor_warn_status.value
 
     def move_to_target(self, target_position):
-        """
-        Demand the motor to drive to a target position.
+        """Demand the motor to drive to a target position.
 
         Argument(s):
             target_position (int): the desire axis target position
@@ -86,8 +82,7 @@ class SimulatedLinmot(StateMachineDevice):
         self.target_position = target_position
 
     def within_hard_limits(self):
-        """
-        Determine if the axis position is within the physics limits of the devices capability.
+        """Determine if the axis position is within the physics limits of the devices capability.
 
         The axis has a range of moment, however if taken beyond these then it will put the controller into an
         error state.

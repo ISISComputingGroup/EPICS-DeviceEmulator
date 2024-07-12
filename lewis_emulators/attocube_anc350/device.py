@@ -1,12 +1,13 @@
-from lewis.devices import StateMachineDevice
-from .states import DefaultState, MovingState
 from collections import OrderedDict
+
+from lewis.devices import StateMachineDevice
+
+from .states import DefaultState, MovingState
 
 
 class SimulatedAttocubeANC350(StateMachineDevice):
     def _initialize_data(self):
-        """
-        Initialize all of the device's attributes.
+        """Initialize all of the device's attributes.
         """
         self.connected = True
         self.position = 0

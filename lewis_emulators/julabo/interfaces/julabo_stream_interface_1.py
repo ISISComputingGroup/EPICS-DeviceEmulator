@@ -17,7 +17,7 @@
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 # *********************************************************************
 
-from lewis.adapters.stream import StreamInterface, Cmd, Var
+from lewis.adapters.stream import Cmd, StreamInterface, Var
 
 
 class JulaboStreamInterfaceV1(StreamInterface):

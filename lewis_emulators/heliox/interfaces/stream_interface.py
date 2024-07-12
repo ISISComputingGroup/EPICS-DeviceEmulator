@@ -120,8 +120,7 @@ class HelioxStreamInterface(StreamInterface):
 
     @if_connected
     def get_all_heliox_status(self):
-        """
-        This function is used by the labview VI. In EPICS it is more convenient to ask for the parameters individually,
+        """This function is used by the labview VI. In EPICS it is more convenient to ask for the parameters individually,
         so we don't use this large function which generates all of the possible status information.
         """
         return (
@@ -154,8 +153,7 @@ class HelioxStreamInterface(StreamInterface):
 
     @if_connected
     def get_catalog(self):
-        """
-        This is only needed by the LabVIEW driver - it is not used by EPICS.
+        """This is only needed by the LabVIEW driver - it is not used by EPICS.
         """
         return (
             "STAT:SYS:CAT"
@@ -168,8 +166,7 @@ class HelioxStreamInterface(StreamInterface):
 
     @if_connected
     def get_nickname(self, arg):
-        """
-        Returns a fake nickname. This is only implemented to allow this emulator to be used with the existing
+        """Returns a fake nickname. This is only implemented to allow this emulator to be used with the existing
         labview driver, and the labview driver actually ignores the results (but not implementing the function causes
         an error).
         """

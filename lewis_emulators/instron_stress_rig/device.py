@@ -1,18 +1,17 @@
-from collections import OrderedDict
-from .states import DefaultState, GoingToSetpointState, GeneratingWaveformState
-from lewis.devices import StateMachineDevice
-from .channel import PositionChannel, StrainChannel, StressChannel
-from .waveform_generator import WaveformGenerator
-
 import time
+from collections import OrderedDict
+
+from lewis.devices import StateMachineDevice
+
+from .channel import PositionChannel, StrainChannel, StressChannel
+from .states import DefaultState, GeneratingWaveformState, GoingToSetpointState
+from .waveform_generator import WaveformGenerator
 
 
 class SimulatedInstron(StateMachineDevice):
     def _initialize_data(self):
+        """Initialize all of the device's attributes.
         """
-        Initialize all of the device's attributes.
-        """
-
         # When initialisation is complete, this is set to true and the device will enter a running state
         self.ready = True
         self.control_channel = 1

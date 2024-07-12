@@ -1,16 +1,17 @@
-from lewis.adapters.stream import StreamInterface
-from lewis.utils.command_builder import CmdBuilder
-from ..device import CircuitAssignment
-from lewis.utils.replies import conditional_reply
-from lewis.utils.constants import ACK
-from lewis.core.logging import has_log
 from enum import Enum
+
+from lewis.adapters.stream import StreamInterface
+from lewis.core.logging import has_log
+from lewis.utils.command_builder import CmdBuilder
+from lewis.utils.constants import ACK
+from lewis.utils.replies import conditional_reply
+
+from ..device import CircuitAssignment
 
 
 @has_log
 class Tpgx00StreamInterfaceBase(object):
-    """
-    Stream interface for the serial port for either a TPG300 or TPG500.
+    """Stream interface for the serial port for either a TPG300 or TPG500.
     """
 
     ack_terminator = "\r\n"  # Acknowledged commands are terminated by this
@@ -69,13 +70,13 @@ class Tpgx00StreamInterfaceBase(object):
     readtimeout = 1
 
     def handle_error(self, request, error):
-        """
-        Prints an error message if a command is not recognised, and sets the device
+        """Prints an error message if a command is not recognised, and sets the device
         error status accordingly.
 
         Args:
             request : Request.
             error: The error that has occurred.
+
         Returns:
             None.
         """
@@ -84,8 +85,7 @@ class Tpgx00StreamInterfaceBase(object):
 
     @conditional_reply("connected")
     def acknowledge_pressure(self, channel):
-        """
-        Acknowledges a request to get the pressure and stores the request.
+        """Acknowledges a request to get the pressure and stores the request.
 
         Args:
             channel: (string) Pressure channel to read from.
@@ -98,20 +98,17 @@ class Tpgx00StreamInterfaceBase(object):
 
     @conditional_reply("connected")
     def acknowledge_units(self):
-        """
-        Acknowledge that the request for current units was received.
+        """Acknowledge that the request for current units was received.
 
         Returns:
             ASCII acknowledgement character (0x6).
         """
-
         self._device.readstate = "UNI"
         return ACK
 
     @conditional_reply("connected")
     def acknowledge_set_units(self, units):
-        """
-        Acknowledge that the request to set the units was received.
+        """Acknowledge that the request to set the units was received.
 
         Args:
             units (integer): Takes the value 1, 2 or 3.
@@ -124,8 +121,7 @@ class Tpgx00StreamInterfaceBase(object):
 
     @conditional_reply("connected")
     def acknowledge_function(self, function):
-        """
-        Acknowledge that the request for function thresholds was received.
+        """Acknowledge that the request for function thresholds was received.
 
         Args:
             function (string): Takes the value 1, 2, 3, 4, A or B. This it the switching
@@ -134,14 +130,12 @@ class Tpgx00StreamInterfaceBase(object):
         Returns:
             ASCII acknowledgement character (0x6).
         """
-
         self._device.readstate = "F" + function
         return ACK
 
     @conditional_reply("connected")
     def acknowledge_set_function(self, function, low_thr, low_exp, high_thr, high_exp, assign):
-        """
-        Acknowledge that the request to set the function thresholds was received.
+        """Acknowledge that the request to set the function thresholds was received.
 
         Args:
             function (string): Takes the value 1, 2, 3, 4, A or B. This is the switching
@@ -168,8 +162,7 @@ class Tpgx00StreamInterfaceBase(object):
 
     @conditional_reply("connected")
     def acknowledge_function_status(self):
-        """
-        Acknowledge that the request to check switching functions status was received
+        """Acknowledge that the request to check switching functions status was received
 
         Returns:
             ASCII acknowledgement character (0x6).
@@ -179,8 +172,7 @@ class Tpgx00StreamInterfaceBase(object):
 
     @conditional_reply("connected")
     def acknowledge_error(self):
-        """
-        Acknowledge that the request to check the device error status was received.
+        """Acknowledge that the request to check the device error status was received.
 
         Returns:
             ASCII acknowledgement character (0x6).
@@ -189,8 +181,7 @@ class Tpgx00StreamInterfaceBase(object):
         return ACK
 
     def handle_enquiry(self):
-        """
-        Handles an enquiry using the last command sent.
+        """Handles an enquiry using the last command sent.
 
         Returns:
             String: Channel pressure and status if last command was in channels.
@@ -238,8 +229,7 @@ class Tpgx00StreamInterfaceBase(object):
             )
 
     def get_units(self):
-        """
-        Gets the units of the device.
+        """Gets the units of the device.
 
         Returns:
             Name of the units.
@@ -247,8 +237,7 @@ class Tpgx00StreamInterfaceBase(object):
         return self.get_units_val(self._device.units)
 
     def set_units(self, units):
-        """
-        Sets the units on the device.
+        """Sets the units on the device.
 
         Args:
             units (Units member): Units to be set
@@ -259,8 +248,7 @@ class Tpgx00StreamInterfaceBase(object):
         self._device.units = units
 
     def get_threshold(self, function):
-        """
-        Gets the settings of a switching function.
+        """Gets the settings of a switching function.
 
         Args:
             function: (string) the switching function to be set
@@ -272,8 +260,7 @@ class Tpgx00StreamInterfaceBase(object):
         return self._device.switching_functions[switching_function]
 
     def set_threshold(self, function):
-        """
-        Sets the settings of a switching function.
+        """Sets the settings of a switching function.
 
         Args:
             function: (ReadState member) the switching function to be set
@@ -287,8 +274,7 @@ class Tpgx00StreamInterfaceBase(object):
         )
 
     def get_thresholds_readstate(self, readstate):
-        """
-        Helper method for getting thresholds of a function all in one string based on current readstate.
+        """Helper method for getting thresholds of a function all in one string based on current readstate.
 
         Args:
             readstate: (ReadState member) the current read state
@@ -309,8 +295,7 @@ class Tpgx00StreamInterfaceBase(object):
         )
 
     def get_switching_functions_status(self):
-        """
-        Returns statuses of switching functions
+        """Returns statuses of switching functions
 
         Returns:
             a dictionary of 6 Enum members (SFStatus.ON/SFStatus.OFF) corresponding to each switching function
@@ -318,8 +303,7 @@ class Tpgx00StreamInterfaceBase(object):
         return self.get_sf_status_val(self._device.switching_functions_status)
 
     def get_pressure(self, channel):
-        """
-        Gets the pressure for a channel.
+        """Gets the pressure for a channel.
 
         Args:
             channel (Enum member): Enum readstate pressure channel. E.g. Readstate.A1.
@@ -334,8 +318,7 @@ class Tpgx00StreamInterfaceBase(object):
         return "{},{}".format(self.get_channel_status_val(status), pressure)
 
     def get_error_status(self):
-        """
-        Gets the device error status.
+        """Gets the device error status.
 
         Returns:
             String: (0000|1000|0100|0010|0001) four-character error status code
@@ -545,8 +528,7 @@ class Tpg500StreamInterface(Tpgx00StreamInterfaceBase, StreamInterface):
         return self.ReadState500[readstate_enum.name].value
 
     def get_thresholds_readstate(self, readstate):
-        """
-        Helper method for getting thresholds of a function all in one string based on current readstate.
+        """Helper method for getting thresholds of a function all in one string based on current readstate.
 
         Args:
             readstate: (ReadState member) the current read state

@@ -1,11 +1,12 @@
 from collections import OrderedDict
-from .states import DefaultState
+
 from lewis.devices import StateMachineDevice
+
+from .states import DefaultState
 
 
 class SimulatedFinsPLC(StateMachineDevice):
-    """
-    Class represented a simulated Helium Recovery FINS PLC.
+    """Class represented a simulated Helium Recovery FINS PLC.
     """
 
     HELIUM_RECOVERY_NODE = 58
@@ -154,10 +155,8 @@ class SimulatedFinsPLC(StateMachineDevice):
     }
 
     def _initialize_data(self):
+        """Initialize all of the device's attributes.
         """
-        Initialize all of the device's attributes.
-        """
-
         self.network_address = 0x00
         self.unit_address = 0x00
 
@@ -317,8 +316,7 @@ class SimulatedFinsPLC(StateMachineDevice):
         return OrderedDict([])
 
     def reset(self):
-        """
-        Public method that re-initializes the device's fields.
+        """Public method that re-initializes the device's fields.
 
         Returns:
             Nothing.
@@ -326,8 +324,7 @@ class SimulatedFinsPLC(StateMachineDevice):
         self._initialize_data()
 
     def set_memory(self, pv_name, data):
-        """
-        Sets a location in the plc emulator's memory to the given data.
+        """Sets a location in the plc emulator's memory to the given data.
 
         Args:
             pv_name (string): The pv name that the test wants to set. Each PV name corresponds to only one memory

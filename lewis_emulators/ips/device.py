@@ -1,11 +1,11 @@
 from collections import OrderedDict
 
 from lewis.core.logging import has_log
-
-from lewis_emulators.ips.modes import Activity, Control, SweepMode, Mode
-from .states import HeaterOffState, HeaterOnState, MagnetQuenchedState
 from lewis.devices import StateMachineDevice
 
+from lewis_emulators.ips.modes import Activity, Control, Mode, SweepMode
+
+from .states import HeaterOffState, HeaterOnState, MagnetQuenchedState
 
 # As long as no magnetic saturation effects are present, there is a linear relationship between Teslas and Amps.
 #
@@ -40,8 +40,7 @@ class SimulatedIps(StateMachineDevice):
     HEATER_RAMP_RATE = 5
 
     def _initialize_data(self):
-        """
-        Initialize all of the device's attributes.
+        """Initialize all of the device's attributes.
         """
         self.reset()
 
@@ -134,8 +133,7 @@ class SimulatedIps(StateMachineDevice):
         self.quenched = False
 
     def get_voltage(self):
-        """
-        Gets the voltage of the PSU.
+        """Gets the voltage of the PSU.
 
         Everything except the leads is superconducting, we use Ohm's law here with the PSU current and the lead
         resistance.

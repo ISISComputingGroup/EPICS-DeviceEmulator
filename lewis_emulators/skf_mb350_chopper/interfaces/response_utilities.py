@@ -1,10 +1,10 @@
-from lewis.utils.byte_conversions import int_to_raw_bytes, float_to_raw_bytes
+from lewis.utils.byte_conversions import float_to_raw_bytes, int_to_raw_bytes
+
 from .crc16 import crc16
 
 
 def build_interlock_status(device):
-    """
-    Builds an integer representation of the interlock bit-field.
+    """Builds an integer representation of the interlock bit-field.
     :param device: the lewis device
     :return: int representation of the bit field
     """
@@ -20,8 +20,7 @@ def build_interlock_status(device):
 
 
 def build_device_status(device):
-    """
-    Builds an integer representation of the device status bit-field.
+    """Builds an integer representation of the device status bit-field.
     :param device: the lewis device
     :return: int representation of the bit field
     """
@@ -45,8 +44,7 @@ def build_device_status(device):
 
 
 def general_status_response_packet(address, device, command):
-    """
-    Returns the general response packet, the default response to any command that doesn't have a more specific response.
+    """Returns the general response packet, the default response to any command that doesn't have a more specific response.
 
     Response structure is:
         8 bytes common header (see ResponseBuilder.add_common_header)
@@ -60,8 +58,7 @@ def general_status_response_packet(address, device, command):
 
 
 def phase_information_response_packet(address, device):
-    """
-    Returns the response to the "get_phase_information" command.
+    """Returns the response to the "get_phase_information" command.
 
     Response structure is:
         8 bytes common header (see ResponseBuilder.add_common_header)
@@ -84,8 +81,7 @@ def phase_information_response_packet(address, device):
 
 
 def rotator_angle_response_packet(address, device):
-    """
-    Returns the response to the "get_rotator_angle" command.
+    """Returns the response to the "get_rotator_angle" command.
 
     Response structure is:
         8 bytes common header (see ResponseBuilder.add_common_header)
@@ -104,8 +100,7 @@ def rotator_angle_response_packet(address, device):
 
 
 def phase_time_response_packet(address, device):
-    """
-    Returns the response to the "get_phase_information" command.
+    """Returns the response to the "get_phase_information" command.
 
     Response structure is:
         8 bytes common header (see ResponseBuilder.add_common_header)
@@ -124,16 +119,14 @@ def phase_time_response_packet(address, device):
 
 
 class ResponseBuilder(object):
-    """
-    Response builder which formats the responses as bytes.
+    """Response builder which formats the responses as bytes.
     """
 
     def __init__(self):
         self.response = bytearray()
 
     def add_int(self, value, length, low_byte_first=True):
-        """
-        Adds an integer to the builder
+        """Adds an integer to the builder
         :param value: The integer to add
         :param length: How many bytes should the integer be represented as
         :param low_byte_first: If true (default), put the least significant byte first.
@@ -144,8 +137,7 @@ class ResponseBuilder(object):
         return self
 
     def add_float(self, value):
-        """
-        Adds an float to the builder (4 bytes, IEEE single-precision)
+        """Adds an float to the builder (4 bytes, IEEE single-precision)
         :param value: The float to add
         :return: The builder
         """
@@ -153,8 +145,7 @@ class ResponseBuilder(object):
         return self
 
     def add_common_header(self, address, command_number, device):
-        """
-        Adds the common header.
+        """Adds the common header.
 
         The header bytes are as follows:
             1 byte (unsigned int): Device address
@@ -179,8 +170,7 @@ class ResponseBuilder(object):
         )
 
     def build(self):
-        """
-        Gets the response from the builder
+        """Gets the response from the builder
         :return: the response
         """
         self.response += crc16(self.response)

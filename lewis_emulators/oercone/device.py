@@ -1,7 +1,9 @@
 from collections import OrderedDict
-from .states import DefaultState
-from lewis.devices import StateMachineDevice
 from enum import Enum, unique
+
+from lewis.devices import StateMachineDevice
+
+from .states import DefaultState
 
 
 @unique
@@ -20,8 +22,7 @@ class ReadState(Enum):
 
 class SimulatedOercone(StateMachineDevice):
     def _initialize_data(self):
-        """
-        Initialize all of the device's attributes.
+        """Initialize all of the device's attributes.
         """
         self._pressure = 0
         self._measurement_unit = Units.mbar
@@ -40,8 +41,7 @@ class SimulatedOercone(StateMachineDevice):
 
     @property
     def pressure(self):
-        """
-        Returns the value of the pressure sensor.
+        """Returns the value of the pressure sensor.
 
         Returns:
             float: Pressure value.
@@ -50,8 +50,7 @@ class SimulatedOercone(StateMachineDevice):
 
     @pressure.setter
     def pressure(self, pressure):
-        """
-        Sets the pressure sensor.
+        """Sets the pressure sensor.
 
         Args:
             pressure: Value to set pressure sensor to.
@@ -63,8 +62,7 @@ class SimulatedOercone(StateMachineDevice):
 
     @property
     def measurement_unit(self):
-        """
-        Returns the value of the pressure sensor.
+        """Returns the value of the pressure sensor.
 
         Returns:
             Units: The enum unit currently in use e.g. Units.Micron.
@@ -73,8 +71,7 @@ class SimulatedOercone(StateMachineDevice):
 
     @measurement_unit.setter
     def measurement_unit(self, units):
-        """
-        Sets the curent units.
+        """Sets the curent units.
 
         Args:
             units (Units member): Enum value to set the units to.
@@ -85,8 +82,7 @@ class SimulatedOercone(StateMachineDevice):
         self._measurement_unit = units
 
     def backdoor_set_units(self, unit):
-        """
-        Sets unit on device. Called only via the backdoor using lewis.
+        """Sets unit on device. Called only via the backdoor using lewis.
 
         Args:
             unit: integer 0, 1, 2, or 3
@@ -98,8 +94,7 @@ class SimulatedOercone(StateMachineDevice):
 
     @property
     def read_state(self):
-        """
-        Returns the readstate for the device
+        """Returns the readstate for the device
 
         Returns:
             Enum: Readstate of the device.
@@ -108,8 +103,7 @@ class SimulatedOercone(StateMachineDevice):
 
     @read_state.setter
     def read_state(self, state):
-        """
-        Sets the readstate of the device
+        """Sets the readstate of the device
 
         Args:
             state: Enum readstate of the device to be set

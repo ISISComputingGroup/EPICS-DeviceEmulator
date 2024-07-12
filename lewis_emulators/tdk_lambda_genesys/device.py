@@ -1,5 +1,7 @@
-from lewis.devices import StateMachineDevice
 from collections import OrderedDict
+
+from lewis.devices import StateMachineDevice
+
 from .states import DefaultState
 
 

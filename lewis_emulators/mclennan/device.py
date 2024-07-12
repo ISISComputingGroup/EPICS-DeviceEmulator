@@ -1,7 +1,8 @@
 from collections import OrderedDict
-from .states import StoppedState, JoggingState, MovingState, HomingState
+
 from lewis.devices import StateMachineDevice
 
+from .states import HomingState, JoggingState, MovingState, StoppedState
 
 states = OrderedDict(
     [
@@ -15,8 +16,7 @@ states = OrderedDict(
 
 class SimulatedMclennan(StateMachineDevice):
     def _initialize_data(self):
-        """
-        Initialize all of the device's attributes.
+        """Initialize all of the device's attributes.
         """
         self.connected = True
         self.is_jogging = False

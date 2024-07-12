@@ -1,19 +1,20 @@
-from .two_gas_mixer import TwoGasMixer
-from .buffer import Buffer
-from .gas import Gas
-from .system_gases import SystemGases
-from .seed_gas_data import SeedGasData
-from .ethernet_device import EthernetDevice
-from .hmi_device import HmiDevice
-from .valve import Valve
-from .error_states import ErrorStates
-from .utilities import format_int, format_float
-from .sensor import Sensor
-from .pressure_sensor import PressureSensor
-from .states import DefaultInitState, DefaultRunningState
 from collections import OrderedDict
 
 from lewis.devices import StateMachineDevice
+
+from .buffer import Buffer
+from .error_states import ErrorStates
+from .ethernet_device import EthernetDevice
+from .gas import Gas
+from .hmi_device import HmiDevice
+from .pressure_sensor import PressureSensor
+from .seed_gas_data import SeedGasData
+from .sensor import Sensor
+from .states import DefaultInitState, DefaultRunningState
+from .system_gases import SystemGases
+from .two_gas_mixer import TwoGasMixer
+from .utilities import format_float, format_int
+from .valve import Valve
 
 
 class SimulatedVolumetricRig(StateMachineDevice):

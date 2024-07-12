@@ -1,5 +1,5 @@
-from lewis.core.statemachine import State
 from lewis.core import approaches
+from lewis.core.statemachine import State
 
 
 def check_speed(device):

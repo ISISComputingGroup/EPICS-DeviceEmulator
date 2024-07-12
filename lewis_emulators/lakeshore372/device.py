@@ -1,12 +1,13 @@
 from collections import OrderedDict
-from .states import DefaultState
+
 from lewis.devices import StateMachineDevice
+
+from .states import DefaultState
 
 
 class SimulatedLakeshore372(StateMachineDevice):
     def _initialize_data(self):
-        """
-        Initialize all of the device's attributes.
+        """Initialize all of the device's attributes.
         """
         self.temperature = 0
         self.heater_range = 0

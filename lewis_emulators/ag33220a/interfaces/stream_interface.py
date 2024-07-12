@@ -1,7 +1,8 @@
-from lewis.adapters.stream import StreamInterface, Cmd
+import traceback
+
+from lewis.adapters.stream import Cmd, StreamInterface
 from lewis.utils.command_builder import string_arg
 from lewis.utils.replies import conditional_reply
-import traceback
 
 NUM_MIN_MAX = "([\-0-9.]+|MAX|MIN)"
 

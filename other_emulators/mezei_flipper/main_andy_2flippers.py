@@ -1,17 +1,14 @@
-from DAQTasks_2flippers import *  # pylint: disable=W0614
-from flippr_3 import *  # pylint: disable=W0614
-from PyQt5 import QtWidgets, QtCore, QtNetwork
+import re
+import socket
+import sys
+import threading
+from time import time
 
 import numpy as np
-
+from DAQTasks_2flippers import *  # pylint: disable=W0614
+from flippr_3 import *  # pylint: disable=W0614
+from PyQt5 import QtCore, QtWidgets
 from QPlot import QPlot
-
-import sys
-import socket
-import threading
-import re
-
-from time import time, sleep
 
 
 class SignalServer(object):
@@ -68,7 +65,6 @@ class SignalServer(object):
         This function is threaded to prevent blocking of the main thread by the while
         loop.
         """
-
         sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
         sock.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
         sock.bind((self.host, self.port))
@@ -87,7 +83,6 @@ class SignalServer(object):
         This threaded model is compatible with the Qt signals / slots model through the
         use of QThread.
         """
-
         size = 1024
         while True:
             try:
@@ -363,7 +358,6 @@ class Flippr:
 
     def fn(self, flipper, filename):
         """Sets the filename to read waveform from"""
-
         turnbackon = "off"  # initialises the parameter to a known state
         if flipper == "p":
             if self.filename_P != filename:
@@ -389,7 +383,6 @@ class Flippr:
 
     def toggle(self, flag):
         """Currently just a wrapper for on() and off(), kept for future"""
-
         if self.running != 0:
             self.off()
         if flag == 1:  # P flipper on 10
@@ -405,7 +398,6 @@ class Flippr:
 
     def const(self, flipper, amp):
         """Adjusts the decay constant for the flipper current"""
-
         turnbackon = "off"  # initialises the parameter to a known state
         if flipper == "p":
             if self.decay_spin_P.value() != amp:
@@ -427,7 +419,6 @@ class Flippr:
 
     def DeltaT(self, flipper, amp):
         """Adjusts the dc time shift for the flipper profile"""
-
         turnbackon = "off"  # initialises the parameter to a known state
         if flipper == "p":
             if self.DeltaT_P.value() != amp:
@@ -449,7 +440,6 @@ class Flippr:
 
     def amplitude(self, flipper, amp):
         """Adjusts the maximum allowed amplitude for the flipper current"""
-
         turnbackon = "off"  # initialises the parameter to a known state
         if flipper == "p":
             if self.amplitude_spin_P.value() != amp:

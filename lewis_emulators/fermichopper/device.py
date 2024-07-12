@@ -1,12 +1,13 @@
 from collections import OrderedDict
-from .states import DefaultState, GoingState, StoppedState, StoppingState
+
 from lewis.devices import StateMachineDevice
+
+from .states import DefaultState, GoingState, StoppedState, StoppingState
 
 
 class SimulatedFermichopper(StateMachineDevice):
     def _initialize_data(self):
-        """
-        Initialize all of the device's attributes.
+        """Initialize all of the device's attributes.
         """
         self.last_command = "0000"
         self.speed = 0

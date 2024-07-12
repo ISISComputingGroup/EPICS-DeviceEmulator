@@ -1,7 +1,7 @@
-from lewis.core.statemachine import State
-from lewis.core import approaches
-
 from enum import Enum
+
+from lewis.core import approaches
+from lewis.core.statemachine import State
 
 
 class WarnStateCode(Enum):

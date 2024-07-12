@@ -1,14 +1,14 @@
 from collections import OrderedDict
-from .states import DefaultState
+
 from lewis.devices import StateMachineDevice
+
+from .states import DefaultState
 
 
 class SimulatedDh2000(StateMachineDevice):
     def _initialize_data(self):
+        """Initialize all of the device's attributes.
         """
-        Initialize all of the device's attributes.
-        """
-
         self._shutter_is_open = False
         self._interlock_triggered = False
         self.is_connected = True
@@ -26,8 +26,7 @@ class SimulatedDh2000(StateMachineDevice):
 
     @property
     def shutter_is_open(self):
-        """
-        Returns whether the shutter is open or closed
+        """Returns whether the shutter is open or closed
 
         Returns:
             shutter_is_open: Bool, True if the shutter is open
@@ -37,8 +36,7 @@ class SimulatedDh2000(StateMachineDevice):
 
     @shutter_is_open.setter
     def shutter_is_open(self, value):
-        """
-        Sets whether the shutter is open or closed
+        """Sets whether the shutter is open or closed
         Args:
             value: Boolean, set to True to open the shutter
 
@@ -49,8 +47,7 @@ class SimulatedDh2000(StateMachineDevice):
 
     @property
     def interlock_is_triggered(self):
-        """
-        Returns whether the interlock has been triggered
+        """Returns whether the interlock has been triggered
 
         Returns:
             interlock_is_triggered: Bool, True if the interlock has been triggered (forcing shutter closed)
@@ -60,8 +57,7 @@ class SimulatedDh2000(StateMachineDevice):
 
     @interlock_is_triggered.setter
     def interlock_is_triggered(self, value):
-        """
-        Sets the interlock triggered status
+        """Sets the interlock triggered status
 
         Returns:
             None

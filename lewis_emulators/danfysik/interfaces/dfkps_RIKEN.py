@@ -1,22 +1,18 @@
-"""
-Stream device for danfysik 8500-like PSU on RIKEN (RB2)
+"""Stream device for danfysik 8500-like PSU on RIKEN (RB2)
 """
 
 from lewis.core.logging import has_log
-
 from lewis.utils.command_builder import CmdBuilder
-from lewis.utils.replies import conditional_reply
-from .dfkps_base import CommonStreamInterface
 
 from .dfkps_8500 import Danfysik8500StreamInterface
+from .dfkps_base import CommonStreamInterface
 
 __all__ = ["DanfysikRIKENStreamInterface"]
 
 
 @has_log
 class DanfysikRIKENStreamInterface(Danfysik8500StreamInterface):
-    """
-    Stream interface for a Danfysik-like PSU on RIKEN (RB2).  Inherited from Danfysik 8500.
+    """Stream interface for a Danfysik-like PSU on RIKEN (RB2).  Inherited from Danfysik 8500.
     """
 
     # use modified protocol file for RB2 PSU

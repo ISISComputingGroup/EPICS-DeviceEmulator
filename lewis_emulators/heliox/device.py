@@ -1,12 +1,13 @@
 from collections import OrderedDict
+
 from lewis.core.logging import has_log
-from .states import TemperatureControlState, He3PotEmptyState
 from lewis.devices import StateMachineDevice
+
+from .states import He3PotEmptyState, TemperatureControlState
 
 
 class TemperatureChannel(object):
-    """
-    Class to represent an individual temperature channel on a Heliox fridge. e.g. He3Sorb or He4Pot channels.
+    """Class to represent an individual temperature channel on a Heliox fridge. e.g. He3Sorb or He4Pot channels.
     """
 
     def __init__(self):
@@ -20,8 +21,7 @@ class TemperatureChannel(object):
 @has_log
 class SimulatedHeliox(StateMachineDevice):
     def _initialize_data(self):
-        """
-        Initialize all of the device's attributes.
+        """Initialize all of the device's attributes.
         """
         self.temperature = 0
         self.temperature_sp = 0

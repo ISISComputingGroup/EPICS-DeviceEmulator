@@ -1,9 +1,8 @@
-from threading import Timer
 
-from lewis.adapters.stream import StreamInterface, Cmd
-from lewis.utils.command_builder import CmdBuilder
-from lewis.utils.replies import conditional_reply
 import threading
+
+from lewis.adapters.stream import StreamInterface
+from lewis.utils.replies import conditional_reply
 
 if_connected = conditional_reply("connected")
 DATA = "L12.123456T"

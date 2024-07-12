@@ -1,9 +1,9 @@
-from lewis.adapters.stream import StreamInterface, Cmd
+from lewis.adapters.stream import Cmd, StreamInterface
 from lewis.core.logging import has_log
-
 from lewis.utils.byte_conversions import raw_bytes_to_int
-from .response_utilities import check_is_byte, dm_memory_area_read_response_fins_frame
+
 from ..device import SimulatedFinsPLC
+from .response_utilities import check_is_byte, dm_memory_area_read_response_fins_frame
 
 
 @has_log
@@ -25,8 +25,7 @@ class FinsPLCStreamInterface(StreamInterface):
         return str(error)
 
     def any_command(self, command):
-        """
-        Handles all command sent to this emulator. It checks the validity of the command, and raises an error if it
+        """Handles all command sent to this emulator. It checks the validity of the command, and raises an error if it
         finds something invalid. If the command is valid, then it returns a string representing the response to the
         command.
 
@@ -115,8 +114,7 @@ class FinsPLCStreamInterface(StreamInterface):
         return reply
 
     def _log_fins_frame(self, fins_frame, is_reply):
-        """
-        Nicely displays every byte in the command as a hexadecimal number in the emulator log.
+        """Nicely displays every byte in the command as a hexadecimal number in the emulator log.
 
         Args:
             fins_frame (bytes): The fins frame we want to log.
@@ -142,8 +140,7 @@ class FinsPLCStreamInterface(StreamInterface):
         memory_start_address,
         number_of_words_to_read,
     ):
-        """
-        Nicely displays the bits of information in the FINS command that will be used for building the reply as numbers.
+        """Nicely displays the bits of information in the FINS command that will be used for building the reply as numbers.
 
         Args:
             client_network_address (int): The FINS network address of the client.
@@ -168,8 +165,7 @@ class FinsPLCStreamInterface(StreamInterface):
 
     @staticmethod
     def _check_fins_frame_header_validity(fins_frame_header):
-        """
-        Checks that the FINS frame header part of the command is valid for a command sent from a client to a server
+        """Checks that the FINS frame header part of the command is valid for a command sent from a client to a server
         (PLC).
 
         Args:

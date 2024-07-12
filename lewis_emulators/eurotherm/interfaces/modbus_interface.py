@@ -1,6 +1,6 @@
-from lewis.adapters.stream import StreamInterface, Cmd
+from lewis.adapters.stream import Cmd, StreamInterface
 from lewis.core.logging import has_log
-from lewis.utils.byte_conversions import int_to_raw_bytes, BYTE
+from lewis.utils.byte_conversions import BYTE, int_to_raw_bytes
 from lewis.utils.replies import conditional_reply
 
 
@@ -18,8 +18,7 @@ def bytes_to_int(bytes):
 
 
 def crc16(data):
-    """
-    CRC algorithm - translated from section 3-5 of eurotherm manual.
+    """CRC algorithm - translated from section 3-5 of eurotherm manual.
     :param data: the data to checksum
     :return: the checksum
     """
@@ -41,8 +40,7 @@ def crc16(data):
 
 @has_log
 class EurothermModbusInterface(StreamInterface):
-    """
-    This implements the modbus stream interface for a eurotherm.
+    """This implements the modbus stream interface for a eurotherm.
 
     Note: Eurotherm uses modbus RTU, not TCP, so cannot use lewis' normal modbus implementation here.
     """

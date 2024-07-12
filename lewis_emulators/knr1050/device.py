@@ -1,15 +1,17 @@
+import time
+from collections import OrderedDict
+
+from lewis.devices import StateMachineDevice
+
 from .states import (
+    HoldState,
+    IdleState,
     InitializingState,
     OffState,
-    IdleState,
-    RunState,
-    HoldState,
     PurgeState,
+    RunState,
     StandbyState,
 )
-from lewis.devices import StateMachineDevice
-from collections import OrderedDict
-import time
 
 states = OrderedDict(
     [
@@ -26,8 +28,7 @@ states = OrderedDict(
 
 class SimulatedKnr1050(StateMachineDevice):
     def _initialize_data(self):
-        """
-        Initialize all of the device's attributes.
+        """Initialize all of the device's attributes.
         """
         self.connected = True
         self.input_correct = True
@@ -55,9 +56,8 @@ class SimulatedKnr1050(StateMachineDevice):
 
     @property
     def time_stamp(self):
-        """
-        Returns:
-            (int) current time in ms
+        """Returns:
+        (int) current time in ms
         """
         return int(round(time.time() * 1000))
 

@@ -1,20 +1,20 @@
 from collections import OrderedDict
-from .states import DefaultState
+
 from lewis.devices import StateMachineDevice
-from .utils import Channel, StatusRegister, ScanTrigger
+
 from .buffer import Buffer
+from .states import DefaultState
+from .utils import Channel, ScanTrigger, StatusRegister
 
 
 class SimulatedKeithley2001(StateMachineDevice):
-    """
-    Simulated Keithley2700 Multimeter
+    """Simulated Keithley2700 Multimeter
     """
 
     number_of_times_device_has_been_reset = 0
 
     def _initialize_data(self):
-        """
-        Initialize all of the device's attributes.
+        """Initialize all of the device's attributes.
         """
         self.connect()
         self.idn = "KEITHLEY INSTRUMENTS INC.,MODEL 2001,4301578,B17  /A02  "
@@ -64,12 +64,10 @@ class SimulatedKeithley2001(StateMachineDevice):
         return OrderedDict([])
 
     def reset_device(self):
-        """
-        Resets device to initialized state.
+        """Resets device to initialized state.
 
         This does not reset the buffer or status register.
         """
-
         for element in self.elements:
             self.elements[element] = False
 
@@ -94,8 +92,7 @@ class SimulatedKeithley2001(StateMachineDevice):
         SimulatedKeithley2001.number_of_times_device_has_been_reset += 1
 
     def close_channel(self, channel):
-        """
-        Closes channel to read from and opens the previously closed channel.
+        """Closes channel to read from and opens the previously closed channel.
 
         Args:
             channel (int): Channel number to close.
@@ -104,7 +101,6 @@ class SimulatedKeithley2001(StateMachineDevice):
         Raises:
             ValueError if channel is not a valid channel.
         """
-
         channel = int(channel)
         try:
             if self.closed_channel != channel:
@@ -116,8 +112,7 @@ class SimulatedKeithley2001(StateMachineDevice):
             raise ValueError("Channel {} is not a valid channel".format(channel))
 
     def take_single_reading(self):
-        """
-        Takes a single reading from the closed channel.
+        """Takes a single reading from the closed channel.
 
         Returns:
             dict: closed channel reading data containing
@@ -125,7 +120,6 @@ class SimulatedKeithley2001(StateMachineDevice):
                 CHAN: Channel number
                 UNIT: channel reading unit
         """
-
         channel = self._channels[self.closed_channel]
         return {
             "READ": channel.reading,
@@ -135,14 +129,12 @@ class SimulatedKeithley2001(StateMachineDevice):
 
     @property
     def scan_trigger_type(self):
-        """
-        Returns name of the scan trigger type.
+        """Returns name of the scan trigger type.
         """
         return self._scan_trigger_type.name
 
     def scan_channels(self):
-        """
-        Generates buffer of readings.
+        """Generates buffer of readings.
 
         Each element of the buffer is a dictinoary of values
         generated from the channel.
@@ -160,71 +152,59 @@ class SimulatedKeithley2001(StateMachineDevice):
 
     @property
     def error(self):
-        """
-        Returns the current error status.
+        """Returns the current error status.
 
         Returns:
             list [int, string]: list of integer error code and error message.
         """
-
         return self._error
 
     def clear_error(self):
-        """
-        Clears any error
+        """Clears any error
         """
         self._error = [0, "No error"]
 
     def connect(self):
-        """
-        Connects the device.
+        """Connects the device.
         """
         self._connected = True
 
     def disconnect(self):
-        """
-        Disconnects the device.
+        """Disconnects the device.
         """
         self._connected = False
 
     # Backdoor functions
     def get_number_of_times_buffer_has_been_cleared_via_the_backdoor(self):
-        """
-        Gets the number of times the buffer has been cleared.
+        """Gets the number of times the buffer has been cleared.
         Only called via the backdoor.
 
         Returns:
             int: Number of times the buffer has been cleared.
         """
-
         return self.buffer.number_of_times_buffer_cleared
 
     def get_number_of_times_status_register_has_been_reset_and_cleared_via_the_backdoor(self):
-        """
-        Gets the number of times the status register has been reset and cleared.
+        """Gets the number of times the status register has been reset and cleared.
 
         Only called via the backdoor.
 
         Returns:
             int: Number of times the status register has been reset and cleared.
         """
-
         return self.status_register.number_of_times_reset_and_cleared
 
     def set_number_of_times_status_register_has_been_reset_and_cleared_via_the_backdoor(
         self, value
     ):
-        """
-        Sets the number of times the status register has been reset and cleared.
+        """Sets the number of times the status register has been reset and cleared.
 
         Only called via the backdoor.
         """
-
         self.status_register.number_of_times_reset_and_cleared = int(value)
 
     def set_channel_value_via_the_backdoor(self, channel, value, reading_unit):
-        """
-        Sets a channel value using Lewis backdoor.
+        """Sets a channel value using Lewis backdoor.
 
         rgs:
             channel (int): Channel number 1,2,3,4,6,7,8, or 9.
@@ -235,8 +215,7 @@ class SimulatedKeithley2001(StateMachineDevice):
         self._channels[channel].reading_units = reading_unit
 
     def set_error_via_the_backdoor(self, error_code, error_message):
-        """
-        Sets an error via the using Lewis backdoor.
+        """Sets an error via the using Lewis backdoor.
 
         Args:
             error_code (string): error code number
@@ -245,8 +224,7 @@ class SimulatedKeithley2001(StateMachineDevice):
         self._error = [int(error_code), error_message]
 
     def get_how_many_times_ioc_has_been_reset_via_the_backdoor(self):
-        """
-        Gets the number of times the ioc has been reset.
+        """Gets the number of times the ioc has been reset.
 
         Only called via the backdoor.
 
@@ -256,8 +234,7 @@ class SimulatedKeithley2001(StateMachineDevice):
         return self.number_of_times_ioc_has_been_reset
 
     def set_how_many_times_ioc_has_been_reset_via_the_backdoor(self, value):
-        """
-        Sets the number of times the ioc has been reset.
+        """Sets the number of times the ioc has been reset.
 
         Only called via the backdoor.
         """

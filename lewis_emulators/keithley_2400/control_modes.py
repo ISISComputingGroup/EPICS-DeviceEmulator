@@ -1,5 +1,4 @@
-"""
-Effectively enumerators for each of the various modes supported by the device. Allows checking for invalid mode
+"""Effectively enumerators for each of the various modes supported by the device. Allows checking for invalid mode
 strings and helps avoid typos.
 """
 

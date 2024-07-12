@@ -84,8 +84,7 @@ class MKS_PR4000B_StreamInterface(StreamInterface):
             )
 
     def _get_getter_and_setter_factories(self):
-        """
-        Returns a pair of functions (getter_factory, setter_factory) which can generate appropriate attribute getters
+        """Returns a pair of functions (getter_factory, setter_factory) which can generate appropriate attribute getters
         and setters for a given property name.
 
         For example:

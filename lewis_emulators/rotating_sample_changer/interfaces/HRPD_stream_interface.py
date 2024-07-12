@@ -1,4 +1,5 @@
 from lewis.adapters.stream import Cmd, StreamInterface
+
 from ..states import Errors
 
 

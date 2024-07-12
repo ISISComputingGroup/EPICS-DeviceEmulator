@@ -17,8 +17,8 @@
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 # *********************************************************************
 
-from lewis.core.statemachine import State
 from lewis.core import approaches
+from lewis.core.statemachine import State
 
 
 class DefaultNotCirculatingState(State):

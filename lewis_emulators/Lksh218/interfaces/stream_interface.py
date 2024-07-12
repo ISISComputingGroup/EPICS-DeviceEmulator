@@ -3,8 +3,7 @@ from lewis.utils.command_builder import CmdBuilder
 
 
 def if_connected(f):
-    """
-    Decorator that executes f if the device is connected and returns None otherwise.
+    """Decorator that executes f if the device is connected and returns None otherwise.
 
     Args:
         f: function to be executed if the device is connected.
@@ -25,8 +24,7 @@ def if_connected(f):
 
 
 class Lakeshore218StreamInterface(StreamInterface):
-    """
-    Stream interface for the serial port
+    """Stream interface for the serial port
     """
 
     in_terminator = "\r\n"
@@ -41,8 +39,7 @@ class Lakeshore218StreamInterface(StreamInterface):
 
     @if_connected
     def get_temp(self, number):
-        """
-        Returns the temperature of a TEMP pv.
+        """Returns the temperature of a TEMP pv.
 
         Args:
             number: integer between 1 and 8
@@ -56,8 +53,7 @@ class Lakeshore218StreamInterface(StreamInterface):
 
     @if_connected
     def get_sensor(self, number):
-        """
-        Returns the temperature of a SENSOR pv.
+        """Returns the temperature of a SENSOR pv.
 
         Args:
             number: integer between 1 and 8
@@ -71,8 +67,7 @@ class Lakeshore218StreamInterface(StreamInterface):
 
     @if_connected
     def get_temp_all(self):
-        """
-        Returns a string from TEMPALL pv.
+        """Returns a string from TEMPALL pv.
 
         Returns:
             string: value of TEMPALL pv.
@@ -81,8 +76,7 @@ class Lakeshore218StreamInterface(StreamInterface):
 
     @if_connected
     def get_sensor_all(self):
-        """
-        Returns a string from SENSORALL pv.
+        """Returns a string from SENSORALL pv.
 
         Returns:
             string: value of SENSORALL pv.

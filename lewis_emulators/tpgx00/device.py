@@ -1,7 +1,9 @@
 from collections import OrderedDict
-from lewis.devices import StateMachineDevice
-from .states import DefaultState
 from enum import Enum, unique
+
+from lewis.devices import StateMachineDevice
+
+from .states import DefaultState
 
 
 @unique
@@ -85,10 +87,9 @@ class ReadState(Enum):
 
 
 class CircuitAssignment:
-    """
-    This object represents settings for a circuit in the device.
-        these settings are: high_threshold(float), high_exponent(int),
-        low_threshold(float), low_exponent(int), circuit_assignment(SFAssignment enum member)
+    """This object represents settings for a circuit in the device.
+    these settings are: high_threshold(float), high_exponent(int),
+    low_threshold(float), low_exponent(int), circuit_assignment(SFAssignment enum member)
     """
 
     def __init__(
@@ -99,8 +100,7 @@ class CircuitAssignment:
         low_exponent=0,
         circuit_assignment="A1",
     ):
-        """
-        Default constructor.
+        """Default constructor.
         """
         self.high_threshold = high_threshold
         self.high_exponent = high_exponent
@@ -110,15 +110,12 @@ class CircuitAssignment:
 
 
 class SimulatedTpgx00(StateMachineDevice):
-    """
-    Simulated device for both the TPG300 and TPG500.
+    """Simulated device for both the TPG300 and TPG500.
     """
 
     def _initialize_data(self):
+        """Sets the initial state of the device.
         """
-        Sets the initial state of the device.
-        """
-
         self.__pressure_a1 = 0.0
         self.__pressure_a2 = 0.0
         self.__pressure_b1 = 0.0
@@ -161,30 +158,25 @@ class SimulatedTpgx00(StateMachineDevice):
 
     @staticmethod
     def _get_state_handlers():
+        """Returns: states and their names
         """
-        Returns: states and their names
-        """
-
         return {DefaultState.NAME: DefaultState()}
 
     @staticmethod
     def _get_initial_state():
-        """
-        Returns: the name of the initial state
+        """Returns: the name of the initial state
         """
         return DefaultState.NAME
 
     @staticmethod
     def _get_transition_handlers():
-        """
-        Returns: the state transitions
+        """Returns: the state transitions
         """
         return OrderedDict()
 
     @property
     def pressure_a1(self):
-        """
-        Returns the value of the A1 pressure sensor.
+        """Returns the value of the A1 pressure sensor.
 
         Returns:
             float: Pressure A1 value.
@@ -193,11 +185,11 @@ class SimulatedTpgx00(StateMachineDevice):
 
     @pressure_a1.setter
     def pressure_a1(self, value):
-        """
-        Sets the A1 pressure sensor.
+        """Sets the A1 pressure sensor.
 
         Args:
             value: Value to set A1 pressure sensor to.
+
         Returns:
             None
         """
@@ -205,8 +197,7 @@ class SimulatedTpgx00(StateMachineDevice):
 
     @property
     def pressure_a2(self):
-        """
-        Returns the value of the A2 pressure sensor.
+        """Returns the value of the A2 pressure sensor.
 
         Returns:
             float: Pressure A1 value.
@@ -215,11 +206,11 @@ class SimulatedTpgx00(StateMachineDevice):
 
     @pressure_a2.setter
     def pressure_a2(self, value):
-        """
-        Sets the B1 pressure sensor.
+        """Sets the B1 pressure sensor.
 
         Args:
             value: Value to set B1 pressure sensor to.
+
         Returns:
             None
         """
@@ -227,8 +218,7 @@ class SimulatedTpgx00(StateMachineDevice):
 
     @property
     def pressure_b1(self):
-        """
-        Returns the value of the A2 pressure sensor.
+        """Returns the value of the A2 pressure sensor.
 
         Returns:
             float: Pressure A1 value.
@@ -237,11 +227,11 @@ class SimulatedTpgx00(StateMachineDevice):
 
     @pressure_b1.setter
     def pressure_b1(self, value):
-        """
-        Sets the B1 pressure sensor.
+        """Sets the B1 pressure sensor.
 
         Args:
             value: Value to set B1 pressure sensor to.
+
         Returns:
             None
         """
@@ -249,8 +239,7 @@ class SimulatedTpgx00(StateMachineDevice):
 
     @property
     def pressure_b2(self):
-        """
-        Returns the value of the B2 pressure sensor.
+        """Returns the value of the B2 pressure sensor.
 
         Returns:
             float: Pressure B2 value.
@@ -259,11 +248,11 @@ class SimulatedTpgx00(StateMachineDevice):
 
     @pressure_b2.setter
     def pressure_b2(self, value):
-        """
-        Sets the B2 pressure sensor.
+        """Sets the B2 pressure sensor.
 
         Args:
             value: Value to set B2 pressure sensor to.
+
         Returns:
             None
         """
@@ -271,8 +260,7 @@ class SimulatedTpgx00(StateMachineDevice):
 
     @property
     def pressure_status_a1(self):
-        """
-        Returns the status of the A1 pressure sensor
+        """Returns the status of the A1 pressure sensor
 
         Returns:
             Enum memeber: A1 pressure sensor status
@@ -281,8 +269,7 @@ class SimulatedTpgx00(StateMachineDevice):
 
     @pressure_status_a1.setter
     def pressure_status_a1(self, value):
-        """
-        Sets the status of the A1 pressure sensor
+        """Sets the status of the A1 pressure sensor
         (Only used via backdoor)
 
         Args:
@@ -294,8 +281,7 @@ class SimulatedTpgx00(StateMachineDevice):
 
     @property
     def pressure_status_a2(self):
-        """
-        Returns the status of the A2 pressure sensor
+        """Returns the status of the A2 pressure sensor
 
         Returns:
             Enum memeber: A2 pressure sensor status
@@ -304,8 +290,7 @@ class SimulatedTpgx00(StateMachineDevice):
 
     @pressure_status_a2.setter
     def pressure_status_a2(self, value):
-        """
-        Sets the status of the A2 pressure sensor
+        """Sets the status of the A2 pressure sensor
         (Only used via backdoor)
 
         Args:
@@ -317,8 +302,7 @@ class SimulatedTpgx00(StateMachineDevice):
 
     @property
     def pressure_status_b1(self):
-        """
-        Returns the status of the B1 pressure sensor
+        """Returns the status of the B1 pressure sensor
 
         Returns:
             Enum memeber: B1 pressure sensor status
@@ -327,8 +311,7 @@ class SimulatedTpgx00(StateMachineDevice):
 
     @pressure_status_b1.setter
     def pressure_status_b1(self, value):
-        """
-        Sets the status of the B1 pressure sensor
+        """Sets the status of the B1 pressure sensor
         (Only used via backdoor)
 
         Args:
@@ -340,8 +323,7 @@ class SimulatedTpgx00(StateMachineDevice):
 
     @property
     def pressure_status_b2(self):
-        """
-        Returns the status of the B2 pressure sensor
+        """Returns the status of the B2 pressure sensor
 
         Returns:
             Enum memeber: B2 pressure sensor status
@@ -350,8 +332,7 @@ class SimulatedTpgx00(StateMachineDevice):
 
     @pressure_status_b2.setter
     def pressure_status_b2(self, value):
-        """
-        Sets the status of the B2 pressure sensor
+        """Sets the status of the B2 pressure sensor
         (Only used via backdoor)
 
         Args:
@@ -363,8 +344,7 @@ class SimulatedTpgx00(StateMachineDevice):
 
     @property
     def units(self):
-        """
-        Returns units currently set of the device.
+        """Returns units currently set of the device.
 
         Returns:
             unit (Enum member): Enum member of Units Enum.
@@ -373,11 +353,11 @@ class SimulatedTpgx00(StateMachineDevice):
 
     @units.setter
     def units(self, units):
-        """
-        Sets the devices units.
+        """Sets the devices units.
 
         Args:
             units: Enum member of Units.
+
         Returns:
             None
         """
@@ -385,8 +365,7 @@ class SimulatedTpgx00(StateMachineDevice):
 
     @property
     def switching_functions_status(self):
-        """
-        Returns status of the switching functions.
+        """Returns status of the switching functions.
 
         Returns:
             a dictionary of 6 Enum members which can be SFStatus.OFF (off) or SFStatus.ON (on)
@@ -395,8 +374,7 @@ class SimulatedTpgx00(StateMachineDevice):
 
     @switching_functions_status.setter
     def switching_functions_status(self, statuses):
-        """
-        Sets the status of the switching functions.
+        """Sets the status of the switching functions.
 
         Args:
             status: list of 6 values which can be 'OFF' or 'ON'
@@ -408,8 +386,7 @@ class SimulatedTpgx00(StateMachineDevice):
 
     @property
     def switching_functions(self):
-        """
-        Returns the settings of a switching function
+        """Returns the settings of a switching function
 
         Returns:
             list of 6 CircuitAssignment instances
@@ -418,8 +395,7 @@ class SimulatedTpgx00(StateMachineDevice):
 
     @switching_functions.setter
     def switching_functions(self, function_list):
-        """
-        Sets the status of the switching functions.
+        """Sets the status of the switching functions.
 
         Args:
             function_list: list of 6 CircuitAssignment instances
@@ -430,8 +406,7 @@ class SimulatedTpgx00(StateMachineDevice):
 
     @property
     def switching_function_to_set(self):
-        """
-        Returns the thresholds of the switching function that will be saved upon receiving ENQ signal.
+        """Returns the thresholds of the switching function that will be saved upon receiving ENQ signal.
 
         Returns:
             CircuitAssignment instance
@@ -440,8 +415,7 @@ class SimulatedTpgx00(StateMachineDevice):
 
     @switching_function_to_set.setter
     def switching_function_to_set(self, function):
-        """
-        Sets the thresholds of the switching function that will be saved upon receiving ENQ signal.
+        """Sets the thresholds of the switching function that will be saved upon receiving ENQ signal.
 
         Args:
             function: CircuitAssignment instance
@@ -452,8 +426,7 @@ class SimulatedTpgx00(StateMachineDevice):
 
     @property
     def switching_function_assignment(self, function):
-        """
-        Returns the assignment of the current switching function
+        """Returns the assignment of the current switching function
 
         Args:
             function: (string) the switching function to retrieve the switching function assignment for.
@@ -462,8 +435,7 @@ class SimulatedTpgx00(StateMachineDevice):
 
     @property
     def on_timer(self):
-        """
-        Returns the ON-Timer property
+        """Returns the ON-Timer property
 
         Returns:
             int: (0-100) ON-Timer value
@@ -472,8 +444,7 @@ class SimulatedTpgx00(StateMachineDevice):
 
     @property
     def error_status(self):
-        """
-        Returns the error status of the device
+        """Returns the error status of the device
 
         Returns:
             Enum: ErrorStatus code of the device
@@ -482,8 +453,7 @@ class SimulatedTpgx00(StateMachineDevice):
 
     @error_status.setter
     def error_status(self, error):
-        """
-        Sets the error status of the device. Called only via the backdoor using lewis.
+        """Sets the error status of the device. Called only via the backdoor using lewis.
 
         Args:
             string: the enum name of the error status to be set
@@ -495,8 +465,7 @@ class SimulatedTpgx00(StateMachineDevice):
 
     @property
     def connected(self):
-        """
-        Returns the current connected state.
+        """Returns the current connected state.
 
         Returns:
             bool: Current connected state.
@@ -504,29 +473,24 @@ class SimulatedTpgx00(StateMachineDevice):
         return self.__connected
 
     def connect(self):
-        """
-        Connects the device.
+        """Connects the device.
 
         Returns:
             None
         """
-
         self.__connected = True
 
     def disconnect(self):
-        """
-        Disconnects the device.
+        """Disconnects the device.
 
         Returns:
             None
         """
-
         self.__connected = False
 
     @property
     def readstate(self):
-        """
-        Returns the readstate for the device
+        """Returns the readstate for the device
 
         Returns:
             Enum: Readstate of the device.
@@ -535,8 +499,7 @@ class SimulatedTpgx00(StateMachineDevice):
 
     @readstate.setter
     def readstate(self, state):
-        """
-        Sets the readstate of the device
+        """Sets the readstate of the device
 
         Args:
             state: (string) readstate name of the device to be set
@@ -547,18 +510,15 @@ class SimulatedTpgx00(StateMachineDevice):
         self.__readstate = ReadState[state]
 
     def backdoor_get_unit(self):
-        """
-        Gets unit on device. Called only via the backdoor using lewis.
+        """Gets unit on device. Called only via the backdoor using lewis.
 
         Returns:
             unit (string): Unit enum name
         """
-
         return self.units.name
 
     def backdoor_get_switching_fn(self):
-        """
-        Gets the current switching function in use on the device.
+        """Gets the current switching function in use on the device.
         Called only via the backdoor using lewis.
 
         Returns:
@@ -567,8 +527,7 @@ class SimulatedTpgx00(StateMachineDevice):
         return self.switching_function_to_set.circuit_assignment.name
 
     def backdoor_set_switching_function_status(self, statuses):
-        """
-        Sets status of switching functions. Called only via the backdoor using lewis.
+        """Sets status of switching functions. Called only via the backdoor using lewis.
 
         Args:
             status: list of 6 values (strings) which can be 'OFF' or 'ON'
@@ -579,8 +538,7 @@ class SimulatedTpgx00(StateMachineDevice):
         self.switching_functions_status = statuses
 
     def backdoor_set_pressure_status(self, channel, status):
-        """
-        Sets the pressure status of the specified channel. Called only via the backdoor using lewis.
+        """Sets the pressure status of the specified channel. Called only via the backdoor using lewis.
 
         Args:
             channel (string): the pressure channel to set to
@@ -593,11 +551,11 @@ class SimulatedTpgx00(StateMachineDevice):
         setattr(self, status_suffix, ChannelStatus[status])
 
     def backdoor_set_error_status(self, error):
-        """
-        Sets the current error status on the device. Called only via the backdoor using lewis.
+        """Sets the current error status on the device. Called only via the backdoor using lewis.
 
         Args:
             status (string): the enum name of the error status to be set.
+
         Returns:
             None
         """

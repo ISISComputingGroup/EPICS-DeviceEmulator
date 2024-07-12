@@ -1,7 +1,8 @@
-from lewis.adapters.stream import StreamInterface, Cmd
+from functools import partial
+
+from lewis.adapters.stream import Cmd, StreamInterface
 from lewis.core.logging import has_log
 from lewis.utils.byte_conversions import int_to_raw_bytes, raw_bytes_to_int
-from functools import partial
 
 BYTES_IN_INT = 4
 HEADER_LENGTH = 4 * BYTES_IN_INT
@@ -54,8 +55,7 @@ ANC_STATUS_ENABLE = 0x1000
 
 
 def convert_to_ints(command, start, end):
-    """
-    Converts an incoming set of bytes into a list of ints. Assuming there are BYTES_IN_INT bytes in an int.
+    """Converts an incoming set of bytes into a list of ints. Assuming there are BYTES_IN_INT bytes in an int.
 
     Args:
         command: The incoming bytes.
@@ -70,8 +70,7 @@ def convert_to_ints(command, start, end):
 
 
 def generate_response(address, index, correlation_num, data=None):
-    """
-    Creates a response of the format:
+    """Creates a response of the format:
     * Length (the length of the response)
     * Opcode (always ACK in this case)
     * Address (where the driver had read/written to)

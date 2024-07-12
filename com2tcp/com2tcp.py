@@ -1,9 +1,10 @@
-import serial
-import time
-import socket
-import threading
 import argparse
+import socket
 import sys
+import threading
+import time
+
+import serial
 
 
 def listen_to_tcp(tcp_conn, serial_conn):
@@ -54,7 +55,7 @@ if __name__ == "__main__":
                 tcp_conn.sendall(data)
 
             time.sleep(0.001)
-    except (KeyboardInterrupt, SystemExit) as e:
+    except (KeyboardInterrupt, SystemExit):
         pass
     finally:
         tcp_conn.close()

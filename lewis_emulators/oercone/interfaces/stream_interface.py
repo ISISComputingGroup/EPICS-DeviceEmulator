@@ -1,8 +1,9 @@
-from lewis.adapters.stream import StreamInterface, Cmd
-from lewis.utils.command_builder import CmdBuilder
+from lewis.adapters.stream import StreamInterface
 from lewis.core.logging import has_log
-from ..device import Units, ReadState
+from lewis.utils.command_builder import CmdBuilder
 from lewis.utils.constants import ACK, ENQ
+
+from ..device import ReadState, Units
 
 
 @has_log
@@ -23,12 +24,12 @@ class OerconeStreamInterface(StreamInterface):
     out_terminator = "\r\n"
 
     def handle_error(self, request, error):
-        """
-        Prints and logs an error message if a command is not recognised.
+        """Prints and logs an error message if a command is not recognised.
 
         Args:
             request : Request.
             error: The error that has occurred.
+
         Returns:
             String: The error string.
         """
@@ -40,8 +41,7 @@ class OerconeStreamInterface(StreamInterface):
         return err_string
 
     def handle_enquiry(self):
-        """
-        Handles an enquiry using the last command sent.
+        """Handles an enquiry using the last command sent.
 
         Returns:
             String: Channel pressure if last command was in channels.
@@ -69,8 +69,7 @@ class OerconeStreamInterface(StreamInterface):
             )
 
     def acknowledge_pressure(self):
-        """
-        Acknowledges a request to get the pressure and stores the request.
+        """Acknowledges a request to get the pressure and stores the request.
 
         Returns:
             ASCII acknowledgement character (0x6).
@@ -79,8 +78,7 @@ class OerconeStreamInterface(StreamInterface):
         return ACK
 
     def acknowledge_measurement_unit(self):
-        """
-        Acknowledge that the request to get the units was received.
+        """Acknowledge that the request to get the units was received.
 
         Returns:
             ASCII acknowledgement character (0x6).
@@ -89,8 +87,7 @@ class OerconeStreamInterface(StreamInterface):
         return ACK
 
     def acknowledge_set_measurement_unit(self, units):
-        """
-        Acknowledge that the request to set the units was received.
+        """Acknowledge that the request to set the units was received.
 
         Args:
             units (integer): Takes the value 1, 2 or 3.
@@ -103,8 +100,7 @@ class OerconeStreamInterface(StreamInterface):
         return ACK
 
     def get_pressure(self):
-        """
-        Gets the pressure for the device.
+        """Gets the pressure for the device.
 
         Returns:
             String: Pressure from the channel.
@@ -112,8 +108,7 @@ class OerconeStreamInterface(StreamInterface):
         return "0,{}".format(self._device.pressure)
 
     def get_measurement_unit(self):
-        """
-        Gets the units of the device.
+        """Gets the units of the device.
 
         Returns:
             Name of the units.
@@ -121,8 +116,7 @@ class OerconeStreamInterface(StreamInterface):
         return "{}".format(self._device.measurement_unit.value)
 
     def set_measurement_unit(self, units):
-        """
-        Sets the units on the device.
+        """Sets the units on the device.
 
         Args:
             units (Units member): Units to be set

@@ -1,9 +1,9 @@
 from lewis.adapters.stream import StreamInterface
-from lewis.utils.command_builder import CmdBuilder
 from lewis.core.logging import has_log
+from lewis.utils.command_builder import CmdBuilder
 from lewis.utils.replies import conditional_reply
-from ..device import PumpStates, GaugeStates, GaugeUnits, PriorityStates
 
+from ..device import GaugeStates, GaugeUnits, PriorityStates, PumpStates
 
 PUMPSTATES_MAP = {
     0: PumpStates.stopped,
@@ -38,8 +38,7 @@ PRIORITYSTATES_MAP = {PriorityStates.OK: 0, PriorityStates.Warning: 1, PriorityS
 
 
 def reverse_dict_lookup(dictionary, value_to_find):
-    """
-    Looks up the key for the supplied value in dictionary dict.
+    """Looks up the key for the supplied value in dictionary dict.
 
     Args:
         dictionary: dictionary, the dictionary to do the reverse lookup
@@ -48,7 +47,6 @@ def reverse_dict_lookup(dictionary, value_to_find):
     Raises:
         KeyError if value does not exist in the dictionary
     """
-
     for key, value in dictionary.items():
         if value == value_to_find:
             return key
@@ -82,16 +80,15 @@ class EdwardsTICStreamInterface(StreamInterface):
     ACK = "&ACK!" + out_terminator
 
     def handle_error(self, request, error):
-        """
-        Prints an error message if a command is not recognised.
+        """Prints an error message if a command is not recognised.
 
         Args:
             request : Request.
             error: The error that has occurred.
+
         Returns:
             None.
         """
-
         self.log.info("An error occurred at request {}: {}".format(request, error))
 
     @conditional_reply("connected")

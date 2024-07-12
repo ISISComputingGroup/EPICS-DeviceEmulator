@@ -1,16 +1,15 @@
-from lewis.adapters.stream import StreamInterface, Cmd
+from enum import Enum
 
+from lewis.adapters.stream import StreamInterface
 from lewis.utils.command_builder import CmdBuilder
 from lewis.utils.replies import conditional_reply
-from enum import Enum
 
 if_connected = conditional_reply("connected")
 if_input_error = conditional_reply("input_correct", "ER,OF,00")
 
 
 class Modes(Enum):
-    """
-    Device Modes
+    """Device Modes
     """
 
     MEASURE = "R0"  # Read measured values

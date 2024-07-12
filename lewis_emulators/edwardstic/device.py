@@ -1,13 +1,13 @@
 from collections import OrderedDict
-from lewis.devices import StateMachineDevice
 from enum import Enum
+
+from lewis.devices import StateMachineDevice
 
 from .states import DefaultState
 
 
 class OnOffStates(Enum):
-    """
-    Holds whether a device function is on or off
+    """Holds whether a device function is on or off
     """
 
     on = 4
@@ -15,8 +15,7 @@ class OnOffStates(Enum):
 
 
 class PumpStates(object):
-    """
-    The pump states
+    """The pump states
     """
 
     stopped = object()
@@ -30,8 +29,7 @@ class PumpStates(object):
 
 
 class GaugeStates(object):
-    """
-    Possible gauge states
+    """Possible gauge states
     """
 
     not_connected = object()
@@ -50,8 +48,7 @@ class GaugeStates(object):
 
 
 class PriorityStates(object):
-    """
-    Priority values
+    """Priority values
     """
 
     OK = object()
@@ -60,8 +57,7 @@ class PriorityStates(object):
 
 
 class GaugeUnits(object):
-    """
-    Units the gauges can measure in
+    """Units the gauges can measure in
     """
 
     Pa = object()
@@ -71,10 +67,8 @@ class GaugeUnits(object):
 
 class SimulatedEdwardsTIC(StateMachineDevice):
     def _initialize_data(self):
+        """Initialize all of the device's attributes.
         """
-        Initialize all of the device's attributes.
-        """
-
         self._turbo_pump = PumpStates.stopped
         self._turbo_priority = PriorityStates.OK
         self._turbo_alert = 0
@@ -101,34 +95,28 @@ class SimulatedEdwardsTIC(StateMachineDevice):
 
     @property
     def turbo_in_standby(self):
-        """
-        Gets whether the turbo is in standby mode
+        """Gets whether the turbo is in standby mode
 
         Returns:
             _turbo_standby: Bool, True if the turbo is in standby mode
         """
-
         return self._turbo_in_standby
 
     @turbo_in_standby.setter
     def turbo_in_standby(self, value):
-        """
-        Sets the turbo standby mode
+        """Sets the turbo standby mode
 
         Args:
             value: Bool, True to set standby mode. False to unset standby mode
         """
-
         self._turbo_in_standby = value
 
     def turbo_set_standby(self, value):
-        """
-        Sets / unsets turbo standby mode
+        """Sets / unsets turbo standby mode
 
         Args:
             value, int: 1 to set standby mode, 0 to unset standby.
         """
-
         if value == 1:
             self.log.info("Entering turbo standby mode")
             self._turbo_in_standby = True
@@ -140,15 +128,12 @@ class SimulatedEdwardsTIC(StateMachineDevice):
 
     @property
     def turbo_pump(self):
+        """Gets the running state of the turbo pump
         """
-        Gets the running state of the turbo pump
-        """
-
         return self._turbo_pump
 
     def set_turbo_pump_state(self, state):
-        """
-        Sets the state of the turbo pump.
+        """Sets the state of the turbo pump.
         This function doesn't exist on the real device and is only called through the back door.
 
         Args:
@@ -159,13 +144,11 @@ class SimulatedEdwardsTIC(StateMachineDevice):
         self._turbo_pump = pump_state
 
     def turbo_start_stop(self, value):
-        """
-        Sets the turbo pump running/stopping
+        """Sets the turbo pump running/stopping
 
         Args:
             value: int, 1 if starting the pump 0 to stop the pump
         """
-
         self.log.info("Starting or stopping turbo {}".format(value))
 
         if value == 1:
@@ -179,77 +162,62 @@ class SimulatedEdwardsTIC(StateMachineDevice):
 
     @property
     def turbo_priority(self):
+        """Gets the priority state of the turbo pump
         """
-        Gets the priority state of the turbo pump
-        """
-
         self.log.info("Getting priority {}".format(self._turbo_priority))
 
         return self._turbo_priority
 
     def set_turbo_priority(self, state):
-        """
-        Sets the priority state of the turbo pump.
+        """Sets the priority state of the turbo pump.
         This function doesn't exist on the real device and is only called through the back door.
 
         Args:
             state: object, an attribute of the PumpStates class
         """
-
         priority_state = getattr(PriorityStates, state)
 
         self._turbo_priority = priority_state
 
     @property
     def turbo_alert(self):
+        """Gets the alert state of the turbo pump
         """
-        Gets the alert state of the turbo pump
-        """
-
         return self._turbo_alert
 
     # This setter doesn't exist on the 'real' device
     def set_turbo_alert(self, state):
-        """
-        Sets the alert state of the turbo pump
+        """Sets the alert state of the turbo pump
 
         Args:
             state: Int, the alert value
         """
-
         self._turbo_alert = state
 
     @property
     def gauge_pressure(self):
+        """Gets the gauge pressure
         """
-        Gets the gauge pressure
-        """
-
         return self._gauge_pressure
 
     @gauge_pressure.setter
     def gauge_pressure(self, value):
-        """
-        Sets the gauge pressure.
+        """Sets the gauge pressure.
         This function is not present on the real device and can only be accessed through the backdoor.
 
         Args:
             value: float, The value to set the gauge pressure to.
         """
-
         self._gauge_pressure = value
 
     @property
     def gauge_state(self):
+        """Gets the running state of the gauges
         """
-        Gets the running state of the gauges
-        """
-
         return self._gauge_state
 
     def set_gauge_state(self, state):
-        """
-        Sets the state of the gauges
+        """Sets the state of the gauges
         This function doesn't exist on the real device and is only called through the back door.
 
         Args:
@@ -264,41 +232,33 @@ class SimulatedEdwardsTIC(StateMachineDevice):
         return self._gauge_alert
 
     def set_gauge_alert(self, state):
-        """
-        Sets the alert state of the gauges.
+        """Sets the alert state of the gauges.
         This is only accessed through the back door
 
         Args:
             state: Int, the alert value
         """
-
         self._gauge_alert = state
 
     @property
     def gauge_priority(self):
+        """Gets the priority state of the gauges
         """
-        Gets the priority state of the gauges
-        """
-
         return self._gauge_priority
 
     def set_gauge_priority(self, state):
-        """
-        Sets the priority state of the gauges.
+        """Sets the priority state of the gauges.
         This function doesn't exist on the real device and is only called through the back door.
 
         Args:
             state: object, an attribute of the PumpStates class
         """
-
         priority_state = getattr(PriorityStates, state)
 
         self._gauge_priority = priority_state
 
     @property
     def gauge_units(self):
+        """Getter for the gauge units
         """
-        Getter for the gauge units
-        """
-
         return self._gauge_units

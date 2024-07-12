@@ -1,13 +1,14 @@
 from collections import OrderedDict
-from .states import DefaultState
+
 from lewis.devices import StateMachineDevice
+
 from .interfaces.stream_interface import Modes
+from .states import DefaultState
 
 
 class SimulatedKeylkg(StateMachineDevice):
     def _initialize_data(self):
-        """
-        Initialize all of the device's attributes.
+        """Initialize all of the device's attributes.
         """
         self.connected = True
         self.input_correct = True

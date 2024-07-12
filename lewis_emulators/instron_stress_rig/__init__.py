@@ -1,5 +1,5 @@
-from .device import SimulatedInstron
 from ..lewis_versions import LEWIS_LATEST
+from .device import SimulatedInstron
 
 framework_version = LEWIS_LATEST
 __all__ = ["SimulatedInstron"]
