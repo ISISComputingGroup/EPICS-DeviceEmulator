@@ -3,14 +3,17 @@ from .states import StoppedState, JoggingState, MovingState, HomingState
 from lewis.devices import StateMachineDevice
 
 
-states = OrderedDict([("Stopped", StoppedState()),
-                      ("Moving", MovingState()),
-                      ("Homing", HomingState()),
-                      ("Jogging", JoggingState())])
+states = OrderedDict(
+    [
+        ("Stopped", StoppedState()),
+        ("Moving", MovingState()),
+        ("Homing", HomingState()),
+        ("Jogging", JoggingState()),
+    ]
+)
 
 
 class SimulatedMclennan(StateMachineDevice):
-
     def _initialize_data(self):
         """
         Initialize all of the device's attributes.
@@ -96,11 +99,13 @@ class SimulatedMclennan(StateMachineDevice):
         return "Stopped"
 
     def _get_transition_handlers(self):
-        return OrderedDict([
-            (("Stopped", "Jogging"), lambda: self.is_jogging),
-            (("Jogging", "Stopped"), lambda: not self.is_jogging),
-            (("Stopped", "Moving"), lambda: self.is_moving),
-            (("Moving", "Stopped"), lambda: not self.is_moving),
-            (("Stopped", "Homing"), lambda: self.is_homing),
-            (("Homing", "Stopped"), lambda: not self.is_homing),
-        ])
+        return OrderedDict(
+            [
+                (("Stopped", "Jogging"), lambda: self.is_jogging),
+                (("Jogging", "Stopped"), lambda: not self.is_jogging),
+                (("Stopped", "Moving"), lambda: self.is_moving),
+                (("Moving", "Stopped"), lambda: not self.is_moving),
+                (("Stopped", "Homing"), lambda: self.is_homing),
+                (("Homing", "Stopped"), lambda: not self.is_homing),
+            ]
+        )

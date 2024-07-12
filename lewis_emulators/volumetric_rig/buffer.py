@@ -9,6 +9,7 @@ class Buffer(object):
     changed and the buffer fills from the system gas it is connected to. The valve can only be opened if mixing of
     the system and buffer gas are permitted
     """
+
     def __init__(self, index, buffer_gas, system_gas):
         assert buffer_gas is not None
         assert system_gas is not None

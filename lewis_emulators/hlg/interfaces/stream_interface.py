@@ -22,7 +22,7 @@ class HlgStreamInterface(StreamInterface):
     commands = {
         CmdBuilder("get_level").escape("PM").build(),
         CmdBuilder("set_verbosity").escape("CV").int().build(),
-        CmdBuilder("set_prefix").escape("CP").int().build()
+        CmdBuilder("set_prefix").escape("CP").int().build(),
     }
 
     in_terminator = "\r\n"
@@ -68,12 +68,13 @@ class HlgStreamInterface(StreamInterface):
 
         """
         if not 0 <= prefix < len(PREFIXES):
-            raise AssertionError("Prefix must be between 0 and {1} '{0}'".format(prefix, len(PREFIXES)))
+            raise AssertionError(
+                "Prefix must be between 0 and {1} '{0}'".format(prefix, len(PREFIXES))
+            )
         self._device.prefix = prefix
         return self._format_output("CP{0}".format(prefix), "Verbose=", str(prefix))
 
     def get_level(self):
-
         """
         Gets the current level
 
@@ -83,7 +84,9 @@ class HlgStreamInterface(StreamInterface):
         if self._device.level is None:
             return None
         else:
-            return self._format_output("PM", "Probe value=", "{level:.3f} mm".format(level=self._device.level))
+            return self._format_output(
+                "PM", "Probe value=", "{level:.3f} mm".format(level=self._device.level)
+            )
 
     def _format_output(self, echo, verbose_prefix, data):
         """

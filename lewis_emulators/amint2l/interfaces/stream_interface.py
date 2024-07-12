@@ -21,7 +21,6 @@ class Amint2lStreamInterface(StreamInterface):
     out_terminator = chr(3)
 
     def __init__(self):
-
         super(Amint2lStreamInterface, self).__init__()
         self.commands = {
             CmdBuilder(self.get_pressure).stx().arg("[A-Fa-f0-9]+").escape("r").build()
@@ -41,7 +40,6 @@ class Amint2lStreamInterface(StreamInterface):
 
     @if_connected
     def get_pressure(self, address):
-
         """
         Gets the current pressure
 

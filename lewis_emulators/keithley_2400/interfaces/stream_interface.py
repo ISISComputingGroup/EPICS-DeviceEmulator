@@ -9,7 +9,6 @@ SCI_NOTATION_REGEX = r"[-+]?[0-9]*\.?[0-9]*e?[-+]?[0-9]+"
 
 @has_log
 class Keithley2400StreamInterface(StreamInterface):
-
     # Commands that we expect via serial during normal operation
     serial_commands = {
         CmdBuilder("get_values").escape(":READ?").build(),
@@ -27,35 +26,71 @@ class Keithley2400StreamInterface(StreamInterface):
         CmdBuilder("get_remote_sensing_mode").escape(":SYST:RSEN?").build(),
         CmdBuilder("set_remote_sensing_mode").escape(":SYST:RSEN ").enum("0", "1").build(),
         CmdBuilder("get_resistance_range_mode").escape(":SENS:RES:RANG:AUTO?").build(),
-        CmdBuilder("set_resistance_range_mode").escape(":SENS:RES:RANG:AUTO ").enum("0", "1").build(),
+        CmdBuilder("set_resistance_range_mode")
+        .escape(":SENS:RES:RANG:AUTO ")
+        .enum("0", "1")
+        .build(),
         CmdBuilder("get_resistance_range").escape(":SENS:RES:RANG?").build(),
-        CmdBuilder("set_resistance_range").escape(":SENS:RES:RANG ").arg(SCI_NOTATION_REGEX).build(),
+        CmdBuilder("set_resistance_range")
+        .escape(":SENS:RES:RANG ")
+        .arg(SCI_NOTATION_REGEX)
+        .build(),
         CmdBuilder("get_source_mode").escape(":SOUR:FUNC?").build(),
         CmdBuilder("set_source_mode").escape(":SOUR:FUNC ").enum("CURR", "VOLT").build(),
         CmdBuilder("get_current_compliance").escape(":SENS:CURR:PROT?").build(),
-        CmdBuilder("set_current_compliance").escape(":SENS:CURR:PROT ").arg(SCI_NOTATION_REGEX).build(),
+        CmdBuilder("set_current_compliance")
+        .escape(":SENS:CURR:PROT ")
+        .arg(SCI_NOTATION_REGEX)
+        .build(),
         CmdBuilder("get_voltage_compliance").escape(":SENS:VOLT:PROT?").build(),
-        CmdBuilder("set_voltage_compliance").escape(":SENS:VOLT:PROT ").arg(SCI_NOTATION_REGEX).build(),
+        CmdBuilder("set_voltage_compliance")
+        .escape(":SENS:VOLT:PROT ")
+        .arg(SCI_NOTATION_REGEX)
+        .build(),
         CmdBuilder("get_source_voltage").escape(":SOUR:VOLT:LEV?").build(),
         CmdBuilder("set_source_voltage").escape(":SOUR:VOLT:LEV ").arg(SCI_NOTATION_REGEX).build(),
         CmdBuilder("get_source_current").escape(":SOUR:CURR:LEV?").build(),
         CmdBuilder("set_source_current").escape(":SOUR:CURR:LEV ").arg(SCI_NOTATION_REGEX).build(),
         CmdBuilder("get_source_current_autorange_mode").escape(":SOUR:CURR:RANG:AUTO?").build(),
-        CmdBuilder("set_source_current_autorange_mode").escape(":SOUR:CURR:RANG:AUTO ").enum("0", "1").build(),
+        CmdBuilder("set_source_current_autorange_mode")
+        .escape(":SOUR:CURR:RANG:AUTO ")
+        .enum("0", "1")
+        .build(),
         CmdBuilder("get_source_voltage_autorange_mode").escape(":SOUR:VOLT:RANG:AUTO?").build(),
-        CmdBuilder("set_source_voltage_autorange_mode").escape(":SOUR:VOLT:RANG:AUTO ").enum("0", "1").build(),
+        CmdBuilder("set_source_voltage_autorange_mode")
+        .escape(":SOUR:VOLT:RANG:AUTO ")
+        .enum("0", "1")
+        .build(),
         CmdBuilder("get_source_current_range").escape(":SOUR:CURR:RANG?").build(),
-        CmdBuilder("set_source_current_range").escape(":SOUR:CURR:RANG ").arg(SCI_NOTATION_REGEX).build(),
+        CmdBuilder("set_source_current_range")
+        .escape(":SOUR:CURR:RANG ")
+        .arg(SCI_NOTATION_REGEX)
+        .build(),
         CmdBuilder("get_source_voltage_range").escape(":SOUR:VOLT:RANG?").build(),
-        CmdBuilder("set_source_voltage_range").escape(":SOUR:VOLT:RANG ").arg(SCI_NOTATION_REGEX).build(),
+        CmdBuilder("set_source_voltage_range")
+        .escape(":SOUR:VOLT:RANG ")
+        .arg(SCI_NOTATION_REGEX)
+        .build(),
         CmdBuilder("get_measured_voltage_autorange_mode").escape(":SENS:VOLT:RANG:AUTO?").build(),
-        CmdBuilder("set_measured_voltage_autorange_mode").escape(":SENS:VOLT:RANG:AUTO ").enum("0", "1").build(),
+        CmdBuilder("set_measured_voltage_autorange_mode")
+        .escape(":SENS:VOLT:RANG:AUTO ")
+        .enum("0", "1")
+        .build(),
         CmdBuilder("get_measured_current_autorange_mode").escape(":SENS:CURR:RANG:AUTO?").build(),
-        CmdBuilder("set_measured_current_autorange_mode").escape(":SENS:CURR:RANG:AUTO ").enum("0", "1").build(),
+        CmdBuilder("set_measured_current_autorange_mode")
+        .escape(":SENS:CURR:RANG:AUTO ")
+        .enum("0", "1")
+        .build(),
         CmdBuilder("get_measured_current_range").escape(":SENS:CURR:RANG?").build(),
-        CmdBuilder("set_measured_current_range").escape(":SENS:CURR:RANG ").arg(SCI_NOTATION_REGEX).build(),
+        CmdBuilder("set_measured_current_range")
+        .escape(":SENS:CURR:RANG ")
+        .arg(SCI_NOTATION_REGEX)
+        .build(),
         CmdBuilder("get_measured_voltage_range").escape(":SENS:VOLT:RANG?").build(),
-        CmdBuilder("set_measured_voltage_range").escape(":SENS:VOLT:RANG ").arg(SCI_NOTATION_REGEX).build(),
+        CmdBuilder("set_measured_voltage_range")
+        .escape(":SENS:VOLT:RANG ")
+        .arg(SCI_NOTATION_REGEX)
+        .build(),
     }
 
     # Private control commands that can be used as an alternative to the lewis backdoor
@@ -75,11 +110,17 @@ class Keithley2400StreamInterface(StreamInterface):
 
         :return: A string of 3 doubles: voltage, current, resistance. In that order
         """
-        return ", ".join([
-            self._device.get_voltage(as_string=True),
-            self._device.get_current(as_string=True),
-            self._device.get_resistance(as_string=True)
-        ]) if self._device.get_output_mode() == OutputMode.ON else None
+        return (
+            ", ".join(
+                [
+                    self._device.get_voltage(as_string=True),
+                    self._device.get_current(as_string=True),
+                    self._device.get_resistance(as_string=True),
+                ]
+            )
+            if self._device.get_output_mode() == OutputMode.ON
+            else None
+        )
 
     def reset(self):
         """
@@ -135,7 +176,9 @@ class Keithley2400StreamInterface(StreamInterface):
         return self._device.get_remote_sensing_mode()
 
     def set_resistance_range_mode(self, new_mode):
-        return self._set_mode(self._device.set_resistance_range_mode, new_mode, ":SENS:RES:RANG:AUTO")
+        return self._set_mode(
+            self._device.set_resistance_range_mode, new_mode, ":SENS:RES:RANG:AUTO"
+        )
 
     def get_resistance_range_mode(self):
         return self._device.get_resistance_range_mode()

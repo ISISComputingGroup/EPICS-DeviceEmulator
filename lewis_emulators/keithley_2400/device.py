@@ -10,7 +10,6 @@ from lewis.devices import StateMachineDevice
 
 
 class SimulatedKeithley2400(StateMachineDevice):
-
     INITIAL_CURRENT = 0.1
     INITIAL_CURRENT_COMPLIANCE = INITIAL_CURRENT
     INITIAL_VOLTAGE = 10.0
@@ -64,23 +63,29 @@ class SimulatedKeithley2400(StateMachineDevice):
 
     def _get_state_handlers(self):
         return {
-            'running': DefaultRunningState(),
-            'static': StaticRunningState(),
+            "running": DefaultRunningState(),
+            "static": StaticRunningState(),
         }
 
     def _get_initial_state(self):
-        return 'static'
+        return "static"
 
     def _get_transition_handlers(self):
-        return OrderedDict([
-            (('static', 'running'), lambda: self.random_output),
-            (('running', 'static'), lambda: not self.random_output),
-        ])
+        return OrderedDict(
+            [
+                (("static", "running"), lambda: self.random_output),
+                (("running", "static"), lambda: not self.random_output),
+            ]
+        )
 
     def _resistance(self):
         # The device only tracks current and voltage. Resistance is calculated as a dependent variable
         r = self.voltage / self.current
-        return min(r, self._resistance_range) if self._resistance_range_mode == ResistanceRangeMode.MANUAL else r
+        return (
+            min(r, self._resistance_range)
+            if self._resistance_range_mode == ResistanceRangeMode.MANUAL
+            else r
+        )
 
     def _format_power_output(self, value, as_string, offset=0.0):
         """
@@ -97,13 +102,17 @@ class SimulatedKeithley2400(StateMachineDevice):
 
     def set_current(self, value):
         self.current = value
-        
+
     def get_voltage(self, as_string=False):
-        return self._format_power_output(self.voltage, as_string, SimulatedKeithley2400.INITIAL_VOLTAGE)
-        
+        return self._format_power_output(
+            self.voltage, as_string, SimulatedKeithley2400.INITIAL_VOLTAGE
+        )
+
     def get_current(self, as_string=False):
-        return self._format_power_output(self.current, as_string, SimulatedKeithley2400.INITIAL_CURRENT)
-        
+        return self._format_power_output(
+            self.current, as_string, SimulatedKeithley2400.INITIAL_CURRENT
+        )
+
     def get_resistance(self, as_string=False):
         return self._format_power_output(self._resistance(), as_string)
 
@@ -113,7 +122,8 @@ class SimulatedKeithley2400(StateMachineDevice):
         """
 
         def update_value(value):
-            return abs(value + uniform(-1, 1)*dt)
+            return abs(value + uniform(-1, 1) * dt)
+
         new_current = max(update_value(self.current), SimulatedKeithley2400.MINIMUM_CURRENT)
         new_voltage = update_value(self.voltage)
 
@@ -189,12 +199,15 @@ class SimulatedKeithley2400(StateMachineDevice):
         return self._source_mode
 
     def set_resistance_range(self, value):
-        self.log.info('Setting resistance range to {}'.format(value))
+        self.log.info("Setting resistance range to {}".format(value))
         from math import pow
+
         # Set the resistance range to the smallest value of 2.1En the requested
         # value exceeds
         self._resistance_range = SimulatedKeithley2400.RESISTANCE_RANGE_MULTIPLIER
-        for r in [SimulatedKeithley2400.RESISTANCE_RANGE_MULTIPLIER * pow(10, i) for i in range(1, 8)]:
+        for r in [
+            SimulatedKeithley2400.RESISTANCE_RANGE_MULTIPLIER * pow(10, i) for i in range(1, 8)
+        ]:
             if value < r:
                 self._resistance_range = r / 10
                 break

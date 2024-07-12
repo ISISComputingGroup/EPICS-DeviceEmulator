@@ -8,7 +8,6 @@ from lewis.core.logging import has_log
 import random
 
 
-
 def truncate_if_set(f):
     """
     Truncates the decorated function's string output if truncated_output is True
@@ -20,11 +19,12 @@ def truncate_if_set(f):
         output = f(self, *args, **kwargs)
 
         if self.truncated_output:
-            output = output[:int(round(len(output) / 2.))]
+            output = output[: int(round(len(output) / 2.0))]
 
         return output
 
     return wrapper
+
 
 @has_log
 def fake_auto_send(f):
@@ -47,7 +47,6 @@ def fake_auto_send(f):
 
 @has_log
 class SimulatedKynctm3K(StateMachineDevice):
-
     INPUT_MODES = ("R0", "R1", "Q0")
 
     def _initialize_data(self):
@@ -73,21 +72,20 @@ class SimulatedKynctm3K(StateMachineDevice):
         """
 
         self._initialize_data()
-        self.OUT_values = ["off"]*16
+        self.OUT_values = ["off"] * 16
 
         return None
 
     def _get_state_handlers(self):
         return {
-            'default': DefaultState(),
+            "default": DefaultState(),
         }
 
     def _get_initial_state(self):
-        return 'default'
+        return "default"
 
     def _get_transition_handlers(self):
-        return OrderedDict([
-        ])
+        return OrderedDict([])
 
     def set_autosend_status(self, new_state):
         """
@@ -147,7 +145,7 @@ class SimulatedKynctm3K(StateMachineDevice):
 
         elif output_setting == "out_of_range":
             # Add a random sign to the out of range string
-            sign = random.sample(('+', '-'), 1)[0]
+            sign = random.sample(("+", "-"), 1)[0]
             return sign + out_of_range_return
 
         elif type(output_setting) is float:
@@ -170,9 +168,11 @@ class SimulatedKynctm3K(StateMachineDevice):
         if self.OUT_values is None:
             return None
         else:
-            channel_strings = ["MM,1111111111111111", ]
+            channel_strings = [
+                "MM,1111111111111111",
+            ]
             for channel, output_value in enumerate(self.OUT_values):
                 # Only return output if the OUT value is in the program
                 channel_strings.append(self.parse_status(output_value))
 
-        return ','.join(channel_strings)
+        return ",".join(channel_strings)

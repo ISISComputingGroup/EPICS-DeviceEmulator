@@ -1,3 +1,3 @@
 from .stream_interface import FZJDDFCHStreamInterface
 
-__all__ = ['FZJDDFCHStreamInterface']
+__all__ = ["FZJDDFCHStreamInterface"]

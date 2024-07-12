@@ -6,6 +6,7 @@ class Sensor(object):
     """
     A basic sensor which monitors a value and keeps track of its own status.
     """
+
     def __init__(self):
         self._status = SensorStatus.NO_REPLY
         self._value = 0.0

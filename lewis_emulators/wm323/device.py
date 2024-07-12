@@ -12,7 +12,6 @@ class Direction(Enum):
 
 @has_log
 class SimulatedWm323(StateMachineDevice):
-
     def _initialize_data(self):
         """
         Initialize all of the device's attributes.
@@ -23,10 +22,10 @@ class SimulatedWm323(StateMachineDevice):
         self.type = "323Du"
 
     def _get_state_handlers(self):
-        return {'default': DefaultState()}
+        return {"default": DefaultState()}
 
     def _get_initial_state(self):
-        return 'default'
+        return "default"
 
     def _get_transition_handlers(self):
         return OrderedDict([])

@@ -36,6 +36,7 @@ class _UpdatedValue(object):
     """
     This class fake-implements the interface of pyqtsignal (emit()) and the "parent" object (value())
     """
+
     def __init__(self, init_val):
         self._val = init_val
 
@@ -54,6 +55,7 @@ class _Parent(object):
     Fake "parent" object. I don't know what type this is meant to have, but all that it actually requires is some
     member attributes which have a .value() method.
     """
+
     def __init__(self):
         self.comp_spin_P = _UpdatedValue(0)
         self.comp_spin_A = _UpdatedValue(0)
@@ -72,8 +74,9 @@ from main_andy_2flippers import SignalServer
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser(
-        description='Test an IOC under emulation by running tests against it')
-    parser.add_argument('-p', '--port', type=int, help="The TCP port to run the server on.")
+        description="Test an IOC under emulation by running tests against it"
+    )
+    parser.add_argument("-p", "--port", type=int, help="The TCP port to run the server on.")
     arguments = parser.parse_args()
 
     parent = _Parent()

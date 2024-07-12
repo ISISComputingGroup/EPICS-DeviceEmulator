@@ -14,35 +14,45 @@ class Sm300StreamInterface(StreamInterface):
     """
     Stream interface for the SM 300 motor emulator
     """
+
     in_terminator = EOT
     out_terminator = ""
 
     def __init__(self):
-
         super(Sm300StreamInterface, self).__init__()
 
         # Commands that we expect via serial during normal operation
         self.commands = {
-
             CmdBuilder(self.home_axis).ack().stx().escape("BR").char().build(),
             CmdBuilder(self.start_movement_to_sp).ack().stx().escape("BSL").build(),
             CmdBuilder(self.stop).ack().stx().escape("BSS").build(),
             CmdBuilder(self.setting).ack().stx().escape("B/").spaces().escape("G").any().build(),
-            CmdBuilder(self.set_position).ack().stx().escape("B/").spaces().escape("X").int().spaces().escape("Y").int()
-                                         .build(),
-            CmdBuilder(self.set_position_as_steps).ack().stx().escape("B").char(not_chars=["FS"]).int().build(),
+            CmdBuilder(self.set_position)
+            .ack()
+            .stx()
+            .escape("B/")
+            .spaces()
+            .escape("X")
+            .int()
+            .spaces()
+            .escape("Y")
+            .int()
+            .build(),
+            CmdBuilder(self.set_position_as_steps)
+            .ack()
+            .stx()
+            .escape("B")
+            .char(not_chars=["FS"])
+            .int()
+            .build(),
             CmdBuilder(self.feed_code).ack().stx().escape("BF").int().build(),
-
-
             CmdBuilder(self.get_position_as_steps).ack().stx().escape("LI").char().build(),
             CmdBuilder(self.get_status).ack().stx().escape("LM").build(),
             CmdBuilder(self.get_position).ack().stx().escape("LQ").build(),
             CmdBuilder(self.error_status).ack().stx().escape("LS10").build(),
-
             CmdBuilder(self.disconnect).ack().stx().escape("M").any().build(),
-
             # This is cheating the PEL1 command comes after PEL0 which is sent with a cr characters so add it in here
-            CmdBuilder(self.reset_code).regex(r"\r?").ack().stx().escape("P").any().build()
+            CmdBuilder(self.reset_code).regex(r"\r?").ack().stx().escape("P").any().build(),
         }
 
     def handle_error(self, request, error):
@@ -84,7 +94,8 @@ class Sm300StreamInterface(StreamInterface):
             xor_chars = chr(xor_chars)
 
             reply = "{ACK}{STX}{message}{ETX}{sum}{xor}".format(
-                message=message, sum=sum_chars, xor=xor_chars, **ASCII_CHARS)
+                message=message, sum=sum_chars, xor=xor_chars, **ASCII_CHARS
+            )
         else:
             reply = "{ACK}{STX}{message}{EOT}".format(message=message, **ASCII_CHARS)
         return reply

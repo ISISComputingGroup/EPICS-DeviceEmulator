@@ -1,6 +1,7 @@
 """
 Stream interface for the SP2xx device.
 """
+
 from lewis.adapters.stream import StreamInterface
 from lewis.core.logging import has_log
 
@@ -25,7 +26,7 @@ def if_error(f):
 
     Returns:
        The value of f(*args) if the device has no error and "\r\nE" otherwise.
-   """
+    """
 
     def _wrapper(*args):
         error = getattr(args[0], "_device").last_error.value
@@ -34,6 +35,7 @@ def if_error(f):
         else:
             result = "\r\nE"
         return result
+
     return _wrapper
 
 
@@ -44,7 +46,6 @@ class Sp2XXStreamInterface(StreamInterface):
     """
 
     def __init__(self):
-
         super(Sp2XXStreamInterface, self).__init__()
         # Commands that we expect via serial during normal operation
         self.commands = {
@@ -58,9 +59,16 @@ class Sp2XXStreamInterface(StreamInterface):
             CmdBuilder(self.reverse_direction).escape("dir rev").eos().build(),
             CmdBuilder(self.get_diameter).escape("dia?").eos().build(),
             CmdBuilder(self.set_diameter).escape("dia ").float().eos().build(),
-            CmdBuilder(
-                self.set_volume_or_rate).arg("vol|rate").char().escape(" ").float(string_arg).escape(" ").string().eos().build(),
-            CmdBuilder(self.get_volume_or_rate).arg("vol|rate").char().escape("?").eos().build()
+            CmdBuilder(self.set_volume_or_rate)
+            .arg("vol|rate")
+            .char()
+            .escape(" ")
+            .float(string_arg)
+            .escape(" ")
+            .string()
+            .eos()
+            .build(),
+            CmdBuilder(self.get_volume_or_rate).arg("vol|rate").char().escape("?").eos().build(),
         }
 
     out_terminator = ""
@@ -102,9 +110,10 @@ class Sp2XXStreamInterface(StreamInterface):
                 self._device.start_device()
                 return self.Withdrawal
             else:
-                print("An error occurred when trying to run the device. The device's running state is \
-                    is {}.".format(
-                    self._device.running_direction))
+                print(
+                    "An error occurred when trying to run the device. The device's running state is \
+                    is {}.".format(self._device.running_direction)
+                )
 
     @if_error
     @if_connected

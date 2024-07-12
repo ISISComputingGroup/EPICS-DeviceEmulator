@@ -1,6 +1,7 @@
 """
 Items associated with WPI SP2XX syringe pump
 """
+
 from collections import OrderedDict
 from .states import DefaultState
 from lewis.devices import StateMachineDevice
@@ -36,15 +37,14 @@ class SimulatedSp2XX(StateMachineDevice):
 
     def _get_state_handlers(self):
         return {
-            'default': DefaultState(),
+            "default": DefaultState(),
         }
 
     def _get_initial_state(self):
-        return 'default'
+        return "default"
 
     def _get_transition_handlers(self):
-        return OrderedDict([
-        ])
+        return OrderedDict([])
 
     @property
     def running(self):
@@ -156,7 +156,7 @@ class SimulatedSp2XX(StateMachineDevice):
     @property
     def last_error(self):
         """
-         Returns the last error type.
+        Returns the last error type.
 
         """
         return self._last_error

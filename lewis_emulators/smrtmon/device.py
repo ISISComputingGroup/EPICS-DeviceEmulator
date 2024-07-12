@@ -22,18 +22,16 @@ class SimulatedSmrtmon(StateMachineDevice):
     def set_oplm(self, num_oplm, oplm_value):
         self.oplm[num_oplm] = oplm_value
 
-    def set_lims(self,num_lims, lims_value):
+    def set_lims(self, num_lims, lims_value):
         self.lims[num_lims] = lims_value
 
     def _get_state_handlers(self):
         return {
-            'default': DefaultState(),
+            "default": DefaultState(),
         }
 
     def _get_initial_state(self):
-        return 'default'
+        return "default"
 
     def _get_transition_handlers(self):
-        return OrderedDict([
-        ])
-
+        return OrderedDict([])

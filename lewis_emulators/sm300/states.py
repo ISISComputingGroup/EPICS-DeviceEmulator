@@ -5,6 +5,7 @@ class DefaultState(State):
     """
     Default state of the system (it only has one)
     """
+
     def in_state(self, dt):
         """
         When in this state simulate each axis.

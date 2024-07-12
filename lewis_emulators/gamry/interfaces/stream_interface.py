@@ -9,7 +9,6 @@ BEAMOFF_COMM = "BEAMOFF"
 
 @has_log
 class GamryStreamInterface(StreamInterface):
-
     commands = {
         Cmd("start_charging", "^" + START_COMM + "$"),
         Cmd("beam_on", "^" + BEAMON_COMM + "$"),

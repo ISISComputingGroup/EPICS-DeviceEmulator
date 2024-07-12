@@ -29,7 +29,7 @@ class TpgStreamInterfaceBase(object, metaclass=abc.ABCMeta):
         CmdBuilder("acknowledge_pressure").escape("PRX").build(),
         CmdBuilder("acknowledge_units").escape("UNI").build(),
         CmdBuilder("set_units").escape("UNI").arg("{0|1|2}").build(),
-        CmdBuilder("handle_enquiry").enq().build()
+        CmdBuilder("handle_enquiry").enq().build(),
     }
 
     def handle_error(self, request, error):
@@ -80,8 +80,13 @@ class TpgStreamInterfaceBase(object, metaclass=abc.ABCMeta):
 
         Returns: a string with pressure and error codes
         """
-        return "{},{},{},{}{}".format(self._device.error1, self._device.pressure1, self._device.error2,
-                                      self._device.pressure2, self.output_terminator())
+        return "{},{},{},{}{}".format(
+            self._device.error1,
+            self._device.pressure1,
+            self._device.error2,
+            self._device.pressure2,
+            self.output_terminator(),
+        )
 
     def get_units(self):
         """
@@ -106,7 +111,7 @@ class TpgStreamInterfaceBase(object, metaclass=abc.ABCMeta):
 
 
 class Tpg36xStreamInterface(TpgStreamInterfaceBase, StreamInterface):
-    protocol = 'tpg36x'
+    protocol = "tpg36x"
     in_terminator = ""
     out_terminator = ""
 
@@ -118,14 +123,16 @@ class Tpg36xStreamInterface(TpgStreamInterfaceBase, StreamInterface):
 
 
 class Tpg361StreamInterface(Tpg36xStreamInterface, StreamInterface):
-    protocol = 'tpg361'
+    protocol = "tpg361"
 
     def get_pressure(self):
-        return "{},{}{}".format(self._device.error1, self._device.pressure1, self.output_terminator())
+        return "{},{}{}".format(
+            self._device.error1, self._device.pressure1, self.output_terminator()
+        )
 
 
 class Tpg26xStreamInterface(TpgStreamInterfaceBase, StreamInterface):
-    protocol = 'tpg26x'
+    protocol = "tpg26x"
 
     in_terminator = "\r\n"
     out_terminator = "\r\n"

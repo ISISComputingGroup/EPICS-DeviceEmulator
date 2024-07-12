@@ -27,19 +27,16 @@ class DeviceStatus(object):
         "28": "Ext. interlock #3",
         "29": "Ext. interlock #4",
         "30": "DCCT fault",
-        "31": "OVP"
+        "31": "OVP",
     }
 
-    _CONTROL_MODE = {
-        "Remote": [False, False],
-        "Local": [False, True]
-    }
+    _CONTROL_MODE = {"Remote": [False, False], "Local": [False, True]}
 
     _UPDATE_MODE = {
         "Normal": [False, False],
         "Waveform": [False, True],
         "Triggered FIFO": [True, False],
-        "Analog Input": [True, True]
+        "Analog Input": [True, True],
     }
 
     def __init__(self, status):
@@ -95,6 +92,8 @@ def convert_to_hexadecimal(bits, padding):
 
     zero_padded_eight_digit_hexadecimal_with_prefix = "{0:#0{1}x}".format(bits_base_2, padding + 2)
 
-    zero_padded_eight_digit_hexadecimal_without_prefix = zero_padded_eight_digit_hexadecimal_with_prefix[2:]
+    zero_padded_eight_digit_hexadecimal_without_prefix = (
+        zero_padded_eight_digit_hexadecimal_with_prefix[2:]
+    )
 
     return zero_padded_eight_digit_hexadecimal_without_prefix.upper()

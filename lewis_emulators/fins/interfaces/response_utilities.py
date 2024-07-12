@@ -20,8 +20,16 @@ def check_is_byte(character):
         raise ValueError("the character in the string must represent a byte value")
 
 
-def dm_memory_area_read_response_fins_frame(device, client_network_address, client_node_address, client_unit_address,
-                                            service_id, memory_start_address, number_of_words_to_read, is_float):
+def dm_memory_area_read_response_fins_frame(
+    device,
+    client_network_address,
+    client_node_address,
+    client_unit_address,
+    service_id,
+    memory_start_address,
+    number_of_words_to_read,
+    is_float,
+):
     """
     Returns a response to a DM memory area read command.
 
@@ -45,10 +53,18 @@ def dm_memory_area_read_response_fins_frame(device, client_network_address, clie
         bytes: the response.
     """
     # The length argument asks for number of bytes, and each word has two bytes
-    fins_reply = FinsResponseBuilder() \
-        .add_fins_frame_header(device.network_address, device.unit_address, client_network_address,
-                               client_node_address, client_unit_address, service_id) \
+    fins_reply = (
+        FinsResponseBuilder()
+        .add_fins_frame_header(
+            device.network_address,
+            device.unit_address,
+            client_network_address,
+            client_node_address,
+            client_unit_address,
+            service_id,
+        )
         .add_fins_command_and_error_codes()
+    )
 
     #  The plc has 2 byte words. The command asks for 1 word if the memory address stores a 16 bit integer, or 2 words
     #  if it stores a 32 bit integer, or a real number.
@@ -153,8 +169,15 @@ class FinsResponseBuilder(object):
         self.response += float_to_raw_bytes(value, False)
         return self
 
-    def add_fins_frame_header(self, emulator_network_address, emulator_unit_address, client_network_address,
-                              client_node, client_unit_address, service_id):
+    def add_fins_frame_header(
+        self,
+        emulator_network_address,
+        emulator_unit_address,
+        client_network_address,
+        client_node,
+        client_unit_address,
+        service_id,
+    ):
         """
         Makes a FINS frame header with the given data for a response to a client's command.
 
@@ -183,14 +206,18 @@ class FinsResponseBuilder(object):
             FinsResponseBuilder: The builder with the FINS frame header bytes.
         """
 
-        return self.add_int(0xC1, 1).add_int(0x00, 1).add_int(0x02, 1) \
-            .add_int(client_network_address, 1) \
-            .add_int(client_node, 1) \
-            .add_int(client_unit_address, 1) \
-            .add_int(emulator_network_address, 1) \
-            .add_int(SimulatedFinsPLC.HELIUM_RECOVERY_NODE, 1) \
-            .add_int(emulator_unit_address, 1) \
+        return (
+            self.add_int(0xC1, 1)
+            .add_int(0x00, 1)
+            .add_int(0x02, 1)
+            .add_int(client_network_address, 1)
+            .add_int(client_node, 1)
+            .add_int(client_unit_address, 1)
+            .add_int(emulator_network_address, 1)
+            .add_int(SimulatedFinsPLC.HELIUM_RECOVERY_NODE, 1)
+            .add_int(emulator_unit_address, 1)
             .add_int(service_id, 1)
+        )
 
     def add_fins_command_and_error_codes(self):
         """

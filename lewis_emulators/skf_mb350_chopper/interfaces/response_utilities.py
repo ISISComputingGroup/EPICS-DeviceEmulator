@@ -33,7 +33,7 @@ def build_device_status(device):
         device.is_levitation_complete(),
         device.is_phase_locked(),
         device.get_motor_direction() > 0,
-        device.is_avc_on()
+        device.is_avc_on(),
     ]
 
     bit = 1
@@ -56,9 +56,7 @@ def general_status_response_packet(address, device, command):
     :param command: The command number that this is a reply to
     :return: The response
     """
-    return ResponseBuilder() \
-        .add_common_header(address, command, device) \
-        .build()
+    return ResponseBuilder().add_common_header(address, command, device).build()
 
 
 def phase_information_response_packet(address, device):
@@ -75,12 +73,14 @@ def phase_information_response_packet(address, device):
     :param device: The lewis device
     :return: The response
     """
-    return ResponseBuilder() \
-        .add_common_header(address, 0xC0, device) \
-        .add_float(device.get_phase()) \
-        .add_float(device.get_phase_repeatability()) \
-        .add_float(device.get_phase_percent_ok()) \
+    return (
+        ResponseBuilder()
+        .add_common_header(address, 0xC0, device)
+        .add_float(device.get_phase())
+        .add_float(device.get_phase_repeatability())
+        .add_float(device.get_phase_percent_ok())
         .build()
+    )
 
 
 def rotator_angle_response_packet(address, device):
@@ -95,10 +95,12 @@ def rotator_angle_response_packet(address, device):
     :param device: The lewis device
     :return: The response
     """
-    return ResponseBuilder() \
-        .add_common_header(address, 0x81, device) \
-        .add_int(int(device.get_rotator_angle()*10), 4) \
+    return (
+        ResponseBuilder()
+        .add_common_header(address, 0x81, device)
+        .add_int(int(device.get_rotator_angle() * 10), 4)
         .build()
+    )
 
 
 def phase_time_response_packet(address, device):
@@ -113,10 +115,12 @@ def phase_time_response_packet(address, device):
     :param device: The lewis device
     :return: The response
     """
-    return ResponseBuilder() \
-        .add_common_header(address, 0x85, device) \
-        .add_float(device.get_phase()/1000.) \
+    return (
+        ResponseBuilder()
+        .add_common_header(address, 0x85, device)
+        .add_float(device.get_phase() / 1000.0)
         .build()
+    )
 
 
 class ResponseBuilder(object):
@@ -165,12 +169,14 @@ class ResponseBuilder(object):
         :param device: The lewis device
         :return: (ResponseBuilder) the builder with the common header bytes.
         """
-        return self.add_int(address, 1) \
-                .add_int(command_number, 1) \
-                .add_int(0x00, 1) \
-                .add_int(build_device_status(device), 1) \
-                .add_int(build_interlock_status(device), 2, low_byte_first=False) \
-                .add_int(int(device.get_frequency()), 2)
+        return (
+            self.add_int(address, 1)
+            .add_int(command_number, 1)
+            .add_int(0x00, 1)
+            .add_int(build_device_status(device), 1)
+            .add_int(build_interlock_status(device), 2, low_byte_first=False)
+            .add_int(int(device.get_frequency()), 2)
+        )
 
     def build(self):
         """

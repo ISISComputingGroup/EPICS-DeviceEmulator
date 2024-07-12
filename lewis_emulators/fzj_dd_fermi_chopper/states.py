@@ -8,7 +8,8 @@ class StartedState(State):
     """
     Device is in started state.
     """
-    NAME = 'Started'
+
+    NAME = "Started"
 
     def in_state(self, dt):
         device = self._context
@@ -20,7 +21,8 @@ class StoppedState(State):
     """
     Device is in stopped state.
     """
-    NAME = 'Stopped'
+
+    NAME = "Stopped"
 
     def in_state(self, dt):
         device = self._context

@@ -29,7 +29,7 @@ class DeviceStatusTests(unittest.TestCase):
             "Ext. interlock #3": False,
             "Ext. interlock #4": False,
             "DCCT fault": False,
-            "OVP": False
+            "OVP": False,
         }
         device_status = DeviceStatus(status)
 
@@ -60,7 +60,7 @@ class DeviceStatusTests(unittest.TestCase):
             "Ext. interlock #3": False,
             "Ext. interlock #4": False,
             "DCCT fault": False,
-            "OVP": False
+            "OVP": False,
         }
         device_status = DeviceStatus(status)
 
@@ -91,7 +91,7 @@ class DeviceStatusTests(unittest.TestCase):
             "Ext. interlock #3": False,
             "Ext. interlock #4": False,
             "DCCT fault": False,
-            "OVP": False
+            "OVP": False,
         }
         device_status = DeviceStatus(status)
 
@@ -131,7 +131,9 @@ class ConvertBitsToHexTests(unittest.TestCase):
         expected = "01"
         assert_that(result, is_(equal_to(expected)))
 
-    def test_that_GIVEN_a_byte_and_padding_of_5_THEN_a_5_padded_two_digit_hex_character_is_returned(self):
+    def test_that_GIVEN_a_byte_and_padding_of_5_THEN_a_5_padded_two_digit_hex_character_is_returned(
+        self,
+    ):
         # Given:
         word = [True, False, False, False, True, True, False, False]
 

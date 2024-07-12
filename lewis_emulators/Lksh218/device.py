@@ -91,7 +91,3 @@ class SimulatedLakeshore218(StateMachineDevice):
             None
         """
         self._sensors[number - 1] = value
-
-
-
-

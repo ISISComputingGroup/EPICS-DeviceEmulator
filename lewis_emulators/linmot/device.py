@@ -12,12 +12,10 @@ DEVICE_DEFAULT_VELO = 52
 DEVICE_DEFAULT_MAX_ACCEL = 10
 DEVICE_DEFAULT_SPEED_RES = 190735
 
-states = OrderedDict([("Stopped", StoppedState()),
-                      ("Moving", MovingState())])
+states = OrderedDict([("Stopped", StoppedState()), ("Moving", MovingState())])
 
 
 class SimulatedLinmot(StateMachineDevice):
-
     def _initialize_data(self):
         """
         Initialize all of the device's attributes.
@@ -38,10 +36,15 @@ class SimulatedLinmot(StateMachineDevice):
         self.tolerance = 0.01
 
     def _get_transition_handlers(self):
-        return OrderedDict([
-            (("Stopped", "Moving"), lambda: self.new_action is True and self.position_reached is False),
-            (("Moving", "Stopped"), lambda: self.position_reached is True),
-        ])
+        return OrderedDict(
+            [
+                (
+                    ("Stopped", "Moving"),
+                    lambda: self.new_action is True and self.position_reached is False,
+                ),
+                (("Moving", "Stopped"), lambda: self.position_reached is True),
+            ]
+        )
 
     @property
     def state(self):

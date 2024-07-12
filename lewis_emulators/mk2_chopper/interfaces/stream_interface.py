@@ -19,7 +19,6 @@ def filled_int(val, length):
 
 
 class Mk2ChopperStreamInterface(StreamInterface):
-
     # Commands that we expect via serial during normal operation
     commands = {
         Cmd("get_true_frequency", "^RF$"),
@@ -35,7 +34,7 @@ class Mk2ChopperStreamInterface(StreamInterface):
         Cmd("set_chopper_started", "^WS([0-9]+)$"),
         Cmd("set_demanded_frequency", "^WM([0-9]+)$"),
         Cmd("set_demanded_phase_delay", "^WP([0-9]+)$"),
-        Cmd("set_demanded_phase_error_window", "^WR([0-9]+)$")
+        Cmd("set_demanded_phase_error_window", "^WR([0-9]+)$"),
     }
 
     in_terminator = "\r"
@@ -64,7 +63,7 @@ class Mk2ChopperStreamInterface(StreamInterface):
         return "RE{0}".format(filled_int(self._device.get_true_phase_error(), 3))
 
     def get_spectral_interlocks(self):
-        bits = [0]*8
+        bits = [0] * 8
         if self._device.get_manufacturer() == ChopperType.CORTINA:
             bits[0] = 1 if self._device.inverter_ready() else 0
             bits[1] = 1 if self._device.motor_running() else 0
@@ -78,7 +77,7 @@ class Mk2ChopperStreamInterface(StreamInterface):
         return "RS{0:8s}".format(Mk2ChopperStreamInterface._string_from_bits(bits))
 
     def get_chopper_interlocks(self):
-        bits = [0]*8
+        bits = [0] * 8
         bits[0] = 1 if self._device.get_system_frequency() == 50 else 0
         bits[1] = 1 if self._device.clock_loss() else 0
         bits[2] = 1 if self._device.bearing_1_overheat() else 0
@@ -88,7 +87,7 @@ class Mk2ChopperStreamInterface(StreamInterface):
         return "RC{0:8s}".format(Mk2ChopperStreamInterface._string_from_bits(bits))
 
     def get_error_flags(self):
-        bits = [0]*8
+        bits = [0] * 8
         bits[0] = 1 if self._device.phase_delay_error() else 0
         bits[1] = 1 if self._device.phase_delay_correction_error() else 0
         bits[2] = 1 if self._device.phase_accuracy_window_error() else 0
@@ -110,16 +109,23 @@ class Mk2ChopperStreamInterface(StreamInterface):
         return
 
     def set_demanded_frequency(self, new_frequency_raw):
-        return Mk2ChopperStreamInterface._set(new_frequency_raw, self.get_demanded_frequency,
-                                              self._device.set_demanded_frequency)
+        return Mk2ChopperStreamInterface._set(
+            new_frequency_raw, self.get_demanded_frequency, self._device.set_demanded_frequency
+        )
 
     def set_demanded_phase_delay(self, new_phase_delay_raw):
-        return Mk2ChopperStreamInterface._set(new_phase_delay_raw, self.get_demanded_phase_delay,
-                                              self._device.set_demanded_phase_delay)
+        return Mk2ChopperStreamInterface._set(
+            new_phase_delay_raw,
+            self.get_demanded_phase_delay,
+            self._device.set_demanded_phase_delay,
+        )
 
     def set_demanded_phase_error_window(self, new_phase_error_window_raw):
-        return Mk2ChopperStreamInterface._set(new_phase_error_window_raw, self.get_demanded_phase_error_window,
-                                              self._device.set_demanded_phase_error_window)
+        return Mk2ChopperStreamInterface._set(
+            new_phase_error_window_raw,
+            self.get_demanded_phase_error_window,
+            self._device.set_demanded_phase_error_window,
+        )
 
     def read_all(self):
         return "RA:Don't use, it causes the driver to lock up"

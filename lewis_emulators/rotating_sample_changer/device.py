@@ -12,7 +12,7 @@ class SimulatedSampleChanger(StateMachineDevice):
 
     # ARM_SPEED = 1.0/25.0  Arm takes 25s to raise/lower (measured on HRPD)
     # ARM_SPEED = 1.0/100.0  # Arm takes 100s to raise/lower (measured on POLARIS)
-    CAR_SPEED = 1.0/6.0  # Carousel takes 6 seconds per position (measured on actual device)
+    CAR_SPEED = 1.0 / 6.0  # Carousel takes 6 seconds per position (measured on actual device)
 
     def _initialize_data(self):
         self.uninitialise()
@@ -32,34 +32,40 @@ class SimulatedSampleChanger(StateMachineDevice):
 
     def _get_state_handlers(self):
         return {
-            'init': State(),
-            'initialising': MovingState(),
-            'idle': State(),
-            'car_moving': MovingState(),
-            'sample_dropped': SampleDroppedState(),
+            "init": State(),
+            "initialising": MovingState(),
+            "idle": State(),
+            "car_moving": MovingState(),
+            "sample_dropped": SampleDroppedState(),
         }
 
     def _get_initial_state(self):
-        return 'init'
+        return "init"
 
     def _get_transition_handlers(self):
-        return OrderedDict([
-            (('init', 'initialising'), lambda: self.car_target > 0),
-            (('initialising', 'idle'), lambda: self.car_pos == 1),
-            (('idle', 'car_moving'), lambda: self.car_target != self.car_pos),
-            (('car_moving', 'sample_dropped'), lambda: self._position_to_drop_sample != None and (self._position_to_drop_sample - self.car_pos) < 0.5),
-            (('car_moving', 'idle'), lambda: self.car_pos == self.car_target),
-            (('sample_dropped', 'idle'), lambda: self.car_target != self.car_pos),
-        ])
+        return OrderedDict(
+            [
+                (("init", "initialising"), lambda: self.car_target > 0),
+                (("initialising", "idle"), lambda: self.car_pos == 1),
+                (("idle", "car_moving"), lambda: self.car_target != self.car_pos),
+                (
+                    ("car_moving", "sample_dropped"),
+                    lambda: self._position_to_drop_sample != None
+                    and (self._position_to_drop_sample - self.car_pos) < 0.5,
+                ),
+                (("car_moving", "idle"), lambda: self.car_pos == self.car_target),
+                (("sample_dropped", "idle"), lambda: self.car_target != self.car_pos),
+            ]
+        )
 
     def is_car_at_one(self):
         return self.car_pos == self.MIN_CAROUSEL
 
     def is_moving(self):
-        return self._csm.state == 'car_moving'
+        return self._csm.state == "car_moving"
 
     def _check_can_move(self):
-        if self._csm.state == 'init':
+        if self._csm.state == "init":
             return Errors.ERR_NOT_INITIALISED
         if self.arm_lowered:
             return Errors.ERR_CANT_ROT_IF_NOT_UP
@@ -84,7 +90,7 @@ class SimulatedSampleChanger(StateMachineDevice):
         return Errors.NO_ERR
 
     def move_to(self, position, lower_arm):
-        if self._csm.state == 'init':
+        if self._csm.state == "init":
             return Errors.ERR_NOT_INITIALISED
         if (position < self.MIN_CAROUSEL) or (position > self.MAX_CAROUSEL):
             return Errors.ERR_INV_DEST
@@ -94,7 +100,7 @@ class SimulatedSampleChanger(StateMachineDevice):
             return Errors.NO_ERR
 
     def set_arm(self, lowered):
-        if self._csm.state == 'init':
+        if self._csm.state == "init":
             return Errors.ERR_NOT_INITIALISED
         if lowered == self.arm_lowered:
             if lowered:

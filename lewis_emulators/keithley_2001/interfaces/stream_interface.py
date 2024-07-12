@@ -4,7 +4,6 @@ from lewis.utils.replies import conditional_reply
 
 
 class Keithley2001StreamInterface(StreamInterface):
-
     in_terminator = "\r\n"
     out_terminator = "\n"
 
@@ -18,7 +17,11 @@ class Keithley2001StreamInterface(StreamInterface):
         CmdBuilder("get_buffer_source").escape(":DATA:FEED?").eos().build(),
         CmdBuilder("set_buffer_egroup").escape(":DATA:EGR ").arg("FULL|COMP").eos().build(),
         CmdBuilder("get_buffer_egroup").escape(":DATA:EGR?").eos().build(),
-        CmdBuilder("set_continuous_initialization").escape(":INIT:CONT ").arg("OFF|ON").eos().build(),
+        CmdBuilder("set_continuous_initialization")
+        .escape(":INIT:CONT ")
+        .arg("OFF|ON")
+        .eos()
+        .build(),
         CmdBuilder("get_continuous_initialization_status").escape(":INIT:CONT?").eos().build(),
         CmdBuilder("get_elements").escape(":FORM:ELEM?").eos().build(),
         CmdBuilder("set_elements").escape(":FORM:ELEM ").string().eos().build(),
@@ -30,30 +33,33 @@ class Keithley2001StreamInterface(StreamInterface):
         CmdBuilder("set_scan_count").escape(":ARM:LAY2:COUN ").int().eos().build(),
         CmdBuilder("get_scan_count").escape(":ARM:LAY2:COUN?").eos().build(),
         CmdBuilder("get_scan_trigger").escape(":ARM:LAY2:SOUR?").eos().build(),
-
         # Reading a single channel
         CmdBuilder("set_read_channel").escape(":ROUT:CLOS (@").int().escape(")").eos().build(),
         CmdBuilder("read_single_channel").escape(":READ?").eos().build(),
-
         # Reading from the buffer
-        CmdBuilder("set_buffer_mode").escape(":DATA:FEED:CONT ").arg("NEV|NEXT|ALW|PRET").eos().build(),
+        CmdBuilder("set_buffer_mode")
+        .escape(":DATA:FEED:CONT ")
+        .arg("NEV|NEXT|ALW|PRET")
+        .eos()
+        .build(),
         CmdBuilder("get_buffer_mode").escape(":DATA:FEED:CONT?").eos().build(),
-
         CmdBuilder("clear_buffer").escape(":DATA:CLE").eos().build(),
         CmdBuilder("scan_channels").escape(":INIT").eos().build(),
         CmdBuilder("get_buffer_date").escape(":DATA:DATA?").eos().build(),
-
         # Setting up a scan
         CmdBuilder("set_measurement_scan_count").escape(":TRIG:COUN ").int().eos().build(),
         CmdBuilder("get_measurement_scan_count").escape(":TRIG:COUN?").eos().build(),
-
         CmdBuilder("set_buffer_size").escape(":DATA:POIN ").int().eos().build(),
         CmdBuilder("get_buffer_size").escape(":DATA:POIN?").eos().build(),
-        CmdBuilder("set_scan_channels").escape(":ROUT:SCAN (@").arg("[0-9,]+").escape(")").eos().build(),
+        CmdBuilder("set_scan_channels")
+        .escape(":ROUT:SCAN (@")
+        .arg("[0-9,]+")
+        .escape(")")
+        .eos()
+        .build(),
         CmdBuilder("get_scan_channels").escape(":ROUT:SCAN?").eos().build(),
-
         # Error handling
-        CmdBuilder("get_error").escape(":SYST:ERR?").eos().build()
+        CmdBuilder("get_error").escape(":SYST:ERR?").eos().build(),
     }
 
     def handle_error(self, request, error):
@@ -97,7 +103,9 @@ class Keithley2001StreamInterface(StreamInterface):
             try:
                 self._device.elements[element] = True
             except LookupError:
-                self.log.error("Tried to set {} which is not a valid reading element.".format(element))
+                self.log.error(
+                    "Tried to set {} which is not a valid reading element.".format(element)
+                )
                 print("Tried to set {} which is not a valid reading element.".format(element))
 
         self._generate_readback_format()

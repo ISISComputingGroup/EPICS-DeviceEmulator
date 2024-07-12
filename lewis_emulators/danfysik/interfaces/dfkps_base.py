@@ -1,12 +1,12 @@
 """
 Stream device for danfysik
 """
+
 import abc
 
 from lewis.core.logging import has_log
 from lewis.utils.command_builder import CmdBuilder
 from lewis.utils.replies import conditional_reply
-
 
 
 @has_log
@@ -17,7 +17,6 @@ class CommonStreamInterface(object, metaclass=abc.ABCMeta):
 
     in_terminator = "\r"
     out_terminator = ""
-
 
     commands = [
         CmdBuilder("get_voltage").escape("AD 2").eos().build(),
@@ -39,7 +38,6 @@ class CommonStreamInterface(object, metaclass=abc.ABCMeta):
             error: problem
         """
         self.log.error("An error occurred at request " + repr(request) + ": " + repr(error))
-
 
     @conditional_reply("connected")
     @conditional_reply("comms_initialized")
@@ -67,7 +65,7 @@ class CommonStreamInterface(object, metaclass=abc.ABCMeta):
         """
         Unlock the device. Implementation could be put in in future.
         """
-        
+
     @conditional_reply("connected")
     @conditional_reply("comms_initialized")
     def get_polarity(self):

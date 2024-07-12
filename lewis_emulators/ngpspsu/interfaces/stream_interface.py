@@ -7,7 +7,6 @@ if_connected = conditional_reply("connected")
 
 
 class NgpspsuStreamInterface(StreamInterface):
-
     # Commands that we expect via serial during normal operation
     commands = {
         CmdBuilder("get_version").escape("VER").eos().build(),
@@ -20,7 +19,7 @@ class NgpspsuStreamInterface(StreamInterface):
         CmdBuilder("read_voltage_setpoint").escape("MWV:?").eos().build(),
         CmdBuilder("read_current").escape("MRI").eos().build(),
         CmdBuilder("set_current_setpoint").escape("MWI:").float().eos().build(),
-        CmdBuilder("read_current_setpoint").escape("MWI:?").eos().build()
+        CmdBuilder("read_current_setpoint").escape("MWI:?").eos().build(),
     }
 
     out_terminator = "\r\n"

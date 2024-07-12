@@ -5,6 +5,7 @@ class Gas(object):
     """
     A gas within the system, identified by either its name or an integer index.
     """
+
     def __init__(self, index, name):
         assert type(index) is int and type(name) is str
         self._index = index

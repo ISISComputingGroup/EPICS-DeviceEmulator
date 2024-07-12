@@ -2,7 +2,12 @@ import re
 
 from lewis.adapters.stream import StreamInterface
 
-from lewis_emulators.neocera_ltc21.constants import HEATER_INDEX, CONTROL_TYPE_MAX, CONTROL_TYPE_MIN, ANALOG_INDEX
+from lewis_emulators.neocera_ltc21.constants import (
+    HEATER_INDEX,
+    CONTROL_TYPE_MAX,
+    CONTROL_TYPE_MIN,
+    ANALOG_INDEX,
+)
 from lewis_emulators.neocera_ltc21.device_errors import NeoceraDeviceErrors
 from lewis_emulators.neocera_ltc21.states import MonitorState, ControlState
 from lewis.utils.command_builder import CmdBuilder
@@ -17,16 +22,50 @@ class NeoceraStreamInterface(StreamInterface):
         CmdBuilder("get_state", arg_sep=",", ignore=r"\r\n\s").escape("QISTATE?").build(),
         CmdBuilder("set_state_monitor", arg_sep=",", ignore=r"\r\n\s").escape("SMON").build(),
         CmdBuilder("set_state_control", arg_sep=",", ignore=r"\r\n\s").escape("SCONT").build(),
-        CmdBuilder("get_temperature_and_unit", arg_sep=",", ignore=r"\r\n\s").escape("QSAMP?").digit().build(),
-        CmdBuilder("get_setpoint_and_unit", arg_sep=",", ignore=r"\r\n\s").escape("QSETP?").digit().build(),
-        CmdBuilder("set_setpoint", arg_sep=",", ignore=r"\r\n\s").escape("SETP").digit().float().build(),
-        CmdBuilder("get_output_config", arg_sep=",", ignore=r"\r\n\s").escape("QOUT?").digit().build(),
-        CmdBuilder("set_heater_control", arg_sep=",", ignore=r"\r\n\s").escape("SHCONT").digit().build(),
-        CmdBuilder("set_analog_control", arg_sep=",", ignore=r"\r\n\s").escape("SACONT").digit().build(),
+        CmdBuilder("get_temperature_and_unit", arg_sep=",", ignore=r"\r\n\s")
+        .escape("QSAMP?")
+        .digit()
+        .build(),
+        CmdBuilder("get_setpoint_and_unit", arg_sep=",", ignore=r"\r\n\s")
+        .escape("QSETP?")
+        .digit()
+        .build(),
+        CmdBuilder("set_setpoint", arg_sep=",", ignore=r"\r\n\s")
+        .escape("SETP")
+        .digit()
+        .float()
+        .build(),
+        CmdBuilder("get_output_config", arg_sep=",", ignore=r"\r\n\s")
+        .escape("QOUT?")
+        .digit()
+        .build(),
+        CmdBuilder("set_heater_control", arg_sep=",", ignore=r"\r\n\s")
+        .escape("SHCONT")
+        .digit()
+        .build(),
+        CmdBuilder("set_analog_control", arg_sep=",", ignore=r"\r\n\s")
+        .escape("SACONT")
+        .digit()
+        .build(),
         CmdBuilder("get_heater", arg_sep=",", ignore=r"\r\n\s").escape("QHEAT?").build(),
         CmdBuilder("get_pid", arg_sep=",", ignore=r"\r\n\s").escape("QPID?").digit().build(),
-        CmdBuilder("set_pid_heater", arg_sep=",", ignore=r"\r\n\s").escape("SPID1,").float().float().float().float().float().build(),
-        CmdBuilder("set_pid_analog", arg_sep=",", ignore=r"\r\n\s").escape("SPID2,").float().float().float().float().float().float().build()
+        CmdBuilder("set_pid_heater", arg_sep=",", ignore=r"\r\n\s")
+        .escape("SPID1,")
+        .float()
+        .float()
+        .float()
+        .float()
+        .float()
+        .build(),
+        CmdBuilder("set_pid_analog", arg_sep=",", ignore=r"\r\n\s")
+        .escape("SPID2,")
+        .float()
+        .float()
+        .float()
+        .float()
+        .float()
+        .float()
+        .build(),
     }
 
     in_terminator = ";"
@@ -99,7 +138,11 @@ class NeoceraStreamInterface(StreamInterface):
 
             self._device.setpoints[output_index] = setpoint
         except (IndexError, ValueError, TypeError):
-            print("Error: invalid output number, '{0}', or setpoint value, '{1}'".format(output_number, value))
+            print(
+                "Error: invalid output number, '{0}', or setpoint value, '{1}'".format(
+                    output_number, value
+                )
+            )
             self._device.error = NeoceraDeviceErrors(NeoceraDeviceErrors.BAD_PARAMETER)
             return ""
 
@@ -119,7 +162,9 @@ class NeoceraStreamInterface(StreamInterface):
             output_index = int(output_number) - 1
 
             output_config = "{sensor_source};{control}".format(
-                sensor_source=device.sensor_source[output_index], control=device.control[output_index])
+                sensor_source=device.sensor_source[output_index],
+                control=device.control[output_index],
+            )
 
             if output_index == HEATER_INDEX:
                 output_config += ";{heater_range}".format(heater_range=device.heater_range)
@@ -161,15 +206,20 @@ class NeoceraStreamInterface(StreamInterface):
         try:
             control_type = int(control_type_number)
 
-            if control_type < CONTROL_TYPE_MIN[output_index] or \
-                    control_type > CONTROL_TYPE_MAX[output_index]:
+            if (
+                control_type < CONTROL_TYPE_MIN[output_index]
+                or control_type > CONTROL_TYPE_MAX[output_index]
+            ):
                 raise ValueError("Bad control type number")
 
             self._device.control[output_index] = control_type
 
         except (IndexError, ValueError, TypeError):
-            print("Error: invalid control type number for output {output}, '{0}'".format(
-                control_type_number, output=output_index))
+            print(
+                "Error: invalid control type number for output {output}, '{0}'".format(
+                    control_type_number, output=output_index
+                )
+            )
             device.error = NeoceraDeviceErrors(NeoceraDeviceErrors.BAD_PARAMETER)
 
     def get_heater(self):
@@ -201,9 +251,13 @@ class NeoceraStreamInterface(StreamInterface):
             pid_output = "{P:f};{I:f};{D:f};{fixed_power:f}".format(**device.pid[output_index])
 
             if output_index == HEATER_INDEX:
-                return "{pid_output};{limit:f}".format(pid_output=pid_output, **device.pid[output_index])
+                return "{pid_output};{limit:f}".format(
+                    pid_output=pid_output, **device.pid[output_index]
+                )
             else:
-                return "{pid_output};{gain:f};{offset:f}".format(pid_output=pid_output, **device.pid[output_index])
+                return "{pid_output};{gain:f};{offset:f}".format(
+                    pid_output=pid_output, **device.pid[output_index]
+                )
 
         except (IndexError, ValueError, TypeError):
             print("Error: invalid output number, '{output}'".format(output=output_number))

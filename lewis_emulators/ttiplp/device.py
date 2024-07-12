@@ -5,7 +5,6 @@ from random import random as rnd
 
 
 class SimulatedTtiplp(StateMachineDevice):
-
     def _initialize_data(self):
         """
         Initialize all of the device's attributes.
@@ -29,29 +28,28 @@ class SimulatedTtiplp(StateMachineDevice):
 
     def _get_state_handlers(self):
         return {
-            'default': DefaultState(),
+            "default": DefaultState(),
         }
 
     def _get_initial_state(self):
-        return 'default'
+        return "default"
 
     def _get_transition_handlers(self):
-        return OrderedDict([
-        ])
+        return OrderedDict([])
 
     def get_volt(self):
         if self.output == 1:
-            self.volt = self.volt_sp + ((rnd()-0.5)/1000)
+            self.volt = self.volt_sp + ((rnd() - 0.5) / 1000)
         else:
-            self.volt = ((rnd()-0.5)/1000)
-        return self.volt    
+            self.volt = (rnd() - 0.5) / 1000
+        return self.volt
 
     def get_curr(self):
         if self.output == 1:
-            self.curr = self.curr_sp+((rnd()-0.5)/1000)
+            self.curr = self.curr_sp + ((rnd() - 0.5) / 1000)
         else:
-            self.curr = ((rnd()-0.5)/1000)
-        return self.curr    
+            self.curr = (rnd() - 0.5) / 1000
+        return self.curr
 
     def set_volt_sp(self, volt_sp):
         self.volt_sp = float(volt_sp)
@@ -61,15 +59,15 @@ class SimulatedTtiplp(StateMachineDevice):
         self.curr_sp = float(curr_sp)
         self._check_trip()
 
-    def set_overvolt(self,overvolt):
+    def set_overvolt(self, overvolt):
         self.overvolt = float(overvolt)
         self._check_trip()
 
-    def set_overcurr(self,overcurr):
+    def set_overcurr(self, overcurr):
         self.overcurr = float(overcurr)
         self._check_trip()
 
-    def set_output(self,output):
+    def set_output(self, output):
         self.output = output
         self._check_trip()
 
@@ -93,17 +91,17 @@ class SimulatedTtiplp(StateMachineDevice):
         return self.current_limited
 
     def _check_trip(self):
-        if (self.output == 1):
+        if self.output == 1:
             # Trip bits
-            if (self.volt_sp > self.overvolt):
+            if self.volt_sp > self.overvolt:
                 self.output = 0
                 self.ovp_tripped = True
-            if(self.curr_sp > self.overcurr):
+            if self.curr_sp > self.overcurr:
                 self.output = 0
                 self.ocp_tripped = True
-            
+
             # Limit bits
-            if(abs(self.volt_sp - self.volt) < 0.01):
+            if abs(self.volt_sp - self.volt) < 0.01:
                 self.voltage_limited = True
-            if(abs(self.curr_sp - self.curr) < 0.01):
+            if abs(self.curr_sp - self.curr) < 0.01:
                 self.current_limited = True

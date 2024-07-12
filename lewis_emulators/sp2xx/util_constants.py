@@ -11,15 +11,12 @@ MODES = {
     "w": withdrawal_mode,
     "i/w": infusion_withdrawal_mode,
     "w/i": withdrawal_infusion_mode,
-    "con": continuous
+    "con": continuous,
 }
 
 infusion_direction = Direction("I", "Infusion")
 withdrawal_direction = Direction("W", "Withdrawal")
 
-DIRECTIONS = {
-    "I": infusion_direction,
-    "W": withdrawal_direction
-}
+DIRECTIONS = {"I": infusion_direction, "W": withdrawal_direction}
 
 NO_ERROR = ErrorType("No error", 0, "NO_ALARM")

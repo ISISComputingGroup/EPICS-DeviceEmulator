@@ -6,7 +6,6 @@ from lewis.devices import StateMachineDevice
 
 
 class SimulatedDMA4500M(StateMachineDevice):
-
     def _initialize_data(self):
         """
         Initialize all of the device's attributes.
@@ -66,10 +65,9 @@ class SimulatedDMA4500M(StateMachineDevice):
 
     def get_raw_data(self):
         sample_id = self.sample_id if self.sample_id else "NaN"
-        return "{0:.6f};{1:.2f};{2:.2f};{3}".format(self.density,
-                                                    self.actual_temperature,
-                                                    self.target_temperature,
-                                                    sample_id)
+        return "{0:.6f};{1:.2f};{2:.2f};{3}".format(
+            self.density, self.actual_temperature, self.target_temperature, sample_id
+        )
 
     def _get_state_handlers(self):
         return {
@@ -82,11 +80,19 @@ class SimulatedDMA4500M(StateMachineDevice):
         return "ready"
 
     def _get_transition_handlers(self):
-        return OrderedDict([
-            (("ready", "measuring"), lambda: self.measuring is True),
-            (("measuring", "ready"), lambda: self.measuring is False and not self.last_measurement_successful),
-            (("measuring", "done"), lambda: self.measuring is False and self.last_measurement_successful),
-            (("done", "measuring"), lambda: self.measuring is True),
-            (("done", "ready"), lambda: self.setting_temperature is True),
-            (("ready", "ready"), lambda: self.setting_temperature is True),
-        ])
+        return OrderedDict(
+            [
+                (("ready", "measuring"), lambda: self.measuring is True),
+                (
+                    ("measuring", "ready"),
+                    lambda: self.measuring is False and not self.last_measurement_successful,
+                ),
+                (
+                    ("measuring", "done"),
+                    lambda: self.measuring is False and self.last_measurement_successful,
+                ),
+                (("done", "measuring"), lambda: self.measuring is True),
+                (("done", "ready"), lambda: self.setting_temperature is True),
+                (("ready", "ready"), lambda: self.setting_temperature is True),
+            ]
+        )

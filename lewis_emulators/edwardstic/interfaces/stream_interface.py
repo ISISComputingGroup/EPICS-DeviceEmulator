@@ -29,20 +29,12 @@ GAUGESTATES_MAP = {
     9: GaugeStates.zeroing,
     10: GaugeStates.degassing,
     11: GaugeStates.on,
-    12: GaugeStates.inhibited
+    12: GaugeStates.inhibited,
 }
 
-GAUGEUNITS_MAP = {
-    GaugeUnits.Pa: 59,
-    GaugeUnits.V: 66,
-    GaugeUnits.percent: 81
-}
+GAUGEUNITS_MAP = {GaugeUnits.Pa: 59, GaugeUnits.V: 66, GaugeUnits.percent: 81}
 
-PRIORITYSTATES_MAP = {
-    PriorityStates.OK: 0,
-    PriorityStates.Warning: 1,
-    PriorityStates.Alarm: 3
-    }
+PRIORITYSTATES_MAP = {PriorityStates.OK: 0, PriorityStates.Warning: 1, PriorityStates.Alarm: 3}
 
 
 def reverse_dict_lookup(dictionary, value_to_find):
@@ -52,7 +44,7 @@ def reverse_dict_lookup(dictionary, value_to_find):
     Args:
         dictionary: dictionary, the dictionary to do the reverse lookup
         value_to_find: the value to find in the dictionary
-    
+
     Raises:
         KeyError if value does not exist in the dictionary
     """
@@ -66,7 +58,6 @@ def reverse_dict_lookup(dictionary, value_to_find):
 
 @has_log
 class EdwardsTICStreamInterface(StreamInterface):
-
     # Commands that we expect via serial during normal operation
     commands = {
         CmdBuilder("turbo_start_stop").escape("!C904 ").int().eos().build(),
@@ -130,9 +121,11 @@ class EdwardsTICStreamInterface(StreamInterface):
     def get_turbo_state(self):
         state_string = "=V904 {turbo_state};{alert};{priority}"
 
-        return state_string.format(turbo_state=reverse_dict_lookup(PUMPSTATES_MAP, self._device.turbo_pump),
-                                   alert=self._device.turbo_alert,
-                                   priority=PRIORITYSTATES_MAP[self._device.turbo_priority])
+        return state_string.format(
+            turbo_state=reverse_dict_lookup(PUMPSTATES_MAP, self._device.turbo_pump),
+            alert=self._device.turbo_alert,
+            priority=PRIORITYSTATES_MAP[self._device.turbo_priority],
+        )
 
     @conditional_reply("connected")
     def get_turbo_status(self):
@@ -184,8 +177,11 @@ class EdwardsTICStreamInterface(StreamInterface):
     def get_gauge(self, gauge_id):
         state_string = "=V91{gauge_id} {pressure};{units};{gauge_state};{alert};{priority}"
 
-        return state_string.format(gauge_id=gauge_id, pressure=self._device.gauge_pressure,
-                                   units=GAUGEUNITS_MAP[self._device.gauge_units],
-                                   gauge_state=reverse_dict_lookup(GAUGESTATES_MAP, self._device.gauge_state),
-                                   alert=self._device.gauge_alert,
-                                   priority=PRIORITYSTATES_MAP[self._device.gauge_priority])
+        return state_string.format(
+            gauge_id=gauge_id,
+            pressure=self._device.gauge_pressure,
+            units=GAUGEUNITS_MAP[self._device.gauge_units],
+            gauge_state=reverse_dict_lookup(GAUGESTATES_MAP, self._device.gauge_state),
+            alert=self._device.gauge_alert,
+            priority=PRIORITYSTATES_MAP[self._device.gauge_priority],
+        )

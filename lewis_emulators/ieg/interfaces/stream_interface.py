@@ -3,7 +3,6 @@ from lewis.core.logging import has_log
 
 
 class IegStreamInterface(StreamInterface):
-
     # Commands that we expect via serial during normal operation
     commands = {
         Cmd("get_status", "^&STS0$"),
@@ -28,30 +27,36 @@ class IegStreamInterface(StreamInterface):
         return str(error)
 
     def get_status(self):
-        return ResponseBuilder() \
-            .add_data_block("IEG", self._device.get_id()) \
-            .add_data_block("OPM", self._device.get_operating_mode()) \
-            .add_data_block("VST", self._build_valve_state()) \
-            .add_data_block("ERR", self._device.get_error()) \
-            .add_data_block("BPH", 0 if self._device.is_buffer_pressure_high() else 1) \
-            .add_data_block("SPL", 1 if self._device.is_sample_pressure_low() else 0) \
-            .add_data_block("SPH", 1 if self._device.is_sample_pressure_high() else 0) \
-            .add_data_block("SPR", int(self._device.get_pressure())) \
+        return (
+            ResponseBuilder()
+            .add_data_block("IEG", self._device.get_id())
+            .add_data_block("OPM", self._device.get_operating_mode())
+            .add_data_block("VST", self._build_valve_state())
+            .add_data_block("ERR", self._device.get_error())
+            .add_data_block("BPH", 0 if self._device.is_buffer_pressure_high() else 1)
+            .add_data_block("SPL", 1 if self._device.is_sample_pressure_low() else 0)
+            .add_data_block("SPH", 1 if self._device.is_sample_pressure_high() else 0)
+            .add_data_block("SPR", int(self._device.get_pressure()))
             .build()
+        )
 
     def change_operating_mode(self, mode):
         self._device.set_operating_mode(int(mode))
-        return ResponseBuilder()\
-            .add_data_block("IEG", self._device.get_id()) \
-            .add_data_block("OPM", self._device.get_operating_mode())\
+        return (
+            ResponseBuilder()
+            .add_data_block("IEG", self._device.get_id())
+            .add_data_block("OPM", self._device.get_operating_mode())
             .build()
+        )
 
     def abort(self):
         self._device.operatingmode = 0
-        return ResponseBuilder() \
-            .add_data_block("IEG", self._device.get_id()) \
-            .add_data_block("KILL") \
+        return (
+            ResponseBuilder()
+            .add_data_block("IEG", self._device.get_id())
+            .add_data_block("KILL")
             .build()
+        )
 
 
 class ResponseBuilder(object):
@@ -64,6 +69,7 @@ class ResponseBuilder(object):
     - Any number of data blocks added by add_data_block()
     - An "end of data block" character
     """
+
     packet_start = "&"
     packet_end = "!\r\n"
     data_block_sep = ","
@@ -72,7 +78,9 @@ class ResponseBuilder(object):
         """
         Initialize a new response.
         """
-        self.response = "{pack_start}ACK{pack_end}{pack_start}".format(pack_start=self.packet_start, pack_end=self.packet_end)
+        self.response = "{pack_start}ACK{pack_end}{pack_start}".format(
+            pack_start=self.packet_start, pack_end=self.packet_end
+        )
 
         # Not yet in a valid state - set to true once at least one data block is added
         self.valid = False
@@ -85,7 +93,10 @@ class ResponseBuilder(object):
         :param data: data to add to the response
         :return: ResponseBuilder
         """
-        if not self.response[-1:] == self.data_block_sep and not self.response[-1:] == self.packet_start:
+        if (
+            not self.response[-1:] == self.data_block_sep
+            and not self.response[-1:] == self.packet_start
+        ):
             self.response += self.data_block_sep
 
         for item in data:

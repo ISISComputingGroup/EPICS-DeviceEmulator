@@ -5,7 +5,8 @@ class DefaultState(State):
     """
     Device is in default state.
     """
-    NAME = 'Default'
+
+    NAME = "Default"
 
     def in_state(self, dt):
         pass

@@ -17,15 +17,17 @@ class POLARISSampleChangerStreamInterface(StreamInterface):
         Cmd("move_to", "^ma(0[1-9]|[1][0-9]|20)$", argument_mappings=[int]),
         Cmd("move_to_without_lowering", "^mn(0[1-9]|[1][0-9]|20)$", argument_mappings=[int]),
         Cmd("raise_arm", "^ra$"),
-        Cmd("retrieve_sample", "^rt$")
+        Cmd("retrieve_sample", "^rt$"),
     }
 
-    error_codes = {Errors.NO_ERR: 0,
-                   Errors.ERR_INV_DEST: 5,
-                   Errors.ERR_NOT_INITIALISED: 6,
-                   Errors.ERR_ARM_DROPPED: 7,
-                   Errors.ERR_ARM_UP: 8,
-                   Errors.ERR_CANT_ROT_IF_NOT_UP: 10}
+    error_codes = {
+        Errors.NO_ERR: 0,
+        Errors.ERR_INV_DEST: 5,
+        Errors.ERR_NOT_INITIALISED: 6,
+        Errors.ERR_ARM_DROPPED: 7,
+        Errors.ERR_ARM_UP: 8,
+        Errors.ERR_CANT_ROT_IF_NOT_UP: 10,
+    }
 
     in_terminator = "\r\n"
     out_terminator = "\r\n"
@@ -41,8 +43,13 @@ class POLARISSampleChangerStreamInterface(StreamInterface):
 
         # Based on testing with actual device, appears to be different than doc
         return_string = "{0:b}01{1:b}{2:b}{3:b}0{4:b}"
-        return_string = return_string.format(not lowered, self._device.is_car_at_one(), not lowered,
-                                             lowered, self._device.is_moving())
+        return_string = return_string.format(
+            not lowered,
+            self._device.is_car_at_one(),
+            not lowered,
+            lowered,
+            self._device.is_moving(),
+        )
 
         return_string += "{:1d}".format(int(self._device.current_err))
         return_string += " {:2d}".format(int(self._device.car_pos))
@@ -79,4 +86,3 @@ class POLARISSampleChangerStreamInterface(StreamInterface):
     def handle_error(self, request, error):
         print("An error occurred at request " + repr(request) + ": " + repr(error))
         return "??"
-

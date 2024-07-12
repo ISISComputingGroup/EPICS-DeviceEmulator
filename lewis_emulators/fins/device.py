@@ -84,7 +84,6 @@ class SimulatedFinsPLC(StateMachineDevice):
         "LIQUEFIER:_ALARM1": 19982,
         "LIQUEFIER:_ALARM2": 19983,
         "MCP:LIQUID_HE_INVENTORY": 19996,
-
         # pv names for memory locations storing 32 bit integers, in the order they appear in the substitutions file
         "GC:R108:U40": 19700,
         "GC:R108:DEWAR_FARM": 19702,
@@ -113,7 +112,6 @@ class SimulatedFinsPLC(StateMachineDevice):
         "GC:IMAT": 19766,
         "GC:LET_AND_NIMROD": 19768,
         "GC:R80:WEST": 19772,
-
         # pv names for bi records for automatic/manual modes, in the order they appear in the substitutions file
         "LIQUID_NITROGEN:STATUS": 19979,
         "CNTRL_VALVE_120:MODE": 19967,
@@ -122,14 +120,12 @@ class SimulatedFinsPLC(StateMachineDevice):
         "HIGH_PRESSURE:MODE": 19973,
         "TIC106:MODE": 19976,
         "PIC112:MODE": 19977,
-
         # pv names for various other mbbi records, in the order they appear in the header template
         "CNTRL_VALVE_120:POSITION": 19968,
         "CNTRL_VALVE_121:POSITION": 19970,
         "PURIFIER:STATUS": 19978,
         "CMPRSSR:STATUS": 19980,
         "COLDBOX:STATUS": 19981,
-
         # pv names for mbbi records that store the status of valves, in the order they appear in the substitutions file
         "MOTORISED_VALVE_108:STATUS": 19875,
         "CNTRL_VALVE_112:STATUS": 19871,
@@ -148,14 +144,13 @@ class SimulatedFinsPLC(StateMachineDevice):
         "MOTORISED_VALVE_178:STATUS": 19993,
         "CNTRL_VALVE_103:STATUS": 19994,
         "CNTRL_VALVE_111:STATUS": 19995,
-
         # pv names for memory locations storing floating point numbers, in the order they appear in the substitutions
         # file
         "MASS_FLOW:HE_RSPPL:TS2:EAST": 19876,  # TS2 mass flow total helium resupply east
         "MASS_FLOW:HE_RSPPL:TS2:WEST": 19878,  # TS2 mass flow total helium resupply west
         "MASS_FLOW:HE_RSPPL:TS1:VOID": 19880,  # TS1 mass flow target group helium resupply void
         "MASS_FLOW:HE_RSPPL:TS1:WNDW": 19882,  # TS1 mass flow target group helium resupply window
-        "MASS_FLOW:HE_RSPPL:TS1:SHTR": 19884  # TS1 mass flow target group helium resupply shutter
+        "MASS_FLOW:HE_RSPPL:TS1:SHTR": 19884,  # TS1 mass flow target group helium resupply shutter
     }
 
     def _initialize_data(self):
@@ -241,7 +236,6 @@ class SimulatedFinsPLC(StateMachineDevice):
             19982: 0,  # liquefier alarm 1
             19983: 0,  # liquefier alarm 2
             19996: 0,  # mcp liquid helium inventory
-
             # memory locations corresponding to bi records for automatic/manual mode
             19967: 0,  # control valve 120 automatic/manual mode
             19969: 0,  # control valve 121 automatic/manual mode
@@ -249,7 +243,6 @@ class SimulatedFinsPLC(StateMachineDevice):
             19973: 0,  # high pressure automatic/manual
             19976: 0,  # TIC106 automatic/manual
             19977: 0,  # PIC112 automatic/manual
-
             # memory locations corresponding to various mbbi records
             19979: 0,  # liquid nitrogen status
             19968: 0,  # control valve 120 position
@@ -257,7 +250,6 @@ class SimulatedFinsPLC(StateMachineDevice):
             19978: 0,  # purifier status
             19980: 0,  # compressor status
             19981: 0,  # coldbox status
-
             # the part of the plc memory storing valve statuses, in the order they appear in the memory map
             19875: 0,  # liquefier coldbox motorised valve 108 status
             19871: 0,  # control valve 112 status
@@ -275,7 +267,7 @@ class SimulatedFinsPLC(StateMachineDevice):
             19992: 0,  # motorised valve 177 status
             19993: 0,  # motorised valve 178 status
             19994: 0,  # control valve 103 status
-            19995: 0  # control valve 111 status
+            19995: 0,  # control valve 111 status
         }
 
         #  represents the part of the plc memory that stores 32 bit ints, in the order they appear in the memory map
@@ -306,7 +298,7 @@ class SimulatedFinsPLC(StateMachineDevice):
             19762: 0,  # gas counter magnet lab
             19766: 0,  # gas counter IMAT
             19768: 0,  # gas counter LET and NIMROD
-            19772: 0  # gas counter R80 west
+            19772: 0,  # gas counter R80 west
         }
 
         # represents the part of the plc memory that stores floating point numbers, in the order they appear in the
@@ -315,15 +307,14 @@ class SimulatedFinsPLC(StateMachineDevice):
 
     def _get_state_handlers(self):
         return {
-            'default': DefaultState(),
+            "default": DefaultState(),
         }
 
     def _get_initial_state(self):
-        return 'default'
+        return "default"
 
     def _get_transition_handlers(self):
-        return OrderedDict([
-        ])
+        return OrderedDict([])
 
     def reset(self):
         """
@@ -359,4 +350,6 @@ class SimulatedFinsPLC(StateMachineDevice):
         elif memory_location in self.float_memory.keys():
             self.float_memory[memory_location] = data
         else:
-            raise ValueError("the pv name maps to a memory address that is not recognized by the emulator memory.")
+            raise ValueError(
+                "the pv name maps to a memory address that is not recognized by the emulator memory."
+            )

@@ -183,8 +183,8 @@ class Lakeshore460StreamInterface(StreamInterface):
 
     def get_multicmds(self, command, other_commands):
         """
-             As the protocol file sends multiple commands (set Channel; request channel PV),
-             these methods split up the commands and process both.
+        As the protocol file sends multiple commands (set Channel; request channel PV),
+        these methods split up the commands and process both.
         """
         replies = []
         for cmd_to_find in [command, other_commands]:

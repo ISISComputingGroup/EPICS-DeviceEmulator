@@ -61,11 +61,12 @@ class Moxa1242ModbusInterface(GenericMoxa12XXInterface):
     # The layout of these registers is described in Appendix A of the moxa e1200 series manual.
 
     ir = ModbusBasicDataBank(0, start_addr=0x200, last_addr=0x204)
-    
+
     # Moxa 1242 has 8 (0x08) Discrete Input registers (di). The other register values are not tested.
     # The layout of these registers is described in Appendix A of the moxa e1200 series manual.
 
     di = ModbusBasicDataBank(False, last_addr=0x08)
+
 
 @has_log
 class Moxa1262ModbusInterface(GenericMoxa12XXInterface):

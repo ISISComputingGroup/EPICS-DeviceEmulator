@@ -7,7 +7,7 @@ from .states import DefaultState
 class SimulatedSKFChopper(StateMachineDevice):
     """
     Simulated SKF chopper. Very basic and only provides frequency as a parameter for now
-    to perform a basic check of modbus comms. 
+    to perform a basic check of modbus comms.
     """
 
     def _initialize_data(self):
@@ -16,7 +16,7 @@ class SimulatedSKFChopper(StateMachineDevice):
         """
         self.connected = True
 
-        self.freq = 40 
+        self.freq = 40
         self.send_ok_transid = True
 
         self.v13_norm = 0
@@ -34,9 +34,7 @@ class SimulatedSKFChopper(StateMachineDevice):
         """
         Returns: states and their names
         """
-        return {
-            DefaultState.NAME: DefaultState()
-        }
+        return {DefaultState.NAME: DefaultState()}
 
     def _get_initial_state(self):
         """

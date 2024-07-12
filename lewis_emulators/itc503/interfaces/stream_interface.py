@@ -3,7 +3,6 @@ from lewis.utils.command_builder import CmdBuilder
 
 
 class Itc503StreamInterface(StreamInterface):
-
     # Commands that we expect via serial during normal operation
     commands = {
         CmdBuilder("set_p").escape("P").float().eos().build(),
@@ -12,32 +11,24 @@ class Itc503StreamInterface(StreamInterface):
         CmdBuilder("get_p").escape("R8").eos().build(),
         CmdBuilder("get_i").escape("R9").eos().build(),
         CmdBuilder("get_d").escape("R10").eos().build(),
-
         CmdBuilder("get_gas_flow").escape("R7").eos().build(),
         CmdBuilder("set_gas_flow").escape("G").float().eos().build(),
-
         CmdBuilder("get_temp").escape("R1").eos().build(),
         CmdBuilder("get_temp").escape("R2").eos().build(),
         CmdBuilder("get_temp").escape("R3").eos().build(),
         CmdBuilder("get_temp_sp").escape("R0").eos().build(),
         CmdBuilder("set_temp").escape("T").float().eos().build(),
-
         CmdBuilder("get_status").escape("X").eos().build(),
-
         CmdBuilder("set_ctrl").escape("C").int().eos().build(),
         CmdBuilder("set_mode").escape("A").int().eos().build(),
         CmdBuilder("set_ctrl_chan").escape("H").int().eos().build(),
-
         CmdBuilder("set_autopid_on").escape("L1").eos().build(),
         CmdBuilder("set_autopid_off").escape("L0").eos().build(),
-
         CmdBuilder("set_heater_maxv").escape("M").float().eos().build(),
         # No readback for max heater output
-
         CmdBuilder("set_heater_v").escape("O").float().eos().build(),
         CmdBuilder("get_heater_v").escape("R6").eos().build(),
         CmdBuilder("get_heater_p").escape("R5").eos().build(),
-
         CmdBuilder("get_temp_error").escape("R4").eos().build(),
     }
 
@@ -45,7 +36,9 @@ class Itc503StreamInterface(StreamInterface):
     out_terminator = "\r"
 
     def handle_error(self, request, error):
-        err_string = "command was: {}, error was: {}: {}\n".format(request, error.__class__.__name__, error)
+        err_string = "command was: {}, error was: {}: {}\n".format(
+            request, error.__class__.__name__, error
+        )
         print(err_string)
         self.log.error(err_string)
         return err_string
@@ -99,7 +92,7 @@ class Itc503StreamInterface(StreamInterface):
             ctrl=self.device.control,
             sweeping=1 if self.device.sweeping else 0,
             control_channel=self.device.control_channel,
-            autopid=1 if self.device.autopid else 0
+            autopid=1 if self.device.autopid else 0,
         )
 
     def set_ctrl(self, ctrl):

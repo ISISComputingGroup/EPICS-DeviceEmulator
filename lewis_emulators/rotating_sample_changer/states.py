@@ -17,8 +17,9 @@ class MovingState(State):
         self._context.arm_lowered = False
 
     def in_state(self, dt):
-        self._context.car_pos = approaches.linear(self._context.car_pos, self._context.car_target,
-                                                  self._context.CAR_SPEED, dt)
+        self._context.car_pos = approaches.linear(
+            self._context.car_pos, self._context.car_target, self._context.CAR_SPEED, dt
+        )
 
     def on_exit(self, dt):
         self._context.arm_lowered = True

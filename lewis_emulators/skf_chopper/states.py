@@ -6,5 +6,5 @@ class DefaultState(State):
     """
     Device is in default state.
     """
-    NAME = 'Default'
 
+    NAME = "Default"

@@ -6,7 +6,6 @@ from lewis.devices import StateMachineDevice
 
 @has_log
 class SimulatedItc503(StateMachineDevice):
-
     def _initialize_data(self):
         """
         Initialize all of the device's attributes.
@@ -28,10 +27,10 @@ class SimulatedItc503(StateMachineDevice):
         self.report_sweep_state_with_leading_zero = False
 
     def _get_state_handlers(self):
-        return {'default': DefaultState()}
+        return {"default": DefaultState()}
 
     def _get_initial_state(self):
-        return 'default'
+        return "default"
 
     def _get_transition_handlers(self):
         return OrderedDict([])

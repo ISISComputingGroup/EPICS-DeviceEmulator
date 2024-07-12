@@ -6,7 +6,6 @@ from .states import DefaultState, StoppingState, GoingState
 
 
 class SimulatedSkfMb350Chopper(StateMachineDevice):
-
     def _initialize_data(self):
         """
         Initialize all of the device's attributes.
@@ -16,27 +15,29 @@ class SimulatedSkfMb350Chopper(StateMachineDevice):
         self.phase = 0
         self.frequency = 0
         self.frequency_setpoint = 0
-        self.phase_percent_ok = 100.
-        self.phase_repeatability = 100.
+        self.phase_percent_ok = 100.0
+        self.phase_repeatability = 100.0
 
-        self.interlocks = OrderedDict([
-            ("DSP_WD_FAIL", False),
-            ("OSCILLATOR_FAIL", False),
-            ("POSITION_SHUTDOWN", False),
-            ("EMERGENCY_STOP", False),
-            ("UPS_FAIL", False),
-            ("EXTERNAL_FAULT", False),
-            ("CC_WD_FAIL", False),
-            ("OVERSPEED_TRIP", False),
-            ("VACUUM_FAIL", False),
-            ("MOTOR_OVER_TEMP", False),
-            ("REFERENCE_SIGNAL_LOSS", False),
-            ("SPEED_SENSOR_LOSS", False),
-            ("COOLING_LOSS", False),
-            ("DSP_SUMMARY_SHUTDOWN", False),
-            ("CC_SHUTDOWN_REQ", False),
-            ("TEST_MODE", False),
-        ])
+        self.interlocks = OrderedDict(
+            [
+                ("DSP_WD_FAIL", False),
+                ("OSCILLATOR_FAIL", False),
+                ("POSITION_SHUTDOWN", False),
+                ("EMERGENCY_STOP", False),
+                ("UPS_FAIL", False),
+                ("EXTERNAL_FAULT", False),
+                ("CC_WD_FAIL", False),
+                ("OVERSPEED_TRIP", False),
+                ("VACUUM_FAIL", False),
+                ("MOTOR_OVER_TEMP", False),
+                ("REFERENCE_SIGNAL_LOSS", False),
+                ("SPEED_SENSOR_LOSS", False),
+                ("COOLING_LOSS", False),
+                ("DSP_SUMMARY_SHUTDOWN", False),
+                ("CC_SHUTDOWN_REQ", False),
+                ("TEST_MODE", False),
+            ]
+        )
 
         self.rotator_angle = 90
 
@@ -48,20 +49,25 @@ class SimulatedSkfMb350Chopper(StateMachineDevice):
 
     def _get_state_handlers(self):
         return {
-            'default': DefaultState(),
-            'going': GoingState(),
-            'stopping': StoppingState(),
+            "default": DefaultState(),
+            "going": GoingState(),
+            "stopping": StoppingState(),
         }
 
     def _get_initial_state(self):
-        return 'default'
+        return "default"
 
     def _get_transition_handlers(self):
-        return OrderedDict([
-            (('default', 'going'), lambda: self.frequency_setpoint != self.frequency and self._started),
-            (('going', 'stopping'), lambda: not self._started),
-            (('stopping', 'default'), lambda: self.frequency == 0 and not self._started),
-        ])
+        return OrderedDict(
+            [
+                (
+                    ("default", "going"),
+                    lambda: self.frequency_setpoint != self.frequency and self._started,
+                ),
+                (("going", "stopping"), lambda: not self._started),
+                (("stopping", "default"), lambda: self.frequency == 0 and not self._started),
+            ]
+        )
 
     def set_frequency(self, frequency):
         self.frequency_setpoint = frequency

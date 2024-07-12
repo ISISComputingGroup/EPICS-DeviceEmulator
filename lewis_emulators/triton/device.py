@@ -10,6 +10,7 @@ class TemperatureStage(object):
     """
     Class representing a temperature stage.
     """
+
     def __init__(self, name):
         self.name = name
         self.temperature = 1
@@ -30,12 +31,12 @@ class PressureSensor(object):
 
     Having this as a class makes it more extensible in future, as the triton driver is still in flux.
     """
+
     def __init__(self):
         self.pressure = 0
 
 
 class SimulatedTriton(StateMachineDevice):
-
     def _initialize_data(self):
         """
         Initialize all of the device's attributes.
@@ -68,7 +69,6 @@ class SimulatedTriton(StateMachineDevice):
         assert self.sample_channel in self.temperature_stages
 
     def find_temperature_channel(self, name):
-
         for k, v in self.temperature_stages.items():
             if v.name == name:
                 return k
@@ -87,10 +87,10 @@ class SimulatedTriton(StateMachineDevice):
         setattr(self.temperature_stages["T{}".format(sensor)], property, value)
 
     def _get_state_handlers(self):
-        return {'default': DefaultState()}
+        return {"default": DefaultState()}
 
     def _get_initial_state(self):
-        return 'default'
+        return "default"
 
     def _get_transition_handlers(self):
         return OrderedDict([])

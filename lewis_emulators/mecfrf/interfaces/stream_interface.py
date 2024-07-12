@@ -7,7 +7,6 @@ EXPECTED_MESSAGE_LENGTH = 188
 
 
 class MecfrfStreamInterface(StreamInterface):
-
     # Commands that we expect via serial during normal operation (No commands - the device always sends a stream of
     # information to the IOC without being polled)
     commands = {}
@@ -68,7 +67,8 @@ class MecfrfStreamInterface(StreamInterface):
         for _ in range(38):
             msg += struct.pack("L", 0)
 
-        assert len(msg) == EXPECTED_MESSAGE_LENGTH, \
-            "Message length {} was expected to be {}".format(len(msg), EXPECTED_MESSAGE_LENGTH)
+        assert (
+            len(msg) == EXPECTED_MESSAGE_LENGTH
+        ), "Message length {} was expected to be {}".format(len(msg), EXPECTED_MESSAGE_LENGTH)
 
         return msg

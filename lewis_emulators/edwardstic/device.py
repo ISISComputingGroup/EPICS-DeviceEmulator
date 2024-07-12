@@ -33,6 +33,7 @@ class GaugeStates(object):
     """
     Possible gauge states
     """
+
     not_connected = object()
     connected = object()
     new_id = object()
@@ -69,7 +70,6 @@ class GaugeUnits(object):
 
 
 class SimulatedEdwardsTIC(StateMachineDevice):
-
     def _initialize_data(self):
         """
         Initialize all of the device's attributes.
@@ -90,15 +90,14 @@ class SimulatedEdwardsTIC(StateMachineDevice):
 
     def _get_state_handlers(self):
         return {
-            'default': DefaultState(),
+            "default": DefaultState(),
         }
 
     def _get_initial_state(self):
-        return 'default'
+        return "default"
 
     def _get_transition_handlers(self):
-        return OrderedDict([
-        ])
+        return OrderedDict([])
 
     @property
     def turbo_in_standby(self):

@@ -21,12 +21,14 @@ class HRPDSampleChangerStreamInterface(StreamInterface):
         Cmd("retrieve_sample", "^rt$"),
     }
 
-    error_codes = {Errors.NO_ERR: 0,
-                   Errors.ERR_INV_DEST: 5,
-                   Errors.ERR_NOT_INITIALISED: 6,
-                   Errors.ERR_ARM_DROPPED: 7,
-                   Errors.ERR_ARM_UP: 8,
-                   Errors.ERR_CANT_ROT_IF_NOT_UP: 7}
+    error_codes = {
+        Errors.NO_ERR: 0,
+        Errors.ERR_INV_DEST: 5,
+        Errors.ERR_NOT_INITIALISED: 6,
+        Errors.ERR_ARM_DROPPED: 7,
+        Errors.ERR_ARM_UP: 8,
+        Errors.ERR_CANT_ROT_IF_NOT_UP: 7,
+    }
 
     in_terminator = "\r"
     out_terminator = "\r\n"
@@ -49,8 +51,9 @@ class HRPDSampleChangerStreamInterface(StreamInterface):
 
         # Based on testing with actual device, appears to be different than doc
         return_string = "01000{0:b}01{1:b}{2:b}{3:b}00000"
-        return_string = return_string.format(not lowered, self._device.is_car_at_one(), not lowered,
-                                             lowered)
+        return_string = return_string.format(
+            not lowered, self._device.is_car_at_one(), not lowered, lowered
+        )
 
         return_string += " 0 {:b}".format(self._device.is_moving())
 
@@ -94,4 +97,3 @@ class HRPDSampleChangerStreamInterface(StreamInterface):
 
     def handle_error(self, request, error):
         print("An error occurred at request " + repr(request) + ": " + repr(error))
-

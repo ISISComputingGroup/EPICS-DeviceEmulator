@@ -5,6 +5,7 @@ class SystemGases(object):
     """
     The collection of gases that are available within the system.
     """
+
     def __init__(self, gases=list()):
         self._gases = set()
         self._add_gases(gases)

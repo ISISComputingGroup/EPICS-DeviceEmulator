@@ -9,7 +9,6 @@ if_connected = conditional_reply("connected")
 
 
 class AG33220AStreamInterface(StreamInterface):
-
     commands = {
         Cmd("get_amplitude", "^VOLT\?$"),
         Cmd("set_amplitude", "^VOLT " + NUM_MIN_MAX, argument_mappings=[string_arg]),
@@ -20,7 +19,11 @@ class AG33220AStreamInterface(StreamInterface):
         Cmd("get_units", "^VOLT:UNIT\?$"),
         Cmd("set_units", "^VOLT:UNIT (VPP|VRMS|DBM)$", argument_mappings=[string_arg]),
         Cmd("get_function", "^FUNC\?$"),
-        Cmd("set_function", "^FUNC (SIN|SQU|RAMP|PULS|NOIS|DC|USER)$", argument_mappings=[string_arg]),
+        Cmd(
+            "set_function",
+            "^FUNC (SIN|SQU|RAMP|PULS|NOIS|DC|USER)$",
+            argument_mappings=[string_arg],
+        ),
         Cmd("get_output", "^OUTP\?$"),
         Cmd("set_output", "^OUTP (ON|OFF)$", argument_mappings=[string_arg]),
         Cmd("get_idn", "^\*IDN\?$"),
@@ -29,7 +32,11 @@ class AG33220AStreamInterface(StreamInterface):
         Cmd("get_voltage_low", "^VOLT:LOW\?$"),
         Cmd("set_voltage_low", "^VOLT:LOW " + NUM_MIN_MAX, argument_mappings=[string_arg]),
         Cmd("get_voltage_range_auto", "^VOLT:RANG:AUTO\?$"),
-        Cmd("set_voltage_range_auto", "^VOLT:RANG:AUTO (OFF|ON|ONCE)$", argument_mappings=[string_arg]),
+        Cmd(
+            "set_voltage_range_auto",
+            "^VOLT:RANG:AUTO (OFF|ON|ONCE)$",
+            argument_mappings=[string_arg],
+        ),
     }
 
     in_terminator = "\n"
@@ -37,7 +44,7 @@ class AG33220AStreamInterface(StreamInterface):
 
     # Takes in a value and returns a value in the form of x.xxx0000000000Eyy
     def float_output(self, value):
-        value = float('%s' % float('%.4g' % float(value)))
+        value = float("%s" % float("%.4g" % float(value)))
         return "{:+.13E}".format(value)
 
     @if_connected

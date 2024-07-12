@@ -4,7 +4,7 @@ from lewis.utils.byte_conversions import int_to_raw_bytes, raw_bytes_to_int
 from functools import partial
 
 BYTES_IN_INT = 4
-HEADER_LENGTH = 4*BYTES_IN_INT
+HEADER_LENGTH = 4 * BYTES_IN_INT
 
 convert_to_response = partial(int_to_raw_bytes, length=BYTES_IN_INT, low_byte_first=True)
 
@@ -41,7 +41,7 @@ ID_ANC_CAP_VALUE = 0x0569
 ID_ANC_STOP_EN = 0x0450  # Enables 'hump' detection
 ID_ANC_REGSPD_SELSP = 0x054A  # Type of setpoint for the speed
 ID_ANC_TARGET = 0x0408  # The target to move to
-ID_ANC_RUN_TARGET = 0x040d  # Actually start the move to target
+ID_ANC_RUN_TARGET = 0x040D  # Actually start the move to target
 ID_ANC_AXIS_ON = 0x3030  # Turn the axis on (on power cycle the axis is turned off
 
 # Status bitmask
@@ -64,7 +64,9 @@ def convert_to_ints(command, start, end):
 
     Returns: A list of integers converted from the command.
     """
-    return [raw_bytes_to_int(command[x:x + BYTES_IN_INT]) for x in range(start, end, BYTES_IN_INT)]
+    return [
+        raw_bytes_to_int(command[x : x + BYTES_IN_INT]) for x in range(start, end, BYTES_IN_INT)
+    ]
 
 
 def generate_response(address, index, correlation_num, data=None):
@@ -96,10 +98,9 @@ def generate_response(address, index, correlation_num, data=None):
 
 @has_log
 class AttocubeANC350StreamInterface(StreamInterface):
-
     # Commands that we expect via serial during normal operation. Match anything!
     commands = {
-        Cmd("any_command", r"^([\s\S]*)$", return_mapping=lambda x:x),
+        Cmd("any_command", r"^([\s\S]*)$", return_mapping=lambda x: x),
     }
 
     in_terminator = ""
@@ -113,7 +114,7 @@ class AttocubeANC350StreamInterface(StreamInterface):
         return str(error)
 
     def any_command(self, command):
-        response = ''
+        response = ""
 
         if not self.device.connected:
             # Used rather than conditional_reply decorator to improve error message
@@ -132,7 +133,9 @@ class AttocubeANC350StreamInterface(StreamInterface):
     def handle_single_command(self, command):
         length = raw_bytes_to_int(command[:BYTES_IN_INT])
 
-        opcode, address, index, correlation_num = convert_to_ints(command, BYTES_IN_INT, HEADER_LENGTH + 1)
+        opcode, address, index, correlation_num = convert_to_ints(
+            command, BYTES_IN_INT, HEADER_LENGTH + 1
+        )
 
         if length > HEADER_LENGTH:
             # This is probably a set command
@@ -140,7 +143,11 @@ class AttocubeANC350StreamInterface(StreamInterface):
 
         # Length should describe command minus itself
         if len(command) - BYTES_IN_INT != length:
-            raise ValueError("Told I would receive {} bytes but received {}".format(length, len(command) - BYTES_IN_INT))
+            raise ValueError(
+                "Told I would receive {} bytes but received {}".format(
+                    length, len(command) - BYTES_IN_INT
+                )
+            )
 
         if opcode == UC_GET:
             return self.get(address, index, correlation_num)
@@ -183,4 +190,3 @@ class AttocubeANC350StreamInterface(StreamInterface):
         except KeyError:
             data = 0  # Just return 0 for now
         return generate_response(address, index, correlation_num, data)
-

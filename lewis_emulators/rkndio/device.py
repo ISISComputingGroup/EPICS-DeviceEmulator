@@ -7,7 +7,6 @@ NUMBER_OF_D_Os = 6
 
 
 class SimulatedRkndio(StateMachineDevice):
-
     def _initialize_data(self):
         """
         Initialize all of the device's attributes.
@@ -20,15 +19,14 @@ class SimulatedRkndio(StateMachineDevice):
 
     def _get_state_handlers(self):
         return {
-            'default': DefaultState(),
+            "default": DefaultState(),
         }
 
     def _get_initial_state(self):
-        return 'default'
+        return "default"
 
     def _get_transition_handlers(self):
-        return OrderedDict([
-        ])
+        return OrderedDict([])
 
     @property
     def idn(self):
@@ -135,5 +133,3 @@ class SimulatedRkndio(StateMachineDevice):
     def reset_error(self):
         self.error = "No error"
         self.status = "No error"
-
-

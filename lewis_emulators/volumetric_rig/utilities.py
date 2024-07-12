@@ -10,7 +10,7 @@ def format_float(f, as_string):
 
 
 def pad_string(s, length, padding_character):
-    return s if length is None else s[:length] + (length - len(s))*padding_character
+    return s if length is None else s[:length] + (length - len(s)) * padding_character
 
 
 def convert_raw_to_int(raw):

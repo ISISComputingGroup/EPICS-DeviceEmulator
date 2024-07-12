@@ -5,6 +5,7 @@ class SimulatedAG33220A(Device):
     """
     Simulated AG33220A
     """
+
     connected = True
 
     # Constants
@@ -16,10 +17,22 @@ class SimulatedAG33220A(Device):
     VOLT_LOW_MAX = 4.99
     VOLT_HIGH_MIN = -4.99
     VOLT_PRECISION = 0.01
-    FREQ_MINS = {"SIN": 10 ** -6, "SQU": 10 ** -6, "RAMP": 10 ** -6, "PULS": 5 * 10 ** -4,
-                 "NOIS": 10 ** -6, "USER": 10 ** -6}
-    FREQ_MAXS = {"SIN": 2 * 10 ** 7, "SQU": 2 * 10 ** 7, "RAMP": 2 * 10 ** 5, "PULS": 5 * 10 ** 6,
-                 "NOIS": 2 * 10 ** 7, "USER": 6 * 10 ** 6}
+    FREQ_MINS = {
+        "SIN": 10**-6,
+        "SQU": 10**-6,
+        "RAMP": 10**-6,
+        "PULS": 5 * 10**-4,
+        "NOIS": 10**-6,
+        "USER": 10**-6,
+    }
+    FREQ_MAXS = {
+        "SIN": 2 * 10**7,
+        "SQU": 2 * 10**7,
+        "RAMP": 2 * 10**5,
+        "PULS": 5 * 10**6,
+        "NOIS": 2 * 10**7,
+        "USER": 6 * 10**6,
+    }
 
     # Device variables
     idn = "Agilent Technologies,33220A-MY44033103,2.02-2.02-22-2"
@@ -76,7 +89,9 @@ class SimulatedAG33220A(Device):
 
         :param new_frequency: the frequency to set to
         """
-        self.frequency = self.limit(new_frequency, self.FREQ_MINS[self.function], self.FREQ_MAXS[self.function])
+        self.frequency = self.limit(
+            new_frequency, self.FREQ_MINS[self.function], self.FREQ_MAXS[self.function]
+        )
 
     def set_new_voltage_high(self, new_voltage_high):
         """
@@ -87,7 +102,9 @@ class SimulatedAG33220A(Device):
         """
         new_voltage_high = self.limit(new_voltage_high, self.VOLT_HIGH_MIN, self.VOLT_MAX)
         if new_voltage_high <= self.voltage_low:
-            self.voltage_low = self.limit(new_voltage_high - self.VOLT_PRECISION, self.VOLT_MIN, new_voltage_high)
+            self.voltage_low = self.limit(
+                new_voltage_high - self.VOLT_PRECISION, self.VOLT_MIN, new_voltage_high
+            )
         self._update_volt_and_offs(self.voltage_low, new_voltage_high)
 
     def set_new_voltage_low(self, new_voltage_low):
@@ -99,7 +116,9 @@ class SimulatedAG33220A(Device):
         """
         new_voltage_low = self.limit(new_voltage_low, self.VOLT_MIN, self.VOLT_LOW_MAX)
         if new_voltage_low >= self.voltage_high:
-            self.voltage_high = self.limit(new_voltage_low + self.VOLT_PRECISION, new_voltage_low, self.VOLT_MAX)
+            self.voltage_high = self.limit(
+                new_voltage_low + self.VOLT_PRECISION, new_voltage_low, self.VOLT_MAX
+            )
         self._update_volt_and_offs(new_voltage_low, self.voltage_high)
 
     def _update_volt_and_offs(self, new_low, new_high):
@@ -112,7 +131,7 @@ class SimulatedAG33220A(Device):
         self.voltage_high = new_high
         self.voltage_low = new_low
         self.amplitude = self.voltage_high - self.voltage_low
-        self.offset = (self.voltage_high + self.voltage_low)/2
+        self.offset = (self.voltage_high + self.voltage_low) / 2
 
     def set_offs_and_update_voltage(self, new_offset):
         """
@@ -122,11 +141,11 @@ class SimulatedAG33220A(Device):
         """
         new_offset = self.limit(new_offset, -self.OFF_MAX, self.OFF_MAX)
         if new_offset + self.voltage_high > self.VOLT_MAX:
-            self.amplitude = 2*(self.VOLT_MAX-new_offset)
+            self.amplitude = 2 * (self.VOLT_MAX - new_offset)
             self.voltage_high = self.VOLT_MAX
             self.voltage_low = self.VOLT_MAX - self.amplitude
         elif new_offset + self.voltage_low < self.VOLT_MIN:
-            self.amplitude = 2*(self.VOLT_MIN-new_offset)
+            self.amplitude = 2 * (self.VOLT_MIN - new_offset)
             self.voltage_low = self.VOLT_MIN
             self.voltage_high = self.VOLT_MIN + self.amplitude
         else:
@@ -154,4 +173,6 @@ class SimulatedAG33220A(Device):
 
     def set_function(self, new_function):
         self.function = new_function
-        self.frequency = self.limit(self.frequency, self.FREQ_MINS[new_function], self.FREQ_MAXS[new_function])
+        self.frequency = self.limit(
+            self.frequency, self.FREQ_MINS[new_function], self.FREQ_MAXS[new_function]
+        )

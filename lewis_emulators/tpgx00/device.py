@@ -7,60 +7,60 @@ from enum import Enum, unique
 @unique
 class Units(Enum):
     hPascal = object()
-    mbar    = object()
-    Torr    = object()
-    Pa      = object()
-    Micron  = object()
-    Volt    = object()
-    Ampere  = object()
+    mbar = object()
+    Torr = object()
+    Pa = object()
+    Micron = object()
+    Volt = object()
+    Ampere = object()
 
 
 @unique
 class ChannelStatus(Enum):
-    DATA_OK     = object()
-    UNDERRANGE  = object()
-    OVERRANGE   = object()
+    DATA_OK = object()
+    UNDERRANGE = object()
+    OVERRANGE = object()
     POINT_ERROR = object()
-    POINT_OFF   = object()
+    POINT_OFF = object()
     NO_HARDWARE = object()
 
 
 @unique
 class SFAssignment(Enum):
-    OFF         = object()
-    A1          = object()
-    A2          = object()
-    B1          = object()
-    B2          = object()
+    OFF = object()
+    A1 = object()
+    A2 = object()
+    B1 = object()
+    B2 = object()
     A1_SELF_MON = object()
     A2_SELF_MON = object()
     B1_SELF_MON = object()
     B2_SELF_MON = object()
-    ON          = object()
+    ON = object()
 
 
 @unique
 class SFStatus(Enum):
     OFF = object()
-    ON  = object()
+    ON = object()
 
 
 @unique
 class ErrorStatus(Enum):
-    NO_ERROR      = object()
-    DEVICE_ERROR  = object()
-    NO_HARDWARE   = object()
+    NO_ERROR = object()
+    DEVICE_ERROR = object()
+    NO_HARDWARE = object()
     INVALID_PARAM = object()
-    SYNTAX_ERROR  = object()
+    SYNTAX_ERROR = object()
 
 
 @unique
 class ReadState(Enum):
-    A1   = object()
-    A2   = object()
-    B1   = object()
-    B2   = object()
-    UNI  = object()
+    A1 = object()
+    A2 = object()
+    B1 = object()
+    B2 = object()
+    UNI = object()
     UNI0 = object()
     UNI1 = object()
     UNI2 = object()
@@ -68,21 +68,21 @@ class ReadState(Enum):
     UNI4 = object()
     UNI5 = object()
     UNI6 = object()
-    F1   = object()
-    F2   = object()
-    F3   = object()
-    F4   = object()
-    FA   = object()
-    FB   = object()
-    FS1  = object()
-    FS2  = object()
-    FS3  = object()
-    FS4  = object()
-    FSA  = object()
-    FSB  = object()
-    SPS  = object()
-    ERR  = object()
-    
+    F1 = object()
+    F2 = object()
+    F3 = object()
+    F4 = object()
+    FA = object()
+    FB = object()
+    FS1 = object()
+    FS2 = object()
+    FS3 = object()
+    FS4 = object()
+    FSA = object()
+    FSB = object()
+    SPS = object()
+    ERR = object()
+
 
 class CircuitAssignment:
     """
@@ -91,7 +91,14 @@ class CircuitAssignment:
         low_threshold(float), low_exponent(int), circuit_assignment(SFAssignment enum member)
     """
 
-    def __init__(self, high_threshold=0.0, high_exponent=0, low_threshold=0.0, low_exponent=0, circuit_assignment="A1"):
+    def __init__(
+        self,
+        high_threshold=0.0,
+        high_exponent=0,
+        low_threshold=0.0,
+        low_exponent=0,
+        circuit_assignment="A1",
+    ):
         """
         Default constructor.
         """
@@ -124,29 +131,29 @@ class SimulatedTpgx00(StateMachineDevice):
         self.__connected = None
         self.__readstate = None
         self.__switching_functions = {
-            "1" : CircuitAssignment(),
-            "2" : CircuitAssignment(),
-            "3" : CircuitAssignment(),
-            "4" : CircuitAssignment(),
-            "A" : CircuitAssignment(),
-            "B" : CircuitAssignment()
+            "1": CircuitAssignment(),
+            "2": CircuitAssignment(),
+            "3": CircuitAssignment(),
+            "4": CircuitAssignment(),
+            "A": CircuitAssignment(),
+            "B": CircuitAssignment(),
         }
         self.__switching_function_to_set = CircuitAssignment()
         self.__switching_functions_status = {
-            "1" : SFStatus["OFF"],
-            "2" : SFStatus["OFF"],
-            "3" : SFStatus["OFF"],
-            "4" : SFStatus["OFF"],
-            "A" : SFStatus["OFF"],
-            "B" : SFStatus["OFF"]
+            "1": SFStatus["OFF"],
+            "2": SFStatus["OFF"],
+            "3": SFStatus["OFF"],
+            "4": SFStatus["OFF"],
+            "A": SFStatus["OFF"],
+            "B": SFStatus["OFF"],
         }
         self.__switching_function_assignment = {
-            "1" : SFAssignment["OFF"],
-            "2" : SFAssignment["OFF"],
-            "3" : SFAssignment["OFF"],
-            "4" : SFAssignment["OFF"],
-            "A" : SFAssignment["OFF"],
-            "B" : SFAssignment["OFF"],
+            "1": SFAssignment["OFF"],
+            "2": SFAssignment["OFF"],
+            "3": SFAssignment["OFF"],
+            "4": SFAssignment["OFF"],
+            "A": SFAssignment["OFF"],
+            "B": SFAssignment["OFF"],
         }
         self.__on_timer = 0
         self.__error_status = ErrorStatus["NO_ERROR"]
@@ -268,10 +275,10 @@ class SimulatedTpgx00(StateMachineDevice):
         Returns the status of the A1 pressure sensor
 
         Returns:
-            Enum memeber: A1 pressure sensor status 
+            Enum memeber: A1 pressure sensor status
         """
         return self.__pressure_status_a1
-    
+
     @pressure_status_a1.setter
     def pressure_status_a1(self, value):
         """
@@ -284,7 +291,7 @@ class SimulatedTpgx00(StateMachineDevice):
             None
         """
         self.__pressure_status_a1 = value
-    
+
     @property
     def pressure_status_a2(self):
         """
@@ -294,7 +301,7 @@ class SimulatedTpgx00(StateMachineDevice):
             Enum memeber: A2 pressure sensor status
         """
         return self.__pressure_status_a2
-    
+
     @pressure_status_a2.setter
     def pressure_status_a2(self, value):
         """
@@ -396,9 +403,8 @@ class SimulatedTpgx00(StateMachineDevice):
         Returns:
             None
         """
-        for (key, status) in zip(self.__switching_functions_status.keys(), statuses):
+        for key, status in zip(self.__switching_functions_status.keys(), statuses):
             self.__switching_functions_status[key] = SFStatus[status]
-        
 
     @property
     def switching_functions(self):
@@ -463,25 +469,25 @@ class SimulatedTpgx00(StateMachineDevice):
             int: (0-100) ON-Timer value
         """
         return self.__on_timer
-    
-    @property 
+
+    @property
     def error_status(self):
         """
         Returns the error status of the device
-        
+
         Returns:
             Enum: ErrorStatus code of the device
         """
         return self.__error_status
-    
+
     @error_status.setter
     def error_status(self, error):
         """
         Sets the error status of the device. Called only via the backdoor using lewis.
-        
+
         Args:
             string: the enum name of the error status to be set
-    
+
         Returns:
             None
         """
@@ -549,17 +555,17 @@ class SimulatedTpgx00(StateMachineDevice):
         """
 
         return self.units.name
-    
+
     def backdoor_get_switching_fn(self):
         """
-        Gets the current switching function in use on the device. 
+        Gets the current switching function in use on the device.
         Called only via the backdoor using lewis.
 
         Returns:
             string: SFAssignment member name
         """
         return self.switching_function_to_set.circuit_assignment.name
-    
+
     def backdoor_set_switching_function_status(self, statuses):
         """
         Sets status of switching functions. Called only via the backdoor using lewis.
@@ -579,7 +585,7 @@ class SimulatedTpgx00(StateMachineDevice):
         Args:
             channel (string): the pressure channel to set to
             status (string): the name of the pressure status Enum to be set
-        
+
         Returns:
             None
         """

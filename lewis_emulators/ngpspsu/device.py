@@ -4,7 +4,6 @@ from lewis.devices import StateMachineDevice
 
 
 class SimulatedNgpspsu(StateMachineDevice):
-
     def _initialize_data(self):
         """
         Initialize all of the device's attributes.
@@ -33,41 +32,40 @@ class SimulatedNgpspsu(StateMachineDevice):
             "Ext. interlock #3": False,
             "Ext. interlock #4": False,
             "DCCT fault": False,
-            "OVP": False
+            "OVP": False,
         }
 
     def _get_state_handlers(self):
         return {
-            'default': DefaultState(),
+            "default": DefaultState(),
         }
 
     def _get_initial_state(self):
-        return 'default'
+        return "default"
 
     def _get_transition_handlers(self):
-        return OrderedDict([
-        ])
+        return OrderedDict([])
 
     @property
     def model_number_and_firmware(self):
-        """ Returns the model number and firmware version. """
+        """Returns the model number and firmware version."""
 
         return self._model_no_and_firmware
 
     @property
     def status(self):
-        """ Returns the status of the device. """
+        """Returns the status of the device."""
 
         return self._status
 
     @property
     def voltage(self):
-        """ Returns voltage to 6 decimal places. """
+        """Returns voltage to 6 decimal places."""
         return "{0:.6f}".format(self._voltage)
 
     @property
     def voltage_setpoint(self):
-        """ Returns last voltage setpoint to 6 decimal places. """
+        """Returns last voltage setpoint to 6 decimal places."""
 
         return "{0:.6f}".format(self._voltage_setpoint)
 
@@ -89,12 +87,12 @@ class SimulatedNgpspsu(StateMachineDevice):
 
     @property
     def current(self):
-        """ Returns current to 6 decimal places. """
+        """Returns current to 6 decimal places."""
         return "{0:.6f}".format(self._current)
 
     @property
     def current_setpoint(self):
-        """ Returns current setpoint to 6 decimal places. """
+        """Returns current setpoint to 6 decimal places."""
 
         return "{0:.6f}".format(self._current_setpoint)
 
@@ -178,12 +176,12 @@ class SimulatedNgpspsu(StateMachineDevice):
         return self._connected
 
     def connect(self):
-        """ Connects the device. """
+        """Connects the device."""
 
         self._connected = True
 
     def disconnect(self):
-        """ Disconnects the device. """
+        """Disconnects the device."""
 
         self._connected = False
 
@@ -199,6 +197,3 @@ class SimulatedNgpspsu(StateMachineDevice):
             self._status[fault_name] = True
         else:
             raise ValueError("Could not find {}".format(fault_name))
-
-
-

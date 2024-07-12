@@ -2,7 +2,6 @@ from lewis.adapters.stream import StreamInterface, Cmd
 
 
 class IrisCryoValveStreamInterface(StreamInterface):
-
     commands = {
         Cmd("get_status", "^\?$"),
         Cmd("set_open", "^OPEN$"),

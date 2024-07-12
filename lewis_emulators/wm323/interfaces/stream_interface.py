@@ -4,7 +4,6 @@ from ..device import Direction
 
 
 class Wm323StreamInterface(StreamInterface):
-
     # Commands that we expect via serial during normal operation
     commands = {
         CmdBuilder("get_status").escape("1RS").eos().build(),
@@ -19,7 +18,9 @@ class Wm323StreamInterface(StreamInterface):
     out_terminator = "\r"
 
     def handle_error(self, request, error):
-        err_string = "command was: {}, error was: {}: {}\n".format(request, error.__class__.__name__, error)
+        err_string = "command was: {}, error was: {}: {}\n".format(
+            request, error.__class__.__name__, error
+        )
         print(err_string)
         self.log.error(err_string)
         return err_string
@@ -28,7 +29,9 @@ class Wm323StreamInterface(StreamInterface):
         running_int = 0
         if self.device.running:
             running_int = 1
-        return "{} {} {} {} !".format(self.device.type, self.device.speed, self.device.direction.name, running_int)
+        return "{} {} {} {} !".format(
+            self.device.type, self.device.speed, self.device.direction.name, running_int
+        )
 
     def set_speed(self, speed):
         self.device.speed = speed

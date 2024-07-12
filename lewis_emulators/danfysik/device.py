@@ -8,6 +8,7 @@ class FieldUnits(object):
     """
     Field units.
     """
+
     OERSTED = object()
     GAUSS = object()
     TESLA = object()
@@ -17,7 +18,7 @@ class SimulatedDanfysik(StateMachineDevice):
     """
     Simulated Danfysik.
     """
-    
+
     def _initialize_data(self):
         """
         Sets the initial state of the device.
@@ -138,7 +139,7 @@ class SimulatedDanfysik(StateMachineDevice):
         """
         current = raw_sp / self.current_write_factor
         self.absolute_current = abs(current)
-        self.negative_polarity = (current < 0)
+        self.negative_polarity = current < 0
 
     def get_voltage(self):
         """
@@ -148,10 +149,10 @@ class SimulatedDanfysik(StateMachineDevice):
         return self.voltage * self.voltage_read_factor
 
     def set_slew_rate(self, dac_num, value):
-        self.slew_rate[dac_num-1] = value
+        self.slew_rate[dac_num - 1] = value
 
     def get_slew_rate(self, dac_num):
-        return self.slew_rate[dac_num-1]
+        return self.slew_rate[dac_num - 1]
 
     def _get_state_handlers(self):
         """

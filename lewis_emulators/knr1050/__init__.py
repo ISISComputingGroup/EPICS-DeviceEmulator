@@ -2,4 +2,4 @@ from .device import SimulatedKnr1050
 from ..lewis_versions import LEWIS_LATEST
 
 framework_version = LEWIS_LATEST
-__all__ = ['SimulatedKnr1050']
+__all__ = ["SimulatedKnr1050"]

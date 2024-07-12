@@ -63,18 +63,20 @@ class SimulatedJulabo(StateMachineDevice):
 
     def _get_state_handlers(self):
         return {
-            'circulate': states.DefaultCirculatingState(),
-            'not_circulate': states.DefaultNotCirculatingState(),
+            "circulate": states.DefaultCirculatingState(),
+            "not_circulate": states.DefaultNotCirculatingState(),
         }
 
     def _get_initial_state(self):
-        return 'not_circulate'
+        return "not_circulate"
 
     def _get_transition_handlers(self):
-        return OrderedDict([
-            (('not_circulate', 'circulate'), lambda: self.circulate_commanded),
-            (('circulate', 'not_circulate'), lambda: not self.circulate_commanded),
-        ])
+        return OrderedDict(
+            [
+                (("not_circulate", "circulate"), lambda: self.circulate_commanded),
+                (("circulate", "not_circulate"), lambda: not self.circulate_commanded),
+            ]
+        )
 
     def set_set_point(self, param):
         """

@@ -2,7 +2,6 @@ from .quarter_cycle_event_detector_states import QuarterCycleEventDetectorStates
 
 
 class QuarterCycleEventDetector(object):
-
     def __init__(self):
         self.counts = 0
         self.max_counts = 0
@@ -29,6 +28,6 @@ class QuarterCycleEventDetector(object):
 
     def cycles(self, fractional=True):
         if fractional:
-            return self.counts/4.0
+            return self.counts / 4.0
         else:
-            return self.counts//4
+            return self.counts // 4

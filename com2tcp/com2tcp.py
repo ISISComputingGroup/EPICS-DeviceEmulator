@@ -16,15 +16,19 @@ def listen_to_tcp(tcp_conn, serial_conn):
 
 
 if __name__ == "__main__":
-    parser = argparse.ArgumentParser(description="Transfers data between a COM port and a TCP port.")
+    parser = argparse.ArgumentParser(
+        description="Transfers data between a COM port and a TCP port."
+    )
     parser.add_argument("tcp_port", help="The port to send TCP messages to. (e.g. 57677)", type=int)
     parser.add_argument("com_port", help="The COM port to send serial messages to. (e.g. COM2)")
-    parser.add_argument('-b', "--baud", help="The baud rate to communicate on the COM port.", default=9600)
+    parser.add_argument(
+        "-b", "--baud", help="The baud rate to communicate on the COM port.", default=9600
+    )
 
     args = parser.parse_args()
 
     try:
-        tcp_conn = socket.create_connection(('localhost', args.tcp_port))
+        tcp_conn = socket.create_connection(("localhost", args.tcp_port))
     except Exception as e:
         print("Failed to connect to tcp port: " + str(e))
         sys.exit()

@@ -3,15 +3,17 @@ from .states import PumpOff, PumpOn, PumpProgram, PumpProgramReset
 from lewis.devices import StateMachineDevice
 
 
-states = OrderedDict([
-    ("pump_off", PumpOff()),
-    ("pump_on", PumpOn()),
-    ("pump_program", PumpProgram()),
-    ("pump_program_reset", PumpProgramReset())])
+states = OrderedDict(
+    [
+        ("pump_off", PumpOff()),
+        ("pump_on", PumpOn()),
+        ("pump_program", PumpProgram()),
+        ("pump_program_reset", PumpProgramReset()),
+    ]
+)
 
 
 class SimulatedJsco4180(StateMachineDevice):
-
     def _initialize_data(self):
         """
         Initialize all of the device's attributes.
@@ -58,23 +60,25 @@ class SimulatedJsco4180(StateMachineDevice):
         return "pump_off"
 
     def _get_transition_handlers(self):
-        return OrderedDict([
-            (("pump_off", "pump_on"), lambda: self.status == "on"),
-            (("pump_off", "pump_program"), lambda: self.status == "pump_program"),
-            (("pump_off", "pump_program_reset"), lambda: self.status == "pump_program_reset"),
-
-            (("pump_on", "pump_off"), lambda: self.status == "pump_off"),
-            (("pump_on", "pump_program"), lambda: self.status == "pump_program"),
-            (("pump_on", "pump_program_reset"), lambda: self.status == "pump_program_reset"),
-
-            (("pump_program", "pump_off"), lambda: self.status == "pump_off"),
-            (("pump_program", "pump_on"), lambda: self.status == "pump_on"),
-            (("pump_program", "pump_program_reset"), lambda: self.status == "pump_program_reset"),
-
-            (("pump_program_reset", "pump_off"), lambda: self.status == "pump_off"),
-            (("pump_program_reset", "pump_on"), lambda: self.status == "pump_on"),
-            (("pump_program_reset", "pump_program"), lambda: self.status == "pump_program"),
-        ])
+        return OrderedDict(
+            [
+                (("pump_off", "pump_on"), lambda: self.status == "on"),
+                (("pump_off", "pump_program"), lambda: self.status == "pump_program"),
+                (("pump_off", "pump_program_reset"), lambda: self.status == "pump_program_reset"),
+                (("pump_on", "pump_off"), lambda: self.status == "pump_off"),
+                (("pump_on", "pump_program"), lambda: self.status == "pump_program"),
+                (("pump_on", "pump_program_reset"), lambda: self.status == "pump_program_reset"),
+                (("pump_program", "pump_off"), lambda: self.status == "pump_off"),
+                (("pump_program", "pump_on"), lambda: self.status == "pump_on"),
+                (
+                    ("pump_program", "pump_program_reset"),
+                    lambda: self.status == "pump_program_reset",
+                ),
+                (("pump_program_reset", "pump_off"), lambda: self.status == "pump_off"),
+                (("pump_program_reset", "pump_on"), lambda: self.status == "pump_on"),
+                (("pump_program_reset", "pump_program"), lambda: self.status == "pump_program"),
+            ]
+        )
 
     def reset(self):
         self._initialize_data()

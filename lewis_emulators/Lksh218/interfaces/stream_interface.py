@@ -12,6 +12,7 @@ def if_connected(f):
     Returns:
         The value of f(*args) if the device is connected and None otherwise.
     """
+
     def wrapper(*args):
         connected = getattr(args[0], "_device").connected
         if connected:
@@ -19,6 +20,7 @@ def if_connected(f):
         else:
             result = None
         return result
+
     return wrapper
 
 
@@ -34,7 +36,7 @@ class Lakeshore218StreamInterface(StreamInterface):
         CmdBuilder("get_temp").escape("KRDG? ").arg("[1-8]").build(),
         CmdBuilder("get_sensor").escape("SRDG? ").arg("[1-8]").build(),
         CmdBuilder("get_temp_all").escape("KRDG? 0").build(),
-        CmdBuilder("get_sensor_all").escape("SRDG? 0").build()
+        CmdBuilder("get_sensor_all").escape("SRDG? 0").build(),
     }
 
     @if_connected

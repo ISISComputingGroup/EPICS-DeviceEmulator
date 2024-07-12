@@ -6,16 +6,18 @@ class MovingState(State):
     """
     Device is in moving state.
     """
-    NAME = 'Moving'
+
+    NAME = "Moving"
 
     def in_state(self, dt):
         device = self._context
-        device.position = approaches.linear(device.position, device.position_setpoint, device.speed, dt)
+        device.position = approaches.linear(
+            device.position, device.position_setpoint, device.speed, dt
+        )
 
 
 class DefaultState(State):
-    NAME = 'Default'
+    NAME = "Default"
 
     def on_entry(self, dt):
         self._context.start_move = False
-

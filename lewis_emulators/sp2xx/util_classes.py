@@ -28,6 +28,7 @@ class Mode(object):
         response (string): Response to a query for the mode.
         name: Description of the mode.
     """
+
     def __init__(self, symbol, response, name):
         self.symbol = symbol
         self.response = response

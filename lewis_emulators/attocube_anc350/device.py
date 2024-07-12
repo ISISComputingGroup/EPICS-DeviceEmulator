@@ -26,17 +26,21 @@ class SimulatedAttocubeANC350(StateMachineDevice):
         self.position_setpoint = position
 
     def set_axis_on(self, on_state):
-        self.axis_on = (on_state == 1)
+        self.axis_on = on_state == 1
 
     def _get_state_handlers(self):
-        return {DefaultState.NAME: DefaultState(),
-                MovingState.NAME: MovingState()}
+        return {DefaultState.NAME: DefaultState(), MovingState.NAME: MovingState()}
 
     def _get_initial_state(self):
         return DefaultState.NAME
 
     def _get_transition_handlers(self):
-        return OrderedDict([
-            ((DefaultState.NAME, MovingState.NAME), lambda: self.start_move and self.axis_on),
-            ((MovingState.NAME, DefaultState.NAME), lambda: self.position_setpoint == self.position),
-        ])
+        return OrderedDict(
+            [
+                ((DefaultState.NAME, MovingState.NAME), lambda: self.start_move and self.axis_on),
+                (
+                    (MovingState.NAME, DefaultState.NAME),
+                    lambda: self.position_setpoint == self.position,
+                ),
+            ]
+        )

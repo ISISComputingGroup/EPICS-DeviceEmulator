@@ -7,13 +7,16 @@ from lewis.utils.constants import ACK, ENQ
 
 @has_log
 class OerconeStreamInterface(StreamInterface):
-
     # Commands that we expect via serial during normal operation
     commands = {
         CmdBuilder("handle_enquiry").escape(ENQ).build(),
         CmdBuilder("acknowledge_pressure").escape("PR1").eos().build(),
         CmdBuilder("acknowledge_measurement_unit").escape("UNI").eos().build(),
-        CmdBuilder("acknowledge_set_measurement_unit").escape("UNI,").arg("0|1|2|3", argument_mapping=int).eos().build()
+        CmdBuilder("acknowledge_set_measurement_unit")
+        .escape("UNI,")
+        .arg("0|1|2|3", argument_mapping=int)
+        .eos()
+        .build(),
     }
 
     in_terminator = "\r\n"
@@ -29,7 +32,9 @@ class OerconeStreamInterface(StreamInterface):
         Returns:
             String: The error string.
         """
-        err_string = "command was: \"{}\", error was: {}: {}\n".format(request, error.__class__.__name__, error)
+        err_string = 'command was: "{}", error was: {}: {}\n'.format(
+            request, error.__class__.__name__, error
+        )
         print(err_string)
         self.log.error(err_string)
         return err_string
@@ -52,8 +57,16 @@ class OerconeStreamInterface(StreamInterface):
         elif self._device._read_state.name == "UNI":
             return self.get_measurement_unit()
         else:
-            self.log.info("Last command was unknown. Current readstate is {}.".format(self._device._read_state))
-            print("Last command was unknown. Current readstate is {}.".format(self._device._read_state))
+            self.log.info(
+                "Last command was unknown. Current readstate is {}.".format(
+                    self._device._read_state
+                )
+            )
+            print(
+                "Last command was unknown. Current readstate is {}.".format(
+                    self._device._read_state
+                )
+            )
 
     def acknowledge_pressure(self):
         """
@@ -109,12 +122,12 @@ class OerconeStreamInterface(StreamInterface):
 
     def set_measurement_unit(self, units):
         """
-       Sets the units on the device.
+        Sets the units on the device.
 
-       Args:
-           units (Units member): Units to be set
+        Args:
+            units (Units member): Units to be set
 
-       Returns:
-           None
-       """
+        Returns:
+            None
+        """
         self._device.measurement_unit = Units(units)

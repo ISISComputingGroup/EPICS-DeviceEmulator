@@ -8,7 +8,6 @@ import time
 
 
 class SimulatedInstron(StateMachineDevice):
-
     def _initialize_data(self):
         """
         Initialize all of the device's attributes.
@@ -40,9 +39,9 @@ class SimulatedInstron(StateMachineDevice):
 
     def _get_state_handlers(self):
         return {
-            'default': DefaultState(),
-            'going': GoingToSetpointState(),
-            'waveform': GeneratingWaveformState(),
+            "default": DefaultState(),
+            "going": GoingToSetpointState(),
+            "waveform": GeneratingWaveformState(),
         }
 
     # This is a workaround for https://github.com/DMSC-Instrument-Data/lewis/issues/248
@@ -61,15 +60,27 @@ class SimulatedInstron(StateMachineDevice):
         self._initialize_data()
 
     def _get_initial_state(self):
-        return 'default'
+        return "default"
 
     def _get_transition_handlers(self):
-        return OrderedDict([
-            (('default', 'going'), lambda: self.movement_type != 0 and self.channels[self.control_channel].value != self.channels[self.control_channel].ramp_amplitude_setpoint),
-            (('going', 'default'), lambda: self.movement_type == 0 or self.channels[self.control_channel].value == self.channels[self.control_channel].ramp_amplitude_setpoint),
-            (('default', 'waveform'), lambda: self._waveform_generator.active()),
-            (('waveform', 'default'), lambda: not self._waveform_generator.active()),
-        ])
+        return OrderedDict(
+            [
+                (
+                    ("default", "going"),
+                    lambda: self.movement_type != 0
+                    and self.channels[self.control_channel].value
+                    != self.channels[self.control_channel].ramp_amplitude_setpoint,
+                ),
+                (
+                    ("going", "default"),
+                    lambda: self.movement_type == 0
+                    or self.channels[self.control_channel].value
+                    == self.channels[self.control_channel].ramp_amplitude_setpoint,
+                ),
+                (("default", "waveform"), lambda: self._waveform_generator.active()),
+                (("waveform", "default"), lambda: not self._waveform_generator.active()),
+            ]
+        )
 
     def get_control_channel(self):
         return self.control_channel
@@ -147,19 +158,25 @@ class SimulatedInstron(StateMachineDevice):
 
     def get_strain_channel_length(self, channel):
         # Getting the length is only supported for channel 3 (strain).
-        assert isinstance(self.channels[channel], StrainChannel), "Length only applies to strain channel"
+        assert isinstance(
+            self.channels[channel], StrainChannel
+        ), "Length only applies to strain channel"
         # This number gets divided by in the IOC - if it's zero things will break.
         assert self.channels[channel].length != 0, "Strain channel length was zero"
         return self.channels[channel].length
 
     def get_chan_area(self, channel):
         # Area is only applicable to stress channel
-        assert isinstance(self.channels[channel], StressChannel), "Area only applies to stress channel"
+        assert isinstance(
+            self.channels[channel], StressChannel
+        ), "Area only applies to stress channel"
         return self.channels[channel].area
 
     def set_chan_area(self, channel, value):
         # Area is only applicable to stress channel
-        assert isinstance(self.channels[channel], StressChannel), "Area only applies to stress channel"
+        assert isinstance(
+            self.channels[channel], StressChannel
+        ), "Area only applies to stress channel"
         self.channels[channel].area = value
 
     def get_chan_transducer_type(self, channel):
@@ -194,7 +211,11 @@ class SimulatedInstron(StateMachineDevice):
         try:
             self._waveform_generator.type[channel] = value
         except NameError:
-            print("Unable to set waveform generator type. Channel: {0}, Value: {1}".format(channel, value))
+            print(
+                "Unable to set waveform generator type. Channel: {0}, Value: {1}".format(
+                    channel, value
+                )
+            )
 
     def get_waveform_amplitude(self, channel):
         try:
@@ -206,7 +227,11 @@ class SimulatedInstron(StateMachineDevice):
         try:
             self._waveform_generator.amplitude[channel] = value
         except NameError:
-            print("Unable to set waveform generator amplitude. Channel: {0}, Value: {1}".format(channel, value))
+            print(
+                "Unable to set waveform generator amplitude. Channel: {0}, Value: {1}".format(
+                    channel, value
+                )
+            )
 
     def get_waveform_frequency(self, channel):
         try:
@@ -218,7 +243,11 @@ class SimulatedInstron(StateMachineDevice):
         try:
             self._waveform_generator.frequency[channel] = value
         except NameError:
-            print("Unable to set waveform generator frequency. Channel: {0}, Value: {1}".format(channel, value))
+            print(
+                "Unable to set waveform generator frequency. Channel: {0}, Value: {1}".format(
+                    channel, value
+                )
+            )
 
     def set_waveform_hold(self):
         self._waveform_generator.hold()
@@ -246,6 +275,6 @@ class SimulatedInstron(StateMachineDevice):
 
     def set_waveform_maintain_log(self):
         return self._waveform_generator.maintain_log()
-        
+
     def get_waveform_value(self):
         return self._waveform_generator.get_value(self.control_channel)

@@ -113,7 +113,7 @@ class SimulatedMoxa1210(StateMachineDevice):
         else:
             raw_val = int(float(value) * max_16_bit_value / max_voltage_range)
 
-        self.interface.ir.set(addr, (raw_val, ))
+        self.interface.ir.set(addr, (raw_val,))
 
     def set_1262_temperature(self, addr, value):
         """
@@ -131,10 +131,10 @@ class SimulatedMoxa1210(StateMachineDevice):
         """
 
         # Convert floating point number to binary representation string
-        binary_representation = struct.pack('<f', value)
+        binary_representation = struct.pack("<f", value)
 
         # Represent the binary as two unsigned int 'words' (H is unsigned int)
-        word1, word2 = struct.unpack('<HH', binary_representation)
+        word1, word2 = struct.unpack("<HH", binary_representation)
 
         # Write to device
         self.interface.ir.set(addr, (word1, word2))

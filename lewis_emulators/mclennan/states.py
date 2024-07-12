@@ -2,7 +2,6 @@ from lewis.core.statemachine import State
 
 
 class StoppedState(State):
-
     def on_entry(self, dt):
         device = self._context
         self.log.info("Entering STOPPED state")
@@ -12,7 +11,6 @@ class StoppedState(State):
 
 
 class JoggingState(State):
-
     def on_entry(self, dt):
         device = self._context
         self.log.info("Entering JOGGING state")
@@ -24,10 +22,11 @@ class JoggingState(State):
         device.is_idle = False
         device.position += device.jog_velocity * dt
 
+
 class MovingState(State):
     def __init__(self):
         self.incr = 0
-    
+
     def on_entry(self, dt):
         device = self._context
         self.log.info("Entering MOVING state")
@@ -41,7 +40,10 @@ class MovingState(State):
         device.is_idle = False
         if device.position == device.target_position:
             device.is_moving = False
+
+
 #        device.position += device.jog_velocity * dt
+
 
 class HomingState(State):
     def __init__(self):
@@ -63,5 +65,6 @@ class HomingState(State):
         else:
             device.position = 0
             device.is_homing = False
-#        device.position += device.jog_velocity * dt
 
+
+#        device.position += device.jog_velocity * dt

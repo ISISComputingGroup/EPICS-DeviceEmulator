@@ -1,3 +1,3 @@
 from .stream_interface import IndfurnStreamInterface
 
-__all__ = ['IndfurnStreamInterface']
+__all__ = ["IndfurnStreamInterface"]

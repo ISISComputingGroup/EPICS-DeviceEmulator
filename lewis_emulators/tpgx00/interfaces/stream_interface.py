@@ -16,16 +16,51 @@ class Tpgx00StreamInterfaceBase(object):
     ack_terminator = "\r\n"  # Acknowledged commands are terminated by this
 
     commands = {
-        CmdBuilder("acknowledge_pressure").escape("P").arg("A1|A2|B1|B2").escape(ack_terminator).eos().build(),
+        CmdBuilder("acknowledge_pressure")
+        .escape("P")
+        .arg("A1|A2|B1|B2")
+        .escape(ack_terminator)
+        .eos()
+        .build(),
         CmdBuilder("acknowledge_units").escape("UNI").escape(ack_terminator).eos().build(),
-        CmdBuilder("acknowledge_set_units").escape("UNI").escape(",").arg("0|1|2|3|4|5|6").escape(ack_terminator).eos().build(),
-        CmdBuilder("acknowledge_function").escape("SP").arg("1|2|3|4|A|B").escape(ack_terminator).eos().build(),
-        CmdBuilder("acknowledge_set_function").escape("SP").arg("1|2|3|4|A|B").escape(",")
-        .arg(r"[+-]?\d+.\d+", float).escape("E").arg(r"(?:-|\+)(?:[1-9]+\d*|0)", int).escape(",")
-        .arg(r"[+-]?\d+.\d+", float).escape("E").arg(r"(?:-|\+)(?:[1-9]+\d*|0)", int).escape(",").int().escape(ack_terminator).eos().build(),
-        CmdBuilder("acknowledge_function_status").escape("SPS").escape(ack_terminator).eos().build(),
+        CmdBuilder("acknowledge_set_units")
+        .escape("UNI")
+        .escape(",")
+        .arg("0|1|2|3|4|5|6")
+        .escape(ack_terminator)
+        .eos()
+        .build(),
+        CmdBuilder("acknowledge_function")
+        .escape("SP")
+        .arg("1|2|3|4|A|B")
+        .escape(ack_terminator)
+        .eos()
+        .build(),
+        CmdBuilder("acknowledge_set_function")
+        .escape("SP")
+        .arg("1|2|3|4|A|B")
+        .escape(",")
+        .arg(r"[+-]?\d+.\d+", float)
+        .escape("E")
+        .arg(r"(?:-|\+)(?:[1-9]+\d*|0)", int)
+        .escape(",")
+        .arg(r"[+-]?\d+.\d+", float)
+        .escape("E")
+        .arg(r"(?:-|\+)(?:[1-9]+\d*|0)", int)
+        .escape(",")
+        .int()
+        .escape(ack_terminator)
+        .eos()
+        .build(),
+        CmdBuilder("acknowledge_function_status")
+        .escape("SPS")
+        .escape(ack_terminator)
+        .eos()
+        .build(),
         CmdBuilder("acknowledge_error").escape("ERR").escape(ack_terminator).eos().build(),
-        CmdBuilder("handle_enquiry").enq().build()  # IMPORTANT: <ENQ> is not terminated with usual terminator
+        CmdBuilder("handle_enquiry")
+        .enq()
+        .build(),  # IMPORTANT: <ENQ> is not terminated with usual terminator
     }
 
     # Override StreamInterface attributes:
@@ -126,7 +161,9 @@ class Tpgx00StreamInterfaceBase(object):
             ASCII acknowledgement character (0x6).
         """
         self._device.readstate = "FS" + function
-        self._device.switching_function_to_set = CircuitAssignment(low_thr, low_exp, high_thr, high_exp, self.get_sf_assignment_name(assign))
+        self._device.switching_function_to_set = CircuitAssignment(
+            low_thr, low_exp, high_thr, high_exp, self.get_sf_assignment_name(assign)
+        )
         return ACK
 
     @conditional_reply("connected")
@@ -139,7 +176,7 @@ class Tpgx00StreamInterfaceBase(object):
         """
         self._device.readstate = "SPS"
         return ACK
-    
+
     @conditional_reply("connected")
     def acknowledge_error(self):
         """
@@ -190,13 +227,15 @@ class Tpgx00StreamInterfaceBase(object):
 
         elif self._device.readstate.name == "SPS":
             status = self.get_switching_functions_status()
-            return ','.join(status)
-        
+            return ",".join(status)
+
         elif self._device.readstate.name == "ERR":
             return self.get_error_status()
 
         else:
-            self.log.info("Last command was unknown. Current readstate is {}.".format(self._device.readstate))
+            self.log.info(
+                "Last command was unknown. Current readstate is {}.".format(self._device.readstate)
+            )
 
     def get_units(self):
         """
@@ -232,7 +271,7 @@ class Tpgx00StreamInterfaceBase(object):
         switching_function = function[-1]
         return self._device.switching_functions[switching_function]
 
-    def set_threshold(self, function): 
+    def set_threshold(self, function):
         """
         Sets the settings of a switching function.
 
@@ -243,7 +282,9 @@ class Tpgx00StreamInterfaceBase(object):
             None.
         """
         switching_function = self.get_readstate_val(function)[-1]
-        self._device.switching_functions[switching_function] = self._device.switching_function_to_set
+        self._device.switching_functions[switching_function] = (
+            self._device.switching_function_to_set
+        )
 
     def get_thresholds_readstate(self, readstate):
         """
@@ -255,9 +296,17 @@ class Tpgx00StreamInterfaceBase(object):
             a string containing the lower and higher threshold and the switching f-n assignment
         """
         function = self.get_threshold(self.get_readstate_val(readstate))
-        return str(function.high_threshold) + "E" + str(function.high_exponent) + "," + \
-               str(function.low_threshold) + "E" + str(function.low_exponent) + "," + str(self.get_sf_assignment_val(function.circuit_assignment))
-
+        return (
+            str(function.high_threshold)
+            + "E"
+            + str(function.high_exponent)
+            + ","
+            + str(function.low_threshold)
+            + "E"
+            + str(function.low_exponent)
+            + ","
+            + str(self.get_sf_assignment_val(function.circuit_assignment))
+        )
 
     def get_switching_functions_status(self):
         """
@@ -283,7 +332,7 @@ class Tpgx00StreamInterfaceBase(object):
         pressure = getattr(self._device, pressure_suffix)
         status = getattr(self._device, status_suffix)
         return "{},{}".format(self.get_channel_status_val(status), pressure)
-    
+
     def get_error_status(self):
         """
         Gets the device error status.
@@ -292,56 +341,50 @@ class Tpgx00StreamInterfaceBase(object):
             String: (0000|1000|0100|0010|0001) four-character error status code
         """
         return self.get_error_status_val(self.device.error_status)
-    
-   
-class Tpg300StreamInterface(Tpgx00StreamInterfaceBase, StreamInterface):
-    protocol = 'tpg300'
 
+
+class Tpg300StreamInterface(Tpgx00StreamInterfaceBase, StreamInterface):
+    protocol = "tpg300"
 
     class SFStatus300(Enum):
         OFF = 0
-        ON  = 1
-    
+        ON = 1
 
     class Units300(Enum):
         hPascal = "Invalid unit"
-        mbar    = 1
-        Torr    = 2
-        Pa      = 3
-        Micron  = "Invalid unit"
-        Volt    = "Invalid unit"
-        Ampere  = "Invalid unit"
-
+        mbar = 1
+        Torr = 2
+        Pa = 3
+        Micron = "Invalid unit"
+        Volt = "Invalid unit"
+        Ampere = "Invalid unit"
 
     class ChannelStatus300(Enum):
-        DATA_OK     = 0
-        UNDERRANGE  = 1
-        OVERRANGE   = 2
+        DATA_OK = 0
+        UNDERRANGE = 1
+        OVERRANGE = 2
         POINT_ERROR = 3
-        POINT_OFF   = 4
+        POINT_OFF = 4
         NO_HARDWARE = 5
 
-
     class SFAssignment300(Enum):
-        OFF         = 0
-        A1          = 1
-        A2          = 2
-        B1          = 3
-        B2          = 4
+        OFF = 0
+        A1 = 1
+        A2 = 2
+        B1 = 3
+        B2 = 4
         A1_SELF_MON = 5
         A2_SELF_MON = 6
         B1_SELF_MON = 7
         B2_SELF_MON = 8
-        ON          = "Invalid assignment"
+        ON = "Invalid assignment"
 
-    
     class ErrorStatus300(Enum):
-        NO_ERROR      = "0000"
-        DEVICE_ERROR  = "1000"
-        NO_HARDWARE   = "0100"
+        NO_ERROR = "0000"
+        DEVICE_ERROR = "1000"
+        NO_HARDWARE = "0100"
         INVALID_PARAM = "0010"
-        SYNTAX_ERROR  = "0001"
-
+        SYNTAX_ERROR = "0001"
 
     class ReadState300(Enum):
         A1 = "A1"
@@ -371,82 +414,78 @@ class Tpg300StreamInterface(Tpgx00StreamInterfaceBase, StreamInterface):
         SPS = "SPS"
 
     def get_sf_status_val(self, status_enums):
-        translated_vals = [str(self.SFStatus300[status.name].value) for status in status_enums.values()]
+        translated_vals = [
+            str(self.SFStatus300[status.name].value) for status in status_enums.values()
+        ]
         return translated_vals
-    
+
     def get_units_val(self, unit_enum):
         return self.Units300[unit_enum.name].value
-    
+
     def get_units_enum(self, unit_num):
         return self.Units300(unit_num)
-    
+
     def get_channel_status_val(self, status_enum):
         return self.ChannelStatus300[status_enum.name].value
 
     def get_sf_assignment_name(self, assignment_num):
         return self.SFAssignment300(assignment_num).name
-    
+
     def get_sf_assignment_val(self, assignment_enum):
         return self.SFAssignment300[assignment_enum.name].value
-    
+
     def get_error_status_val(self, error_enum):
         return self.ErrorStatus300[error_enum.name].value
-    
+
     def get_readstate_enum(self, state_str):
         return self.ReadState300(state_str)
-    
+
     def get_readstate_val(self, readstate_enum):
         return self.ReadState300[readstate_enum.name].value
-        
+
 
 class Tpg500StreamInterface(Tpgx00StreamInterfaceBase, StreamInterface):
-    protocol = 'tpg500'
+    protocol = "tpg500"
 
-    
     class SFStatus500(Enum):
         OFF = 0
-        ON  = 1
+        ON = 1
 
-    
     class Units500(Enum):
         hPascal = 0
-        mbar    = 1
-        Torr    = 2
-        Pa      = 3
-        Micron  = 4
-        Volt    = 5
-        Ampere  = 6
-
+        mbar = 1
+        Torr = 2
+        Pa = 3
+        Micron = 4
+        Volt = 5
+        Ampere = 6
 
     class ChannelStatus500(Enum):
-        DATA_OK     = 0
-        UNDERRANGE  = 1
-        OVERRANGE   = 2
+        DATA_OK = 0
+        UNDERRANGE = 1
+        OVERRANGE = 2
         POINT_ERROR = 3
-        POINT_OFF   = 4
+        POINT_OFF = 4
         NO_HARDWARE = 5
 
-    
     class SFAssignment500(Enum):
-        OFF         = 0
-        A1          = 1
-        A2          = 2
-        B1          = 3
-        B2          = 4
+        OFF = 0
+        A1 = 1
+        A2 = 2
+        B1 = 3
+        B2 = 4
         A1_SELF_MON = "Invalid assignment"
         A2_SELF_MON = "Invalid assignment"
         B1_SELF_MON = "Invalid assignment"
         B2_SELF_MON = "Invalid assignment"
-        ON          = 5
+        ON = 5
 
-    
     class ErrorStatus500(Enum):
-        NO_ERROR      = "0000"
-        DEVICE_ERROR  = "1000"
-        NO_HARDWARE   = "0100"
+        NO_ERROR = "0000"
+        DEVICE_ERROR = "1000"
+        NO_HARDWARE = "0100"
         INVALID_PARAM = "0010"
-        SYNTAX_ERROR  = "0001"
-
+        SYNTAX_ERROR = "0001"
 
     class ReadState500(Enum):
         A1 = "a1"
@@ -476,33 +515,35 @@ class Tpg500StreamInterface(Tpgx00StreamInterfaceBase, StreamInterface):
         SPS = "SPS"
 
     def get_sf_status_val(self, status_enums):
-        translated_vals = [str(self.SFStatus500[status.name].value) for status in status_enums.values()]
+        translated_vals = [
+            str(self.SFStatus500[status.name].value) for status in status_enums.values()
+        ]
         return translated_vals
-    
+
     def get_units_val(self, unit_enum):
         return self.Units500[unit_enum.name].value
-    
+
     def get_units_enum(self, unit_num):
         return self.Units500(unit_num)
-    
+
     def get_channel_status_val(self, status_enum):
         return self.ChannelStatus500[status_enum.name].value
 
     def get_sf_assignment_name(self, assignment_num):
         return self.SFAssignment500(assignment_num).name
-    
+
     def get_sf_assignment_val(self, assignment_enum):
         return self.SFAssignment500[assignment_enum.name].value
-    
+
     def get_error_status_val(self, error_enum):
         return self.ErrorStatus500[error_enum.name].value
-    
+
     def get_readstate_enum(self, state_str):
         return self.ReadState500(state_str)
-    
+
     def get_readstate_val(self, readstate_enum):
         return self.ReadState500[readstate_enum.name].value
-    
+
     def get_thresholds_readstate(self, readstate):
         """
         Helper method for getting thresholds of a function all in one string based on current readstate.
@@ -514,7 +555,16 @@ class Tpg500StreamInterface(Tpgx00StreamInterfaceBase, StreamInterface):
             ON-timer value.
         """
         function = self.get_threshold(self.get_readstate_val(readstate))
-        return str(function.high_threshold) + "E" + str(function.high_exponent) + "," + \
-               str(function.low_threshold) + "E" + str(function.low_exponent) + "," + \
-               str(self.get_sf_assignment_val(function.circuit_assignment))+ "," + \
-               str(self._device.on_timer)
+        return (
+            str(function.high_threshold)
+            + "E"
+            + str(function.high_exponent)
+            + ","
+            + str(function.low_threshold)
+            + "E"
+            + str(function.low_exponent)
+            + ","
+            + str(self.get_sf_assignment_val(function.circuit_assignment))
+            + ","
+            + str(self._device.on_timer)
+        )

@@ -46,8 +46,21 @@ class SimulatedNeocera(StateMachineDevice):
         self.heater = 0
 
         self.pid = [{}] * self.sensor_count
-        self.pid[HEATER_INDEX] = {"P": 10.0, "I": 11.0, "D": 12.0, "fixed_power": 13.0, "limit": 100.0}
-        self.pid[ANALOG_INDEX] = {"P": 10.0, "I": 11.0, "D": 12.0, "fixed_power": 13.0, "gain": 1.0, "offset": 2.0}
+        self.pid[HEATER_INDEX] = {
+            "P": 10.0,
+            "I": 11.0,
+            "D": 12.0,
+            "fixed_power": 13.0,
+            "limit": 100.0,
+        }
+        self.pid[ANALOG_INDEX] = {
+            "P": 10.0,
+            "I": 11.0,
+            "D": 12.0,
+            "fixed_power": 13.0,
+            "gain": 1.0,
+            "offset": 2.0,
+        }
 
         # errors created within the device
         self._error = NeoceraDeviceErrors()
@@ -56,10 +69,7 @@ class SimulatedNeocera(StateMachineDevice):
         """
         :return: states and their names
         """
-        return {
-            MonitorState.NAME: MonitorState(),
-            ControlState.NAME: ControlState()
-        }
+        return {MonitorState.NAME: MonitorState(), ControlState.NAME: ControlState()}
 
     def _get_initial_state(self):
         """
@@ -71,10 +81,18 @@ class SimulatedNeocera(StateMachineDevice):
         """
         :return: the state transitions
         """
-        return OrderedDict([
-            ((MonitorState.NAME, ControlState.NAME), lambda: self.current_state == ControlState.NAME),
-            ((ControlState.NAME, MonitorState.NAME), lambda: self.current_state == MonitorState.NAME),
-        ])
+        return OrderedDict(
+            [
+                (
+                    (MonitorState.NAME, ControlState.NAME),
+                    lambda: self.current_state == ControlState.NAME,
+                ),
+                (
+                    (ControlState.NAME, MonitorState.NAME),
+                    lambda: self.current_state == MonitorState.NAME,
+                ),
+            ]
+        )
 
     def set_state_monitor(self):
         """

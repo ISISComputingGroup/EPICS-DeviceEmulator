@@ -1,3 +1,3 @@
 from .stream_interface import TDKLambdaGenesysStreamInterface
 
-__all__ = ['TDKLambdaGenesysStreamInterface']
+__all__ = ["TDKLambdaGenesysStreamInterface"]

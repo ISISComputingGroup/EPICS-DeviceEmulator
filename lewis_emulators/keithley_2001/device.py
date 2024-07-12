@@ -9,6 +9,7 @@ class SimulatedKeithley2001(StateMachineDevice):
     """
     Simulated Keithley2700 Multimeter
     """
+
     number_of_times_device_has_been_reset = 0
 
     def _initialize_data(self):
@@ -18,7 +19,12 @@ class SimulatedKeithley2001(StateMachineDevice):
         self.connect()
         self.idn = "KEITHLEY INSTRUMENTS INC.,MODEL 2001,4301578,B17  /A02  "
         self.elements = {
-            "READ": False, "CHAN": False, "RNUM": False, "UNIT": False, "TIME": False, "STAT": False
+            "READ": False,
+            "CHAN": False,
+            "RNUM": False,
+            "UNIT": False,
+            "TIME": False,
+            "STAT": False,
         }
         self._channel_readback_format = None
 
@@ -40,20 +46,19 @@ class SimulatedKeithley2001(StateMachineDevice):
             7: Channel(7),
             8: Channel(8),
             9: Channel(9),
-            10: Channel(10)
+            10: Channel(10),
         }
         self.closed_channel = None
         self._error = [0, "No error"]
         self.number_of_times_ioc_has_been_reset = 0
 
-
     def _get_state_handlers(self):
         return {
-            'default': DefaultState(),
+            "default": DefaultState(),
         }
 
     def _get_initial_state(self):
-        return 'default'
+        return "default"
 
     def _get_transition_handlers(self):
         return OrderedDict([])
@@ -80,7 +85,7 @@ class SimulatedKeithley2001(StateMachineDevice):
             7: Channel(7),
             8: Channel(8),
             9: Channel(9),
-            10: Channel(10)
+            10: Channel(10),
         }
         self.closed_channel = None
         self._scan_trigger_type = ScanTrigger.IMM
@@ -125,8 +130,8 @@ class SimulatedKeithley2001(StateMachineDevice):
         return {
             "READ": channel.reading,
             "CHAN": channel.channel,
-            "READ_UNIT": channel.reading_units
-            }
+            "READ_UNIT": channel.reading_units,
+        }
 
     @property
     def scan_trigger_type(self):
@@ -145,11 +150,13 @@ class SimulatedKeithley2001(StateMachineDevice):
         """
         for channel_to_scan in self.buffer.scan_channels:
             channel = self._channels[int(channel_to_scan)]
-            self.buffer.buffer.append({
-                "READ": channel.reading,
-                "CHAN": channel.channel,
-                "READ_UNIT": channel.reading_units
-            })
+            self.buffer.buffer.append(
+                {
+                    "READ": channel.reading,
+                    "CHAN": channel.channel,
+                    "READ_UNIT": channel.reading_units,
+                }
+            )
 
     @property
     def error(self):
@@ -194,22 +201,24 @@ class SimulatedKeithley2001(StateMachineDevice):
 
     def get_number_of_times_status_register_has_been_reset_and_cleared_via_the_backdoor(self):
         """
-       Gets the number of times the status register has been reset and cleared.
+        Gets the number of times the status register has been reset and cleared.
 
-       Only called via the backdoor.
+        Only called via the backdoor.
 
-       Returns:
-           int: Number of times the status register has been reset and cleared.
-       """
+        Returns:
+            int: Number of times the status register has been reset and cleared.
+        """
 
         return self.status_register.number_of_times_reset_and_cleared
 
-    def set_number_of_times_status_register_has_been_reset_and_cleared_via_the_backdoor(self, value):
+    def set_number_of_times_status_register_has_been_reset_and_cleared_via_the_backdoor(
+        self, value
+    ):
         """
-       Sets the number of times the status register has been reset and cleared.
+        Sets the number of times the status register has been reset and cleared.
 
-       Only called via the backdoor.
-       """
+        Only called via the backdoor.
+        """
 
         self.status_register.number_of_times_reset_and_cleared = int(value)
 

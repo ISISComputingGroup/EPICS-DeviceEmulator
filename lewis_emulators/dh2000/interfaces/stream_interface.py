@@ -6,7 +6,6 @@ from lewis.utils.replies import conditional_reply
 
 @has_log
 class Dh2000StreamInterface(StreamInterface):
-
     # Commands that we expect via serial during normal operation
     commands = {
         CmdBuilder("get_status").escape("&STS!").eos().build(),
@@ -55,6 +54,8 @@ class Dh2000StreamInterface(StreamInterface):
         shutter = self._device.shutter_is_open
         interlock = self._device.interlock_is_triggered
 
-        status_string = "{ACK}\n&A{shutter},B0,I{intlock}!".format(ACK=self.ACK, shutter=int(shutter), intlock=int(interlock))
+        status_string = "{ACK}\n&A{shutter},B0,I{intlock}!".format(
+            ACK=self.ACK, shutter=int(shutter), intlock=int(interlock)
+        )
 
         return status_string

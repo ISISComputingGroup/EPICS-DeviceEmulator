@@ -3,8 +3,8 @@ from lewis.utils.replies import conditional_reply
 
 if_connected = conditional_reply("connected")
 
-class FlipprpsStreamInterface(StreamInterface):
 
+class FlipprpsStreamInterface(StreamInterface):
     # Commands that we expect via serial during normal operation
     commands = {
         Cmd("set_polarity_down", "^dn$"),

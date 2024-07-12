@@ -89,16 +89,14 @@ class SimulatedSm300(StateMachineDevice):
     """
     Simulated SM300 Device
     """
+
     def _initialize_data(self):
         """
         Initialize all of the device's attributes.
         """
         # Is the device initialised, if not it won't talk to me
         self.initialised = False
-        self.axes = {
-            "X": Axis("X"),
-            "Y": Axis("Y")
-        }
+        self.axes = {"X": Axis("X"), "Y": Axis("Y")}
         self.x_axis = self.axes["X"]
         self.y_axis = self.axes["Y"]
         self.is_moving = None  # let the axis report its motion
@@ -129,7 +127,7 @@ class SimulatedSm300(StateMachineDevice):
 
         """
         if self.is_moving is not None:
-                return self.is_moving
+            return self.is_moving
 
         for axis in self.axes.values():
             if axis.moving:
@@ -139,15 +137,14 @@ class SimulatedSm300(StateMachineDevice):
 
     def _get_state_handlers(self):
         return {
-            'default': DefaultState(),
+            "default": DefaultState(),
         }
 
     def _get_initial_state(self):
-        return 'default'
+        return "default"
 
     def _get_transition_handlers(self):
-        return OrderedDict([
-        ])
+        return OrderedDict([])
 
     def reset(self):
         """
