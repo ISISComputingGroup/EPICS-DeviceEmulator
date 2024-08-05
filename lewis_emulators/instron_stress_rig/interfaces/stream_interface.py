@@ -1,13 +1,14 @@
-from lewis.adapters.stream import StreamInterface, Cmd
+from lewis.adapters.stream import Cmd, StreamInterface
 
 
 class InstronStreamInterface(StreamInterface):
-
     # Commands that we expect via serial during normal operation
     commands = {
         Cmd("get_control_channel", "^Q300$"),
         Cmd("set_control_channel", "^C300,([1-3])$"),
-        Cmd("set_control_channel", "^C500,([1-3]);C38,1$"),  # Alternative "set channel", used by instron_arby
+        Cmd(
+            "set_control_channel", "^C500,([1-3]);C38,1$"
+        ),  # Alternative "set channel", used by instron_arby
         Cmd("disable_watchdog", "^C904,0$"),
         Cmd("get_control_mode", "^Q909$"),
         Cmd("set_control_mode", "^P909,([0-1])$"),
@@ -20,12 +21,10 @@ class InstronStreamInterface(StreamInterface):
         Cmd("set_moving", "^C372$"),  # Used by instron_arby
         Cmd("get_step_time", "^Q86,([1-3])$"),
         Cmd("set_step_time", "^C86,([1-3]),([0-9]*.[0-9]*)$"),
-
         # Complex "trigger" logic, not emulated, ignore these commands
         Cmd("ignore", "^C916,0$"),  # Used by instron_arby
         Cmd("ignore", "^C914,4$"),  # Used by instron_arby
         Cmd("ignore", "^C916,2$"),  # Used by instron_arby
-
         # Channel commands
         Cmd("get_chan_waveform_type", "^Q2,([1-3])$"),
         Cmd("set_chan_waveform_type", "^C2,([1-3]),([0-5])$"),
@@ -37,7 +36,6 @@ class InstronStreamInterface(StreamInterface):
         Cmd("get_chan_area", "^Q341,([1-3])$"),
         Cmd("set_chan_area", "^C341,([1-3]),([0-9]*.[0-9]*)$"),
         Cmd("get_chan_type", "^Q307,([1-3])$"),
-
         # Waveform commands
         Cmd("get_waveform_status", "^Q200$"),
         Cmd("abort_waveform_generation", "^C200,0$"),
@@ -51,7 +49,6 @@ class InstronStreamInterface(StreamInterface):
         Cmd("set_waveform_frequency", "^C202,([1-3]),([0-9]*.[0-9]*)$"),
         Cmd("set_waveform_hold", "^C213,3$"),
         Cmd("set_waveform_maintain_log", "^C214,0$"),
-
         # Waveform (quarter counter event detector) commands
         Cmd("arm_quarter_counter", "^C212,2$"),
         Cmd("get_quarter_counts", "^Q210$"),

@@ -12,10 +12,11 @@ class TemperatureControlState(State):
 
 
 class He3PotEmptyState(State):
-
     DRIFT_TOWARDS = 1.5  # When the 3He pot is empty, this is the temperature it will drift towards
 
     def in_state(self, dt):
         device = self._context
 
-        device.temperature = approaches.linear(device.temperature, device.drift_towards, device.drift_rate, dt)
+        device.temperature = approaches.linear(
+            device.temperature, device.drift_towards, device.drift_rate, dt
+        )

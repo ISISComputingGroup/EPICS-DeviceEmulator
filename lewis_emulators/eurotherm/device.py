@@ -2,17 +2,16 @@ from collections import OrderedDict
 from time import sleep
 
 from lewis.devices import StateMachineDevice
+
 from .states import DefaultState
 
 
 class SimulatedEurotherm(StateMachineDevice):
-    """
-    Simulated Eurotherm temperature sensor.
+    """Simulated Eurotherm temperature sensor.
     """
 
     def _initialize_data(self):
-        """
-        Sets the initial state of the device.
+        """Sets the initial state of the device.
         """
         self.connected = True
         self.delay_time = None
@@ -45,36 +44,29 @@ class SimulatedEurotherm(StateMachineDevice):
         self.scaling = 1.0
 
     def _get_state_handlers(self):
+        """Returns: states and their names
         """
-        Returns: states and their names
-        """
-        return {
-            DefaultState.NAME: DefaultState()
-        }
+        return {DefaultState.NAME: DefaultState()}
 
     def _get_initial_state(self):
-        """
-        Returns: the name of the initial state
+        """Returns: the name of the initial state
         """
         return DefaultState.NAME
 
     def _get_transition_handlers(self):
-        """
-        Returns: the state transitions
+        """Returns: the state transitions
         """
         return OrderedDict()
-    
+
     def _delay(self):
-        """
-        Simulate a delay.
+        """Simulate a delay.
         """
         if self.delay_time is not None:
             sleep(self.delay_time)
 
     @property
     def address(self):
-        """
-        Get the address of the device.
+        """Get the address of the device.
 
         Returns: the address of the device e.g. "A01"
         """
@@ -82,8 +74,7 @@ class SimulatedEurotherm(StateMachineDevice):
 
     @address.setter
     def address(self, addr):
-        """
-        Sets the address of the device.
+        """Sets the address of the device.
 
         Args:
             addr (str): the address of this device e.g. "A01".
@@ -93,8 +84,7 @@ class SimulatedEurotherm(StateMachineDevice):
 
     @property
     def current_temperature(self):
-        """
-        Get current temperature of the device.
+        """Get current temperature of the device.
 
         Returns: the current temperature in K.
         """
@@ -103,8 +93,7 @@ class SimulatedEurotherm(StateMachineDevice):
 
     @current_temperature.setter
     def current_temperature(self, temp):
-        """
-        Set the current temperature of the device.
+        """Set the current temperature of the device.
 
         Args:
             temp: the current temperature of the device in K.
@@ -114,8 +103,7 @@ class SimulatedEurotherm(StateMachineDevice):
 
     @property
     def ramping_on(self):
-        """
-        Gets whether the device is currently ramping.
+        """Gets whether the device is currently ramping.
 
         Returns: bool indicating if the device is ramping.
         """
@@ -124,8 +112,7 @@ class SimulatedEurotherm(StateMachineDevice):
 
     @ramping_on.setter
     def ramping_on(self, toggle):
-        """
-        Sets whether the device is currently ramping.
+        """Sets whether the device is currently ramping.
 
         Args:
             toggle (bool): turn ramping on or off.
@@ -135,8 +122,7 @@ class SimulatedEurotherm(StateMachineDevice):
 
     @property
     def ramp_rate(self):
-        """
-        Get the current ramp rate.
+        """Get the current ramp rate.
 
         Returns: the current ramp rate in K/min
         """
@@ -145,8 +131,7 @@ class SimulatedEurotherm(StateMachineDevice):
 
     @ramp_rate.setter
     def ramp_rate(self, ramp_rate):
-        """
-        Set the ramp rate.
+        """Set the ramp rate.
 
         Args:
             ramp_rate (float): set the current ramp rate in K/min.
@@ -156,8 +141,7 @@ class SimulatedEurotherm(StateMachineDevice):
 
     @property
     def ramp_setpoint_temperature(self):
-        """
-        Get the set point temperature.
+        """Get the set point temperature.
 
         Returns: the current value of the setpoint temperature in K.
         """
@@ -166,53 +150,47 @@ class SimulatedEurotherm(StateMachineDevice):
 
     @ramp_setpoint_temperature.setter
     def ramp_setpoint_temperature(self, temp):
-        """
-        Set the set point temperature.
+        """Set the set point temperature.
 
         Args:
             temp (float): the current value of the set point temperature in K.
 
         """
         self._ramp_setpoint_temperature = temp
-    
+
     @property
     def output_rate(self):
-        """
-        Get the set point output rate.
+        """Get the set point output rate.
         """
         self._delay()
         return self._output_rate
-        
+
     @output_rate.setter
     def output_rate(self, value):
-        """
-        Set the set point output rate.
+        """Set the set point output rate.
         """
         self._output_rate = value
 
     @property
     def needlevalve_flow(self):
-        """
-        Get the flow readback from the transducer
+        """Get the flow readback from the transducer
 
         Returns: the current value of the flow rate in L/min
         """
         return self._needlevalve_flow
-    
+
     @needlevalve_flow.setter
     def needlevalve_flow(self, flow):
-        """
-        Sets the flow readback from the transducer
+        """Sets the flow readback from the transducer
 
-        Args: 
+        Args:
             flow (double) the current value of the flow rate in L/min
         """
         self._needlevalve_flow = flow
 
     @property
     def needlevalve_manual_flow(self):
-        """
-        Get the manual flow setpoint
+        """Get the manual flow setpoint
 
         Returns: the current value of the manual flow setpoint
         """
@@ -220,18 +198,16 @@ class SimulatedEurotherm(StateMachineDevice):
 
     @needlevalve_manual_flow.setter
     def needlevalve_manual_flow(self, flow_val):
-        """
-        Sets the manual flow setpoint
+        """Sets the manual flow setpoint
 
         Args:
             flow_val (float): set the manual flow setpoint in L/min
         """
         self._needlevalve_manual_flow = flow_val
-    
+
     @property
     def needlevalve_flow_low_lim(self):
-        """
-        Get the low setpoint limit for flow control
+        """Get the low setpoint limit for flow control
 
         Returns: the current value of the manual flow setpoint
         """
@@ -239,8 +215,7 @@ class SimulatedEurotherm(StateMachineDevice):
 
     @needlevalve_flow_low_lim.setter
     def needlevalve_flow_low_lim(self, low_lim):
-        """
-        Sets the low setpoint limit for flow control
+        """Sets the low setpoint limit for flow control
 
         Args:
             low_lim (float): set the low setpoint limit in L/min
@@ -249,8 +224,7 @@ class SimulatedEurotherm(StateMachineDevice):
 
     @property
     def needlevalve_flow_high_lim(self):
-        """
-        Get the low setpoint limit for flow control
+        """Get the low setpoint limit for flow control
 
         Returns: the current value of the manual flow setpoint
         """
@@ -258,8 +232,7 @@ class SimulatedEurotherm(StateMachineDevice):
 
     @needlevalve_flow_high_lim.setter
     def needlevalve_flow_high_lim(self, high_lim):
-        """
-        Sets the high setpoint limit for flow control
+        """Sets the high setpoint limit for flow control
 
         Args:
             high_lim (float): set the high setpoint limit in L/min
@@ -268,8 +241,7 @@ class SimulatedEurotherm(StateMachineDevice):
 
     @property
     def needlevalve_auto_flow_scale(self):
-        """
-        Get the auto_flow_scale
+        """Get the auto_flow_scale
 
         Returns: the current value of the manual flow setpoint
         """
@@ -277,8 +249,7 @@ class SimulatedEurotherm(StateMachineDevice):
 
     @needlevalve_auto_flow_scale.setter
     def needlevalve_auto_flow_scale(self, value):
-        """
-        Sets the auto_flow_scale
+        """Sets the auto_flow_scale
 
         Args:
             value (float): set the high setpoint limit in L/min
@@ -287,8 +258,7 @@ class SimulatedEurotherm(StateMachineDevice):
 
     @property
     def needlevalve_min_auto_flow_bl_temp(self):
-        """
-        Get min_auto_flow_bl_tempw setpoint
+        """Get min_auto_flow_bl_tempw setpoint
 
         Returns: current mode of the fmin_auto_flow_bl_temp
         """
@@ -296,8 +266,7 @@ class SimulatedEurotherm(StateMachineDevice):
 
     @needlevalve_min_auto_flow_bl_temp.setter
     def needlevalve_min_auto_flow_bl_temp(self, value):
-        """
-        Sets the  min_auto_flow_bl_temp setpoint
+        """Sets the  min_auto_flow_bl_temp setpoint
 
         Args:
             value (int)
@@ -306,8 +275,7 @@ class SimulatedEurotherm(StateMachineDevice):
 
     @property
     def needlevalve_flow_sp_mode(self):
-        """
-        Get the mode of the flow setpoint 
+        """Get the mode of the flow setpoint
 
         Returns: current mode of the flow setpoint (AUTO/MANUAL)
         """
@@ -315,8 +283,7 @@ class SimulatedEurotherm(StateMachineDevice):
 
     @needlevalve_flow_sp_mode.setter
     def needlevalve_flow_sp_mode(self, mode):
-        """
-        Sets the mode of the flow setpoint 
+        """Sets the mode of the flow setpoint
 
         Args:
             mode (int)
@@ -325,39 +292,34 @@ class SimulatedEurotherm(StateMachineDevice):
 
     @property
     def needlevalve_direction(self):
-        """
-        Get the direction of the valve 
+        """Get the direction of the valve
 
         Returns: current direction of the valve (OPENING/CLOSING)
         """
         return self._needlevalve_direction
-    
+
     @needlevalve_direction.setter
     def needlevalve_direction(self, dir):
-        """
-        Sets the direction of the valve 
+        """Sets the direction of the valve
 
-        Args: 
+        Args:
             dir (int) current direction of the valve (OPENING/CLOSING)
         """
         self._needlevalve_direction = dir
-    
+
     @property
     def needlevalve_stop(self):
-        """
-        Gets the control mode of Loop 2 
+        """Gets the control mode of Loop 2
 
         Returns: current control mode of Loop 2 (STOPPED/NOT STOPPED)
         """
         return self._needlevalve_stop
-    
+
     @needlevalve_stop.setter
     def needlevalve_stop(self, stop_val):
-        """
-        Sets the control mode of Loop 2 
+        """Sets the control mode of Loop 2
 
         Args:
             stop_val (int)
         """
         self._needlevalve_stop = stop_val
-

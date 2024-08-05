@@ -1,12 +1,12 @@
 import unittest
-from hamcrest import assert_that, is_, equal_to
 
-from lewis_emulators.ngpspsu.interfaces.device_status import convert_to_hexadecimal, DeviceStatus
+from hamcrest import assert_that, equal_to, is_
+
+from lewis_emulators.ngpspsu.interfaces.device_status import DeviceStatus, convert_to_hexadecimal
 
 
 class DeviceStatusTests(unittest.TestCase):
-    """
-    Tests that the device status is correctly converted.
+    """Tests that the device status is correctly converted.
     """
 
     def test_that_GIVEN_a_blank_device_status_THEN_all_hex_characters_zero(self):
@@ -29,7 +29,7 @@ class DeviceStatusTests(unittest.TestCase):
             "Ext. interlock #3": False,
             "Ext. interlock #4": False,
             "DCCT fault": False,
-            "OVP": False
+            "OVP": False,
         }
         device_status = DeviceStatus(status)
 
@@ -60,7 +60,7 @@ class DeviceStatusTests(unittest.TestCase):
             "Ext. interlock #3": False,
             "Ext. interlock #4": False,
             "DCCT fault": False,
-            "OVP": False
+            "OVP": False,
         }
         device_status = DeviceStatus(status)
 
@@ -91,7 +91,7 @@ class DeviceStatusTests(unittest.TestCase):
             "Ext. interlock #3": False,
             "Ext. interlock #4": False,
             "DCCT fault": False,
-            "OVP": False
+            "OVP": False,
         }
         device_status = DeviceStatus(status)
 
@@ -104,8 +104,7 @@ class DeviceStatusTests(unittest.TestCase):
 
 
 class ConvertBitsToHexTests(unittest.TestCase):
-    """
-    Tests for converting a word of 4 bits to the
+    """Tests for converting a word of 4 bits to the
     corresponding hexadecimal character.
     """
 
@@ -131,7 +130,9 @@ class ConvertBitsToHexTests(unittest.TestCase):
         expected = "01"
         assert_that(result, is_(equal_to(expected)))
 
-    def test_that_GIVEN_a_byte_and_padding_of_5_THEN_a_5_padded_two_digit_hex_character_is_returned(self):
+    def test_that_GIVEN_a_byte_and_padding_of_5_THEN_a_5_padded_two_digit_hex_character_is_returned(
+        self,
+    ):
         # Given:
         word = [True, False, False, False, True, True, False, False]
 

@@ -10,7 +10,6 @@ class Channel(object):
 
 
 class StatusRegister(object):
-
     def __init__(self):
         self.buffer_full = False
         self.measurement_summary_status = False

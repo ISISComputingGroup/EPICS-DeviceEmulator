@@ -1,25 +1,23 @@
-"""
-Device classes for the SM 300 motor emulator
+"""Device classes for the SM 300 motor emulator
 """
 
 from collections import OrderedDict
 
+from lewis.core import approaches
 from lewis.core.logging import has_log
+from lewis.devices import StateMachineDevice
 
 from .states import DefaultState
-from lewis.devices import StateMachineDevice
-from lewis.core import approaches
 
 
 @has_log
 class Axis(object):
-    """
-    An axis within the SM300 device
+    """An axis within the SM300 device
     """
 
     def __init__(self, axis_label):
-        """
-        Constructor.
+        """Constructor.
+
         Args:
             axis_label: the label for the axis
         """
@@ -32,15 +30,14 @@ class Axis(object):
         self.axis_label = axis_label
 
     def home(self):
-        """
-        Perform a homing operation.
+        """Perform a homing operation.
         """
         self.sp = 0.0
         self.move_to_sp()
 
     def simulate(self, dt):
-        """
-        Simulate movement of the axis.
+        """Simulate movement of the axis.
+
         Args:
             dt: time since last simulation
         """
@@ -51,14 +48,12 @@ class Axis(object):
         return
 
     def _at_position(self):
-        """
-        Returns: True if at position (within tolerance); False otherwise.
+        """Returns: True if at position (within tolerance); False otherwise.
         """
         return abs(self.rbv - self._move_to_sp) < 0.01
 
     def get_label_and_position(self):
-        """
-        Returns: axis label and current position in steps
+        """Returns: axis label and current position in steps
         """
         if self.rbv_error is not None:
             return self.rbv_error
@@ -66,15 +61,13 @@ class Axis(object):
             return "{label}{0:.0f}".format(self.rbv, label=self.axis_label)
 
     def stop(self):
-        """
-        Stop the motor moving.
+        """Stop the motor moving.
 
         """
         self.moving = False
 
     def move_to_sp(self):
-        """
-        Start a movement of the axis to the current set point
+        """Start a movement of the axis to the current set point
 
         Returns: True if can start moving (or is already at position), False otherwise
         """
@@ -86,19 +79,15 @@ class Axis(object):
 
 
 class SimulatedSm300(StateMachineDevice):
+    """Simulated SM300 Device
     """
-    Simulated SM300 Device
-    """
+
     def _initialize_data(self):
-        """
-        Initialize all of the device's attributes.
+        """Initialize all of the device's attributes.
         """
         # Is the device initialised, if not it won't talk to me
         self.initialised = False
-        self.axes = {
-            "X": Axis("X"),
-            "Y": Axis("Y")
-        }
+        self.axes = {"X": Axis("X"), "Y": Axis("Y")}
         self.x_axis = self.axes["X"]
         self.y_axis = self.axes["Y"]
         self.is_moving = None  # let the axis report its motion
@@ -110,8 +99,7 @@ class SimulatedSm300(StateMachineDevice):
         self.is_disconnected = False
 
     def move_to_sp(self):
-        """
-        Move to the setpoint if the motor is not already moving
+        """Move to the setpoint if the motor is not already moving
         Returns: True if new points set; False otherwise
         """
         if self.is_motor_moving():
@@ -123,13 +111,11 @@ class SimulatedSm300(StateMachineDevice):
         return True
 
     def is_motor_moving(self):
-        """
-
-        Returns: whether the motor is moving
+        """Returns: whether the motor is moving
 
         """
         if self.is_moving is not None:
-                return self.is_moving
+            return self.is_moving
 
         for axis in self.axes.values():
             if axis.moving:
@@ -139,26 +125,23 @@ class SimulatedSm300(StateMachineDevice):
 
     def _get_state_handlers(self):
         return {
-            'default': DefaultState(),
+            "default": DefaultState(),
         }
 
     def _get_initial_state(self):
-        return 'default'
+        return "default"
 
     def _get_transition_handlers(self):
-        return OrderedDict([
-        ])
+        return OrderedDict([])
 
     def reset(self):
-        """
-        Reset device to start up state
+        """Reset device to start up state
         """
         self._initialize_data()
 
     @property
     def x_axis_rbv(self):
-        """
-        Returns: Read back value for the x axis (useful usage through the back door
+        """Returns: Read back value for the x axis (useful usage through the back door
         """
         return self.x_axis.rbv
 
@@ -168,8 +151,7 @@ class SimulatedSm300(StateMachineDevice):
 
     @property
     def y_axis_rbv(self):
-        """
-        Returns: Read back value for the y axis (useful usage through the back door
+        """Returns: Read back value for the y axis (useful usage through the back door
         """
         return self.y_axis.rbv
 
@@ -179,8 +161,7 @@ class SimulatedSm300(StateMachineDevice):
 
     @property
     def x_axis_sp(self):
-        """
-        Returns: Set point value for the x axis (useful usage through the back door
+        """Returns: Set point value for the x axis (useful usage through the back door
         """
         return self.x_axis.rbv
 
@@ -190,8 +171,7 @@ class SimulatedSm300(StateMachineDevice):
 
     @property
     def y_axis_sp(self):
-        """
-        Returns: Set point value for the y axis (useful usage through the back door
+        """Returns: Set point value for the y axis (useful usage through the back door
         """
         return self.y_axis.rbv
 
@@ -201,8 +181,7 @@ class SimulatedSm300(StateMachineDevice):
 
     @property
     def x_axis_rbv_error(self):
-        """
-        Returns: The error to give instead of the read back value
+        """Returns: The error to give instead of the read back value
         """
         return self.x_axis.rbv_error
 

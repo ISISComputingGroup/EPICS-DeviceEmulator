@@ -1,18 +1,18 @@
 from collections import OrderedDict
-from .states import DefaultState, GoingState, StoppedState, StoppingState
+
 from lewis.devices import StateMachineDevice
+
+from .states import DefaultState, GoingState, StoppedState, StoppingState
 
 
 class SimulatedFermichopper(StateMachineDevice):
-
     def _initialize_data(self):
-        """
-        Initialize all of the device's attributes.
+        """Initialize all of the device's attributes.
         """
         self.last_command = "0000"
         self.speed = 0
         self.speed_setpoint = 0
-        self._allowed_speed_setpoints = list(50*i for i in range(1, 13))
+        self._allowed_speed_setpoints = list(50 * i for i in range(1, 13))
 
         self.delay_highword = 0
         self.delay_lowword = 0
@@ -46,26 +46,27 @@ class SimulatedFermichopper(StateMachineDevice):
 
     def _get_state_handlers(self):
         return {
-            'default': DefaultState(),
-            'stopping': StoppingState(),
-            'going': GoingState(),
-            'stopped': StoppedState(),
+            "default": DefaultState(),
+            "stopping": StoppingState(),
+            "going": GoingState(),
+            "stopped": StoppedState(),
         }
 
     def _get_initial_state(self):
-        return 'default'
+        return "default"
 
     def _get_transition_handlers(self):
-        return OrderedDict([
-            (('default', 'stopped'), lambda: not self.runmode),
-            (('default', 'going'), lambda: self.runmode),
-            (('stopped', 'going'), lambda: self.runmode),
-            (('going', 'stopping'), lambda: self.runmode is False),
-            (('stopping', 'stopped'), lambda: self.speed == 0),
-        ])
+        return OrderedDict(
+            [
+                (("default", "stopped"), lambda: not self.runmode),
+                (("default", "going"), lambda: self.runmode),
+                (("stopped", "going"), lambda: self.runmode),
+                (("going", "stopping"), lambda: self.runmode is False),
+                (("stopping", "stopped"), lambda: self.speed == 0),
+            ]
+        )
 
     def do_command(self, command):
-
         valid_commands = ["0001", "0002", "0003", "0004", "0005", "0006", "0007", "0008"]
         assert command in valid_commands, "Invalid command."
 
@@ -121,12 +122,16 @@ class SimulatedFermichopper(StateMachineDevice):
         self.update_delay()
 
     def update_delay(self):
-        self.delay = (self.delay_highword * 65536 + self.delay_lowword)
-        self.is_lying_about_delay_sp_rbv = False  # Resending the setpoint causes the device to no longer be confused
+        self.delay = self.delay_highword * 65536 + self.delay_lowword
+        self.is_lying_about_delay_sp_rbv = (
+            False  # Resending the setpoint causes the device to no longer be confused
+        )
 
     def set_gate_width(self, value):
         self.gatewidth = value
-        self.is_lying_about_gatewidth = False  # Resending the setpoint causes the device to no longer be confused
+        self.is_lying_about_gatewidth = (
+            False  # Resending the setpoint causes the device to no longer be confused
+        )
 
     def get_gate_width(self):
         if self.is_lying_about_gatewidth:

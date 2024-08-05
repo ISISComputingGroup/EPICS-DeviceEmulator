@@ -6,8 +6,7 @@ if_connected = conditional_reply("connected")
 
 
 class EurothermStreamInterface(StreamInterface):
-    """
-    Stream interface for the serial port
+    """Stream interface for the serial port
     """
 
     commands = {
@@ -24,9 +23,24 @@ class EurothermStreamInterface(StreamInterface):
         CmdBuilder("get_highlim").eot().regex("[0-9]{4}HS").enq().build(),
         CmdBuilder("get_lowlim").eot().regex("[0-9]{4}LS").enq().build(),
         CmdBuilder("get_error").eot().regex("[0-9]{4}EE").enq().build(),
-
-        CmdBuilder("set_ramp_setpoint", arg_sep="").eot().regex("[0-9]{4}").stx().escape("SL").float().etx().any().build(),
-        CmdBuilder("set_output_rate", arg_sep="").eot().regex("[0-9]{4}").stx().escape("OR").float().etx().any().build(),
+        CmdBuilder("set_ramp_setpoint", arg_sep="")
+        .eot()
+        .regex("[0-9]{4}")
+        .stx()
+        .escape("SL")
+        .float()
+        .etx()
+        .any()
+        .build(),
+        CmdBuilder("set_output_rate", arg_sep="")
+        .eot()
+        .regex("[0-9]{4}")
+        .stx()
+        .escape("OR")
+        .float()
+        .etx()
+        .any()
+        .build(),
     }
 
     # Add terminating characters manually for each command, as write and read commands use different formatting for their 'in' commands.
@@ -34,21 +48,20 @@ class EurothermStreamInterface(StreamInterface):
     out_terminator = ""
     readtimeout = 1
 
-    # calculate a eurotherm xor checksum character from a data string    
+    # calculate a eurotherm xor checksum character from a data string
     def make_checksum(self, chars):
         checksum = 0
         for c in chars:
             checksum ^= ord(c)
         return chr(checksum)
-    
+
     def make_read_reply(self, command, value):
         reply = f"\x02{command}{value}\x03"
-        # checksum calculated on characters after \x02 but up to and including \x03 
+        # checksum calculated on characters after \x02 but up to and including \x03
         return f"{reply}{self.make_checksum(reply[1:])}"
 
     def handle_error(self, request, error):
-        """
-        If command is not recognised print and error
+        """If command is not recognised print and error
 
         Args:
             request: requested string
@@ -104,8 +117,7 @@ class EurothermStreamInterface(StreamInterface):
 
     @if_connected
     def get_current_temperature(self):
-        """
-        Get the current temperature of the device.
+        """Get the current temperature of the device.
 
         Returns: the current temperature formatted like the Eurotherm protocol.
         """
@@ -113,8 +125,7 @@ class EurothermStreamInterface(StreamInterface):
 
     @if_connected
     def get_ramp_setpoint(self):
-        """
-        Get the set point temperature.
+        """Get the set point temperature.
 
         Returns: the current set point temperature formatted like the Eurotherm protocol.
         """
@@ -122,8 +133,7 @@ class EurothermStreamInterface(StreamInterface):
 
     @if_connected
     def set_ramp_setpoint(self, temperature, _):
-        """
-        Set the set point temperature.
+        """Set the set point temperature.
 
         Args:
             temperature: the temperature to set the setpoint to.
@@ -135,8 +145,7 @@ class EurothermStreamInterface(StreamInterface):
 
     @if_connected
     def get_error(self):
-        """
-        Get the error.
+        """Get the error.
 
         Returns: the current error code in HEX.
         """

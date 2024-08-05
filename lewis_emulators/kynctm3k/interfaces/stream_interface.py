@@ -1,16 +1,15 @@
-from lewis.adapters.stream import StreamInterface, Cmd
+from lewis.adapters.stream import Cmd, StreamInterface
 from lewis.core.logging import has_log
 from lewis.utils.command_builder import CmdBuilder
 
 
 @has_log
 class Kynctm3KStreamInterface(StreamInterface):
-
     # Commands that we expect via serial during normal operation
     commands = {
         Cmd("return_data", "MM,1111111111111111$"),
         CmdBuilder("change_input_mode").enum("Q0", "R0", "R1").build(),
-        CmdBuilder("toggle_autosend").escape("SW,EA,").enum("1", "0").build()
+        CmdBuilder("toggle_autosend").escape("SW,EA,").enum("1", "0").build(),
     }
 
     in_terminator = "\r"

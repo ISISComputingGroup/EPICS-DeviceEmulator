@@ -8,10 +8,9 @@ class RunStatus(Enum):
 
 
 class Direction(object):
-    """
-    Attributes
-        symbol: Respinse symbol, I or W.
-        name: Name of the direction. Infusion of withdrawal.
+    """Attributes:
+    symbol: Respinse symbol, I or W.
+    name: Name of the direction. Infusion of withdrawal.
     """
 
     def __init__(self, symbol, name):
@@ -20,14 +19,14 @@ class Direction(object):
 
 
 class Mode(object):
-    """
-    Operation mode for the device.
+    """Operation mode for the device.
 
     Attributes:
         set_symbol (string): Symbol for setting the mode
         response (string): Response to a query for the mode.
         name: Description of the mode.
     """
+
     def __init__(self, symbol, response, name):
         self.symbol = symbol
         self.response = response
@@ -35,8 +34,7 @@ class Mode(object):
 
 
 class ErrorType(object):
-    """
-    Error Type.
+    """Error Type.
 
     Attributes:
         name: String name of the error

@@ -1,6 +1,5 @@
 from lewis.adapters.stream import StreamInterface
 from lewis.core.logging import has_log
-
 from lewis.utils.command_builder import CmdBuilder
 from lewis.utils.replies import conditional_reply
 
@@ -9,9 +8,8 @@ if_connected = conditional_reply("connected")
 
 @has_log
 class Tekafg3XXXStreamInterface(StreamInterface):
-
-    in_terminator = '\n'
-    out_terminator = '\n'
+    in_terminator = "\n"
+    out_terminator = "\n"
 
     def __init__(self):
         super(Tekafg3XXXStreamInterface, self).__init__()
@@ -22,60 +20,201 @@ class Tekafg3XXXStreamInterface(StreamInterface):
             CmdBuilder(self.get_status).escape("OUTP").int().escape(":STAT?").build(),
             CmdBuilder(self.set_status).escape("OUTP").int().escape(":STAT ").int().build(),
             CmdBuilder(self.get_function).escape("SOUR").int().escape(":FUNC:SHAP?").build(),
-            CmdBuilder(self.set_function).escape("SOUR").int().escape(":FUNC:SHAP ").arg("SIN|SQU|PULS|RAMP|PRN|DC|SINC|GAUS|LOR|ERIS|EDEC|HAV").build(),
+            CmdBuilder(self.set_function)
+            .escape("SOUR")
+            .int()
+            .escape(":FUNC:SHAP ")
+            .arg("SIN|SQU|PULS|RAMP|PRN|DC|SINC|GAUS|LOR|ERIS|EDEC|HAV")
+            .build(),
             CmdBuilder(self.get_polarity).escape("OUTP").int().escape(":POL?").build(),
-            CmdBuilder(self.set_polarity).escape("OUTP").int().escape(":POL ").arg("NORM|INV").build(),
+            CmdBuilder(self.set_polarity)
+            .escape("OUTP")
+            .int()
+            .escape(":POL ")
+            .arg("NORM|INV")
+            .build(),
             CmdBuilder(self.get_impedance).escape("OUTP").int().escape(":IMP?").build(),
             CmdBuilder(self.set_impedance).escape("OUTP").int().escape(":IMP ").float().build(),
             CmdBuilder(self.get_voltage).escape("SOUR").int().escape(":VOLT?").build(),
             CmdBuilder(self.set_voltage).escape("SOUR").int().escape(":VOLT ").float().build(),
             CmdBuilder(self.get_voltage_units).escape("SOUR").int().escape(":VOLT:UNIT?").build(),
-            CmdBuilder(self.set_voltage_units).escape("SOUR").int().escape(":VOLT:UNIT ").arg("VPP|VRMS|DBM").build(),
-            CmdBuilder(self.get_voltage_low_level).escape("SOUR").int().escape(":VOLT:LEV:IMM:LOW?").build(),
-            CmdBuilder(self.set_voltage_low_level).escape("SOUR").int().escape(":VOLT:LEV:IMM:LOW ").float().build(),
-            CmdBuilder(self.get_voltage_high_level).escape("SOUR").int().escape(":VOLT:LEV:IMM:HIGH?").build(),
-            CmdBuilder(self.set_voltage_high_level).escape("SOUR").int().escape(":VOLT:LEV:IMM:HIGH ").float().build(),
-            CmdBuilder(self.get_voltage_low_limit).escape("SOUR").int().escape(":VOLT:LIM:LOW?").build(),
-            CmdBuilder(self.set_voltage_low_limit).escape("SOUR").int().escape(":VOLT:LIM:LOW ").float().build(),
-            CmdBuilder(self.get_voltage_high_limit).escape("SOUR").int().escape(":VOLT:LIM:HIGH?").build(),
-            CmdBuilder(self.set_voltage_high_limit).escape("SOUR").int().escape(":VOLT:LIM:HIGH ").float().build(),
-            CmdBuilder(self.get_voltage_offset).escape("SOUR").int().escape(":VOLT:LEV:IMM:OFFS?").build(),
-            CmdBuilder(self.set_voltage_offset).escape("SOUR").int().escape(":VOLT:LEV:IMM:OFFS ").float().build(),
+            CmdBuilder(self.set_voltage_units)
+            .escape("SOUR")
+            .int()
+            .escape(":VOLT:UNIT ")
+            .arg("VPP|VRMS|DBM")
+            .build(),
+            CmdBuilder(self.get_voltage_low_level)
+            .escape("SOUR")
+            .int()
+            .escape(":VOLT:LEV:IMM:LOW?")
+            .build(),
+            CmdBuilder(self.set_voltage_low_level)
+            .escape("SOUR")
+            .int()
+            .escape(":VOLT:LEV:IMM:LOW ")
+            .float()
+            .build(),
+            CmdBuilder(self.get_voltage_high_level)
+            .escape("SOUR")
+            .int()
+            .escape(":VOLT:LEV:IMM:HIGH?")
+            .build(),
+            CmdBuilder(self.set_voltage_high_level)
+            .escape("SOUR")
+            .int()
+            .escape(":VOLT:LEV:IMM:HIGH ")
+            .float()
+            .build(),
+            CmdBuilder(self.get_voltage_low_limit)
+            .escape("SOUR")
+            .int()
+            .escape(":VOLT:LIM:LOW?")
+            .build(),
+            CmdBuilder(self.set_voltage_low_limit)
+            .escape("SOUR")
+            .int()
+            .escape(":VOLT:LIM:LOW ")
+            .float()
+            .build(),
+            CmdBuilder(self.get_voltage_high_limit)
+            .escape("SOUR")
+            .int()
+            .escape(":VOLT:LIM:HIGH?")
+            .build(),
+            CmdBuilder(self.set_voltage_high_limit)
+            .escape("SOUR")
+            .int()
+            .escape(":VOLT:LIM:HIGH ")
+            .float()
+            .build(),
+            CmdBuilder(self.get_voltage_offset)
+            .escape("SOUR")
+            .int()
+            .escape(":VOLT:LEV:IMM:OFFS?")
+            .build(),
+            CmdBuilder(self.set_voltage_offset)
+            .escape("SOUR")
+            .int()
+            .escape(":VOLT:LEV:IMM:OFFS ")
+            .float()
+            .build(),
             CmdBuilder(self.get_frequency).escape("SOUR").int().escape(":FREQ:FIX?").build(),
-            CmdBuilder(self.set_frequency).escape("SOUR").int().escape(":FREQ:FIX ").float().build(),
+            CmdBuilder(self.set_frequency)
+            .escape("SOUR")
+            .int()
+            .escape(":FREQ:FIX ")
+            .float()
+            .build(),
             CmdBuilder(self.get_phase).escape("SOUR").int().escape(":PHASE:ADJ?").build(),
             CmdBuilder(self.set_phase).escape("SOUR").int().escape(":PHASE:ADJ ").float().build(),
             CmdBuilder(self.get_burst_status).escape("SOUR").int().escape(":BURS:STAT?").build(),
-            CmdBuilder(self.set_burst_status).escape("SOUR").int().escape(":BURS:STAT ").arg("ON|OFF|1|0").build(),
+            CmdBuilder(self.set_burst_status)
+            .escape("SOUR")
+            .int()
+            .escape(":BURS:STAT ")
+            .arg("ON|OFF|1|0")
+            .build(),
             CmdBuilder(self.get_burst_mode).escape("SOUR").int().escape(":BURS:MODE?").build(),
-            CmdBuilder(self.set_burst_mode).escape("SOUR").int().escape(":BURS:MODE ").arg("TRIG|GAT").build(),
-            CmdBuilder(self.get_burst_num_cycles).escape("SOUR").int().escape(":BURS:NCYC?").build(),
-            CmdBuilder(self.set_burst_num_cycles).escape("SOUR").int().escape(":BURS:NCYC ").float().build(),
-            CmdBuilder(self.get_burst_time_delay).escape("SOUR").int().escape(":BURS:TDEL?").build(),
-            CmdBuilder(self.set_burst_time_delay).escape("SOUR").int().escape(":BURS:TDEL ").float().build(),
+            CmdBuilder(self.set_burst_mode)
+            .escape("SOUR")
+            .int()
+            .escape(":BURS:MODE ")
+            .arg("TRIG|GAT")
+            .build(),
+            CmdBuilder(self.get_burst_num_cycles)
+            .escape("SOUR")
+            .int()
+            .escape(":BURS:NCYC?")
+            .build(),
+            CmdBuilder(self.set_burst_num_cycles)
+            .escape("SOUR")
+            .int()
+            .escape(":BURS:NCYC ")
+            .float()
+            .build(),
+            CmdBuilder(self.get_burst_time_delay)
+            .escape("SOUR")
+            .int()
+            .escape(":BURS:TDEL?")
+            .build(),
+            CmdBuilder(self.set_burst_time_delay)
+            .escape("SOUR")
+            .int()
+            .escape(":BURS:TDEL ")
+            .float()
+            .build(),
             CmdBuilder(self.get_frequency_mode).escape("SOUR").int().escape(":FREQ:MODE?").build(),
-            CmdBuilder(self.set_frequency_mode).escape("SOUR").int().escape(":FREQ:MODE ").arg("CW|FIX|SWE").build(),
+            CmdBuilder(self.set_frequency_mode)
+            .escape("SOUR")
+            .int()
+            .escape(":FREQ:MODE ")
+            .arg("CW|FIX|SWE")
+            .build(),
             CmdBuilder(self.get_sweep_span).escape("SOUR").int().escape(":FREQ:SPAN?").build(),
-            CmdBuilder(self.set_sweep_span).escape("SOUR").int().escape(":FREQ:SPAN ").float().build(),
+            CmdBuilder(self.set_sweep_span)
+            .escape("SOUR")
+            .int()
+            .escape(":FREQ:SPAN ")
+            .float()
+            .build(),
             CmdBuilder(self.get_sweep_start).escape("SOUR").int().escape(":FREQ:STAR?").build(),
-            CmdBuilder(self.set_sweep_start).escape("SOUR").int().escape(":FREQ:STAR ").float().build(),
+            CmdBuilder(self.set_sweep_start)
+            .escape("SOUR")
+            .int()
+            .escape(":FREQ:STAR ")
+            .float()
+            .build(),
             CmdBuilder(self.get_sweep_stop).escape("SOUR").int().escape(":FREQ:STOP?").build(),
-            CmdBuilder(self.set_sweep_stop).escape("SOUR").int().escape(":FREQ:STOP ").float().build(),
+            CmdBuilder(self.set_sweep_stop)
+            .escape("SOUR")
+            .int()
+            .escape(":FREQ:STOP ")
+            .float()
+            .build(),
             CmdBuilder(self.get_sweep_hold_time).escape("SOUR").int().escape(":SWE:HTIM?").build(),
-            CmdBuilder(self.set_sweep_hold_time).escape("SOUR").int().escape(":SWE:HTIM ").float().build(),
+            CmdBuilder(self.set_sweep_hold_time)
+            .escape("SOUR")
+            .int()
+            .escape(":SWE:HTIM ")
+            .float()
+            .build(),
             CmdBuilder(self.get_sweep_mode).escape("SOUR").int().escape(":SWE:MODE?").build(),
-            CmdBuilder(self.set_sweep_mode).escape("SOUR").int().escape(":SWE:MODE ").arg("AUTO|MAN").build(),
-            CmdBuilder(self.get_sweep_return_time).escape("SOUR").int().escape(":SWE:RTIM?").build(),
-            CmdBuilder(self.set_sweep_return_time).escape("SOUR").int().escape(":SWE:RTIM ").float().build(),
+            CmdBuilder(self.set_sweep_mode)
+            .escape("SOUR")
+            .int()
+            .escape(":SWE:MODE ")
+            .arg("AUTO|MAN")
+            .build(),
+            CmdBuilder(self.get_sweep_return_time)
+            .escape("SOUR")
+            .int()
+            .escape(":SWE:RTIM?")
+            .build(),
+            CmdBuilder(self.set_sweep_return_time)
+            .escape("SOUR")
+            .int()
+            .escape(":SWE:RTIM ")
+            .float()
+            .build(),
             CmdBuilder(self.get_sweep_spacing).escape("SOUR").int().escape(":SWE:SPAC?").build(),
-            CmdBuilder(self.set_sweep_spacing).escape("SOUR").int().escape(":SWE:SPAC ").arg("LIN|LOG").build(),
+            CmdBuilder(self.set_sweep_spacing)
+            .escape("SOUR")
+            .int()
+            .escape(":SWE:SPAC ")
+            .arg("LIN|LOG")
+            .build(),
             CmdBuilder(self.get_sweep_time).escape("SOUR").int().escape(":SWE:TIME?").build(),
-            CmdBuilder(self.set_sweep_time).escape("SOUR").int().escape(":SWE:TIME ").float().build(),
+            CmdBuilder(self.set_sweep_time)
+            .escape("SOUR")
+            .int()
+            .escape(":SWE:TIME ")
+            .float()
+            .build(),
         }
 
     def handle_error(self, request, error):
-        """
-        If command is not recognised print and error
+        """If command is not recognised print and error
 
         Args:
             request: requested string
@@ -85,8 +224,7 @@ class Tekafg3XXXStreamInterface(StreamInterface):
         self.log.error("An error occurred at request " + repr(request) + ": " + repr(error))
 
     def identity(self):
-        """
-        :return: identity of the device
+        """:return: identity of the device
         """
         return "TEKTRONIX,AFG3021,C100101,SCPI:99.0 FV:1.0"
 
@@ -94,8 +232,7 @@ class Tekafg3XXXStreamInterface(StreamInterface):
         self.device.triggered = True
 
     def _channel(self, channel_num: int):
-        """
-        Helper method to get a channel object from the device according to number
+        """Helper method to get a channel object from the device according to number
         """
         return self.device.channels[channel_num]
 

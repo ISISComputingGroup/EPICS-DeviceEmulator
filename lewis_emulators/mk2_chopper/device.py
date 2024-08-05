@@ -1,19 +1,21 @@
 from collections import OrderedDict
-from .states import DefaultInitState, DefaultStoppedState, DefaultStartedState, MAX_TEMPERATURE
+
 from lewis.devices import StateMachineDevice
+
 from .chopper_type import ChopperType
+from .states import MAX_TEMPERATURE, DefaultInitState, DefaultStartedState, DefaultStoppedState
 
 
 class SimulatedMk2Chopper(StateMachineDevice):
-
     def _initialize_data(self):
-        """
-        Initialize all of the device's attributes.
+        """Initialize all of the device's attributes.
         """
         self._type = ChopperType(50, ChopperType.INDRAMAT)
 
         self._demanded_frequency = self._type.get_frequency()
-        self._max_phase_delay = self._type.get_max_phase_for_closest_frequency(self._demanded_frequency)
+        self._max_phase_delay = self._type.get_max_phase_for_closest_frequency(
+            self._demanded_frequency
+        )
         self._true_frequency = 0
 
         self._demanded_phase_delay = 0
@@ -33,20 +35,22 @@ class SimulatedMk2Chopper(StateMachineDevice):
 
     def _get_state_handlers(self):
         return {
-            'init': DefaultInitState(),
-            'stopped': DefaultStoppedState(),
-            'started': DefaultStartedState(),
+            "init": DefaultInitState(),
+            "stopped": DefaultStoppedState(),
+            "started": DefaultStartedState(),
         }
 
     def _get_initial_state(self):
-        return 'init'
+        return "init"
 
     def _get_transition_handlers(self):
-        return OrderedDict([
-            (('init', 'stopped'), lambda: self.ready),
-            (('stopped', 'started'), lambda: self._started is True),
-            (('started', 'stopped'), lambda: self._started is False),
-        ])
+        return OrderedDict(
+            [
+                (("init", "stopped"), lambda: self.ready),
+                (("stopped", "started"), lambda: self._started is True),
+                (("started", "stopped"), lambda: self._started is False),
+            ]
+        )
 
     def get_system_frequency(self):
         return self._type.get_frequency()
@@ -82,7 +86,7 @@ class SimulatedMk2Chopper(StateMachineDevice):
         return self._started
 
     def in_sync(self):
-        tolerance = 0.001*self._type.get_frequency()
+        tolerance = 0.001 * self._type.get_frequency()
         return abs(self._true_frequency - self._demanded_frequency) < tolerance
 
     def reg_mode(self):
@@ -113,11 +117,14 @@ class SimulatedMk2Chopper(StateMachineDevice):
         return self._phase_delay_error
 
     def phase_delay_correction_error(self):
-        tolerance = 0.001*self._demanded_phase_delay
+        tolerance = 0.001 * self._demanded_phase_delay
         return abs(self._true_phase_delay - self._demanded_phase_delay) > tolerance
 
     def phase_accuracy_window_error(self):
-        return abs(self._true_phase_delay - self._demanded_phase_delay) > self._demanded_phase_error_window
+        return (
+            abs(self._true_phase_delay - self._demanded_phase_delay)
+            > self._demanded_phase_error_window
+        )
 
     def set_demanded_frequency(self, new_frequency_int):
         self._demanded_frequency = self._type.get_closest_valid_frequency(new_frequency_int)

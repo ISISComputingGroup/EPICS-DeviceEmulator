@@ -18,8 +18,10 @@
 # *********************************************************************
 
 from collections import OrderedDict
-from lewis.devices import StateMachineDevice
+
 from lewis.core.utils import check_limits
+from lewis.devices import StateMachineDevice
+
 from . import states
 
 
@@ -49,8 +51,7 @@ class SimulatedJulabo(StateMachineDevice):
     control_mode = ControlModes.EXTERNAL
 
     def _initialize_data(self):
-        """
-        This method is called once on construction. After that, it may be
+        """This method is called once on construction. After that, it may be
         manually called again to reset the device to its default state.
 
         After the first call during construction, the class is frozen.
@@ -63,22 +64,23 @@ class SimulatedJulabo(StateMachineDevice):
 
     def _get_state_handlers(self):
         return {
-            'circulate': states.DefaultCirculatingState(),
-            'not_circulate': states.DefaultNotCirculatingState(),
+            "circulate": states.DefaultCirculatingState(),
+            "not_circulate": states.DefaultNotCirculatingState(),
         }
 
     def _get_initial_state(self):
-        return 'not_circulate'
+        return "not_circulate"
 
     def _get_transition_handlers(self):
-        return OrderedDict([
-            (('not_circulate', 'circulate'), lambda: self.circulate_commanded),
-            (('circulate', 'not_circulate'), lambda: not self.circulate_commanded),
-        ])
+        return OrderedDict(
+            [
+                (("not_circulate", "circulate"), lambda: self.circulate_commanded),
+                (("circulate", "not_circulate"), lambda: not self.circulate_commanded),
+            ]
+        )
 
     def set_set_point(self, param):
-        """
-        Sets the target temperature.
+        """Sets the target temperature.
 
         :param param: The new temperature in C. Must be positive.
         :return: Empty string.
@@ -88,8 +90,7 @@ class SimulatedJulabo(StateMachineDevice):
         return ""
 
     def set_circulating(self, param):
-        """
-        Sets whether to circulate - in effect whether the heater is on.
+        """Sets whether to circulate - in effect whether the heater is on.
 
         :param param: The mode to set, must be 0 or 1.
         :return: Empty string.
@@ -104,8 +105,7 @@ class SimulatedJulabo(StateMachineDevice):
 
     @check_limits(0.1, 99.9)
     def set_internal_p(self, param):
-        """
-        Sets the internal proportional.
+        """Sets the internal proportional.
         Xp in Julabo speak.
 
         :param param: The value to set, must be between 0.1 and 99.9
@@ -116,8 +116,7 @@ class SimulatedJulabo(StateMachineDevice):
 
     @check_limits(3, 9999)
     def set_internal_i(self, param):
-        """
-        Sets the internal integral.
+        """Sets the internal integral.
         Tn in Julabo speak.
 
         :param param: The value to set, must be an integer between 3 and 9999
@@ -128,8 +127,7 @@ class SimulatedJulabo(StateMachineDevice):
 
     @check_limits(0, 999)
     def set_internal_d(self, param):
-        """
-        Sets the internal derivative.
+        """Sets the internal derivative.
         Tv in Julabo speak.
 
         :param param: The value to set, must be an integer between 0 and 999
@@ -140,8 +138,7 @@ class SimulatedJulabo(StateMachineDevice):
 
     @check_limits(0.1, 99.9)
     def set_external_p(self, param):
-        """
-        Sets the external proportional.
+        """Sets the external proportional.
         Xp in Julabo speak.
 
         :param param: The value to set, must be between 0.1 and 99.9
@@ -152,8 +149,7 @@ class SimulatedJulabo(StateMachineDevice):
 
     @check_limits(3, 9999)
     def set_external_i(self, param):
-        """
-        Sets the external integral.
+        """Sets the external integral.
         Tn in Julabo speak.
 
         :param param: The value to set, must be an integer between 3 and 9999
@@ -164,8 +160,7 @@ class SimulatedJulabo(StateMachineDevice):
 
     @check_limits(0, 999)
     def set_external_d(self, param):
-        """
-        Sets the external derivative.
+        """Sets the external derivative.
         Tv in Julabo speak.
 
         :param param: The value to set, must be an integer between 0 and 999
@@ -176,8 +171,7 @@ class SimulatedJulabo(StateMachineDevice):
 
     @check_limits(0, 1)
     def set_control_mode(self, control_mode):
-        """
-        Sets the control mode of the julabo.
+        """Sets the control mode of the julabo.
         :param control_mode: (int) 1 for external control, 0 for internal control
         :return: Empty string
         """

@@ -1,13 +1,13 @@
 from collections import OrderedDict
-from .states import DefaultState
+
 from lewis.devices import StateMachineDevice
+
+from .states import DefaultState
 
 
 class SimulatedMezflipr(StateMachineDevice):
-
     def _initialize_data(self):
-        """
-        Initialize all of the device's attributes.
+        """Initialize all of the device's attributes.
         """
         self.connected = True
 
@@ -18,10 +18,10 @@ class SimulatedMezflipr(StateMachineDevice):
         self.mode = "static"
 
     def _get_state_handlers(self):
-        return {'default': DefaultState()}
+        return {"default": DefaultState()}
 
     def _get_initial_state(self):
-        return 'default'
+        return "default"
 
     def _get_transition_handlers(self):
         return OrderedDict([])

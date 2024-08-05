@@ -2,7 +2,6 @@ from enum import Enum
 
 
 class Buffer(object):
-
     def __init__(self):
         self.buffer = []
         self._size = 100

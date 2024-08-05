@@ -1,8 +1,8 @@
 from functools import wraps
-from lewis.utils.command_builder import CmdBuilder
-from lewis.core.logging import has_log
-from lewis.adapters.stream import StreamInterface
 
+from lewis.adapters.stream import StreamInterface
+from lewis.core.logging import has_log
+from lewis.utils.command_builder import CmdBuilder
 from lewis.utils.replies import conditional_reply
 
 if_connected = conditional_reply("connected")
@@ -10,16 +10,17 @@ if_connected = conditional_reply("connected")
 
 def needs_remote_mode(func):
     wraps(func)
+
     def _wrapper(self, *args, **kwargs):
         if not self._device.remote_comms_enabled:
             raise ValueError("Not in remote mode")
         return func(self, *args, **kwargs)
+
     return _wrapper
 
 
 @has_log
 class KepcoStreamInterface(StreamInterface):
-
     in_terminator = "\n"
     out_terminator = "\r\n"
 
@@ -45,7 +46,7 @@ class KepcoStreamInterface(StreamInterface):
         CmdBuilder("set_auto_voltage_range").escape("VOLT:RANG:AUTO ").int().build(),
     }
 
-    def handle_error(self,request, error):
+    def handle_error(self, request, error):
         self.log.error("An error occurred at request" + repr(request) + ": " + repr(error))
         print("An error occurred at request" + repr(request) + ": " + repr(error))
 
@@ -105,7 +106,7 @@ class KepcoStreamInterface(StreamInterface):
             mode = int(mode)
             if mode not in [0, 1]:
                 raise ValueError("Invalid mode in set_control_mode: {}".format(mode))
-            self._device.remote_comms_enabled = (mode == 1)
+            self._device.remote_comms_enabled = mode == 1
 
     @if_connected
     def reset(self):
@@ -114,7 +115,7 @@ class KepcoStreamInterface(StreamInterface):
     @if_connected
     def get_current_range(self):
         return f"{self._device.current_range}"
-        
+
     @if_connected
     def get_voltage_range(self):
         return f"{self._device.voltage_range}"
@@ -125,7 +126,7 @@ class KepcoStreamInterface(StreamInterface):
             self._device.current_range = range
         else:
             raise ValueError(f"Invalid current range {range}")
-       
+
     @if_connected
     def set_voltage_range(self, range):
         if range == 1 or range == 4:
@@ -139,11 +140,10 @@ class KepcoStreamInterface(StreamInterface):
             self._device.auto_current_range = range
         else:
             raise ValueError(f"Invalid auto current range {range}")
-       
+
     @if_connected
     def set_auto_voltage_range(self, range):
         if range == 0 or range == 1:
             self._device.auto_voltage_range = range
         else:
             raise ValueError(f"Invalid auto voltage range {range}")
-

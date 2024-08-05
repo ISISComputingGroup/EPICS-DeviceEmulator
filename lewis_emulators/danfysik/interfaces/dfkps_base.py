@@ -1,6 +1,6 @@
+"""Stream device for danfysik
 """
-Stream device for danfysik
-"""
+
 import abc
 
 from lewis.core.logging import has_log
@@ -8,16 +8,13 @@ from lewis.utils.command_builder import CmdBuilder
 from lewis.utils.replies import conditional_reply
 
 
-
 @has_log
 class CommonStreamInterface(object, metaclass=abc.ABCMeta):
-    """
-    Common part of the stream interface for a Danfysik.
+    """Common part of the stream interface for a Danfysik.
     """
 
     in_terminator = "\r"
     out_terminator = ""
-
 
     commands = [
         CmdBuilder("get_voltage").escape("AD 2").eos().build(),
@@ -31,15 +28,13 @@ class CommonStreamInterface(object, metaclass=abc.ABCMeta):
     ]
 
     def handle_error(self, request, error):
-        """
-        If command is not recognised print and error
+        """If command is not recognised print and error
 
         Args:
             request: requested string
             error: problem
         """
         self.log.error("An error occurred at request " + repr(request) + ": " + repr(error))
-
 
     @conditional_reply("connected")
     @conditional_reply("comms_initialized")
@@ -64,10 +59,9 @@ class CommonStreamInterface(object, metaclass=abc.ABCMeta):
     @conditional_reply("connected")
     @conditional_reply("comms_initialized")
     def unlock(self):
+        """Unlock the device. Implementation could be put in in future.
         """
-        Unlock the device. Implementation could be put in in future.
-        """
-        
+
     @conditional_reply("connected")
     @conditional_reply("comms_initialized")
     def get_polarity(self):
@@ -96,14 +90,12 @@ class CommonStreamInterface(object, metaclass=abc.ABCMeta):
 
     @abc.abstractmethod
     def get_status(self):
-        """
-        Respond to the get_status command.
+        """Respond to the get_status command.
         """
 
     @conditional_reply("connected")
     def init_comms(self):
-        """
-        Initialize comms of device
+        """Initialize comms of device
         """
         self.device.comms_initialized = True
 

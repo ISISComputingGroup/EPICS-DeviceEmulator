@@ -1,16 +1,16 @@
 from collections import OrderedDict
-from .states import DefaultState
+
 from lewis.devices import StateMachineDevice
+
+from .states import DefaultState
 
 NUMBER_OF_D_Is = 6
 NUMBER_OF_D_Os = 6
 
 
 class SimulatedRkndio(StateMachineDevice):
-
     def _initialize_data(self):
-        """
-        Initialize all of the device's attributes.
+        """Initialize all of the device's attributes.
         """
         self._idn = "RIKENFE Prototype v2.0"
         self._connected = True
@@ -20,20 +20,18 @@ class SimulatedRkndio(StateMachineDevice):
 
     def _get_state_handlers(self):
         return {
-            'default': DefaultState(),
+            "default": DefaultState(),
         }
 
     def _get_initial_state(self):
-        return 'default'
+        return "default"
 
     def _get_transition_handlers(self):
-        return OrderedDict([
-        ])
+        return OrderedDict([])
 
     @property
     def idn(self):
-        """
-        Returns the IDN of the device.
+        """Returns the IDN of the device.
 
         Returns:
             (string): The IDN of the device.
@@ -45,8 +43,7 @@ class SimulatedRkndio(StateMachineDevice):
         return self._connected
 
     def get_input_state(self, pin):
-        """
-        Gets the state
+        """Gets the state
 
         Args:
             pin: Pin number of DO
@@ -65,8 +62,7 @@ class SimulatedRkndio(StateMachineDevice):
             return "ERROR"
 
     def set_input_state_via_the_backdoor(self, pin, state):
-        """
-        Sets the read state of a pin. Called only via the backdoor.
+        """Sets the read state of a pin. Called only via the backdoor.
 
         Args:
             pin: pin number (int 2-7)
@@ -78,8 +74,7 @@ class SimulatedRkndio(StateMachineDevice):
         self._input_states[pin - 2] = state
 
     def set_output_state(self, pin, state):
-        """
-        Gets the state
+        """Gets the state
 
         Args:
             pin: Pin number of DI
@@ -103,8 +98,7 @@ class SimulatedRkndio(StateMachineDevice):
             return "ERROR"
 
     def get_output_state_via_the_backdoor(self, pin):
-        """
-        Gets the set state of a pin. Called only via the backdoor.
+        """Gets the set state of a pin. Called only via the backdoor.
 
         Args:
             pin: pin number (int 8-13)
@@ -115,8 +109,7 @@ class SimulatedRkndio(StateMachineDevice):
         return self._output_states[pin - 8]
 
     def connect(self):
-        """
-        Connects the device.
+        """Connects the device.
 
         Returns:
             None
@@ -124,8 +117,7 @@ class SimulatedRkndio(StateMachineDevice):
         self._connected = True
 
     def disconnect(self):
-        """
-        Disconnects the device.
+        """Disconnects the device.
 
         Returns:
             Nome
@@ -135,5 +127,3 @@ class SimulatedRkndio(StateMachineDevice):
     def reset_error(self):
         self.error = "No error"
         self.status = "No error"
-
-

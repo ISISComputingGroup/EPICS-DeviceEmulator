@@ -1,23 +1,23 @@
-from .two_gas_mixer import TwoGasMixer
-from .buffer import Buffer
-from .gas import Gas
-from .system_gases import SystemGases
-from .seed_gas_data import SeedGasData
-from .ethernet_device import EthernetDevice
-from .hmi_device import HmiDevice
-from .valve import Valve
-from .error_states import ErrorStates
-from .utilities import format_int, format_float
-from .sensor import Sensor
-from .pressure_sensor import PressureSensor
-from .states import DefaultInitState, DefaultRunningState
 from collections import OrderedDict
 
 from lewis.devices import StateMachineDevice
 
+from .buffer import Buffer
+from .error_states import ErrorStates
+from .ethernet_device import EthernetDevice
+from .gas import Gas
+from .hmi_device import HmiDevice
+from .pressure_sensor import PressureSensor
+from .seed_gas_data import SeedGasData
+from .sensor import Sensor
+from .states import DefaultInitState, DefaultRunningState
+from .system_gases import SystemGases
+from .two_gas_mixer import TwoGasMixer
+from .utilities import format_float, format_int
+from .valve import Valve
+
 
 class SimulatedVolumetricRig(StateMachineDevice):
-
     HALTED_MESSAGE = "Rejected only allowed when running"
 
     def _initialize_data(self):
@@ -26,19 +26,25 @@ class SimulatedVolumetricRig(StateMachineDevice):
         self._cycle_pressures = False
 
         # Set up all available gases
-        self._system_gases = SystemGases([Gas(i, SeedGasData.names[i]) for i in range(len(SeedGasData.names))])
+        self._system_gases = SystemGases(
+            [Gas(i, SeedGasData.names[i]) for i in range(len(SeedGasData.names))]
+        )
 
         # Set mixable gases
         self._mixer = TwoGasMixer()
         for name1, name2 in SeedGasData.mixable_gas_names():
-            self._mixer.add_mixable(self._system_gases.gas_by_name(name1), self._system_gases.gas_by_name(name2))
+            self._mixer.add_mixable(
+                self._system_gases.gas_by_name(name1), self._system_gases.gas_by_name(name2)
+            )
 
         # Set buffers
-        buffer_gases = [(self._system_gases.gas_by_name(name1),
-                         self._system_gases.gas_by_name(name2))
-                        for name1, name2 in SeedGasData.buffer_gas_names()]
-        self._buffers = [Buffer(i + 1, buffer_gases[i][0], buffer_gases[i][1])
-                         for i in range(len(buffer_gases))]
+        buffer_gases = [
+            (self._system_gases.gas_by_name(name1), self._system_gases.gas_by_name(name2))
+            for name1, name2 in SeedGasData.buffer_gas_names()
+        ]
+        self._buffers = [
+            Buffer(i + 1, buffer_gases[i][0], buffer_gases[i][1]) for i in range(len(buffer_gases))
+        ]
 
         # Set ethernet devices
         self._plc = EthernetDevice("192.168.0.1")
@@ -63,17 +69,19 @@ class SimulatedVolumetricRig(StateMachineDevice):
 
     def _get_state_handlers(self):
         return {
-            'init': DefaultInitState(),
-            'running': DefaultRunningState(),
+            "init": DefaultInitState(),
+            "running": DefaultRunningState(),
         }
 
     def _get_initial_state(self):
-        return 'init'
+        return "init"
 
     def _get_transition_handlers(self):
-        return OrderedDict([
-            (('init', 'running'), lambda: self.serial_command_mode),
-        ])
+        return OrderedDict(
+            [
+                (("init", "running"), lambda: self.serial_command_mode),
+            ]
+        )
 
     def identify(self):
         return "ISIS Volumetric Gas Handing Panel"
@@ -107,7 +115,9 @@ class SimulatedVolumetricRig(StateMachineDevice):
         return self._pressure_sensors if not reverse else list(reversed(self._pressure_sensors))
 
     def temperature_sensors(self, reverse=False):
-        return self._temperature_sensors if not reverse else list(reversed(self._temperature_sensors))
+        return (
+            self._temperature_sensors if not reverse else list(reversed(self._temperature_sensors))
+        )
 
     def target_pressure(self, as_string):
         return format_float(self._target_pressure, as_string)
@@ -124,10 +134,11 @@ class SimulatedVolumetricRig(StateMachineDevice):
 
     def valves_status(self):
         # The valve order goes: supply, vacuum, cell, buffer(n), ... , buffer(1)
-        return [self._supply_valve.status(),
-                self._vacuum_extract_valve.status(),
-                self._cell_valve.status()] + \
-               [b.valve_status() for b in list(reversed(self._buffers))]
+        return [
+            self._supply_valve.status(),
+            self._vacuum_extract_valve.status(),
+            self._cell_valve.status(),
+        ] + [b.valve_status() for b in list(reversed(self._buffers))]
 
     def buffer_valve_is_open(self, buffer_number):
         buff = self.buffer(buffer_number)
@@ -154,8 +165,10 @@ class SimulatedVolumetricRig(StateMachineDevice):
             buff = self.buffer(buffer_number)
             # The buffer must exist and the system gas connected to it must be mixable with all the other current
             # buffer gases
-            if buff is not None and all(self._mixer.can_mix(buff.system_gas(), b.buffer_gas()) for b in self._buffers):
-                    buff.open_valve(self._mixer)
+            if buff is not None and all(
+                self._mixer.can_mix(buff.system_gas(), b.buffer_gas()) for b in self._buffers
+            ):
+                buff.open_valve(self._mixer)
 
     def open_cell_valve(self):
         if not self._halted:
@@ -226,8 +239,12 @@ class SimulatedVolumetricRig(StateMachineDevice):
                 if number_of_open_buffers > 0:
                     # Approach a pressure above target pressure so we intentionally go over the limit
                     from random import random
-                    p.approach_value(dt, 1.1*self._target_pressure,
-                                     base_rate*float(number_of_open_buffers)/self.buffer_count()*random())
+
+                    p.approach_value(
+                        dt,
+                        1.1 * self._target_pressure,
+                        base_rate * float(number_of_open_buffers) / self.buffer_count() * random(),
+                    )
                 else:
                     p.approach_value(dt, 0.0, base_rate)
                 if self._overall_pressure() < 0.5 * self._target_pressure:

@@ -1,5 +1,5 @@
-from lewis.core.statemachine import State
 from lewis.core.logging import has_log
+from lewis.core.statemachine import State
 
 
 @has_log

@@ -4,26 +4,31 @@ from lewis.utils.replies import conditional_reply
 
 
 class RkndioStreamInterface(StreamInterface):
-
     # Commands that we expect via serial during normal operation
     commands = {
         CmdBuilder("get_idn").escape("*IDN?").eos().build(),
         CmdBuilder("get_status").escape("STATUS").eos().build(),
         CmdBuilder("get_error").escape("ERR").eos().build(),
         CmdBuilder("get_d_i_state").escape("READ ").arg("2|3|4|5|6|7").eos().build(),
-        CmdBuilder("set_d_o_state").escape("WRITE ").arg("8|9|10|11|12|13").escape(" ").arg("FALSE|TRUE").eos().build()
+        CmdBuilder("set_d_o_state")
+        .escape("WRITE ")
+        .arg("8|9|10|11|12|13")
+        .escape(" ")
+        .arg("FALSE|TRUE")
+        .eos()
+        .build(),
     }
 
     in_terminator = "\r\n"
     out_terminator = "\r\n"
 
     def handle_error(self, request, error):
-        """
-        Prints an error message if a command is not recognised.
+        """Prints an error message if a command is not recognised.
 
         Args:
             request : Request.
             error: The error that has occurred.
+
         Returns:
             None.
         """
@@ -50,7 +55,3 @@ class RkndioStreamInterface(StreamInterface):
     @conditional_reply("connected")
     def set_d_o_state(self, pin, state):
         return self._device.set_output_state(pin, state)
-
-
-
-

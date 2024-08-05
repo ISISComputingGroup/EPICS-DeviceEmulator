@@ -4,10 +4,10 @@ from lewis.core.statemachine import State
 
 @has_log
 class DefaultState(State):
+    """Device is in default state.
     """
-    Device is in default state.
-    """
-    NAME = 'Default'
+
+    NAME = "Default"
 
     def in_state(self, dt):
         pass

@@ -1,6 +1,6 @@
-from lewis.adapters.stream import StreamInterface, Cmd
+from lewis.adapters.stream import Cmd, StreamInterface
 from lewis.core.logging import has_log
-from lewis.utils.byte_conversions import int_to_raw_bytes, BYTE
+from lewis.utils.byte_conversions import BYTE, int_to_raw_bytes
 from lewis.utils.replies import conditional_reply
 
 
@@ -9,6 +9,7 @@ def log_replies(f):
         result = f(self, *args, **kwargs)
         self.log.info(f"Reply in {f.__name__}: {result}")
         return result
+
     return _wrapper
 
 
@@ -17,8 +18,7 @@ def bytes_to_int(bytes):
 
 
 def crc16(data):
-    """
-    CRC algorithm - translated from section 3-5 of eurotherm manual.
+    """CRC algorithm - translated from section 3-5 of eurotherm manual.
     :param data: the data to checksum
     :return: the checksum
     """
@@ -33,18 +33,18 @@ def crc16(data):
             else:
                 crc >>= 1
 
-            crc %= BYTE ** 2
+            crc %= BYTE**2
 
     return int_to_raw_bytes(crc, 2, low_byte_first=True)
 
 
 @has_log
 class EurothermModbusInterface(StreamInterface):
-    """
-    This implements the modbus stream interface for a eurotherm.
+    """This implements the modbus stream interface for a eurotherm.
 
     Note: Eurotherm uses modbus RTU, not TCP, so cannot use lewis' normal modbus implementation here.
     """
+
     commands = {
         Cmd("any_command", r"^([\s\S]*)$", return_mapping=lambda x: x),
     }
@@ -72,7 +72,7 @@ class EurothermModbusInterface(StreamInterface):
             1136: self.get_nv_flow_low_lim,
             4963: self.get_nv_min_auto_flow_bl_temp,
             4965: self.get_nv_auto_flow_scale,
-            1292: self.get_nv_stop
+            1292: self.get_nv_stop,
         }
 
         self.write_commands = {
@@ -89,13 +89,13 @@ class EurothermModbusInterface(StreamInterface):
             1136: self.set_nv_flow_low_lim,
             4963: self.set_nv_min_auto_flow_bl_temp,
             4965: self.set_nv_auto_flow_scale,
-            1292: self.set_nv_stop
+            1292: self.set_nv_stop,
         }
 
     in_terminator = ""
     out_terminator = ""
     readtimeout = 10
-    
+
     protocol = "eurotherm_modbus"
 
     def handle_error(self, request, error):
@@ -113,7 +113,7 @@ class EurothermModbusInterface(StreamInterface):
         data = command[2:-2]
         crc = command[-2:]
 
-        assert(crc16(command) == b"\x00\x00", "Invalid checksum from IOC")
+        assert (crc16(command) == b"\x00\x00", "Invalid checksum from IOC")
 
         if len(data) != 4:
             raise ValueError(f"Invalid message length {len(data)}")
@@ -134,9 +134,11 @@ class EurothermModbusInterface(StreamInterface):
         self.log.info(f"reply_data = {reply_data}")
         assert -0x8000 <= reply_data <= 0x7FFF, f"reply {reply_data} was outside modbus range, bug?"
 
-        reply = comms_address.to_bytes(1, byteorder="big", signed=True) \
-            + b"\x03\x02" \
+        reply = (
+            comms_address.to_bytes(1, byteorder="big", signed=True)
+            + b"\x03\x02"
             + reply_data.to_bytes(2, byteorder="big", signed=True)
+        )
 
         return reply + crc16(reply)
 
@@ -207,40 +209,40 @@ class EurothermModbusInterface(StreamInterface):
 
     def get_nv_flow(self):
         return int(self.device.needlevalve_flow)
-    
+
     def get_nv_manual_flow(self):
         return int(self.device.needlevalve_manual_flow)
-    
+
     def set_nv_manual_flow(self, value):
         self.device.needlevalve_manual_flow = value
 
     def get_nv_flow_low_lim(self):
         return int(self.device.needlevalve_flow_low_lim)
-        
+
     def set_nv_flow_low_lim(self, value):
         self.device.needlevalve_flow_low_lim = value
 
     def get_nv_flow_high_lim(self):
         return int(self.device.needlevalve_flow_high_lim)
-        
+
     def set_nv_flow_high_lim(self, value):
         self.device.needlevalve_flow_high_lim = value
 
     def get_nv_min_auto_flow_bl_temp(self):
         return int(self.device.needlevalve_min_auto_flow_bl_temp)
-        
+
     def set_nv_min_auto_flow_bl_temp(self, value):
         self.device.needlevalve_min_auto_flow_bl_temp = value
 
     def get_nv_auto_flow_scale(self):
         return int(self.device.needlevalve_auto_flow_scale)
-        
+
     def set_nv_auto_flow_scale(self, value):
         self.device.needlevalve_auto_flow_scale = value
 
     def get_nv_flow_sp_mode(self):
         return int(self.device.needlevalve_flow_sp_mode)
-    
+
     def set_nv_flow_sp_mode(self, value):
         self.device.needlevalve_flow_sp_mode = value
 
@@ -249,7 +251,6 @@ class EurothermModbusInterface(StreamInterface):
 
     def set_nv_stop(self, value):
         self.device.needlevalve_stop = value
-    
+
     def get_nv_stop(self):
         return int(self.device.needlevalve_stop)
-    

@@ -1,6 +1,8 @@
 from collections import OrderedDict
-from .states import DefaultState
+
 from lewis.devices import StateMachineDevice
+
+from .states import DefaultState
 
 
 class SampleHolderMaterials(object):
@@ -14,10 +16,8 @@ class SampleHolderMaterials(object):
 
 
 class SimulatedIndfurn(StateMachineDevice):
-
     def _initialize_data(self):
-        """
-        Initialize all of the device's attributes.
+        """Initialize all of the device's attributes.
         """
         self.setpoint = 20
         self.pipe_temperature = 25.1
@@ -49,10 +49,10 @@ class SimulatedIndfurn(StateMachineDevice):
         self.thermocouple_1_fault, self.thermocouple_2_fault = 0, 0
 
     def _get_state_handlers(self):
-        return {'default': DefaultState()}
+        return {"default": DefaultState()}
 
     def _get_initial_state(self):
-        return 'default'
+        return "default"
 
     def _get_transition_handlers(self):
         return OrderedDict([])

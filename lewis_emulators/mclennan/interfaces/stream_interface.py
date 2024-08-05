@@ -8,7 +8,6 @@ if_connected = conditional_reply("connected")
 
 @has_log
 class MclennanStreamInterface(StreamInterface):
-
     # Commands that we expect via serial during normal operation
     commands = {
         CmdBuilder("stop").int().escape("ST").eos().build(),
@@ -23,21 +22,16 @@ class MclennanStreamInterface(StreamInterface):
         CmdBuilder("jog").int().escape("CV").int().eos().build(),
         CmdBuilder("query_speeds").int().escape("QS").eos().build(),
         CmdBuilder("set_mode").int().escape("CM").int().eos().build(),
-        CmdBuilder("set_encoder_ratio").int().escape(
-            "ER").int().escape("/").int().eos().build(),
+        CmdBuilder("set_encoder_ratio").int().escape("ER").int().escape("/").int().eos().build(),
         CmdBuilder("set_window").int().escape("WI").int().eos().build(),
         CmdBuilder("set_timeout").int().escape("TO").int().eos().build(),
-        CmdBuilder("set_tracking_window").int().escape(
-            "TR").int().eos().build(),
-        CmdBuilder("enable_soft_limits").int().escape(
-            "SL").int().eos().build(),
+        CmdBuilder("set_tracking_window").int().escape("TR").int().eos().build(),
+        CmdBuilder("enable_soft_limits").int().escape("SL").int().eos().build(),
         CmdBuilder("set_backoff").int().escape("BO").int().eos().build(),
         CmdBuilder("set_creep_steps").int().escape("CR").int().eos().build(),
         CmdBuilder("set_settle_time").int().escape("SE").int().eos().build(),
-        CmdBuilder("set_abort_mode").int().escape(
-            "AM").arg("[0-1]{8}").eos().build(),
-        CmdBuilder("set_datum_mode").int().escape(
-            "DM").arg("[0-1]{8}").eos().build(),
+        CmdBuilder("set_abort_mode").int().escape("AM").arg("[0-1]{8}").eos().build(),
+        CmdBuilder("set_datum_mode").int().escape("DM").arg("[0-1]{8}").eos().build(),
         CmdBuilder("set_home_pos").int().escape("SH").int().eos().build(),
         CmdBuilder("move_relative").int().escape("MR").int().eos().build(),
         CmdBuilder("move_absolute").int().escape("MA").int().eos().build(),
@@ -45,10 +39,8 @@ class MclennanStreamInterface(StreamInterface):
         CmdBuilder("home").int().escape("HD").int().eos().build(),
         CmdBuilder("set_ba").int().escape("BA").eos().build(),
         CmdBuilder("clear_datum").int().escape("CD").eos().build(),
-        CmdBuilder("define_command_position").int().escape(
-            "CP").int().eos().build(),
-        CmdBuilder("define_actual_position").int().escape(
-            "AP").int().eos().build(),
+        CmdBuilder("define_command_position").int().escape("CP").int().eos().build(),
+        CmdBuilder("define_actual_position").int().escape("AP").int().eos().build(),
         CmdBuilder("query_mode").int().escape("QM").eos().build(),
         CmdBuilder("query_current_op").int().escape("CO").eos().build(),
         CmdBuilder("query_all").int().escape("QA").eos().build(),
@@ -60,7 +52,8 @@ class MclennanStreamInterface(StreamInterface):
 
     def handle_error(self, request, error):
         err_string = "command was: {}, error was: {}: {}\n".format(
-            request, error.__class__.__name__, error)
+            request, error.__class__.__name__, error
+        )
         print(err_string)
         self.log.error(err_string)
         return err_string
@@ -72,12 +65,19 @@ class MclennanStreamInterface(StreamInterface):
 
     @if_connected
     def identify(self, controller):
-        return f"{controller:02}: PM600 Ver 3.02" if not self.device.is_pm304 else "1:Mclennan Servo Supplies Ltd. PM304 V6.15"
+        return (
+            f"{controller:02}: PM600 Ver 3.02"
+            if not self.device.is_pm304
+            else "1:Mclennan Servo Supplies Ltd. PM304 V6.15"
+        )
 
     @if_connected
     def query_speeds(self, controller):
-        return f"SV={self.device.velocity[controller]},SC={self.device.creep_speed[controller]},SA={self.device.accl[controller]},SD={self.device.decl[controller]}" if self.device.is_pm304 else \
-               f"{controller:02}:SC = {self.device.creep_speed[controller]} SV = {self.device.velocity[controller]} SA = {self.device.accl[controller]} SD = {self.device.decl[controller]} LD = 200000"
+        return (
+            f"SV={self.device.velocity[controller]},SC={self.device.creep_speed[controller]},SA={self.device.accl[controller]},SD={self.device.decl[controller]}"
+            if self.device.is_pm304
+            else f"{controller:02}:SC = {self.device.creep_speed[controller]} SV = {self.device.velocity[controller]} SA = {self.device.accl[controller]} SD = {self.device.decl[controller]} LD = 200000"
+        )
 
     @if_connected
     def set_creep_speed(self, controller, creep_speed):
@@ -254,9 +254,9 @@ class MclennanStreamInterface(StreamInterface):
             "Valid sequences: none Autoexec disabled",
             "Valid cams: none",
             "Valid profiles: none Profile time = 1000 ms",
-            "Read port: %00000000 Last write: %00000000"
+            "Read port: %00000000 Last write: %00000000",
         ]
-        return f'{controller:02}QA\r' + '\r\n'.join(lines)
+        return f"{controller:02}QA\r" + "\r\n".join(lines)
 
     @if_connected
     def query_position(self, controller):

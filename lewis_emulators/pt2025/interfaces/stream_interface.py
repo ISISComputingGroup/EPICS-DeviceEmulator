@@ -1,12 +1,14 @@
-from threading import Timer
 
-from lewis.adapters.stream import StreamInterface, Cmd
-from lewis.utils.command_builder import CmdBuilder
-from lewis.utils.replies import conditional_reply
 import threading
+
+from lewis.adapters.stream import StreamInterface
+from lewis.utils.replies import conditional_reply
+
 if_connected = conditional_reply("connected")
 DATA = "L12.123456T"
 NUMBER_OF_MESSAGES = 10
+
+
 class Pt2025StreamInterface(StreamInterface):
     commands = {}
     in_terminator = "\r\n"
@@ -34,7 +36,6 @@ class Pt2025StreamInterface(StreamInterface):
             return
         else:
             handler.unsolicited_reply(str(self.device.data))
-
 
     def handle_error(self, request, error):
         pass

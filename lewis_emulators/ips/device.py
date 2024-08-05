@@ -1,11 +1,11 @@
 from collections import OrderedDict
 
 from lewis.core.logging import has_log
-
-from lewis_emulators.ips.modes import Activity, Control, SweepMode, Mode
-from .states import HeaterOffState, HeaterOnState, MagnetQuenchedState
 from lewis.devices import StateMachineDevice
 
+from lewis_emulators.ips.modes import Activity, Control, Mode, SweepMode
+
+from .states import HeaterOffState, HeaterOnState, MagnetQuenchedState
 
 # As long as no magnetic saturation effects are present, there is a linear relationship between Teslas and Amps.
 #
@@ -25,7 +25,6 @@ def tesla_to_amps(tesla):
 
 @has_log
 class SimulatedIps(StateMachineDevice):
-
     # Currents that correspond to the switch heater being on and off
     HEATER_OFF_CURRENT, HEATER_ON_CURRENT = 0, 10
 
@@ -41,8 +40,7 @@ class SimulatedIps(StateMachineDevice):
     HEATER_RAMP_RATE = 5
 
     def _initialize_data(self):
-        """
-        Initialize all of the device's attributes.
+        """Initialize all of the device's attributes.
         """
         self.reset()
 
@@ -89,7 +87,7 @@ class SimulatedIps(StateMachineDevice):
 
         # No idea what sensible values are here. Also not clear what the behaviour is of the controller when these
         # limits are hit.
-        self.neg_current_limit, self.pos_current_limit = -10**6, 10**6
+        self.neg_current_limit, self.pos_current_limit = -(10**6), 10**6
 
         # Local and locked is the zeroth mode of the control command
         self.control = Control.LOCAL_LOCKED
@@ -102,26 +100,26 @@ class SimulatedIps(StateMachineDevice):
 
     def _get_state_handlers(self):
         return {
-            'heater_off': HeaterOffState(),
-            'heater_on': HeaterOnState(),
-            'quenched': MagnetQuenchedState(),
+            "heater_off": HeaterOffState(),
+            "heater_on": HeaterOnState(),
+            "quenched": MagnetQuenchedState(),
         }
 
     def _get_initial_state(self):
-        return 'heater_off'
+        return "heater_off"
 
     def _get_transition_handlers(self):
-        return OrderedDict([
-            (('heater_off', 'heater_on'), lambda: self.heater_on),
-            (('heater_on', 'heater_off'), lambda: not self.heater_on),
-
-            (('heater_on', 'quenched'), lambda: self.quenched),
-            (('heater_off', 'quenched'), lambda: self.quenched),
-
-            # Only triggered when device is reset or similar
-            (('quenched', 'heater_off'), lambda: not self.quenched and not self.heater_on),
-            (('quenched', 'heater_on'), lambda: not self.quenched and self.heater_on),
-        ])
+        return OrderedDict(
+            [
+                (("heater_off", "heater_on"), lambda: self.heater_on),
+                (("heater_on", "heater_off"), lambda: not self.heater_on),
+                (("heater_on", "quenched"), lambda: self.quenched),
+                (("heater_off", "quenched"), lambda: self.quenched),
+                # Only triggered when device is reset or similar
+                (("quenched", "heater_off"), lambda: not self.quenched and not self.heater_on),
+                (("quenched", "heater_on"), lambda: not self.quenched and self.heater_on),
+            ]
+        )
 
     def quench(self, reason):
         self.log.info("Magnet quenching at current={} because: {}".format(self.current, reason))
@@ -135,8 +133,7 @@ class SimulatedIps(StateMachineDevice):
         self.quenched = False
 
     def get_voltage(self):
-        """
-        Gets the voltage of the PSU.
+        """Gets the voltage of the PSU.
 
         Everything except the leads is superconducting, we use Ohm's law here with the PSU current and the lead
         resistance.
@@ -148,5 +145,7 @@ class SimulatedIps(StateMachineDevice):
 
     def set_heater_status(self, new_status):
         if new_status and abs(self.current - self.magnet_current) > self.QUENCH_CURRENT_DELTA:
-            raise ValueError("Can't set the heater to on while the magnet current and PSU current are mismatched")
+            raise ValueError(
+                "Can't set the heater to on while the magnet current and PSU current are mismatched"
+            )
         self.heater_on = new_status

@@ -1,9 +1,8 @@
+"""Stream interface for the SP2xx device.
 """
-Stream interface for the SP2xx device.
-"""
+
 from lewis.adapters.stream import StreamInterface
 from lewis.core.logging import has_log
-
 from lewis.utils.command_builder import CmdBuilder, string_arg
 from lewis.utils.replies import conditional_reply
 
@@ -17,15 +16,14 @@ if_connected = conditional_reply("connected")
 
 
 def if_error(f):
-    """
-    Decorator that executes f if the device has no errors on it and returns the error prompt otherwise.
+    """Decorator that executes f if the device has no errors on it and returns the error prompt otherwise.
 
     Args:
         f: function to be executed if the device has no error.
 
     Returns:
        The value of f(*args) if the device has no error and "\r\nE" otherwise.
-   """
+    """
 
     def _wrapper(*args):
         error = getattr(args[0], "_device").last_error.value
@@ -34,17 +32,16 @@ def if_error(f):
         else:
             result = "\r\nE"
         return result
+
     return _wrapper
 
 
 @has_log
 class Sp2XXStreamInterface(StreamInterface):
-    """
-    Stream interface for the serial port.
+    """Stream interface for the serial port.
     """
 
     def __init__(self):
-
         super(Sp2XXStreamInterface, self).__init__()
         # Commands that we expect via serial during normal operation
         self.commands = {
@@ -58,9 +55,16 @@ class Sp2XXStreamInterface(StreamInterface):
             CmdBuilder(self.reverse_direction).escape("dir rev").eos().build(),
             CmdBuilder(self.get_diameter).escape("dia?").eos().build(),
             CmdBuilder(self.set_diameter).escape("dia ").float().eos().build(),
-            CmdBuilder(
-                self.set_volume_or_rate).arg("vol|rate").char().escape(" ").float(string_arg).escape(" ").string().eos().build(),
-            CmdBuilder(self.get_volume_or_rate).arg("vol|rate").char().escape("?").eos().build()
+            CmdBuilder(self.set_volume_or_rate)
+            .arg("vol|rate")
+            .char()
+            .escape(" ")
+            .float(string_arg)
+            .escape(" ")
+            .string()
+            .eos()
+            .build(),
+            CmdBuilder(self.get_volume_or_rate).arg("vol|rate").char().escape("?").eos().build(),
         }
 
     out_terminator = ""
@@ -72,12 +76,12 @@ class Sp2XXStreamInterface(StreamInterface):
     Stopped = "\r\n:"
 
     def handle_error(self, request, error):
-        """
-        Prints an error message if a command is not recognised.
+        """Prints an error message if a command is not recognised.
 
         Args:
             request : Request.
             error: The error that has occurred.
+
         Returns:
             None.
         """
@@ -88,8 +92,7 @@ class Sp2XXStreamInterface(StreamInterface):
     @if_error
     @if_connected
     def start(self):
-        """
-        Starts the device running to present settings if it is not running.
+        """Starts the device running to present settings if it is not running.
 
         Returns:
 
@@ -102,15 +105,15 @@ class Sp2XXStreamInterface(StreamInterface):
                 self._device.start_device()
                 return self.Withdrawal
             else:
-                print("An error occurred when trying to run the device. The device's running state is \
-                    is {}.".format(
-                    self._device.running_direction))
+                print(
+                    "An error occurred when trying to run the device. The device's running state is \
+                    is {}.".format(self._device.running_direction)
+                )
 
     @if_error
     @if_connected
     def get_run_status(self):
-        """
-        Gets the run status of the pump.
+        """Gets the run status of the pump.
 
         Returns:
             "\r\n:" : If the device is not running.
@@ -129,8 +132,8 @@ class Sp2XXStreamInterface(StreamInterface):
     @if_error
     @if_connected
     def stop(self):
-        """
-        Stops the device running.
+        """Stops the device running.
+
         Returns:
             "\r\n:" : stopped prompt
         """
@@ -139,8 +142,7 @@ class Sp2XXStreamInterface(StreamInterface):
 
     @if_connected
     def get_error_status(self):
-        """
-        Gets the error status from the device and returns the error value and run status.
+        """Gets the error status from the device and returns the error value and run status.
 
         Returns:
             \r\n%i\r{} where %i is the error_type value and {} the run status.
@@ -160,8 +162,7 @@ class Sp2XXStreamInterface(StreamInterface):
     @if_error
     @if_connected
     def set_mode(self, mode_symbol):
-        """
-        Sets the mode of the device.
+        """Sets the mode of the device.
 
         Args:
             mode_symbol: symbol to change the mode setting
@@ -175,8 +176,7 @@ class Sp2XXStreamInterface(StreamInterface):
     @if_error
     @if_connected
     def get_mode(self):
-        """
-        Gets the mode of the device
+        """Gets the mode of the device
 
         Returns:
             The mode the device is in and the run status.
@@ -189,8 +189,7 @@ class Sp2XXStreamInterface(StreamInterface):
     @if_error
     @if_connected
     def get_direction(self):
-        """
-        Gets the direction of the device
+        """Gets the direction of the device
 
         Returns:
             The direction the device is in and the run status.
@@ -202,8 +201,7 @@ class Sp2XXStreamInterface(StreamInterface):
     @if_error
     @if_connected
     def reverse_direction(self):
-        """
-        Attempt to reverse the direction of a running device.
+        """Attempt to reverse the direction of a running device.
 
         Returns:
             Run status if the device is running and in infusion or withdrawal mode.
@@ -217,8 +215,7 @@ class Sp2XXStreamInterface(StreamInterface):
     @if_error
     @if_connected
     def get_diameter(self):
-        """
-        Gets the diameter that the syringe is set to.
+        """Gets the diameter that the syringe is set to.
 
         Returns:
             float: Diameter of the syringe.
@@ -227,8 +224,7 @@ class Sp2XXStreamInterface(StreamInterface):
         return "{}{}{}".format(self._return, self._device.diameter, run_status)
 
     def set_diameter(self, value):
-        """
-        Sets the diameter of the
+        """Sets the diameter of the
         Returns:
             \r\nNA{}: If value is
         """
@@ -241,8 +237,8 @@ class Sp2XXStreamInterface(StreamInterface):
     @if_error
     @if_connected
     def set_volume_or_rate(self, vol_or_rate, vol_or_rate_type, value, units):
-        """
-        Set a volume or rate.
+        """Set a volume or rate.
+
         Args:
             vol_or_rate: vol to set a volume, rate to set a rate, anything else is an error
             vol_or_rate_type: the type of the volume or rate, i for infusion, w for withdrawal, anything else
@@ -287,8 +283,8 @@ class Sp2XXStreamInterface(StreamInterface):
     @if_error
     @if_connected
     def get_volume_or_rate(self, vol_or_rate, vol_or_rate_type):
-        """
-        Get a volume or rate.
+        """Get a volume or rate.
+
         Args:
             vol_or_rate: vol to set a volume, rate to set a rate, anything else is an error
             vol_or_rate_type: the type of the volume or rate, i for infusion, w for withdrawal, anything else

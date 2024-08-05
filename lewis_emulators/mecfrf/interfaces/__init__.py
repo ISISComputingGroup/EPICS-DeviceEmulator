@@ -1,3 +1,3 @@
 from .stream_interface import MecfrfStreamInterface
 
-__all__ = ['MecfrfStreamInterface']
+__all__ = ["MecfrfStreamInterface"]

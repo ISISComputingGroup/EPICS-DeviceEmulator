@@ -1,23 +1,34 @@
-from .states import InitializingState, OffState, IdleState, RunState, HoldState, PurgeState, StandbyState
-from lewis.devices import StateMachineDevice
-from collections import OrderedDict
 import time
+from collections import OrderedDict
 
-states = OrderedDict([
-    ('INITIALIZING', InitializingState()),
-    ('OFF', OffState()),
-    ('IDLE', IdleState()),
-    ('RUN', RunState()),
-    ('HOLD', HoldState()),
-    ('PURGE', PurgeState()),
-    ('STANDBY', StandbyState())])
+from lewis.devices import StateMachineDevice
+
+from .states import (
+    HoldState,
+    IdleState,
+    InitializingState,
+    OffState,
+    PurgeState,
+    RunState,
+    StandbyState,
+)
+
+states = OrderedDict(
+    [
+        ("INITIALIZING", InitializingState()),
+        ("OFF", OffState()),
+        ("IDLE", IdleState()),
+        ("RUN", RunState()),
+        ("HOLD", HoldState()),
+        ("PURGE", PurgeState()),
+        ("STANDBY", StandbyState()),
+    ]
+)
 
 
 class SimulatedKnr1050(StateMachineDevice):
-
     def _initialize_data(self):
-        """
-        Initialize all of the device's attributes.
+        """Initialize all of the device's attributes.
         """
         self.connected = True
         self.input_correct = True
@@ -45,9 +56,8 @@ class SimulatedKnr1050(StateMachineDevice):
 
     @property
     def time_stamp(self):
-        """
-        Returns:
-            (int) current time in ms
+        """Returns:
+        (int) current time in ms
         """
         return int(round(time.time() * 1000))
 
@@ -63,13 +73,15 @@ class SimulatedKnr1050(StateMachineDevice):
         return states
 
     def _get_initial_state(self):
-        return 'OFF'
+        return "OFF"
 
     def _get_transition_handlers(self):
-        return OrderedDict([
-            (('INITIALIZING', 'IDLE'), lambda: self.initializing is False),
-            (('IDLE', 'OFF'), lambda: self.pump_on is False),
-            (('OFF', 'IDLE'), lambda: self.pump_on is True),
-            (('RUN', 'HOLD'), lambda: self.hold is True),
-            (('RUN', 'STANDBY'), lambda: self.standby is True)
-        ])
+        return OrderedDict(
+            [
+                (("INITIALIZING", "IDLE"), lambda: self.initializing is False),
+                (("IDLE", "OFF"), lambda: self.pump_on is False),
+                (("OFF", "IDLE"), lambda: self.pump_on is True),
+                (("RUN", "HOLD"), lambda: self.hold is True),
+                (("RUN", "STANDBY"), lambda: self.standby is True),
+            ]
+        )

@@ -1,3 +1,3 @@
 from .stream_interface import IpsStreamInterface
 
-__all__ = ['IpsStreamInterface']
+__all__ = ["IpsStreamInterface"]

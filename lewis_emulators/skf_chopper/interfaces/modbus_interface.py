@@ -1,24 +1,27 @@
-from lewis.adapters.stream import StreamInterface, Cmd
-from lewis.core.logging import has_log
-from lewis.utils.byte_conversions import float_to_raw_bytes, raw_bytes_to_int, int_to_raw_bytes
-from lewis.utils.replies import conditional_reply
 from os import urandom
+
+from lewis.adapters.stream import Cmd, StreamInterface
+from lewis.core.logging import has_log
+from lewis.utils.byte_conversions import float_to_raw_bytes, int_to_raw_bytes, raw_bytes_to_int
+from lewis.utils.replies import conditional_reply
+
 
 def log_replies(f):
     def _wrapper(self, *args, **kwargs):
         result = f(self, *args, **kwargs)
         self.log.info(f"Reply in {f.__name__}: {result}")
         return result
+
     return _wrapper
 
 
 @has_log
 class SKFChopperModbusInterface(StreamInterface):
-    """
-    This implements the modbus stream interface for an skf chopper.
-    This is not a full implementation of the device and just handles frequency for now to check 
+    """This implements the modbus stream interface for an skf chopper.
+    This is not a full implementation of the device and just handles frequency for now to check
     that modbus comms work OK.
     """
+
     commands = {
         Cmd("any_command", r"^([\s\S]*)$", return_mapping=lambda x: x),
     }
@@ -26,8 +29,8 @@ class SKFChopperModbusInterface(StreamInterface):
     def __init__(self):
         super().__init__()
         self.read_commands = {
-            353: self.get_freq, # RBV
-            345: self.get_freq, # SP:RBV
+            353: self.get_freq,  # RBV
+            345: self.get_freq,  # SP:RBV
             905: self.get_v13_norm,
             906: self.get_w13_norm,
             907: self.get_v24_norm,
@@ -41,7 +44,7 @@ class SKFChopperModbusInterface(StreamInterface):
         }
 
         self.write_commands = {
-            345: self.set_freq, # SP
+            345: self.set_freq,  # SP
         }
 
     in_terminator = ""
@@ -66,8 +69,8 @@ class SKFChopperModbusInterface(StreamInterface):
         data = command[8:]
 
         if len(command[6:]) != length:
-             raise ValueError(f"Invalid message length, expected {length} but got {len(data)}")
-    
+            raise ValueError(f"Invalid message length, expected {length} but got {len(data)}")
+
         if function_code == 3:
             return self.handle_read(transaction_id, protocol_id, unit, function_code, data)
         elif function_code == 16:
@@ -85,7 +88,7 @@ class SKFChopperModbusInterface(StreamInterface):
             reply_data = 0
 
         self.log.info(f"reply_data = {reply_data}")
-        
+
         if isinstance(reply_data, float) and words_to_read == 2:
             data_length = 4
             littleendian_bytes = bytearray(float_to_raw_bytes(reply_data, low_byte_first=True))
@@ -97,13 +100,15 @@ class SKFChopperModbusInterface(StreamInterface):
 
             # Do the same for the remainder
             second_word = littleendian_bytes[2:][::-1]
-            
-            # Concatenate the two bytes/words 
+
+            # Concatenate the two bytes/words
             reply_data_bytes = first_word + second_word
         elif isinstance(reply_data, int):
             if words_to_read == 2:
                 data_length = 4
-                littleendian_bytes = bytearray(int_to_raw_bytes(reply_data, data_length, low_byte_first=True))
+                littleendian_bytes = bytearray(
+                    int_to_raw_bytes(reply_data, data_length, low_byte_first=True)
+                )
                 first_word = littleendian_bytes[:2][::-1]
                 second_word = littleendian_bytes[2:][::-1]
                 reply_data_bytes = first_word + second_word
@@ -111,20 +116,22 @@ class SKFChopperModbusInterface(StreamInterface):
                 data_length = 2
                 reply_data_bytes = int_to_raw_bytes(reply_data, data_length, low_byte_first=False)
         else:
-            raise ValueError(f"Unknown data type or data length")
+            raise ValueError("Unknown data type or data length")
 
         function_code_bytes = function_code.to_bytes(1, byteorder="big")
         unit_bytes = unit.to_bytes(1, byteorder="big")
         data_length_bytes = data_length.to_bytes(1, byteorder="big")
-        length = int(3+data_length).to_bytes(2, byteorder="big")
+        length = int(3 + data_length).to_bytes(2, byteorder="big")
 
-        reply = transaction_id \
-            + protocol_id \
-            + length \
-            + unit_bytes \
-            + function_code_bytes \
-            + data_length_bytes \
+        reply = (
+            transaction_id
+            + protocol_id
+            + length
+            + unit_bytes
+            + function_code_bytes
+            + data_length_bytes
             + reply_data_bytes
+        )
 
         return reply
 
@@ -136,37 +143,36 @@ class SKFChopperModbusInterface(StreamInterface):
 
     def get_freq(self):
         return float(self.device.freq)
-    
+
     def get_v13_norm(self):
         return self.device.v13_norm
-    
+
     def get_w13_norm(self):
         return self.device.w13_norm
-    
+
     def get_v24_norm(self):
         return self.device.v24_norm
-    
+
     def get_w24_norm(self):
         return self.device.w24_norm
-    
+
     def get_z12_norm(self):
         return self.device.z12_norm
-    
+
     def get_v13_fsv(self):
         return self.device.v13_fsv
-    
+
     def get_w13_fsv(self):
         return self.device.w13_fsv
-    
+
     def get_v24_fsv(self):
         return self.device.v24_fsv
-    
+
     def get_w24_fsv(self):
         return self.device.w24_fsv
-    
+
     def get_z12_fsv(self):
         return self.device.z12_fsv
 
     def set_freq(self, value):
         self.device.freq = value
-

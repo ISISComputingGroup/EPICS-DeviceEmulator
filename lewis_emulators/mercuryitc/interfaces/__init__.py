@@ -1,3 +1,3 @@
 from .stream_interface import MercuryitcInterface
 
-__all__ = ['MercuryitcInterface']
+__all__ = ["MercuryitcInterface"]

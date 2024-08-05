@@ -1,23 +1,23 @@
-from lewis.core.statemachine import State
 from lewis.core import approaches
+from lewis.core.statemachine import State
 
 from .constants import HEATER_INDEX
 
 
 class OffState(State):
-    """
-    Device is in off state.
+    """Device is in off state.
 
     It does not display the temperature on the front it is not monitoring or controlling it.
     """
-    NAME = 'off'
+
+    NAME = "off"
 
 
 class MonitorState(State):
+    """Temperature is being monitored but heater is switched off.
     """
-    Temperature is being monitored but heater is switched off.
-    """
-    NAME = 'monitor'
+
+    NAME = "monitor"
 
     def in_state(self, dt):
         # heater is off because we are in monitor mode
@@ -25,11 +25,11 @@ class MonitorState(State):
 
 
 class ControlState(State):
-    """
-    Temperature is being controlled and monitored. The device will try to use the heater to make
+    """Temperature is being controlled and monitored. The device will try to use the heater to make
     the temperature the same as the set point.
     """
-    NAME = 'control'
+
+    NAME = "control"
 
     def in_state(self, dt):
         device = self._context

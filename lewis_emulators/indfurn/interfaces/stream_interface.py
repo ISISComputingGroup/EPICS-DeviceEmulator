@@ -1,9 +1,8 @@
 from lewis.adapters.stream import StreamInterface
 from lewis.core.logging import has_log
-
-from lewis_emulators.indfurn.device import SampleHolderMaterials
 from lewis.utils.command_builder import CmdBuilder
 
+from lewis_emulators.indfurn.device import SampleHolderMaterials
 
 SAMPLE_HOLDER_MATERIALS = {
     "aluminium": SampleHolderMaterials.ALUMINIUM,
@@ -21,80 +20,70 @@ class IndfurnStreamInterface(StreamInterface):
     commands = {
         # ID
         CmdBuilder("get_version").escape("?ver").eos().build(),
-
         CmdBuilder("get_setpoint").escape("?pidSP").eos().build(),
         CmdBuilder("set_setpoint").escape(">pidSP ").float().eos().build(),
-
         CmdBuilder("get_psu_voltage").escape("?powV").eos().build(),
         CmdBuilder("set_psu_voltage").escape(">powV ").float().eos().build(),
-
         CmdBuilder("get_psu_current").escape("?powI").eos().build(),
         CmdBuilder("set_psu_current").escape(">powI ").float().eos().build(),
-
         CmdBuilder("get_output").escape("?pidOUTM").eos().build(),
         CmdBuilder("set_output").escape(">pidOUTM ").float().eos().build(),
-
         CmdBuilder("get_thermocouple_temperature").escape("?tempTC").eos().build(),
         CmdBuilder("get_thermocouple2_temperature").escape("?tmpTC2").eos().build(),
         CmdBuilder("get_pipe_temperature").escape("?tempP").eos().build(),
         CmdBuilder("get_capacitor_bank_temperature").escape("?tempC").eos().build(),
         CmdBuilder("get_fet_temperature").escape("?tempS").eos().build(),
-
         CmdBuilder("get_pid_params").escape("?pidTu").eos().build(),
-        CmdBuilder("set_pid_params").escape(">pidTu ").float().escape(" ").float().escape(" ").float().eos().build(),
-
+        CmdBuilder("set_pid_params")
+        .escape(">pidTu ")
+        .float()
+        .escape(" ")
+        .float()
+        .escape(" ")
+        .float()
+        .eos()
+        .build(),
         CmdBuilder("get_sample_time").escape("?pidSt").eos().build(),
         CmdBuilder("set_sample_time").escape(">pidSt ").int().eos().build(),
-
         CmdBuilder("get_psu_direction").escape("?pidDir").eos().build(),
         CmdBuilder("set_psu_direction").escape(">pidDir ").any().eos().build(),
-
         CmdBuilder("get_pid_mode").escape("?pidMODE").eos().build(),
         CmdBuilder("set_pid_mode").escape(">pidMODE ").char().eos().build(),
-
         CmdBuilder("set_psu_remote").escape(">powR").eos().build(),
         CmdBuilder("set_psu_local").escape(">powL").eos().build(),
         CmdBuilder("get_psu_control_mode").escape("?powRL").eos().build(),
-
         CmdBuilder("set_psu_on").escape(">powON").eos().build(),
         CmdBuilder("set_psu_off").escape(">powOFF").eos().build(),
         CmdBuilder("get_psu_power").escape("?powOnOff").eos().build(),
-
         CmdBuilder("set_led_on").escape(">ledON").eos().build(),
         CmdBuilder("set_led_off").escape(">ledOFF").eos().build(),
         CmdBuilder("get_led").escape("?ledOnOff").eos().build(),
-
         CmdBuilder("set_hf_on").escape(">oscON").eos().build(),
         CmdBuilder("set_hf_off").escape(">oscOFF").eos().build(),
         CmdBuilder("get_hf_power").escape("?oscOnOff").eos().build(),
-
         CmdBuilder("get_pid_limits").escape("?pidOUTL").eos().build(),
         CmdBuilder("set_pid_limits").escape(">pidOUTL ").float().escape(" ").float().eos().build(),
-
         CmdBuilder("get_psu_overtemp").escape("?alarmh").eos().build(),
         CmdBuilder("get_psu_overvolt").escape("?alarmv").eos().build(),
         CmdBuilder("get_cooling_water_flow_status").escape("?flowSt").eos().build(),
         CmdBuilder("get_cooling_water_flow").escape("?flowCw").eos().build(),
         CmdBuilder("reset_alarms").escape(">ackAlarm").eos().build(),
-
         CmdBuilder("set_runmode_on").escape(">pidRUN").eos().build(),
         CmdBuilder("set_runmode_off").escape(">pidSTP").eos().build(),
         CmdBuilder("get_runmode").escape("?pidRUN").eos().build(),
-
         CmdBuilder("get_sample_holder_material").escape("?sHold").eos().build(),
         CmdBuilder("set_sample_holder_material").escape(">sHold ").string().eos().build(),
-
         CmdBuilder("get_tc_fault").escape("?faultTC").eos().build(),
         CmdBuilder("get_tc2_fault").escape("?fltTC2").eos().build(),
-
-
     }
 
     in_terminator = "\r\n"
     out_terminator = "\r\n"
 
     def handle_error(self, request, error):
-        err_string = "command was: {}, error was: {}: {}\n".format(request, error.__class__.__name__, error)
+        err_string = "command was: {}, error was: {}: {}\n".format(
+            request, error.__class__.__name__, error
+        )
         print(err_string)
         self.log.error(err_string)
         return "<Unsupported command"
@@ -169,7 +158,9 @@ class IndfurnStreamInterface(StreamInterface):
         return "<ack"
 
     def get_pid_limits(self):
-        return "<PID out limit min max:  {:.2f} {:.2f}".format(self.device.pid_lower_limit, self.device.pid_upper_limit)
+        return "<PID out limit min max:  {:.2f} {:.2f}".format(
+            self.device.pid_lower_limit, self.device.pid_upper_limit
+        )
 
     def set_pid_limits(self, pid_lower_limit, pid_upper_limit):
         self.device.pid_lower_limit = pid_lower_limit
