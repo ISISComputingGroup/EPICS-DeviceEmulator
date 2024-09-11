@@ -1,4 +1,5 @@
 from collections import OrderedDict
+from typing import Any
 
 from lewis.devices import StateMachineDevice
 
@@ -6,7 +7,7 @@ from .states import DefaultState
 
 
 class SourceChannel:
-    def __init__(self):
+    def __init__(self) -> None:
         self.status = 0
         self.function = "SIN"
         self.polarity = "NORM"
@@ -33,23 +34,23 @@ class SourceChannel:
         self.sweep_return_time = 0.0
         self.sweep_spacing = "LIN"
         self.sweep_time = 0.0
+        self.ramp_symmetry = 0.0
 
 
 class SimulatedTekafg3XXX(StateMachineDevice):
-    def _initialize_data(self):
-        """Initialize all of the device's attributes.
-        """
+    def _initialize_data(self) -> None:
+        """Initialize all of the device's attributes."""
         self.connected = True
         self.channels = {1: SourceChannel(), 2: SourceChannel()}
         self.triggered = False
 
-    def _get_state_handlers(self):
+    def _get_state_handlers(self) -> dict[str, Any]:
         return {
             "default": DefaultState(),
         }
 
-    def _get_initial_state(self):
+    def _get_initial_state(self) -> str:
         return "default"
 
-    def _get_transition_handlers(self):
+    def _get_transition_handlers(self) -> OrderedDict[Any, Any]:
         return OrderedDict([])
