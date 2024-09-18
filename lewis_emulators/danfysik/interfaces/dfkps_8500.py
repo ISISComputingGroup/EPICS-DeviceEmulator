@@ -25,7 +25,9 @@ class Danfysik8500StreamInterface(CommonStreamInterface, StreamInterface):
     PSU_ADDRESS = 75
 
     commands = CommonStreamInterface.commands + [
-        CmdBuilder("set_current").escape("DA 0 ").int().eos().build(),
+        # See https://github.com/ISISComputingGroup/IBEX/issues/8502 for justification about why
+        # we are using WA over DA 0
+        CmdBuilder("set_current").escape("WA ").int().eos().build(),
         CmdBuilder("get_current").escape("AD 8").eos().build(),
         CmdBuilder("set_address").escape("ADR ").int().eos().build(),
         CmdBuilder("get_address").escape("ADR").eos().build(),
