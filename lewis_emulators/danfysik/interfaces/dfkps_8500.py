@@ -1,5 +1,4 @@
-"""Stream device for danfysik 8500
-"""
+"""Stream device for danfysik 8500"""
 
 from lewis.adapters.stream import StreamInterface
 from lewis.core.logging import has_log
@@ -13,8 +12,7 @@ __all__ = ["Danfysik8500StreamInterface"]
 
 @has_log
 class Danfysik8500StreamInterface(CommonStreamInterface, StreamInterface):
-    """Stream interface for a Danfysik model 8500.
-    """
+    """Stream interface for a Danfysik model 8500."""
 
     in_terminator = "\r"
     out_terminator = "\n\r"
@@ -25,7 +23,9 @@ class Danfysik8500StreamInterface(CommonStreamInterface, StreamInterface):
     PSU_ADDRESS = 75
 
     commands = CommonStreamInterface.commands + [
-        CmdBuilder("set_current").escape("DA 0 ").int().eos().build(),
+        # See https://github.com/ISISComputingGroup/IBEX/issues/8502 for justification about why
+        # we are using WA over DA 0
+        CmdBuilder("set_current").escape("WA ").int().eos().build(),
         CmdBuilder("get_current").escape("AD 8").eos().build(),
         CmdBuilder("set_address").escape("ADR ").int().eos().build(),
         CmdBuilder("get_address").escape("ADR").eos().build(),
@@ -43,9 +43,8 @@ class Danfysik8500StreamInterface(CommonStreamInterface, StreamInterface):
 
     @conditional_reply("connected")
     @conditional_reply("comms_initialized")
-    def get_status(self):
-        """Respond to the get_status command (S1)
-        """
+    def get_status(self) -> str:
+        """Respond to the get_status command (S1)"""
         response = (
             "{power_off}{pol_normal}{pol_reversed}{reg_transformer}{dac16}{dac17}{is_percent}{spare}"
             "{transistor_fault}{sum_interlock}{dc_overcurrent}{dc_overload}{reg_mod_fail}{prereg_fail}"
@@ -81,20 +80,20 @@ class Danfysik8500StreamInterface(CommonStreamInterface, StreamInterface):
 
         return response
 
-    def set_address(self, value):
+    def set_address(self, value: int) -> None:
         self.device.set_address(value)
 
     @conditional_reply("connected")
     @conditional_reply("comms_initialized")
-    def get_address(self):
+    def get_address(self) -> str:
         return "{:03d}".format(self.address)
 
     @conditional_reply("connected")
     @conditional_reply("comms_initialized")
-    def get_slew_rate(self, dac_num):
+    def get_slew_rate(self, dac_num: int) -> float:
         return self.device.get_slew_rate(dac_num)
 
     @conditional_reply("connected")
     @conditional_reply("comms_initialized")
-    def set_slew_rate(self, dac_num, slew_rate_value):
+    def set_slew_rate(self, dac_num: int, slew_rate_value: float) -> None:
         self.device.set_slew_rate(dac_num, slew_rate_value)
