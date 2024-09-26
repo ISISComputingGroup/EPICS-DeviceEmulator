@@ -1,7 +1,12 @@
+import typing
+
 from lewis.adapters.stream import StreamInterface
 from lewis.core.logging import has_log
 from lewis.utils.command_builder import CmdBuilder
 from lewis.utils.replies import conditional_reply
+
+if typing.TYPE_CHECKING:
+    from lewis_emulators.tekafg3XXX.device import SimulatedTekafg3XXX, SourceChannel
 
 if_connected = conditional_reply("connected")
 
@@ -11,8 +16,9 @@ class Tekafg3XXXStreamInterface(StreamInterface):
     in_terminator = "\n"
     out_terminator = "\n"
 
-    def __init__(self):
+    def __init__(self) -> None:
         super(Tekafg3XXXStreamInterface, self).__init__()
+        self.device: "SimulatedTekafg3XXX"
         # Commands that we expect via serial during normal operation
         self.commands = {
             CmdBuilder(self.identity).escape("*IDN?").eos().build(),
@@ -211,9 +217,20 @@ class Tekafg3XXXStreamInterface(StreamInterface):
             .escape(":SWE:TIME ")
             .float()
             .build(),
+            CmdBuilder(self.get_ramp_symmetry)
+            .escape("SOUR")
+            .int()
+            .escape(":FUNC:RAMP:SYMM?")
+            .build(),
+            CmdBuilder(self.set_ramp_symmetry)
+            .escape("SOUR")
+            .int()
+            .escape(":FUNC:RAMP:SYMM ")
+            .float()
+            .build(),
         }
 
-    def handle_error(self, request, error):
+    def handle_error(self, request: str, error: str | Exception) -> None:
         """If command is not recognised print and error
 
         Args:
@@ -223,171 +240,175 @@ class Tekafg3XXXStreamInterface(StreamInterface):
         """
         self.log.error("An error occurred at request " + repr(request) + ": " + repr(error))
 
-    def identity(self):
-        """:return: identity of the device
-        """
+    def identity(self) -> str:
+        """:return: identity of the device"""
         return "TEKTRONIX,AFG3021,C100101,SCPI:99.0 FV:1.0"
 
-    def trigger(self):
+    def trigger(self) -> None:
         self.device.triggered = True
 
-    def _channel(self, channel_num: int):
-        """Helper method to get a channel object from the device according to number
-        """
+    def _channel(self, channel_num: int) -> "SourceChannel":
+        """Helper method to get a channel object from the device according to number"""
         return self.device.channels[channel_num]
 
     def get_status(self, channel: int) -> int:
         return self._channel(channel).status
 
-    def set_status(self, channel: int, new_status: int):
+    def set_status(self, channel: int, new_status: int) -> None:
         self._channel(channel).status = new_status
 
     def get_function(self, channel: int) -> str:
         return self._channel(channel).function
 
-    def set_function(self, channel: int, new_function: str):
+    def set_function(self, channel: int, new_function: str) -> None:
         self._channel(channel).function = new_function
 
     def get_polarity(self, channel: int) -> str:
         return self._channel(channel).polarity
 
-    def set_polarity(self, channel: int, new_polarity: str):
+    def set_polarity(self, channel: int, new_polarity: str) -> None:
         self._channel(channel).polarity = new_polarity
 
     def get_impedance(self, channel: int) -> float:
         return self._channel(channel).impedance
 
-    def set_impedance(self, channel: int, new_impedance: float):
+    def set_impedance(self, channel: int, new_impedance: float) -> None:
         self._channel(channel).impedance = new_impedance
 
     def get_voltage(self, channel: int) -> int:
         return self._channel(channel).voltage
 
-    def set_voltage(self, channel: int, new_voltage: float):
+    def set_voltage(self, channel: int, new_voltage: float) -> None:
         self._channel(channel).voltage = new_voltage
 
     def get_voltage_units(self, channel: int) -> str:
         return self._channel(channel).voltage_units
 
-    def set_voltage_units(self, channel: int, new_voltage_units: str):
+    def set_voltage_units(self, channel: int, new_voltage_units: str) -> None:
         self._channel(channel).voltage_units = new_voltage_units
 
     def get_voltage_low_limit(self, channel: int) -> float:
         return self._channel(channel).voltage_low_limit
 
-    def set_voltage_low_limit(self, channel: int, new_voltage_low_limit: float):
+    def set_voltage_low_limit(self, channel: int, new_voltage_low_limit: float) -> None:
         self._channel(channel).voltage_low_limit = new_voltage_low_limit
 
     def get_voltage_low_level(self, channel: int) -> float:
         return self._channel(channel).voltage_low_level
 
-    def set_voltage_low_level(self, channel: int, new_voltage_low_level: float):
+    def set_voltage_low_level(self, channel: int, new_voltage_low_level: float) -> None:
         self._channel(channel).voltage_low_level = new_voltage_low_level
 
     def get_voltage_high_limit(self, channel: int) -> float:
         return self._channel(channel).voltage_high_limit
 
-    def set_voltage_high_limit(self, channel: int, new_voltage_high_limit: float):
+    def set_voltage_high_limit(self, channel: int, new_voltage_high_limit: float) -> None:
         self._channel(channel).voltage_high_limit = new_voltage_high_limit
 
     def get_voltage_high_level(self, channel: int) -> float:
         return self._channel(channel).voltage_high_level
 
-    def set_voltage_high_level(self, channel: int, new_voltage_high_level: float):
+    def set_voltage_high_level(self, channel: int, new_voltage_high_level: float) -> None:
         self._channel(channel).voltage_high_level = new_voltage_high_level
 
     def get_voltage_offset(self, channel: int) -> float:
         return self._channel(channel).voltage_offset
 
-    def set_voltage_offset(self, channel: int, new_voltage_offset: float):
+    def set_voltage_offset(self, channel: int, new_voltage_offset: float) -> None:
         self._channel(channel).voltage_offset = new_voltage_offset
 
     def get_frequency(self, channel: int) -> float:
         return self._channel(channel).frequency
 
-    def set_frequency(self, channel: int, new_frequency: float):
+    def set_frequency(self, channel: int, new_frequency: float) -> None:
         self._channel(channel).frequency = new_frequency
 
     def get_frequency_mode(self, channel: int) -> str:
         return self._channel(channel).frequency_mode
 
-    def set_frequency_mode(self, channel: int, new_frequency_mode: str):
+    def set_frequency_mode(self, channel: int, new_frequency_mode: str) -> None:
         self._channel(channel).frequency_mode = new_frequency_mode
 
     def get_phase(self, channel: int) -> float:
         return self._channel(channel).phase
 
-    def set_phase(self, channel: int, new_phase: float):
+    def set_phase(self, channel: int, new_phase: float) -> None:
         self._channel(channel).phase = new_phase
 
     def get_burst_status(self, channel: int) -> str:
         return self._channel(channel).burst_status
 
-    def set_burst_status(self, channel: int, new_burst_status: str):
+    def set_burst_status(self, channel: int, new_burst_status: str) -> None:
         self._channel(channel).burst_status = "ON" if new_burst_status in ["ON", "1"] else "OFF"
 
     def get_burst_mode(self, channel: int) -> str:
         return self._channel(channel).burst_mode
 
-    def set_burst_mode(self, channel: int, new_burst_mode: str):
+    def set_burst_mode(self, channel: int, new_burst_mode: str) -> None:
         self._channel(channel).burst_mode = new_burst_mode
 
     def get_burst_num_cycles(self, channel: int) -> int:
         return self._channel(channel).burst_num_cycles
 
-    def set_burst_num_cycles(self, channel: int, new_burst_num_cycles: int):
+    def set_burst_num_cycles(self, channel: int, new_burst_num_cycles: int) -> None:
         self._channel(channel).burst_num_cycles = new_burst_num_cycles
 
     def get_burst_time_delay(self, channel: int) -> int:
         return self._channel(channel).burst_time_delay
 
-    def set_burst_time_delay(self, channel: int, new_burst_time_delay: int):
+    def set_burst_time_delay(self, channel: int, new_burst_time_delay: int) -> None:
         self._channel(channel).burst_time_delay = new_burst_time_delay
 
     def get_sweep_span(self, channel: int) -> int:
         return self._channel(channel).sweep_span
 
-    def set_sweep_span(self, channel: int, new_sweep_span: int):
+    def set_sweep_span(self, channel: int, new_sweep_span: int) -> None:
         self._channel(channel).sweep_span = new_sweep_span
 
     def get_sweep_start(self, channel: int) -> int:
         return self._channel(channel).sweep_start
 
-    def set_sweep_start(self, channel: int, new_sweep_start: int):
+    def set_sweep_start(self, channel: int, new_sweep_start: int) -> None:
         self._channel(channel).sweep_start = new_sweep_start
 
     def get_sweep_stop(self, channel: int) -> int:
         return self._channel(channel).sweep_stop
 
-    def set_sweep_stop(self, channel: int, new_sweep_stop: int):
+    def set_sweep_stop(self, channel: int, new_sweep_stop: int) -> None:
         self._channel(channel).sweep_stop = new_sweep_stop
 
     def get_sweep_hold_time(self, channel: int) -> int:
         return self._channel(channel).sweep_hold_time
 
-    def set_sweep_hold_time(self, channel: int, new_sweep_hold_time: int):
+    def set_sweep_hold_time(self, channel: int, new_sweep_hold_time: int) -> None:
         self._channel(channel).sweep_hold_time = new_sweep_hold_time
 
     def get_sweep_mode(self, channel: int) -> str:
         return self._channel(channel).sweep_mode
 
-    def set_sweep_mode(self, channel: int, new_sweep_mode: str):
+    def set_sweep_mode(self, channel: int, new_sweep_mode: str) -> None:
         self._channel(channel).sweep_mode = new_sweep_mode
 
     def get_sweep_return_time(self, channel: int) -> int:
         return self._channel(channel).sweep_return_time
 
-    def set_sweep_return_time(self, channel: int, new_sweep_return_time: int):
+    def set_sweep_return_time(self, channel: int, new_sweep_return_time: int) -> None:
         self._channel(channel).sweep_return_time = new_sweep_return_time
 
     def get_sweep_spacing(self, channel: int) -> str:
         return self._channel(channel).sweep_spacing
 
-    def set_sweep_spacing(self, channel: int, new_sweep_spacing: str):
+    def set_sweep_spacing(self, channel: int, new_sweep_spacing: str) -> None:
         self._channel(channel).sweep_spacing = new_sweep_spacing
 
     def get_sweep_time(self, channel: int) -> int:
         return self._channel(channel).sweep_time
 
-    def set_sweep_time(self, channel: int, new_sweep_time: int):
+    def set_sweep_time(self, channel: int, new_sweep_time: int) -> None:
         self._channel(channel).sweep_time = new_sweep_time
+
+    def get_ramp_symmetry(self, channel: int) -> float:
+        return self._channel(channel).ramp_symmetry
+
+    def set_ramp_symmetry(self, channel: int, new_ramp_symmetry: float) -> None:
+        self._channel(channel).ramp_symmetry = new_ramp_symmetry
