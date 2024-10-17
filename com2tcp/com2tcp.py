@@ -7,11 +7,11 @@ import time
 import serial
 
 
-def listen_to_tcp(tcp_conn, serial_conn):
+def listen_to_tcp(tcp_conn: socket.socket, serial_conn: serial.Serial) -> None:
     while True:
         tcp_data = tcp_conn.recv(1024)
         if len(data) > 0:
-            serial_conn.writelines(tcp_data)
+            serial_conn.writelines(tcp_data) # type: ignore - pyright doesn't understand bytes -> readable buffer
             print("Data on tcp: " + str(tcp_data))
         time.sleep(0.001)
 
@@ -49,7 +49,7 @@ if __name__ == "__main__":
 
     try:
         while True:
-            if serial_conn.inWaiting():
+            if serial_conn.in_waiting:
                 data = serial_conn.read()
                 print("Data on serial: " + str(data))
                 tcp_conn.sendall(data)
