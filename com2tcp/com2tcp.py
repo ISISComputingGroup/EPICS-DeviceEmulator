@@ -11,7 +11,7 @@ def listen_to_tcp(tcp_conn: socket.socket, serial_conn: serial.Serial) -> None:
     while True:
         tcp_data = tcp_conn.recv(1024)
         if len(data) > 0:
-            serial_conn.writelines(tcp_data)  # type: ignore - pyright doesn't understand bytes -> readable buffer
+            serial_conn.writelines([tcp_data])
             print("Data on tcp: " + str(tcp_data))
         time.sleep(0.001)
 
