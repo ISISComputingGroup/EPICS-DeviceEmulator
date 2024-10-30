@@ -5,29 +5,47 @@ from lewis.utils.replies import conditional_reply
 if_connected = conditional_reply("connected")
 
 #TODO: add address params to methods 
+
+def translate_adddress(f):
+    def wrapper(self,addr,*args,**kwargs):
+        print("translate addr: " + addr)
+        addr = str(addr)
+        assert len(addr) == 4
+        gad = addr[0]
+        assert addr[1] == gad
+        lad = addr[2]
+        assert addr[3] == lad
+
+        address = gad + lad
+
+
+        return f(self,address,*args,**kwargs)
+    
+    return wrapper
+
 class EurothermStreamInterface(StreamInterface):
     """
     Stream interface for the serial port
     """
 
     commands = {
-        CmdBuilder("get_current_temperature").eot().int().escape("PV").enq().build(),
-        CmdBuilder("get_setpoint").eot().int().escape("SL").enq().build(),
-        CmdBuilder("get_ramp_setpoint").eot().int().escape("SP").enq().build(),
-        CmdBuilder("get_output").eot().int().escape("OP").enq().build(),
-        CmdBuilder("get_max_output").eot().int().escape("HO").enq().build(),
-        CmdBuilder("get_output_rate").eot().int().escape("OR").enq().build(),
-        CmdBuilder("get_autotune").eot().int().escape("AT").enq().build(),
-        CmdBuilder("get_proportional").eot().int().escape("XP").enq().build(),
-        CmdBuilder("get_derivative").eot().int().escape("TD").enq().build(),
-        CmdBuilder("get_integral").eot().int().escape("TI").enq().build(),
-        CmdBuilder("get_highlim").eot().int().escape("HS").enq().build(),
-        CmdBuilder("get_lowlim").eot().int().escape("LS").enq().build(),
-        CmdBuilder("get_error").eot().int().escape("EE").enq().build(),
-        CmdBuilder("get_address").eot().int().escape("").enq().build(),
+        CmdBuilder("get_current_temperature").eot().arg("[0-9]{4}").escape("PV").enq().build(),
+        CmdBuilder("get_setpoint").eot().arg("[0-9]{4}").escape("SL").enq().build(),
+        CmdBuilder("get_ramp_setpoint").eot().arg("[0-9]{4}").escape("SP").enq().build(),
+        CmdBuilder("get_output").eot().arg("[0-9]{4}").escape("OP").enq().build(),
+        CmdBuilder("get_max_output").eot().arg("[0-9]{4}").escape("HO").enq().build(),
+        CmdBuilder("get_output_rate").eot().arg("[0-9]{4}").escape("OR").enq().build(),
+        CmdBuilder("get_autotune").eot().arg("[0-9]{4}").escape("AT").enq().build(),
+        CmdBuilder("get_proportional").eot().arg("[0-9]{4}").escape("XP").enq().build(),
+        CmdBuilder("get_derivative").eot().arg("[0-9]{4}").escape("TD").enq().build(),
+        CmdBuilder("get_integral").eot().arg("[0-9]{4}").escape("TI").enq().build(),
+        CmdBuilder("get_highlim").eot().arg("[0-9]{4}").escape("HS").enq().build(),
+        CmdBuilder("get_lowlim").eot().arg("[0-9]{4}").escape("LS").enq().build(),
+        CmdBuilder("get_error").eot().arg("[0-9]{4}").escape("EE").enq().build(),
+        CmdBuilder("get_address").eot().arg("[0-9]{4}").escape("").enq().build(),
 
-        CmdBuilder("set_ramp_setpoint", arg_sep="").eot().int().stx().escape("SL").float().etx().any().build(),
-        CmdBuilder("set_output_rate", arg_sep="").eot().int().stx().escape("OR").float().etx().any().build(),
+        CmdBuilder("set_ramp_setpoint", arg_sep="").eot().arg("[0-9]{4}").stx().escape("SL").float().etx().any().build(),
+        CmdBuilder("set_output_rate", arg_sep="").eot().arg("[0-9]{4}").stx().escape("OR").float().etx().any().build(),
     }
 
     # Add terminating characters manually for each command, as write and read commands use different formatting for their 'in' commands.
@@ -59,6 +77,7 @@ class EurothermStreamInterface(StreamInterface):
         self.log.error("An error occurred at request " + repr(request) + ": " + repr(error))
 
     @if_connected
+    @translate_adddress
     def get_address(self, addr):
         """
         Get the address of the specific Eurotherm sensor, i.e. A01 or 0011
@@ -66,6 +85,7 @@ class EurothermStreamInterface(StreamInterface):
         return self.make_read_reply(self.device.address(addr))
     
     @if_connected
+    @translate_adddress
     def get_setpoint(self, addr):
         try:
             return self.make_read_reply("SL", self.device.setpoint_temperature(addr))
@@ -73,13 +93,16 @@ class EurothermStreamInterface(StreamInterface):
             return None
 
     @if_connected
+    @translate_adddress
     def get_proportional(self, addr):
         try:
             return self.make_read_reply("XP", self.device.p(addr))
-        except:
+        except Exception as e:
+            print(e)
             return None
 
     @if_connected
+    @translate_adddress
     def get_integral(self, addr):
         try:
             return self.make_read_reply("TI", self.device.i(addr))
@@ -87,6 +110,7 @@ class EurothermStreamInterface(StreamInterface):
             return None
 
     @if_connected
+    @translate_adddress
     def get_derivative(self, addr):
         try:
             return self.make_read_reply("TD", self.device.d(addr))
@@ -94,13 +118,16 @@ class EurothermStreamInterface(StreamInterface):
             return None
         
     @if_connected
+    @translate_adddress
     def get_output(self, addr):
         try:
             return self.make_read_reply("OP", self.device.output(addr))
-        except:
+        except Exception as e:
+            print(e)
             return None
 
     @if_connected
+    @translate_adddress
     def get_highlim(self, addr):
         try:
             return self.make_read_reply("HS", self.device.high_lim(addr))
@@ -108,6 +135,7 @@ class EurothermStreamInterface(StreamInterface):
             return None
 
     @if_connected
+    @translate_adddress
     def get_lowlim(self, addr):
         try:
             return self.make_read_reply("LS", self.device.low_lim(addr))
@@ -115,6 +143,7 @@ class EurothermStreamInterface(StreamInterface):
             return None
 
     @if_connected
+    @translate_adddress
     def get_max_output(self, addr):
         try:
             return self.make_read_reply("HO", self.device.max_output(addr))
@@ -122,6 +151,7 @@ class EurothermStreamInterface(StreamInterface):
             return None
         
     @if_connected
+    @translate_adddress
     def get_autotune(self, addr):
         try:
             return self.make_read_reply("AT", self.device.autotune(addr))
@@ -129,6 +159,7 @@ class EurothermStreamInterface(StreamInterface):
             return None
 
     @if_connected
+    @translate_adddress
     def get_current_temperature(self, addr):
         """
         Get the current temperature of the device.
@@ -141,6 +172,7 @@ class EurothermStreamInterface(StreamInterface):
             return None
 
     @if_connected
+    @translate_adddress
     def get_output_rate(self, addr):
         try:
             return self.make_read_reply("OR", self.device.output_rate(addr))
@@ -148,6 +180,7 @@ class EurothermStreamInterface(StreamInterface):
             return None
 
     @if_connected
+    @translate_adddress
     def set_output_rate(self, addr, output_rate, _):
         try:
             self.device.set_output_rate(addr, output_rate)
@@ -156,6 +189,7 @@ class EurothermStreamInterface(StreamInterface):
             return None
 
     @if_connected
+    @translate_adddress
     def get_ramp_setpoint(self, addr):
         """
         Get the set point temperature.
@@ -168,6 +202,7 @@ class EurothermStreamInterface(StreamInterface):
             return None
 
     @if_connected
+    @translate_adddress
     def set_ramp_setpoint(self, addr, temperature, _):
         """
         Set the set point temperature.
@@ -184,6 +219,7 @@ class EurothermStreamInterface(StreamInterface):
             return None
 
     @if_connected
+    @translate_adddress
     def get_error(self, addr):
         """
         Get the error.
