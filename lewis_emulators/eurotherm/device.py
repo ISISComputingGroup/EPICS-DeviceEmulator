@@ -53,6 +53,20 @@ class SimulatedEurotherm(StateMachineDevice):
         if self.delay_time is not None:
             sleep(self.delay_time)
 
+    def set_delay_time(self, addr, value):
+        """
+        Set a simulated delay time
+        """
+        value = float(value)
+        if addr is None:
+            for euro in self.sensors.values():
+                euro._delay = value
+        else:
+            euro = self.sensors[addr]
+            if not euro.connected:
+                raise ValueError
+            euro._delay = value
+
     def setpoint_temperature(self, addr):
         """
         Get current temperature of the device.
@@ -534,7 +548,7 @@ class SimulatedEurotherm(StateMachineDevice):
         """
         Sets the high limit
         """
-        value = int(value)
+        value = float(value)
         if addr is None:
             for euro in self.sensors.values():
                 euro.high_lim = value
@@ -559,7 +573,7 @@ class SimulatedEurotherm(StateMachineDevice):
         """
         Sets the low limit
         """
-        value = int(value)
+        value = float(value)
         if addr is None:
             for euro in self.sensors.values():
                 euro.low_lim = value
@@ -584,7 +598,7 @@ class SimulatedEurotherm(StateMachineDevice):
         """
         Sets the output value
         """
-        value = int(value)
+        value = float(value)
         if addr is None:
             for euro in self.sensors.values():
                 euro.output = value
@@ -609,7 +623,7 @@ class SimulatedEurotherm(StateMachineDevice):
         """
         Sets the max_output value
         """
-        value = int(value)
+        value = float(value)
         if addr is None:
             for euro in self.sensors.values():
                 euro.max_output = value
