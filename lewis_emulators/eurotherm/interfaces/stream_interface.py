@@ -8,7 +8,6 @@ if_connected = conditional_reply("connected")
 
 def translate_adddress(f):
     def wrapper(self,addr,*args,**kwargs):
-        print("translate addr: " + addr)
         addr = str(addr)
         assert len(addr) == 4
         gad = addr[0]
