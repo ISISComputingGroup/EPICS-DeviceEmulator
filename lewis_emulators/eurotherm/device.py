@@ -278,7 +278,7 @@ class SimulatedEurotherm(StateMachineDevice):
         Args: 
             value - flow (double) the current value of the flow rate in L/min
         """
-        value = int(value)
+        value = str(value)
         if addr is None:
             for euro in self.sensors.values():
                 euro.needlevalve_flow = value
@@ -308,7 +308,7 @@ class SimulatedEurotherm(StateMachineDevice):
         Args:
             value - flow_val (float): set the manual flow setpoint in L/min
         """
-        value = int(value)
+        value = str(value)
         if addr is None:
             for euro in self.sensors.values():
                 euro.needlevalve_manual_flow = value
@@ -339,7 +339,7 @@ class SimulatedEurotherm(StateMachineDevice):
         Args:
             value - low_lim (float): set the low setpoint limit in L/min
         """
-        value = float(value)
+        value = str(value)
         if addr is None:
             for euro in self.sensors.values():
                 euro.needlevalve_flow_low_lim = value
@@ -370,7 +370,7 @@ class SimulatedEurotherm(StateMachineDevice):
         Args:
             value - high_lim (float): set the high setpoint limit in L/min
         """
-        value = float(value)
+        value = str(value)
         if addr is None:
             for euro in self.sensors.values():
                 euro.needlevalve_flow_high_lim = value
@@ -402,7 +402,7 @@ class SimulatedEurotherm(StateMachineDevice):
         Args:
             value (float): set the high setpoint limit in L/min
         """
-        value = float(value)
+        value = str(value)
         if addr is None:
             for euro in self.sensors.values():
                 euro.needlevalve_auto_flow_scale = value
@@ -433,7 +433,7 @@ class SimulatedEurotherm(StateMachineDevice):
         Args:
             value (int)
         """
-        value = int(value)
+        value = str(value)
         if addr is None:
             for euro in self.sensors.values():
                 euro.needlevalve_min_auto_flow_bl_temp = value
@@ -463,7 +463,7 @@ class SimulatedEurotherm(StateMachineDevice):
         Args:
             value - mode (int)
         """
-        value = int(value) 
+        value = str(value) 
         if addr is None:
             for euro in self.sensors.values():
                 euro.needlevalve_flow_sp_mode = value
@@ -493,7 +493,7 @@ class SimulatedEurotherm(StateMachineDevice):
         Args: 
             value - dir (int) current direction of the valve (OPENING/CLOSING)
         """
-        value = int(value)
+        value = str(value)
         if addr is None:
             for euro in self.sensors.values():
                 euro.needlevalve_direction = value
@@ -523,7 +523,7 @@ class SimulatedEurotherm(StateMachineDevice):
         Args:
             value - stop_val (int)
         """
-        value = int(value)
+        value = str(value)
         if addr is None:
             for euro in self.sensors.values():
                 euro.needlevalve_stop = value
