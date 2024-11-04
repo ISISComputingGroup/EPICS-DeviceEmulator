@@ -3,6 +3,8 @@ from lewis.core.logging import has_log
 from lewis.utils.byte_conversions import int_to_raw_bytes, BYTE
 from lewis.utils.replies import conditional_reply
 
+sensor = "01"
+
 
 def log_replies(f):
     def _wrapper(self, *args, **kwargs):
@@ -152,104 +154,104 @@ class EurothermModbusInterface(StreamInterface):
         return command
 
     def get_temperature(self):
-        return int(self.device.current_temperature * self.device.scaling)
+        return int(self.device.current_temperature(sensor) * self.device.scaling(sensor))
 
     def get_temperature_sp(self):
-        return int(self.device.ramp_setpoint_temperature * self.device.scaling)
+        return int(self.device.ramp_setpoint_temperature(sensor) * self.device.scaling(sensor))
 
     def set_temperature_sp(self, value):
-        self.device.ramp_setpoint_temperature = value / self.device.scaling
+        self.device.set_ramp_setpoint_temperature(sensor, (value / self.device.scaling(sensor)))
 
     def get_p(self):
-        return int(self.device.p)
+        return int(self.device.p(sensor))
 
     def get_i(self):
-        return int(self.device.i)
+        return int(self.device.i(sensor))
 
     def get_d(self):
-        return int(self.device.d)
+        return int(self.device.d(sensor))
 
     def set_p(self, value):
-        self.device.p = value
+        self.device.set_p(sensor, value)
 
     def set_i(self, value):
-        self.device.i = value
+        self.device.set_i(sensor, value)
 
     def set_d(self, value):
-        self.device.d = value
+        self.device.set_d(sensor, value)
 
     def get_high_lim(self):
-        return int(self.device.high_lim * self.device.scaling)
+        return int(self.device.high_lim(sensor) * self.device.scaling(sensor))
 
     def get_low_lim(self):
-        return int(self.device.low_lim * self.device.scaling)
+        return int(self.device.low_lim(sensor) * self.device.scaling(sensor))
 
     def get_autotune(self):
-        return int(self.device.autotune)
+        return int(self.device.autotune(sensor))
 
     def set_autotune(self, value):
-        self.device.autotune = value
+        self.device.set_autotune(sensor, value)
 
     def get_max_output(self):
-        return int(self.device.max_output * self.device.scaling)
+        return int(self.device.max_output(sensor) * self.device.scaling(sensor))
 
     def set_max_output(self, value):
-        self.device.max_output = value / self.device.scaling
+        self.device.set_max_output(sensor, (value / self.device.scaling(sensor)))
 
     def get_output_rate(self):
-        return self.device.output_rate
+        return self.device.output_rate(sensor)
 
     def set_output_rate(self, value):
-        self.device.output_rate = value
+        self.device.set_output_rate(sensor, value)
 
     def get_output(self):
-        return int(self.device.output * self.device.scaling)
+        return int(self.device.output(sensor) * self.device.scaling(sensor))
 
     def get_nv_flow(self):
-        return int(self.device.needlevalve_flow)
+        return int(self.device.needlevalve_flow(sensor))
     
     def get_nv_manual_flow(self):
-        return int(self.device.needlevalve_manual_flow)
+        return int(self.device.needlevalve_manual_flow(sensor))
     
     def set_nv_manual_flow(self, value):
-        self.device.needlevalve_manual_flow = value
+        self.device.set_needlevalve_manual_flow(sensor, value)
 
     def get_nv_flow_low_lim(self):
-        return int(self.device.needlevalve_flow_low_lim)
+        return int(self.device.needlevalve_flow_low_lim(sensor))
         
     def set_nv_flow_low_lim(self, value):
-        self.device.needlevalve_flow_low_lim = value
+        self.device.set_needlevalve_flow_low_lim(sensor, value)
 
     def get_nv_flow_high_lim(self):
-        return int(self.device.needlevalve_flow_high_lim)
+        return int(self.device.needlevalve_flow_high_lim(sensor))
         
     def set_nv_flow_high_lim(self, value):
-        self.device.needlevalve_flow_high_lim = value
+        self.device.set_needlevalve_flow_high_lim(sensor, value)
 
     def get_nv_min_auto_flow_bl_temp(self):
-        return int(self.device.needlevalve_min_auto_flow_bl_temp)
+        return int(self.device.needlevalve_min_auto_flow_bl_temp(sensor))
         
     def set_nv_min_auto_flow_bl_temp(self, value):
-        self.device.needlevalve_min_auto_flow_bl_temp = value
+        self.device.set_needlevalve_min_auto_flow_bl_temp(sensor, value)
 
     def get_nv_auto_flow_scale(self):
         return int(self.device.needlevalve_auto_flow_scale)
         
     def set_nv_auto_flow_scale(self, value):
-        self.device.needlevalve_auto_flow_scale = value
+        self.device.set_needlevalve_auto_flow_scale(sensor, value)
 
     def get_nv_flow_sp_mode(self):
-        return int(self.device.needlevalve_flow_sp_mode)
+        return int(self.device.needlevalve_flow_sp_mode(sensor))
     
     def set_nv_flow_sp_mode(self, value):
-        self.device.needlevalve_flow_sp_mode = value
+        self.device.set_needlevalve_flow_sp_mode(sensor, value)
 
     def get_nv_direction(self):
-        return int(self.device.needlevalve_direction)
+        return int(self.device.needlevalve_direction(sensor))
 
     def set_nv_stop(self, value):
-        self.device.needlevalve_stop = value
+        self.device.set_needlevalve_stop(sensor, value)
     
     def get_nv_stop(self):
-        return int(self.device.needlevalve_stop)
+        return int(self.device.needlevalve_stop(sensor))
     
