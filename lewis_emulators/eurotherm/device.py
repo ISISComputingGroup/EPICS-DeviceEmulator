@@ -737,19 +737,17 @@ class SimulatedEurotherm(StateMachineDevice):
 
     def p(self, addr):
         """
-        Gets the autotune value
+        Gets the p value
         """
-        print(addr)
         
         euro = self.sensors[addr]
-        print(euro)
         if not euro.connected:
             raise ValueError
         return euro.p
     
     def set_p(self, addr, value):
         """
-        Sets the autotune value
+        Sets the p value
         """
         value = int(value)
         if addr is None:
@@ -764,9 +762,8 @@ class SimulatedEurotherm(StateMachineDevice):
 
     def i(self, addr):
         """
-        Gets the autotune value
+        Gets the i value
         """
-        
         euro = self.sensors[addr]
         if not euro.connected:
             raise ValueError
@@ -774,7 +771,7 @@ class SimulatedEurotherm(StateMachineDevice):
     
     def set_i(self, addr, value):
         """
-        Sets the autotune value
+        Sets the i value
         """
         value = int(value)
         if addr is None:
@@ -789,7 +786,7 @@ class SimulatedEurotherm(StateMachineDevice):
 
     def d(self, addr):
         """
-        Gets the autotune value
+        Gets the d value
         """
         
         euro = self.sensors[addr]
@@ -799,7 +796,7 @@ class SimulatedEurotherm(StateMachineDevice):
     
     def set_d(self, addr, value):
         """
-        Sets the autotune value
+        Sets the d value
         """
         value = int(value)
         if addr is None:
