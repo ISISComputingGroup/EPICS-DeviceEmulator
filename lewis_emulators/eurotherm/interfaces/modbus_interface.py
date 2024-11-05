@@ -235,7 +235,7 @@ class EurothermModbusInterface(StreamInterface):
         self.device.set_needlevalve_min_auto_flow_bl_temp(sensor, value)
 
     def get_nv_auto_flow_scale(self):
-        return int(self.device.needlevalve_auto_flow_scale)
+        return int(self.device.needlevalve_auto_flow_scale(sensor))
         
     def set_nv_auto_flow_scale(self, value):
         self.device.set_needlevalve_auto_flow_scale(sensor, value)
