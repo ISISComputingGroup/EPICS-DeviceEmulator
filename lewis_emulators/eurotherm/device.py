@@ -429,7 +429,7 @@ class SimulatedEurotherm(StateMachineDevice):
         Sets the  min_auto_flow_bl_temp setpoint
 
         Args:
-            value (int)
+            value (float)
         """
         value = float(value)
         if addr is None:
@@ -647,7 +647,7 @@ class SimulatedEurotherm(StateMachineDevice):
         """
         Set the set point output rate.
         """
-        value = int(value)
+        value = float(value)
         if addr is None:
             for euro in self.sensors.values():
                 euro.output_rate = value
