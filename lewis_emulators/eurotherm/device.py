@@ -647,7 +647,7 @@ class SimulatedEurotherm(StateMachineDevice):
         """
         Set the set point output rate.
         """
-        value = float(value)
+        value = int(value)
         if addr is None:
             for euro in self.sensors.values():
                 euro.output_rate = value
