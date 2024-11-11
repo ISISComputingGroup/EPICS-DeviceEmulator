@@ -220,7 +220,7 @@ class EurothermModbusInterface(StreamInterface):
         self.device.set_max_output(sensor, (value / self.device.scaling(sensor)))
 
     def get_output_rate(self) -> int:
-        return self.device.output_rate(sensor)
+        return int(self.device.output_rate(sensor))
 
     def set_output_rate(self, value: int) -> None:
         self.device.set_output_rate(sensor, value)
