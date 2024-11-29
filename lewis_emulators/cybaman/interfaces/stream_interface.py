@@ -1,14 +1,12 @@
-from lewis.adapters.stream import StreamInterface, Cmd
-from lewis.utils.replies import conditional_reply
-
+from lewis.adapters.stream import Cmd, StreamInterface
 from lewis.core.logging import has_log
+from lewis.utils.replies import conditional_reply
 
 if_connected = conditional_reply("connected")
 
 
 class CybamanStreamInterface(StreamInterface):
-    """
-    Stream interface for the serial port
+    """Stream interface for the serial port
     """
 
     FLOAT = "([-+]?[0-9]*\.?[0-9]*)"
@@ -18,7 +16,10 @@ class CybamanStreamInterface(StreamInterface):
         Cmd("get_a", "^M101$"),
         Cmd("get_b", "^M201$"),
         Cmd("get_c", "^M301$"),
-        Cmd("set_all", "^OPEN PROG 10 CLEAR\nG1 A " + FLOAT + " B " + FLOAT + " C " + FLOAT + " TM([0-9]*)$"),
+        Cmd(
+            "set_all",
+            "^OPEN PROG 10 CLEAR\nG1 A " + FLOAT + " B " + FLOAT + " C " + FLOAT + " TM([0-9]*)$",
+        ),
         Cmd("ignore", "^CLOSE$"),
         Cmd("ignore", "^B10R$"),
         Cmd("reset", "^\$\$\$$"),
@@ -35,8 +36,7 @@ class CybamanStreamInterface(StreamInterface):
 
     @has_log
     def handle_error(self, request, error):
-        """
-        If command is not recognised print and error.
+        """If command is not recognised print and error.
 
         :param request: requested string
         :param error: problem
@@ -67,15 +67,15 @@ class CybamanStreamInterface(StreamInterface):
 
     @if_connected
     def get_a(self):
-        return "{}\r".format(self._device.a*3577)
+        return "{}\r".format(self._device.a * 3577)
 
     @if_connected
     def get_b(self):
-        return "{}\r".format(self._device.b*3663)
+        return "{}\r".format(self._device.b * 3663)
 
     @if_connected
     def get_c(self):
-        return "{}\r".format(self._device.c*3663)
+        return "{}\r".format(self._device.c * 3663)
 
     @if_connected
     def set_all(self, a, b, c, tm):
@@ -91,8 +91,8 @@ class CybamanStreamInterface(StreamInterface):
         old_position = (self._device.a, self._device.b, self._device.c)
         new_position = (float(a), float(b), float(c))
 
-        max_difference = max([abs(a-b) for a, b in zip(old_position, new_position)])
-        expected_tm = max([int(round(max_difference/5.0)) * 1000, 4000])
+        max_difference = max([abs(a - b) for a, b in zip(old_position, new_position)])
+        expected_tm = max([int(round(max_difference / 5.0)) * 1000, 4000])
 
         # Allow a difference of 1000 for rounding errors / differences between labview and epics
         # (error would get multiplied by 1000)

@@ -5,10 +5,10 @@ from lewis.core.statemachine import State
 
 
 class StartedState(State):
+    """Device is in started state.
     """
-    Device is in started state.
-    """
-    NAME = 'Started'
+
+    NAME = "Started"
 
     def in_state(self, dt):
         device = self._context
@@ -17,10 +17,10 @@ class StartedState(State):
 
 
 class StoppedState(State):
+    """Device is in stopped state.
     """
-    Device is in stopped state.
-    """
-    NAME = 'Stopped'
+
+    NAME = "Stopped"
 
     def in_state(self, dt):
         device = self._context

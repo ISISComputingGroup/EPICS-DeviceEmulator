@@ -1,15 +1,15 @@
 from collections import OrderedDict
+
 from lewis.core.logging import has_log
-from .states import He3PotEmptyState, TemperatureControlState, RegeneratingState
 from lewis.devices import StateMachineDevice
+
+from .states import He3PotEmptyState, RegeneratingState, TemperatureControlState
 
 
 @has_log
 class SimulatedItc503(StateMachineDevice):
-
     def _initialize_data(self):
-        """
-        Initialize all of the device's attributes.
+        """Initialize all of the device's attributes.
         """
         self.control_channel = 1
         self.p, self.i, self.d = 0, 0, 0
@@ -34,21 +34,32 @@ class SimulatedItc503(StateMachineDevice):
 
     def _get_state_handlers(self):
         return {
-            'temperature_control': TemperatureControlState(),
-            'helium_3_empty': He3PotEmptyState(),
-            'regenerating': RegeneratingState()
+            "temperature_control": TemperatureControlState(),
+            "helium_3_empty": He3PotEmptyState(),
+            "regenerating": RegeneratingState(),
         }
 
     def _get_initial_state(self):
-        return 'temperature_control'
+        return "temperature_control"
 
     def _get_transition_handlers(self):
-        return OrderedDict([
-            (('temperature_control', 'helium_3_empty'), lambda: self.helium_3_pot_empty),
-            (('helium_3_empty', 'regenerating'), lambda: self.control_channel == 1 and self.temperature_sp >= 30),
-            (('temperature_control', 'regenerating'), lambda: self.control_channel == 1 and self.temperature_sp >= 30),
-            (('regenerating', 'temperature_control'), lambda: self.sorb_temp >= 30 and not self.helium_3_pot_empty)
-        ])
+        return OrderedDict(
+            [
+                (("temperature_control", "helium_3_empty"), lambda: self.helium_3_pot_empty),
+                (
+                    ("helium_3_empty", "regenerating"),
+                    lambda: self.control_channel == 1 and self.temperature_sp >= 30,
+                ),
+                (
+                    ("temperature_control", "regenerating"),
+                    lambda: self.control_channel == 1 and self.temperature_sp >= 30,
+                ),
+                (
+                    ("regenerating", "temperature_control"),
+                    lambda: self.sorb_temp >= 30 and not self.helium_3_pot_empty,
+                ),
+            ]
+        )
 
     @property
     def temperature_1(self):

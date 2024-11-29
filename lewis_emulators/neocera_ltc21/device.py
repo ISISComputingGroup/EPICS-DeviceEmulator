@@ -2,21 +2,18 @@ from collections import OrderedDict
 
 from lewis.devices import StateMachineDevice
 
-from .constants import HEATER_INDEX, ANALOG_INDEX
+from .constants import ANALOG_INDEX, HEATER_INDEX
 from .device_errors import NeoceraDeviceErrors
-from .states import MonitorState, ControlState
+from .states import ControlState, MonitorState
 
 
 class SimulatedNeocera(StateMachineDevice):
-    """
-    Simulated Neocera LTG21 temperature controller.
+    """Simulated Neocera LTG21 temperature controller.
     """
 
     def _initialize_data(self):
+        """Sets the initial state of the device.
         """
-        Sets the initial state of the device.
-        """
-
         # desired current state of the system
         self.current_state = self._get_initial_state()
 
@@ -46,51 +43,63 @@ class SimulatedNeocera(StateMachineDevice):
         self.heater = 0
 
         self.pid = [{}] * self.sensor_count
-        self.pid[HEATER_INDEX] = {"P": 10.0, "I": 11.0, "D": 12.0, "fixed_power": 13.0, "limit": 100.0}
-        self.pid[ANALOG_INDEX] = {"P": 10.0, "I": 11.0, "D": 12.0, "fixed_power": 13.0, "gain": 1.0, "offset": 2.0}
+        self.pid[HEATER_INDEX] = {
+            "P": 10.0,
+            "I": 11.0,
+            "D": 12.0,
+            "fixed_power": 13.0,
+            "limit": 100.0,
+        }
+        self.pid[ANALOG_INDEX] = {
+            "P": 10.0,
+            "I": 11.0,
+            "D": 12.0,
+            "fixed_power": 13.0,
+            "gain": 1.0,
+            "offset": 2.0,
+        }
 
         # errors created within the device
         self._error = NeoceraDeviceErrors()
 
     def _get_state_handlers(self):
+        """:return: states and their names
         """
-        :return: states and their names
-        """
-        return {
-            MonitorState.NAME: MonitorState(),
-            ControlState.NAME: ControlState()
-        }
+        return {MonitorState.NAME: MonitorState(), ControlState.NAME: ControlState()}
 
     def _get_initial_state(self):
-        """
-        :return: the name of the initial state
+        """:return: the name of the initial state
         """
         return ControlState.NAME
 
     def _get_transition_handlers(self):
+        """:return: the state transitions
         """
-        :return: the state transitions
-        """
-        return OrderedDict([
-            ((MonitorState.NAME, ControlState.NAME), lambda: self.current_state == ControlState.NAME),
-            ((ControlState.NAME, MonitorState.NAME), lambda: self.current_state == MonitorState.NAME),
-        ])
+        return OrderedDict(
+            [
+                (
+                    (MonitorState.NAME, ControlState.NAME),
+                    lambda: self.current_state == ControlState.NAME,
+                ),
+                (
+                    (ControlState.NAME, MonitorState.NAME),
+                    lambda: self.current_state == MonitorState.NAME,
+                ),
+            ]
+        )
 
     def set_state_monitor(self):
-        """
-        Sets the current state to MONITOR.
+        """Sets the current state to MONITOR.
         """
         self.current_state = MonitorState.NAME
 
     def set_state_control(self):
-        """
-        Sets the current state to CONTROL.
+        """Sets the current state to CONTROL.
         """
         self.current_state = ControlState.NAME
 
     @property
     def state(self):
-        """
-        :return: the state
+        """:return: the state
         """
         return self._csm.state

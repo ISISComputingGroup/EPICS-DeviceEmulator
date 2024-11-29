@@ -1,3 +1,3 @@
 from .stream_interface import GamryStreamInterface
 
-__all__ = ['GamryStreamInterface']
+__all__ = ["GamryStreamInterface"]

@@ -1,5 +1,6 @@
-from lewis.adapters.stream import StreamInterface, Cmd
 from threading import Timer
+
+from lewis.adapters.stream import Cmd, StreamInterface
 from lewis.core.logging import has_log
 
 START_COMM = "START01"
@@ -9,7 +10,6 @@ BEAMOFF_COMM = "BEAMOFF"
 
 @has_log
 class GamryStreamInterface(StreamInterface):
-
     commands = {
         Cmd("start_charging", "^" + START_COMM + "$"),
         Cmd("beam_on", "^" + BEAMON_COMM + "$"),

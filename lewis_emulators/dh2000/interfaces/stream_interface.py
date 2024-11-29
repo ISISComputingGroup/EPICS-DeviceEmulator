@@ -1,12 +1,11 @@
 from lewis.adapters.stream import StreamInterface
-from lewis.utils.command_builder import CmdBuilder
 from lewis.core.logging import has_log
+from lewis.utils.command_builder import CmdBuilder
 from lewis.utils.replies import conditional_reply
 
 
 @has_log
 class Dh2000StreamInterface(StreamInterface):
-
     # Commands that we expect via serial during normal operation
     commands = {
         CmdBuilder("get_status").escape("&STS!").eos().build(),
@@ -22,16 +21,15 @@ class Dh2000StreamInterface(StreamInterface):
 
     @staticmethod
     def handle_error(request, error):
-        """
-        Prints an error message if a command is not recognised.
+        """Prints an error message if a command is not recognised.
 
         Args:
             request : Request.
             error: The error that has occurred.
+
         Returns:
             None.
         """
-
         print("An error occurred at request {}: {}".format(request, error))
 
     @conditional_reply("is_connected")
@@ -55,6 +53,8 @@ class Dh2000StreamInterface(StreamInterface):
         shutter = self._device.shutter_is_open
         interlock = self._device.interlock_is_triggered
 
-        status_string = "{ACK}\n&A{shutter},B0,I{intlock}!".format(ACK=self.ACK, shutter=int(shutter), intlock=int(interlock))
+        status_string = "{ACK}\n&A{shutter},B0,I{intlock}!".format(
+            ACK=self.ACK, shutter=int(shutter), intlock=int(interlock)
+        )
 
         return status_string

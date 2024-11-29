@@ -33,8 +33,7 @@ def translate_adddress(
 
 
 class EurothermStreamInterface(StreamInterface):
-    """
-    Stream interface for the serial port
+    """Stream interface for the serial port
     """
 
     def __init__(self) -> None:

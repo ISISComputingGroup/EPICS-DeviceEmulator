@@ -8,30 +8,27 @@ if_connected = conditional_reply("connected")
 
 @has_log
 class MezfliprStreamInterface(StreamInterface):
-
     # Commands that we expect via serial during normal operation
     commands = {
         CmdBuilder("set_compensation").escape("compensation_current=").float().eos().build(),
         CmdBuilder("get_compensation").escape("compensation_current?").eos().build(),
-
         CmdBuilder("set_state").escape("device_state=").enum("off", "on").eos().build(),
         CmdBuilder("get_state").escape("device_state?").eos().build(),
-
         CmdBuilder("get_mode").escape("mode?").eos().build(),
         CmdBuilder("get_params").escape("flipper_params?").eos().build(),
-
         CmdBuilder("set_flipper_current").escape("flipper_current=").float().eos().build(),
         CmdBuilder("set_flipper_steps").escape("flipper_steps=").any().eos().build(),
         CmdBuilder("set_flipper_analytical").escape("flipper_analytical=").any().eos().build(),
         CmdBuilder("set_flipper_filename").escape("flipper_filename=").any().eos().build(),
-
     }
 
     in_terminator = "\n"
     out_terminator = "\n"
 
     def handle_error(self, request, error):
-        err_string = "command was: {}, error was: {}: {}\n".format(request, error.__class__.__name__, error)
+        err_string = "command was: {}, error was: {}: {}\n".format(
+            request, error.__class__.__name__, error
+        )
         print(err_string)
         self.log.error(err_string)
         return err_string

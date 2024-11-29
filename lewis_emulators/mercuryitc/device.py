@@ -1,9 +1,11 @@
-from __future__ import absolute_import, division, unicode_literals, print_function
+from __future__ import absolute_import, division, print_function, unicode_literals
 
 from collections import OrderedDict
+
 from lewis.core.logging import has_log
-from .states import DefaultState
 from lewis.devices import StateMachineDevice
+
+from .states import DefaultState
 
 
 class ChannelTypes(object):
@@ -22,9 +24,9 @@ class Channel(object):
 
 
 class TempPressureCommonChannel(Channel):
+    """Holds attributes common to temperature and pressure channels
     """
-    Holds attributes common to temperature and pressure channels
-    """
+
     def __init__(self, channel_type, nickname):
         super(TempPressureCommonChannel, self).__init__(channel_type, nickname)
 
@@ -94,7 +96,6 @@ class LevelChannel(Channel):
 
 @has_log
 class SimulatedMercuryitc(StateMachineDevice):
-
     def _initialize_data(self):
         self.connected = True
 
@@ -105,22 +106,18 @@ class SimulatedMercuryitc(StateMachineDevice):
             "MB0.T0": TemperatureChannel("MB0.T0"),
             "MB1.H0": HeaterChannel("DB0.H0"),
             "DB1.A0": AuxChannel("DB1.A0"),
-
             # Temperature channel 2
             "DB2.T1": TemperatureChannel("DB2.T1"),
             "DB3.H1": HeaterChannel("DB3.H1"),
             "DB4.A1": AuxChannel("DB4.A1"),
-
             # Pressure channel 1
             "DB5.P0": PressureChannel("DB5.P0"),
             "DB6.H2": HeaterChannel("DB6.H2"),
             "DB7.A2": AuxChannel("DB7.A2"),
-
             # Pressure channel 2
             "DB5.P1": PressureChannel("DB5.P1"),
             "DB6.H3": HeaterChannel("DB6.H3"),
             "DB7.A3": AuxChannel("DB7.A3"),
-
             # Level channel 1
             "DB8.L0": LevelChannel("DB8.L0"),
         }
@@ -142,10 +139,10 @@ class SimulatedMercuryitc(StateMachineDevice):
         self._initialize_data()
 
     def _get_state_handlers(self):
-        return {'default': DefaultState()}
+        return {"default": DefaultState()}
 
     def _get_initial_state(self):
-        return 'default'
+        return "default"
 
     def _get_transition_handlers(self):
         return OrderedDict([])

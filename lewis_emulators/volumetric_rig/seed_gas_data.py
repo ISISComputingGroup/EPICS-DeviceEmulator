@@ -1,6 +1,5 @@
 class SeedGasData(object):
-    """
-    Contains information about gases and their mixing properties used to set up the initial device state.
+    """Contains information about gases and their mixing properties used to set up the initial device state.
     """
 
     # Gas names
@@ -25,8 +24,28 @@ class SeedGasData(object):
     garlic = "GARLIC"
     brown_sauce = "BROWN SAUCE"
 
-    names = [unknown, empty, vacuum_extract, argon, nitrogen, neon, carbon_dioxide, carbon_monoxide, helium, gravy,
-             liver, hydrogen, oxygen, curried_rat, fresh_coffee, bacon, onion, chips, garlic, brown_sauce]
+    names = [
+        unknown,
+        empty,
+        vacuum_extract,
+        argon,
+        nitrogen,
+        neon,
+        carbon_dioxide,
+        carbon_monoxide,
+        helium,
+        gravy,
+        liver,
+        hydrogen,
+        oxygen,
+        curried_rat,
+        fresh_coffee,
+        bacon,
+        onion,
+        chips,
+        garlic,
+        brown_sauce,
+    ]
 
     @staticmethod
     def mixable_gas_names():
@@ -46,10 +65,22 @@ class SeedGasData(object):
         for g in {sgd.hydrogen, sgd.oxygen, sgd.onion, sgd.garlic, sgd.brown_sauce}:
             mixable_names.add((sgd.gravy, g))
         import itertools
-        for pair in list(itertools.combinations(
-            {sgd.oxygen, sgd.curried_rat, sgd.fresh_coffee, sgd.bacon,
-             sgd.onion, sgd.chips, sgd.garlic, sgd.brown_sauce},
-                2)):
+
+        for pair in list(
+            itertools.combinations(
+                {
+                    sgd.oxygen,
+                    sgd.curried_rat,
+                    sgd.fresh_coffee,
+                    sgd.bacon,
+                    sgd.onion,
+                    sgd.chips,
+                    sgd.garlic,
+                    sgd.brown_sauce,
+                },
+                2,
+            )
+        ):
             mixable_names.add((pair[0], pair[1]))
         return mixable_names
 

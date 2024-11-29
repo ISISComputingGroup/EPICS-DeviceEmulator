@@ -1,17 +1,15 @@
-from lewis.adapters.modbus import ModbusInterface, ModbusBasicDataBank
+from lewis.adapters.modbus import ModbusBasicDataBank, ModbusInterface
 from lewis.core.logging import has_log
 
 
 class GenericMoxa12XXInterface(ModbusInterface):
-    """
-    A generic interface which can be used to create a set of modbus registers for a device
+    """A generic interface which can be used to create a set of modbus registers for a device
 
     """
 
     @ModbusInterface.device.setter
     def device(self, new_device):
-        """
-        Overrides base implementation to give attached device a reference to self
+        """Overrides base implementation to give attached device a reference to self
         Required to allow communications between the interface and device
         """
         ModbusInterface.device.fset(self, new_device)
@@ -20,8 +18,7 @@ class GenericMoxa12XXInterface(ModbusInterface):
 
 @has_log
 class Moxa1210ModbusInterface(GenericMoxa12XXInterface):
-    """
-    Creates modbus data registers for a Moxa e1210 and makes them available to the lewis device.
+    """Creates modbus data registers for a Moxa e1210 and makes them available to the lewis device.
 
     """
 
@@ -35,8 +32,7 @@ class Moxa1210ModbusInterface(GenericMoxa12XXInterface):
 
 @has_log
 class Moxa1240ModbusInterface(GenericMoxa12XXInterface):
-    """
-    Creates modbus data registers for a Moxa e1240 and makes them available to the lewis device.
+    """Creates modbus data registers for a Moxa e1240 and makes them available to the lewis device.
 
     """
 
@@ -50,8 +46,7 @@ class Moxa1240ModbusInterface(GenericMoxa12XXInterface):
 
 @has_log
 class Moxa1242ModbusInterface(GenericMoxa12XXInterface):
-    """
-    Creates modbus data registers for a Moxa e1242 and makes them available to the lewis device.
+    """Creates modbus data registers for a Moxa e1242 and makes them available to the lewis device.
 
     """
 
@@ -61,16 +56,16 @@ class Moxa1242ModbusInterface(GenericMoxa12XXInterface):
     # The layout of these registers is described in Appendix A of the moxa e1200 series manual.
 
     ir = ModbusBasicDataBank(0, start_addr=0x200, last_addr=0x204)
-    
+
     # Moxa 1242 has 8 (0x08) Discrete Input registers (di). The other register values are not tested.
     # The layout of these registers is described in Appendix A of the moxa e1200 series manual.
 
     di = ModbusBasicDataBank(False, last_addr=0x08)
 
+
 @has_log
 class Moxa1262ModbusInterface(GenericMoxa12XXInterface):
-    """
-    Creates modbus data registers for a Moxa e1240 and makes them available to the lewis device.
+    """Creates modbus data registers for a Moxa e1240 and makes them available to the lewis device.
 
     """
 

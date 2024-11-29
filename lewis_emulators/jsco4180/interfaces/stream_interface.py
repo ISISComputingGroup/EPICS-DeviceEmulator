@@ -1,6 +1,4 @@
-
 from lewis.adapters.stream import StreamInterface
-
 from lewis.utils.command_builder import CmdBuilder
 from lewis.utils.replies import conditional_reply, timed_reply
 
@@ -10,46 +8,47 @@ if_valid_input_delay = timed_reply(action="crash_pump", minimum_time_delay=100)
 
 
 def combined_checks(func):
-    """
-    Combine all conditional reply checks so we have a single decorator
+    """Combine all conditional reply checks so we have a single decorator
     """
     return if_valid_input_delay(if_connected(if_input_error(func)))
 
 
 class Jsco4180StreamInterface(StreamInterface):
-
-    in_terminator = '\r'
-    out_terminator = '\r\n'
+    in_terminator = "\r"
+    out_terminator = "\r\n"
 
     def __init__(self):
-
         super(Jsco4180StreamInterface, self).__init__()
         # Commands that we expect via serial during normal operation
         self.commands = {
             CmdBuilder(self.set_flowrate).float().escape(" flowrate set").eos().build(),
             CmdBuilder(self.get_flowrate_rbv).escape("flowrate load p").eos().build(),
             CmdBuilder(self.get_flowrate).escape("a_flow load p").eos().build(),
-
             CmdBuilder(self.get_pressure).escape("a_press1 load p").eos().build(),
             CmdBuilder(self.set_pressure_max).int().escape(" pmax set").build(),
             CmdBuilder(self.get_pressure_max).escape("a_pmax load p").eos().build(),
             CmdBuilder(self.set_pressure_min).int().escape(" pmin set").build(),
             CmdBuilder(self.get_pressure_min).escape("a_pmin load p").eos().build(),
-
             CmdBuilder(self.get_program_runtime).escape("current_time load p").eos().build(),
-
             CmdBuilder(self.get_component_a).escape("compa load p").eos().build(),
             CmdBuilder(self.get_component_b).escape("compb load p").eos().build(),
             CmdBuilder(self.get_component_c).escape("compc load p").eos().build(),
             CmdBuilder(self.get_component_d).escape("compd load p").eos().build(),
-            CmdBuilder(self.set_composition).float().escape(" ").float().escape(" ").float().escape(" ").float().escape(" comp set").eos().build(),
-
+            CmdBuilder(self.set_composition)
+            .float()
+            .escape(" ")
+            .float()
+            .escape(" ")
+            .float()
+            .escape(" ")
+            .float()
+            .escape(" comp set")
+            .eos()
+            .build(),
             CmdBuilder(self.get_error).escape("trouble load p").eos().build(),
             CmdBuilder(self.set_error).escape("0 trouble set").build(),
-
             CmdBuilder(self.set_pump).int().escape(" pump set").eos().build(),
             CmdBuilder(self.get_status).escape("status load p").eos().build(),
-
             CmdBuilder(self.set_file_number).int().escape(" fileno set").eos().build(),
             CmdBuilder(self.set_file_open).int().escape(" openfile").eos().build(),
             CmdBuilder(self.set_file_closed).int().escape(" closefile").eos().build(),
@@ -146,7 +145,7 @@ class Jsco4180StreamInterface(StreamInterface):
 
     @combined_checks
     def get_program_runtime(self):
-        if self.device.status == 'pump_program_reset':
+        if self.device.status == "pump_program_reset":
             self.device.program_runtime += 1
         return int(self.device.program_runtime)
 

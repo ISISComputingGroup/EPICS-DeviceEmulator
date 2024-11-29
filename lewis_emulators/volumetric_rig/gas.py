@@ -1,10 +1,10 @@
-from .utilities import pad_string, format_int
+from .utilities import format_int, pad_string
 
 
 class Gas(object):
+    """A gas within the system, identified by either its name or an integer index.
     """
-    A gas within the system, identified by either its name or an integer index.
-    """
+
     def __init__(self, index, name):
         assert type(index) is int and type(name) is str
         self._index = index

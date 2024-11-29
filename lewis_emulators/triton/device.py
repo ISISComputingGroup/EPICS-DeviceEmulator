@@ -1,15 +1,16 @@
 from collections import OrderedDict
-from .states import DefaultState
+
 from lewis.devices import StateMachineDevice
 
+from .states import DefaultState
 
 HEATER_NAME = "H1"
 
 
 class TemperatureStage(object):
+    """Class representing a temperature stage.
     """
-    Class representing a temperature stage.
-    """
+
     def __init__(self, name):
         self.name = name
         self.temperature = 1
@@ -25,20 +26,18 @@ class TemperatureStage(object):
 
 
 class PressureSensor(object):
-    """
-    Class to represent a pressure sensor.
+    """Class to represent a pressure sensor.
 
     Having this as a class makes it more extensible in future, as the triton driver is still in flux.
     """
+
     def __init__(self):
         self.pressure = 0
 
 
 class SimulatedTriton(StateMachineDevice):
-
     def _initialize_data(self):
-        """
-        Initialize all of the device's attributes.
+        """Initialize all of the device's attributes.
         """
         self.heater_range = 0
         self.heater_power = 1
@@ -68,7 +67,6 @@ class SimulatedTriton(StateMachineDevice):
         assert self.sample_channel in self.temperature_stages
 
     def find_temperature_channel(self, name):
-
         for k, v in self.temperature_stages.items():
             if v.name == name:
                 return k
@@ -87,10 +85,10 @@ class SimulatedTriton(StateMachineDevice):
         setattr(self.temperature_stages["T{}".format(sensor)], property, value)
 
     def _get_state_handlers(self):
-        return {'default': DefaultState()}
+        return {"default": DefaultState()}
 
     def _get_initial_state(self):
-        return 'default'
+        return "default"
 
     def _get_transition_handlers(self):
         return OrderedDict([])

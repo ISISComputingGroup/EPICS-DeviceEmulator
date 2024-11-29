@@ -28,9 +28,9 @@ class MeasuringState(State):
             self._context.data_buffer = "data: ---;---;canceled"
         else:
             self._context.condition = "valid"
-            self._context.data_buffer = "data: {0:.5f};{1:.2f};{2}".format(self._context.density,
-                                                                           self._context.actual_temperature,
-                                                                           self._context.condition)
+            self._context.data_buffer = "data: {0:.5f};{1:.2f};{2}".format(
+                self._context.density, self._context.actual_temperature, self._context.condition
+            )
 
 
 class DoneState(State):

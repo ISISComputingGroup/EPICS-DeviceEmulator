@@ -8,7 +8,6 @@ if_connected = conditional_reply("connected")
 
 @has_log
 class DMA4500MStreamInterface(StreamInterface):
-
     in_terminator = "\r"
     out_terminator = "\r"
 
@@ -19,13 +18,28 @@ class DMA4500MStreamInterface(StreamInterface):
             CmdBuilder(self.start).escape("start").eos().build(),
             CmdBuilder(self.abort).escape("abort").eos().build(),
             CmdBuilder(self.finished).escape("finished").eos().build(),
-            CmdBuilder(self.set_temperature).escape("set").optional(" ").escape("temperature ").arg(".+").eos().build(),
+            CmdBuilder(self.set_temperature)
+            .escape("set")
+            .optional(" ")
+            .escape("temperature ")
+            .arg(".+")
+            .eos()
+            .build(),
             CmdBuilder(self.get_data).escape("get").optional(" ").escape("data").eos().build(),
-            CmdBuilder(self.get_raw_data).escape("get").optional(" ").escape("raw").optional(" ").escape("data").eos().build(),
+            CmdBuilder(self.get_raw_data)
+            .escape("get")
+            .optional(" ")
+            .escape("raw")
+            .optional(" ")
+            .escape("data")
+            .eos()
+            .build(),
         }
 
     def handle_error(self, request, error):
-        err_string = "command was: {}, error was: {}: {}\n".format(request, error.__class__.__name__, error)
+        err_string = "command was: {}, error was: {}: {}\n".format(
+            request, error.__class__.__name__, error
+        )
         print(err_string)
         self.log.error(err_string)
         return err_string

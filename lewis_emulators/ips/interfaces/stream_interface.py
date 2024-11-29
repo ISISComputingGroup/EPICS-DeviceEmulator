@@ -1,12 +1,10 @@
 from lewis.adapters.stream import StreamInterface
 from lewis.core.logging import has_log
-
 from lewis.utils.command_builder import CmdBuilder
 
 from lewis_emulators.ips.modes import Activity, Control
-from ..device import amps_to_tesla, tesla_to_amps
 
-from six import iteritems
+from ..device import amps_to_tesla, tesla_to_amps
 
 MODE_MAPPING = {
     0: Activity.HOLD,
@@ -25,7 +23,6 @@ CONTROL_MODE_MAPPING = {
 
 @has_log
 class IpsStreamInterface(StreamInterface):
-
     # Commands that we expect via serial during normal operation
     commands = {
         CmdBuilder("get_version").escape("V").eos().build(),
@@ -49,14 +46,16 @@ class IpsStreamInterface(StreamInterface):
         CmdBuilder("get_pos_current_limit").escape("R22").eos().build(),
         CmdBuilder("get_lead_resistance").escape("R23").eos().build(),
         CmdBuilder("get_magnet_inductance").escape("R24").eos().build(),
-
-        CmdBuilder("set_control_mode").escape("C").arg("0|1|2|3", argument_mapping=int).eos().build(),
+        CmdBuilder("set_control_mode")
+        .escape("C")
+        .arg("0|1|2|3", argument_mapping=int)
+        .eos()
+        .build(),
         CmdBuilder("set_mode").escape("A").int().eos().build(),
         CmdBuilder("set_current").escape("I").float().eos().build(),
         CmdBuilder("set_field").escape("J").float().eos().build(),
         CmdBuilder("set_field_sweep_rate").escape("T").float().eos().build(),
         CmdBuilder("set_sweep_mode").escape("M").int().eos().build(),
-
         CmdBuilder("set_heater_on").escape("H1").eos().build(),
         CmdBuilder("set_heater_off").escape("H0").eos().build(),
         CmdBuilder("set_heater_off").escape("H2").eos().build(),
@@ -66,7 +65,9 @@ class IpsStreamInterface(StreamInterface):
     out_terminator = "\r"
 
     def handle_error(self, request, error):
-        err_string = "command was: {}, error was: {}: {}\n".format(request, error.__class__.__name__, error)
+        err_string = "command was: {}, error was: {}: {}\n".format(
+            request, error.__class__.__name__, error
+        )
         print(err_string)
         self.log.error(err_string)
         return err_string
@@ -75,8 +76,7 @@ class IpsStreamInterface(StreamInterface):
         return "Simulated IPS"
 
     def set_comms_mode(self):
-        """
-        This sets the terminator that the device wants, not implemented in emulator. Command does not reply.
+        """This sets the terminator that the device wants, not implemented in emulator. Command does not reply.
         """
 
     def set_control_mode(self, mode):
@@ -95,7 +95,7 @@ class IpsStreamInterface(StreamInterface):
         resp = "X{x1}{x2}A{a}C{c}H{h}M{m1}{m2}P{p1}{p2}"
 
         def translate_activity():
-            for k, v in iteritems(MODE_MAPPING):
+            for k, v in MODE_MAPPING.items():
                 if v == self.device.activity:
                     return k
             else:
@@ -129,55 +129,55 @@ class IpsStreamInterface(StreamInterface):
 
         return resp.format(**statuses)
 
-    def get_current_setpoint(self): 
+    def get_current_setpoint(self):
         return "R{}".format(self.device.current_setpoint)
 
-    def get_supply_voltage(self): 
+    def get_supply_voltage(self):
         return "R{}".format(self.device.get_voltage())
 
     def get_measured_current(self):
         return "R{}".format(self.device.measured_current)
 
-    def get_current(self): 
+    def get_current(self):
         return "R{}".format(self.device.current)
 
-    def get_current_sweep_rate(self): 
+    def get_current_sweep_rate(self):
         return "R{}".format(self.device.current_ramp_rate)
 
     def get_field(self):
         return "R{}".format(amps_to_tesla(self.device.current))
 
-    def get_field_setpoint(self): 
+    def get_field_setpoint(self):
         return "R{}".format(amps_to_tesla(self.device.current_setpoint))
 
-    def get_field_sweep_rate(self): 
+    def get_field_sweep_rate(self):
         return "R{}".format(amps_to_tesla(self.device.current_ramp_rate))
 
-    def get_software_voltage_limit(self): 
+    def get_software_voltage_limit(self):
         return "R0"
 
-    def get_persistent_magnet_current(self): 
+    def get_persistent_magnet_current(self):
         return "R{}".format(self.device.magnet_current)
 
-    def get_trip_current(self): 
+    def get_trip_current(self):
         return "R{}".format(self.device.trip_current)
 
-    def get_persistent_magnet_field(self): 
+    def get_persistent_magnet_field(self):
         return "R{}".format(amps_to_tesla(self.device.magnet_current))
 
-    def get_trip_field(self): 
+    def get_trip_field(self):
         return "R{}".format(amps_to_tesla(self.device.trip_current))
 
-    def get_heater_current(self): 
+    def get_heater_current(self):
         return "R{}".format(self.device.heater_current)
 
-    def get_neg_current_limit(self): 
+    def get_neg_current_limit(self):
         return "R{}".format(self.device.neg_current_limit)
 
     def get_pos_current_limit(self):
         return "R{}".format(self.device.pos_current_limit)
 
-    def get_lead_resistance(self): 
+    def get_lead_resistance(self):
         return "R{}".format(self.device.lead_resistance)
 
     def get_magnet_inductance(self):

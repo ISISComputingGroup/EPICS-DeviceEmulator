@@ -1,5 +1,5 @@
-from lewis.core.statemachine import State
 from lewis.core import approaches
+from lewis.core.statemachine import State
 
 
 def check_speed(device):
@@ -39,7 +39,9 @@ class GoingState(State):
             if not device.magneticbearing:
                 rate -= 1
 
-        device.set_true_speed(approaches.linear(device.get_true_speed(), device.get_speed_setpoint(), rate, dt))
+        device.set_true_speed(
+            approaches.linear(device.get_true_speed(), device.get_speed_setpoint(), rate, dt)
+        )
 
         check_speed(device)
 

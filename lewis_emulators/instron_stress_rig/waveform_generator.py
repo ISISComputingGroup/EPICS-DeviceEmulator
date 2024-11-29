@@ -1,8 +1,9 @@
+import math
+from datetime import datetime, timedelta
+
+from .quarter_cycle_event_detector import QuarterCycleEventDetector as QCED
 from .waveform_generator_states import WaveformGeneratorStates as GenStates
 from .waveform_types import WaveformTypes
-from datetime import datetime, timedelta
-from .quarter_cycle_event_detector import QuarterCycleEventDetector as QCED
-import math
 
 
 class WaveformGenerator(object):
@@ -10,9 +11,9 @@ class WaveformGenerator(object):
 
     def __init__(self):
         self.state = GenStates.STOPPED
-        self.amplitude = {i+1: 0.0 for i in range(3)}
-        self.frequency = {i+1: 1.0 for i in range(3)}
-        self.type = {i+1: WaveformTypes.SINE for i in range(3)}
+        self.amplitude = {i + 1: 0.0 for i in range(3)}
+        self.frequency = {i + 1: 1.0 for i in range(3)}
+        self.type = {i + 1: WaveformTypes.SINE for i in range(3)}
         self.stop_requested_at_time = None
         self.quart_counter = QCED()
 
@@ -28,8 +29,10 @@ class WaveformGenerator(object):
             self.state = GenStates.FINISHING
 
     def time_to_stop(self):
-        return self.stop_requested_at_time is not None and \
-               (datetime.now() - self.stop_requested_at_time) > WaveformGenerator.STOP_DELAY
+        return (
+            self.stop_requested_at_time is not None
+            and (datetime.now() - self.stop_requested_at_time) > WaveformGenerator.STOP_DELAY
+        )
 
     def stop(self):
         self.stop_requested_at_time = None
@@ -53,29 +56,29 @@ class WaveformGenerator(object):
 
     def get_value(self, channel):
         def sin(a, x, f):
-            return a*math.sin(math.pi*x*f)
+            return a * math.sin(math.pi * x * f)
 
         def square(a, x, f):
             return math.copysign(a, sin(a, x, f))
 
         def sawtooth(a, x, f):
-            return a*(x % (1.0/f))
+            return a * (x % (1.0 / f))
 
         def triangle(a, x, f):
-            return a*(1 - 2*abs((f*x-0.5) % 2 - 1))
+            return a * (1 - 2 * abs((f * x - 0.5) % 2 - 1))
 
         def haversine(a, x, f):
-            return a/2.0*(1.0 - math.cos(math.pi*f*x))
+            return a / 2.0 * (1.0 - math.cos(math.pi * f * x))
 
         def havertriangle(a, x, f):
-            return a*(1 - abs(f*x % 2 - 1))
+            return a * (1 - abs(f * x % 2 - 1))
 
         def haversquare(a, x, f):
-            return a/2.0*(1.0 + math.copysign(1.0, haversine(a, x, f)-0.5))
+            return a / 2.0 * (1.0 + math.copysign(1.0, haversine(a, x, f) - 0.5))
 
         if self.active():
             amp = self.amplitude[channel]
-            freq = max(self.frequency[channel], 1.e-20)
+            freq = max(self.frequency[channel], 1.0e-20)
             wave_type = self.type[channel]
             val = self.quart_counter.counts
 

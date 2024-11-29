@@ -1,15 +1,18 @@
-from lewis.adapters.stream import StreamInterface, Cmd
+from lewis.adapters.stream import Cmd, StreamInterface
 from lewis.core.logging import has_log
-
 from lewis.utils.byte_conversions import raw_bytes_to_int
-from .response_utilities import phase_information_response_packet, rotator_angle_response_packet, \
-    phase_time_response_packet, general_status_response_packet
-from .crc16 import crc16_matches, crc16
+
+from .crc16 import crc16, crc16_matches
+from .response_utilities import (
+    general_status_response_packet,
+    phase_information_response_packet,
+    phase_time_response_packet,
+    rotator_angle_response_packet,
+)
 
 
 @has_log
 class SkfMb350ChopperStreamInterface(StreamInterface):
-
     # Commands that we expect via serial during normal operation. Match anything!
     commands = {
         Cmd("any_command", r"^([\s\S]*)$", return_mapping=lambda x: x),
@@ -25,7 +28,6 @@ class SkfMb350ChopperStreamInterface(StreamInterface):
         return str(error)
 
     def any_command(self, command):
-
         command_mapping = {
             0x20: self.start,
             0x30: self.stop,
@@ -53,8 +55,11 @@ class SkfMb350ChopperStreamInterface(StreamInterface):
         command_data = [c for c in command[3:-2]]
 
         if not crc16_matches(command[:-2], command[-2:]):
-            raise ValueError("CRC Checksum didn't match. Expected {} but got {}"
-                             .format(crc16(command[:-2]), command[-2:]))
+            raise ValueError(
+                "CRC Checksum didn't match. Expected {} but got {}".format(
+                    crc16(command[:-2]), command[-2:]
+                )
+            )
 
         return command_mapping[command_number](address, command_data)
 
@@ -69,7 +74,7 @@ class SkfMb350ChopperStreamInterface(StreamInterface):
     def set_nominal_phase(self, address, data):
         self.log.info("Setting phase")
         self.log.info("Data = {}".format(data))
-        nominal_phase = raw_bytes_to_int(data) / 1000.
+        nominal_phase = raw_bytes_to_int(data) / 1000.0
         self.log.info("Setting nominal phase to {}".format(nominal_phase))
         self._device.set_nominal_phase(nominal_phase)
         return general_status_response_packet(address, self.device, 0x90)
@@ -79,7 +84,7 @@ class SkfMb350ChopperStreamInterface(StreamInterface):
         self.log.info("Data = {}".format(data))
         width = raw_bytes_to_int(data)
         self.log.info("Setting gate width to {}".format(width))
-        self._device.set_phase_repeatability(width / 10.)
+        self._device.set_phase_repeatability(width / 10.0)
         return general_status_response_packet(address, self.device, 0x8E)
 
     def set_rotational_speed(self, address, data):
@@ -94,8 +99,8 @@ class SkfMb350ChopperStreamInterface(StreamInterface):
         self.log.info("Setting rotator angle")
         self.log.info("Data = {}".format(data))
         angle_times_ten = raw_bytes_to_int(data)
-        self.log.info("Setting rotator angle to {}".format(angle_times_ten / 10.))
-        self._device.set_rotator_angle(angle_times_ten / 10.)
+        self.log.info("Setting rotator angle to {}".format(angle_times_ten / 10.0))
+        self._device.set_rotator_angle(angle_times_ten / 10.0)
         return general_status_response_packet(address, self.device, 0x82)
 
     def get_phase_info(self, address, data):

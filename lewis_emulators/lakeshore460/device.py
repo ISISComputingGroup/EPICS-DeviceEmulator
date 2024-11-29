@@ -1,10 +1,11 @@
 from collections import OrderedDict
+
 from lewis.devices import StateMachineDevice
+
 from .states import DefaultState
 
 
 class Channel(object):
-
     def __init__(self):
         self.field_reading = 1.234
         self.field_multiplier = " "
@@ -27,13 +28,11 @@ class Channel(object):
 
 
 class SimulatedLakeshore460(StateMachineDevice):
-    """
-    Simulated Lakeshore 460
+    """Simulated Lakeshore 460
     """
 
     def _initialize_data(self):
-        """
-        Sets the initial state of the device.
+        """Sets the initial state of the device.
         """
         self.idn = "LSCI,MODEL460,0,22323"
         self.source = 1
@@ -42,20 +41,17 @@ class SimulatedLakeshore460(StateMachineDevice):
         self.unit = "T"
 
     def _get_state_handlers(self):
-        """
-        Returns: states and their names
+        """Returns: states and their names
         """
         return {DefaultState.NAME: DefaultState()}
 
     def _get_initial_state(self):
-        """
-        Returns: the name of the initial state
+        """Returns: the name of the initial state
         """
         return DefaultState.NAME
 
     def _get_transition_handlers(self):
-        """
-        Returns: the state transitions
+        """Returns: the state transitions
         """
         return OrderedDict()
 
@@ -68,8 +64,7 @@ class SimulatedLakeshore460(StateMachineDevice):
         return getattr(self.channels[str(channel)], str(param))
 
     def update_reading_and_multiplier(self, reading, multiplier):
-        """
-        Args:
+        """Args:
             reading: A reading from the device.
             multiplier: The current multiplier for the reading.
 
@@ -77,22 +72,19 @@ class SimulatedLakeshore460(StateMachineDevice):
             new_reading: Updated reading value, based on more appropriate multiplier
             new_multiplier: updated multiplier for the value
         """
-
         stripped_reading = self.strip_multiplier(reading, multiplier)
         new_multiplier = self.calculate_multiplier(stripped_reading)
         new_reading = self.apply_multiplier(stripped_reading, new_multiplier)
         return new_reading, new_multiplier
 
     def strip_multiplier(self, reading, multiplier):
-        """
-        Args:
+        """Args:
             reading: A reading from the device with multiplier applied.
             multiplier: The current multiplier for the reading.
 
         Returns:
                 The raw reading.
         """
-
         if multiplier == "u":
             return reading * 0.000001
         if multiplier == "m":
@@ -103,15 +95,13 @@ class SimulatedLakeshore460(StateMachineDevice):
             return reading
 
     def apply_multiplier(self, reading, multiplier):
-        """
-        Args:
+        """Args:
             reading:  A raw reading from the device.
             multiplier: The multiplier to be applied.
 
         Returns:
             The reading with the multiplier applied.
         """
-
         if multiplier == "u":
             return reading / 0.000001
         if multiplier == "m":
@@ -122,9 +112,7 @@ class SimulatedLakeshore460(StateMachineDevice):
             return reading
 
     def convert_units(self, convert_value):
-        """
-
-        Converts between Tesla and Gauss (applies conversion of *10000 or *0.0001)
+        """Converts between Tesla and Gauss (applies conversion of *10000 or *0.0001)
         Then updates reading values according to the more appropriate multiplier
 
         Args:
@@ -133,34 +121,37 @@ class SimulatedLakeshore460(StateMachineDevice):
         Returns:
             None.
         """
-
-        channels = ['X', 'Y', 'Z', 'V']
+        channels = ["X", "Y", "Z", "V"]
         for c in channels:
             self.channel = c
             self.channels[c].field_reading *= convert_value
-            self.channels[c].field_reading, \
-                self.channels[c].field_multiplier = \
-                self.update_reading_and_multiplier(self.channels[c].field_reading,
-                                                   self.channels[c].field_multiplier)
+            self.channels[c].field_reading, self.channels[c].field_multiplier = (
+                self.update_reading_and_multiplier(
+                    self.channels[c].field_reading, self.channels[c].field_multiplier
+                )
+            )
             self.channels[c].max_hold_reading *= convert_value
-            self.channels[c].max_hold_reading, \
-                self.channels[c].max_hold_multiplier = \
-                self.update_reading_and_multiplier(self.channels[c].max_hold_reading,
-                                                   self.channels[c].max_hold_multiplier)
+            self.channels[c].max_hold_reading, self.channels[c].max_hold_multiplier = (
+                self.update_reading_and_multiplier(
+                    self.channels[c].max_hold_reading, self.channels[c].max_hold_multiplier
+                )
+            )
             self.channels[c].rel_mode_reading *= convert_value
-            self.channels[c].rel_mode_reading, \
-                self.channels[c].rel_mode_multiplier = \
-                self.update_reading_and_multiplier(self.channels[c].rel_mode_reading,
-                                                   self.channels[c].rel_mode_multiplier)
+            self.channels[c].rel_mode_reading, self.channels[c].rel_mode_multiplier = (
+                self.update_reading_and_multiplier(
+                    self.channels[c].rel_mode_reading, self.channels[c].rel_mode_multiplier
+                )
+            )
             self.channels[c].relative_setpoint *= convert_value
-            self.channels[c].relative_setpoint, \
-                self.channels[c].relative_setpoint_multiplier = \
-                self.update_reading_and_multiplier(self.channels[c].relative_setpoint,
-                                                   self.channels[c].relative_setpoint_multiplier)
+            self.channels[c].relative_setpoint, self.channels[c].relative_setpoint_multiplier = (
+                self.update_reading_and_multiplier(
+                    self.channels[c].relative_setpoint,
+                    self.channels[c].relative_setpoint_multiplier,
+                )
+            )
 
     def calculate_multiplier(self, reading):
-        """
-        Calculates the most appropriate multiplier for a given value.
+        """Calculates the most appropriate multiplier for a given value.
 
         Args:
             reading: A raw reading from the device.
@@ -169,7 +160,6 @@ class SimulatedLakeshore460(StateMachineDevice):
             The most appropriate multiplier value for the given raw reading.
 
         """
-
         if reading <= 0.001:
             return "u"
         if 0.001 < reading <= 0:

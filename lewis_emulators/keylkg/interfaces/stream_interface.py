@@ -1,35 +1,45 @@
-from lewis.adapters.stream import StreamInterface, Cmd
-
-from lewis.utils.command_builder import CmdBuilder
-from lewis.utils.replies import conditional_reply
 from enum import Enum
 
-if_connected = conditional_reply('connected')
-if_input_error = conditional_reply('input_correct', "ER,OF,00")
+from lewis.adapters.stream import StreamInterface
+from lewis.utils.command_builder import CmdBuilder
+from lewis.utils.replies import conditional_reply
+
+if_connected = conditional_reply("connected")
+if_input_error = conditional_reply("input_correct", "ER,OF,00")
 
 
 class Modes(Enum):
+    """Device Modes
     """
-    Device Modes
-    """
-    MEASURE = 'R0'  # Read measured values
-    SET_UP = 'Q0'  # Configure device parameters
+
+    MEASURE = "R0"  # Read measured values
+    SET_UP = "Q0"  # Configure device parameters
 
 
 class KeylkgStreamInterface(StreamInterface):
-
-    terminator = '\r'
+    terminator = "\r"
 
     def __init__(self):
-
         super(KeylkgStreamInterface, self).__init__()
         # Commands that we expect via serial during normal operation
         self.commands = {
             CmdBuilder(self.set_mode).arg("Q0|R0").eos().build(),
-            CmdBuilder(self.set_measurement_offset).escape("SW,OF,").int().escape(",").float().eos().build(),
+            CmdBuilder(self.set_measurement_offset)
+            .escape("SW,OF,")
+            .int()
+            .escape(",")
+            .float()
+            .eos()
+            .build(),
             CmdBuilder(self.get_measurement_offset).escape("SR,OF,").float().eos().build(),
             CmdBuilder(self.get_measurement_mode).escape("SR,HB,").int().eos().build(),
-            CmdBuilder(self.set_measurement_mode).escape("SW,HB,").int().escape(",").int().eos().build(),
+            CmdBuilder(self.set_measurement_mode)
+            .escape("SW,HB,")
+            .int()
+            .escape(",")
+            .int()
+            .eos()
+            .build(),
             CmdBuilder(self.get_measurement_value).escape("M").int().eos().build(),
             CmdBuilder(self.reset_measurement).escape("VR,").int().eos().build(),
         }
@@ -54,12 +64,23 @@ class KeylkgStreamInterface(StreamInterface):
         detector_2_value = self.device.detector_2_raw_value - self.device.detector_2_offset
 
         if measurement_head == 0:
-            return "ER,M0,01" if self.device.mode == Modes.SET_UP else "M0,{0:+08.4f},{1:+08.4f}".format(detector_1_value,
-                                                                                                         detector_2_value)
+            return (
+                "ER,M0,01"
+                if self.device.mode == Modes.SET_UP
+                else "M0,{0:+08.4f},{1:+08.4f}".format(detector_1_value, detector_2_value)
+            )
         elif measurement_head == 1:
-            return "ER,M1,01" if self.device.mode == Modes.SET_UP else "M1,{:+08.4f}".format(detector_1_value)
+            return (
+                "ER,M1,01"
+                if self.device.mode == Modes.SET_UP
+                else "M1,{:+08.4f}".format(detector_1_value)
+            )
         elif measurement_head == 2:
-            return "ER,M2,01" if self.device.mode == Modes.SET_UP else "M2,{:+08.4f}".format(detector_2_value)
+            return (
+                "ER,M2,01"
+                if self.device.mode == Modes.SET_UP
+                else "M2,{:+08.4f}".format(detector_2_value)
+            )
 
     @if_connected
     def set_measurement_mode(self, measurement_head, function):

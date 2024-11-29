@@ -1,15 +1,15 @@
 from collections import OrderedDict
+
 from lewis.core.logging import has_log
-from .states import DefaultState
 from lewis.devices import StateMachineDevice
+
+from .states import DefaultState
 
 
 @has_log
 class SimulatedItc503(StateMachineDevice):
-
     def _initialize_data(self):
-        """
-        Initialize all of the device's attributes.
+        """Initialize all of the device's attributes.
         """
         self.p, self.i, self.d = 0, 0, 0
         self.gas_flow = 0
@@ -28,10 +28,10 @@ class SimulatedItc503(StateMachineDevice):
         self.report_sweep_state_with_leading_zero = False
 
     def _get_state_handlers(self):
-        return {'default': DefaultState()}
+        return {"default": DefaultState()}
 
     def _get_initial_state(self):
-        return 'default'
+        return "default"
 
     def _get_transition_handlers(self):
         return OrderedDict([])

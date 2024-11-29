@@ -3,14 +3,25 @@ from .utilities import format_int
 
 
 class HmiDevice(EthernetDevice):
-
     OK_STATUS = "OK"
 
     def __init__(self, ip):
         self._status = HmiDevice.OK_STATUS
         self._base_page = 34
         self._sub_page = 2
-        self._count_cycles = ["999", "006", "002", "002", "002", "002", "002", "002", "001", "001", "310"]
+        self._count_cycles = [
+            "999",
+            "006",
+            "002",
+            "002",
+            "002",
+            "002",
+            "002",
+            "002",
+            "001",
+            "001",
+            "310",
+        ]
         self._count = 0
         self._max_grabbed = 38
         self._limit = 20

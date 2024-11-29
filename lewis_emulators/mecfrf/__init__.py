@@ -1,5 +1,5 @@
-from .device import SimulatedMecfrf
 from ..lewis_versions import LEWIS_LATEST
+from .device import SimulatedMecfrf
 
 framework_version = LEWIS_LATEST
-__all__ = ['SimulatedMecfrf']
+__all__ = ["SimulatedMecfrf"]

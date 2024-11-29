@@ -5,8 +5,7 @@ from lewis.utils.command_builder import CmdBuilder
 
 @has_log
 class Lakeshore460StreamInterface(StreamInterface):
-    """
-    Stream interface for the serial port
+    """Stream interface for the serial port
     """
 
     in_terminator = "\r\n"
@@ -182,9 +181,8 @@ class Lakeshore460StreamInterface(StreamInterface):
         return self._device.channels[self.get_channel()].relative_setpoint_multiplier
 
     def get_multicmds(self, command, other_commands):
-        """
-             As the protocol file sends multiple commands (set Channel; request channel PV),
-             these methods split up the commands and process both.
+        """As the protocol file sends multiple commands (set Channel; request channel PV),
+        these methods split up the commands and process both.
         """
         replies = []
         for cmd_to_find in [command, other_commands]:

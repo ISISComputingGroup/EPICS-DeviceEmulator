@@ -5,8 +5,7 @@ NUMBER_OF_HEXADECIMAL_CHARACTERS = 8
 
 
 class DeviceStatus(object):
-    """
-    Converts the device's status to a list of 8 hexadecimal characters.
+    """Converts the device's status to a list of 8 hexadecimal characters.
     """
 
     _REFERENCE = {
@@ -27,19 +26,16 @@ class DeviceStatus(object):
         "28": "Ext. interlock #3",
         "29": "Ext. interlock #4",
         "30": "DCCT fault",
-        "31": "OVP"
+        "31": "OVP",
     }
 
-    _CONTROL_MODE = {
-        "Remote": [False, False],
-        "Local": [False, True]
-    }
+    _CONTROL_MODE = {"Remote": [False, False], "Local": [False, True]}
 
     _UPDATE_MODE = {
         "Normal": [False, False],
         "Waveform": [False, True],
         "Triggered FIFO": [True, False],
-        "Analog Input": [True, True]
+        "Analog Input": [True, True],
     }
 
     def __init__(self, status):
@@ -47,13 +43,11 @@ class DeviceStatus(object):
         self._bits = [False for _ in range(0, NUMBER_OF_BITS)]
 
     def in_hexadecimal(self):
-        """
-        Returns the status of the device as a string of hexadecimal values.
+        """Returns the status of the device as a string of hexadecimal values.
 
         Returns:
             string: 8 hexadecimal values 0-F.
         """
-
         self._convert_status_to_bits()
         hexadecimals = self._get_hexadecimals(NUMBER_OF_HEXADECIMAL_CHARACTERS)
         return "".join(hexadecimals)
@@ -74,8 +68,7 @@ class DeviceStatus(object):
 
 
 def convert_to_hexadecimal(bits, padding):
-    """
-    Converts  bits to a hexadecimal character with padding.
+    """Converts  bits to a hexadecimal character with padding.
 
     E.g.
         Converts [False, False, False, True], 0 to "1".
@@ -88,13 +81,14 @@ def convert_to_hexadecimal(bits, padding):
     Returns:
         string: Zero padded hexadecimal number.
     """
-
     bits_as_strings = ["1" if bit else "0" for bit in bits]
 
     bits_base_2 = int("".join(bits_as_strings), 2)
 
     zero_padded_eight_digit_hexadecimal_with_prefix = "{0:#0{1}x}".format(bits_base_2, padding + 2)
 
-    zero_padded_eight_digit_hexadecimal_without_prefix = zero_padded_eight_digit_hexadecimal_with_prefix[2:]
+    zero_padded_eight_digit_hexadecimal_without_prefix = (
+        zero_padded_eight_digit_hexadecimal_with_prefix[2:]
+    )
 
     return zero_padded_eight_digit_hexadecimal_without_prefix.upper()
