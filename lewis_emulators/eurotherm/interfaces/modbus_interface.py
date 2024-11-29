@@ -1,11 +1,27 @@
+import logging
+from typing import Callable, Concatenate, ParamSpec, Protocol, TypeVar
+
 from lewis.adapters.stream import Cmd, StreamInterface
 from lewis.core.logging import has_log
 from lewis.utils.byte_conversions import BYTE, int_to_raw_bytes
 from lewis.utils.replies import conditional_reply
 
+from lewis_emulators.eurotherm import SimulatedEurotherm
 
-def log_replies(f):
-    def _wrapper(self, *args, **kwargs):
+sensor = "01"
+
+
+class HasLog(Protocol):
+    log: logging.Logger
+
+
+P = ParamSpec("P")
+T = TypeVar("T")
+T_self = TypeVar("T_self", bound=HasLog)
+
+
+def log_replies(f: Callable[Concatenate[T_self, P], T]) -> Callable[Concatenate[T_self, P], T]:
+    def _wrapper(self: T_self, *args: P.args, **kwargs: P.kwargs) -> T:
         result = f(self, *args, **kwargs)
         self.log.info(f"Reply in {f.__name__}: {result}")
         return result
@@ -13,12 +29,13 @@ def log_replies(f):
     return _wrapper
 
 
-def bytes_to_int(bytes):
+def bytes_to_int(bytes: bytes) -> int:
     return int.from_bytes(bytes, byteorder="big", signed=True)
 
 
-def crc16(data):
-    """CRC algorithm - translated from section 3-5 of eurotherm manual.
+def crc16(data: bytes) -> bytes:
+    """
+    CRC algorithm - translated from section 3-5 of eurotherm manual.
     :param data: the data to checksum
     :return: the checksum
     """
@@ -40,18 +57,23 @@ def crc16(data):
 
 @has_log
 class EurothermModbusInterface(StreamInterface):
-    """This implements the modbus stream interface for a eurotherm.
+    """
+    This implements the modbus stream interface for a eurotherm.
 
-    Note: Eurotherm uses modbus RTU, not TCP, so cannot use lewis' normal modbus implementation here.
+    Note: Eurotherm uses modbus RTU, not TCP, so cannot use lewis' normal modbus
+    implementation here.
     """
 
     commands = {
         Cmd("any_command", r"^([\s\S]*)$", return_mapping=lambda x: x),
     }
 
-    def __init__(self):
+    def __init__(self) -> None:
         super().__init__()
-        # Modbus addresses for the needle valve were obtained from Jamie, full info can be found on the manuals share
+        self.device: SimulatedEurotherm
+        self.log: logging.Logger
+        # Modbus addresses for the needle valve were obtained from Jamie,
+        # full info can be found on the manuals share
         self.read_commands = {
             1: self.get_temperature,
             2: self.get_temperature_sp,
@@ -98,22 +120,20 @@ class EurothermModbusInterface(StreamInterface):
 
     protocol = "eurotherm_modbus"
 
-    def handle_error(self, request, error):
+    def handle_error(self, request: bytes, error: BaseException | str) -> None:
         error_message = "An error occurred at request " + repr(request) + ": " + repr(error)
         print(error_message)
         self.log.error(error_message)
-        return str(error)
 
     @log_replies
     @conditional_reply("connected")
-    def any_command(self, command):
+    def any_command(self, command: bytes) -> bytes | None:
         self.log.info(command)
         comms_address = command[0]
         function_code = int(command[1])
         data = command[2:-2]
-        crc = command[-2:]
 
-        assert (crc16(command) == b"\x00\x00", "Invalid checksum from IOC")
+        assert crc16(command) == b"\x00\x00", "Invalid checksum from IOC"
 
         if len(data) != 4:
             raise ValueError(f"Invalid message length {len(data)}")
@@ -125,7 +145,7 @@ class EurothermModbusInterface(StreamInterface):
         else:
             raise ValueError(f"Unknown modbus function code: {function_code}")
 
-    def handle_read(self, comms_address, data):
+    def handle_read(self, comms_address: int, data: bytes) -> bytes:
         mem_address = bytes_to_int(data[0:2])
         words_to_read = bytes_to_int(data[2:4])
         self.log.info(f"Attempting to read {words_to_read} words from mem address: {mem_address}")
@@ -142,115 +162,116 @@ class EurothermModbusInterface(StreamInterface):
 
         return reply + crc16(reply)
 
-    def handle_write(self, data, command):
+    def handle_write(self, data: bytes, command: bytes) -> bytes | None:
         mem_address = bytes_to_int(data[0:2])
         value = bytes_to_int(data[2:4])
         self.log.info(f"Attempting to write {value} to mem address: {mem_address}")
         try:
             self.write_commands[mem_address](value)
-        except:
+        except Exception as e:
+            self.log.error(e)
             return None
         # On write, device echos command back to IOC
         return command
 
-    def get_temperature(self):
-        return int(self.device.current_temperature * self.device.scaling)
+    def get_temperature(self) -> int:
+        return int(self.device.current_temperature(sensor) * self.device.scaling(sensor))
 
-    def get_temperature_sp(self):
-        return int(self.device.ramp_setpoint_temperature * self.device.scaling)
+    def get_temperature_sp(self) -> int:
+        return int(self.device.ramp_setpoint_temperature(sensor) * self.device.scaling(sensor))
 
-    def set_temperature_sp(self, value):
-        self.device.ramp_setpoint_temperature = value / self.device.scaling
+    def set_temperature_sp(self, value: int) -> None:
+        self.device.set_ramp_setpoint_temperature(sensor, (value / self.device.scaling(sensor)))
 
-    def get_p(self):
-        return int(self.device.p)
+    def get_p(self) -> int:
+        return int(self.device.p(sensor))
 
-    def get_i(self):
-        return int(self.device.i)
+    def get_i(self) -> int:
+        return int(self.device.i(sensor))
 
-    def get_d(self):
-        return int(self.device.d)
+    def get_d(self) -> int:
+        return int(self.device.d(sensor))
 
-    def set_p(self, value):
-        self.device.p = value
+    def set_p(self, value: int) -> None:
+        self.device.set_p(sensor, value)
 
-    def set_i(self, value):
-        self.device.i = value
+    def set_i(self, value: int) -> None:
+        self.device.set_i(sensor, value)
 
-    def set_d(self, value):
-        self.device.d = value
+    def set_d(self, value: int) -> None:
+        self.device.set_d(sensor, value)
 
-    def get_high_lim(self):
-        return int(self.device.high_lim * self.device.scaling)
+    def get_high_lim(self) -> int:
+        return int(self.device.high_lim(sensor) * self.device.scaling(sensor))
 
-    def get_low_lim(self):
-        return int(self.device.low_lim * self.device.scaling)
+    def get_low_lim(self) -> int:
+        return int(self.device.low_lim(sensor) * self.device.scaling(sensor))
 
-    def get_autotune(self):
-        return int(self.device.autotune)
+    def get_autotune(self) -> int:
+        return int(self.device.autotune(sensor))
 
-    def set_autotune(self, value):
-        self.device.autotune = value
+    def set_autotune(self, value: int) -> None:
+        self.device.set_autotune(sensor, value)
 
-    def get_max_output(self):
-        return int(self.device.max_output * self.device.scaling)
+    def get_max_output(self) -> int:
+        return int(self.device.max_output(sensor) * self.device.scaling(sensor))
 
-    def set_max_output(self, value):
-        self.device.max_output = value / self.device.scaling
+    def set_max_output(self, value: int) -> None:
+        self.device.set_max_output(sensor, (value / self.device.scaling(sensor)))
 
-    def get_output_rate(self):
-        return self.device.output_rate
+    def get_output_rate(self) -> int:
+        return int(self.device.output_rate(sensor))
 
-    def set_output_rate(self, value):
-        self.device.output_rate = value
+    def set_output_rate(self, value: int) -> None:
+        self.device.set_output_rate(sensor, value)
 
-    def get_output(self):
-        return int(self.device.output * self.device.scaling)
+    def get_output(self) -> int:
+        return int(self.device.output(sensor) * self.device.scaling(sensor))
 
-    def get_nv_flow(self):
-        return int(self.device.needlevalve_flow)
+    def get_nv_flow(self) -> int:
+        return int(self.device.needlevalve_flow(sensor))
 
-    def get_nv_manual_flow(self):
-        return int(self.device.needlevalve_manual_flow)
+    def get_nv_manual_flow(self) -> int:
+        return int(self.device.needlevalve_manual_flow(sensor))
 
-    def set_nv_manual_flow(self, value):
-        self.device.needlevalve_manual_flow = value
+    def set_nv_manual_flow(self, value: int) -> None:
+        self.device.set_needlevalve_manual_flow(sensor, value)
 
-    def get_nv_flow_low_lim(self):
-        return int(self.device.needlevalve_flow_low_lim)
+    def get_nv_flow_low_lim(self) -> int:
+        return int(self.device.needlevalve_flow_low_lim(sensor))
 
-    def set_nv_flow_low_lim(self, value):
-        self.device.needlevalve_flow_low_lim = value
+    def set_nv_flow_low_lim(self, value: int) -> None:
+        self.device.set_needlevalve_flow_low_lim(sensor, value)
 
-    def get_nv_flow_high_lim(self):
-        return int(self.device.needlevalve_flow_high_lim)
+    def get_nv_flow_high_lim(self) -> int:
+        return int(self.device.needlevalve_flow_high_lim(sensor))
 
-    def set_nv_flow_high_lim(self, value):
-        self.device.needlevalve_flow_high_lim = value
+    def set_nv_flow_high_lim(self, value: int) -> None:
+        self.device.set_needlevalve_flow_high_lim(sensor, value)
 
-    def get_nv_min_auto_flow_bl_temp(self):
-        return int(self.device.needlevalve_min_auto_flow_bl_temp)
+    def get_nv_min_auto_flow_bl_temp(self) -> int:
+        return int(self.device.needlevalve_min_auto_flow_bl_temp(sensor))
 
-    def set_nv_min_auto_flow_bl_temp(self, value):
-        self.device.needlevalve_min_auto_flow_bl_temp = value
+    def set_nv_min_auto_flow_bl_temp(self, value: int) -> None:
+        self.device.set_needlevalve_min_auto_flow_bl_temp(sensor, value)
 
-    def get_nv_auto_flow_scale(self):
-        return int(self.device.needlevalve_auto_flow_scale)
+    def get_nv_auto_flow_scale(self) -> int:
+        return int(self.device.needlevalve_auto_flow_scale(sensor))
 
-    def set_nv_auto_flow_scale(self, value):
-        self.device.needlevalve_auto_flow_scale = value
+    def set_nv_auto_flow_scale(self, value: int) -> None:
+        self.device.set_needlevalve_auto_flow_scale(sensor, value)
 
-    def get_nv_flow_sp_mode(self):
-        return int(self.device.needlevalve_flow_sp_mode)
+    def get_nv_flow_sp_mode(self) -> int:
+        return int(self.device.needlevalve_flow_sp_mode(sensor))
 
-    def set_nv_flow_sp_mode(self, value):
-        self.device.needlevalve_flow_sp_mode = value
+    def set_nv_flow_sp_mode(self, value: int) -> None:
+        self.device.set_needlevalve_flow_sp_mode(sensor, value)
 
-    def get_nv_direction(self):
-        return int(self.device.needlevalve_direction)
+    def get_nv_direction(self) -> int:
+        return int(self.device.needlevalve_direction(sensor))
 
-    def set_nv_stop(self, value):
-        self.device.needlevalve_stop = value
+    def set_nv_stop(self, value: int) -> None:
+        self.device.set_needlevalve_stop(sensor, value)
 
-    def get_nv_stop(self):
-        return int(self.device.needlevalve_stop)
+    def get_nv_stop(self) -> int:
+        return int(self.device.needlevalve_stop(sensor))
