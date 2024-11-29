@@ -4,6 +4,7 @@ from typing import Callable, ClassVar, Concatenate, ParamSpec, TypeVar
 from lewis.adapters.stream import StreamInterface
 from lewis.utils.command_builder import CmdBuilder
 from lewis.utils.replies import conditional_reply
+
 from lewis_emulators.eurotherm import SimulatedEurotherm
 
 if_connected = conditional_reply("connected")
