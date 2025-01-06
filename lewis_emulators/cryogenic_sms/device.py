@@ -1,13 +1,13 @@
+from collections import OrderedDict
 from datetime import datetime
 
 from lewis.devices import StateMachineDevice
-from collections import OrderedDict
-from .states import DefaultInitState, HoldingState, TrippedState, RampingState
-from .utils import RampTarget, RampDirection
+
+from .states import DefaultInitState, HoldingState, RampingState, TrippedState
+from .utils import RampDirection, RampTarget
 
 
 class SimulatedCRYOSMS(StateMachineDevice):
-
     def _initialize_data(self):
         # field constant (load line gradient)
         self.constant = 0.029
@@ -51,28 +51,29 @@ class SimulatedCRYOSMS(StateMachineDevice):
 
     def _get_state_handlers(self):
         return {
-            'init': DefaultInitState(),
-            'holding': HoldingState(),
-            'tripped': TrippedState(),
-            'ramping': RampingState(),
+            "init": DefaultInitState(),
+            "holding": HoldingState(),
+            "tripped": TrippedState(),
+            "ramping": RampingState(),
         }
 
     def _get_initial_state(self):
-        return 'init'
+        return "init"
 
     def _get_transition_handlers(self):
-
-        return OrderedDict([
-            (('init', 'ramping'), lambda: not self.at_target and not self.is_paused),
-            (('ramping', 'holding'), lambda: self.is_paused or self.at_target),
-            (('ramping', 'tripped'), lambda: self.is_quenched or self.is_xtripped),
-            (('holding', 'ramping'), lambda: not self.at_target and not self.is_paused),
-        ])
+        return OrderedDict(
+            [
+                (("init", "ramping"), lambda: not self.at_target and not self.is_paused),
+                (("ramping", "holding"), lambda: self.is_paused or self.at_target),
+                (("ramping", "tripped"), lambda: self.is_quenched or self.is_xtripped),
+                (("holding", "ramping"), lambda: not self.at_target and not self.is_paused),
+            ]
+        )
 
     # Utilities
 
     def timestamp_str(self):
-        return datetime.now().strftime('%H:%M:%S')
+        return datetime.now().strftime("%H:%M:%S")
 
     def switch_mode(self, mode):
         if mode == "TESLA" and not self.is_output_mode_tesla:

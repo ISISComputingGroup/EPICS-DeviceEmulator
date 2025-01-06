@@ -1,10 +1,9 @@
-from lewis.core.statemachine import State
 from lewis.core import approaches
 from lewis.core.logging import has_log
+from lewis.core.statemachine import State
 
 
 def get_target_value(device):
-
     if device.ramp_target == "MID":
         target_value = device.mid_target
     elif device.ramp_target == "MAX":
@@ -16,7 +15,6 @@ def get_target_value(device):
 
 
 class DefaultInitState(State):
-
     def in_state(self, dt):
         device = self._context
         device.check_is_at_target()
@@ -24,7 +22,6 @@ class DefaultInitState(State):
 
 @has_log
 class HoldingState(State):
-
     def on_entry(self, dt):
         self.log.info("*********** ENTERED HOLD STATE")
 
@@ -34,13 +31,11 @@ class HoldingState(State):
 
 
 class TrippedState(State):
-
     def in_state(self, dt):
         pass
 
 
 class RampingState(State):
-
     def in_state(self, dt):
         device = self._context
         # to avoid tests taking forever, ignoring actual rate in favour of value that ramps between boundaries in
