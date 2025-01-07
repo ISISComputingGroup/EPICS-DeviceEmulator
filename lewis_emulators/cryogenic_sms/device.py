@@ -9,6 +9,8 @@ from .utils import RampDirection, RampTarget
 
 class SimulatedCRYOSMS(StateMachineDevice):
     def _initialize_data(self):
+        self.connected = True
+
         # field constant (load line gradient)
         self.constant = 0.029
 

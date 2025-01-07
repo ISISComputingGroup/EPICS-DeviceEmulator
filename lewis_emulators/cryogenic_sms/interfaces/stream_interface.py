@@ -3,11 +3,15 @@ from datetime import datetime
 from lewis.adapters.stream import StreamInterface
 from lewis.core.logging import has_log
 from lewis.utils.command_builder import CmdBuilder
+from lewis.utils.replies import conditional_reply
 
 from ..utils import RampDirection, RampTarget
 
 ON_STATES = ["ON", "1"]
 OFF_STATES = ["OFF", "0"]
+
+
+if_connected = conditional_reply("connected")
 
 
 @has_log
@@ -177,9 +181,11 @@ class CRYOSMSStreamInterface(StreamInterface):
         elif self._device.ramp_target.name == "ZERO":
             return self._device.zero_target
 
+    @if_connected
     def read_direction(self):
         return "CURRENT DIRECTION: {}\r\n".format(self._device.direction.name)
 
+    @if_connected
     def write_direction(self, direction):
         if direction == "+":
             self._device.direction = RampDirection.POSITIVE
@@ -189,15 +195,18 @@ class CRYOSMSStreamInterface(StreamInterface):
             self._device.direction = RampDirection.ZERO
         return "........ \r\n"
 
+    @if_connected
     def read_output_mode(self):
         return self._out_message("UNITS: {}\r\n\x13".format(self._get_output_mode_string()))
 
+    @if_connected
     def read_output(self):
         sign = -1 if self._device.direction == RampDirection.NEGATIVE else 1
         return "........ OUTPUT: {} {} AT {} VOLTS \r\n\x13".format(
             self._device.output * sign, self._get_output_mode_string(), self._device.output_voltage
         )
 
+    @if_connected
     def write_output_mode(self, output_mode):
         # Convert values if output mode is changing between amps(OFF) / tesla(ON)
         constant = self._device.constant
@@ -216,9 +225,11 @@ class CRYOSMSStreamInterface(StreamInterface):
             raise ValueError("Invalid arguments sent")
         return f"{self._device.log_message}\r\n\x13"
 
+    @if_connected
     def read_ramp_target(self):
         return self._out_message("RAMP TARGET: {}".format(self._device.ramp_target.name))
 
+    @if_connected
     def read_ramp_status(self):
         output = self._device.output
         status_message = "RAMP STATUS: "
@@ -247,6 +258,7 @@ class CRYOSMSStreamInterface(StreamInterface):
             raise ValueError("Didn't match any of the expected conditions")
         return self._out_message(status_message)
 
+    @if_connected
     def write_ramp_target(self, ramp_target_str):
         if ramp_target_str in ["0", "ZERO"]:
             ramp_target = RampTarget.ZERO
@@ -263,14 +275,17 @@ class CRYOSMSStreamInterface(StreamInterface):
         self._device.is_paused = False
         return self._out_message(f"RAMP TARGET: {out}")
 
+    @if_connected
     def read_ramp_rate(self):
         return self._out_message("RAMP RATE: {} A/SEC".format(self._device.ramp_rate))
 
+    @if_connected
     def write_ramp_rate(self, ramp_rate):
         self._device.ramp_rate = float(ramp_rate)
         self._create_log_message("RAMP RATE", ramp_rate, suffix=" A/SEC")
         return f"{self._device.log_message}\r\n\x13"
 
+    @if_connected
     def read_heater_status(self):
         heater_value = "ON" if self._device.is_heater_on else "OFF"
         if self._device.output_persist != 0.0 and heater_value == "OFF":
@@ -282,6 +297,7 @@ class CRYOSMSStreamInterface(StreamInterface):
         else:
             return self._out_message("HEATER STATUS: {}".format(heater_value))
 
+    @if_connected
     def write_heater_status(self, heater_status):
         if heater_status in ON_STATES:
             self._device.output_persist = 0.0
@@ -294,9 +310,11 @@ class CRYOSMSStreamInterface(StreamInterface):
         self._create_log_message("HEATER STATUS", heater_status)
         return self._out_message(f"HEATER STATUS: {heater_status}")
 
+    @if_connected
     def read_pause(self):
         return self._out_message("PAUSE STATUS: {}".format(self._get_paused_state_str()))
 
+    @if_connected
     def write_pause(self, paused):
         mode = self._get_output_mode_string()
         target = self._get_ramp_target_value()
@@ -317,51 +335,61 @@ class CRYOSMSStreamInterface(StreamInterface):
 
         return self._out_message("PAUSE STATUS: {}".format(paused), terminator="\r\n")
 
+    @if_connected
     def read_heater_value(self):
         return self._out_message(
             "HEATER OUTPUT: {} VOLTS".format(self._device.heater_value), terminator="\x13"
         )
 
+    @if_connected
     def write_heater_value(self, heater_value):
         self._device.heater_value = heater_value
         self._create_log_message("HEATER OUTPUT", heater_value, suffix=" VOLTS")
         return f"{self._device.log_message}\x13"
 
+    @if_connected
     def read_max_target(self):
         mode = self._get_output_mode_string()
         return self._out_message(
             "MAX SETTING: {:.4} {}".format(float(self._device.max_target), mode), terminator="\r\n"
         )
 
+    @if_connected
     def write_max_target(self, max_target):
         self._device.max_target = abs(float(max_target))  # abs because PSU ignores sign
         units = self._get_output_mode_string()
         self._create_log_message("MAX SETTING", max_target, suffix=" {}".format(units))
         return f"{self._device.log_message}\r\n\x13"
 
+    @if_connected
     def read_mid_target(self):
         mode = self._get_output_mode_string()
         return self._out_message(
             "MID SETTING: {:.4} {}".format(float(self._device.mid_target), mode), terminator="\r\n"
         )
 
+    @if_connected
     def write_mid_target(self, mid_target):
         self._device.mid_target = abs(float(mid_target))  # abs because PSU ignores sign
         units = self._get_output_mode_string()
         self._create_log_message("MID SETTING", mid_target, suffix=" {}".format(units))
         return f"{self._device.log_message}\r\n\x13"
 
+    @if_connected
     def read_limit(self):
         return self._out_message("VOLTAGE LIMIT: {} VOLTS".format(self._device.limit))
 
+    @if_connected
     def write_limit(self, limit):
         self._device.limit = limit
         self._create_log_message("VOLTAGE LIMIT", limit, suffix=" VOLTS")
         return f"{self._device.log_message}\r\n\x13"
 
+    @if_connected
     def read_constant(self):
         return self._out_message("FIELD CONSTANT: {:.7} T/A".format(self._device.constant))
 
+    @if_connected
     def write_constant(self, constant):
         self._device.constant = float(constant)
         self._create_log_message("FIELD CONSTANT", constant, suffix=" T/A")
