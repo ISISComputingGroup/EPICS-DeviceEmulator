@@ -1,6 +1,8 @@
 from collections import OrderedDict
 from datetime import datetime
+from typing import Callable
 
+from lewis.core.statemachine import State
 from lewis.devices import StateMachineDevice
 
 from .states import DefaultInitState, HoldingState, RampingState, TrippedState
@@ -8,14 +10,14 @@ from .utils import RampDirection, RampTarget
 
 
 class SimulatedCRYOSMS(StateMachineDevice):
-    def _initialize_data(self):
+    def _initialize_data(self) -> None:
         self.connected = True
 
         # field constant (load line gradient)
         self.constant = 0.029
 
         # targets
-        self.max_target = 10
+        self.max_target = 10.0
         self.mid_target = 0.0
         self.prev_target = 0.0
         self.zero_target = 0.0
@@ -50,8 +52,9 @@ class SimulatedCRYOSMS(StateMachineDevice):
 
         # log message
         self.log_message = "this is the initial log message"
+        self.error_message = ""
 
-    def _get_state_handlers(self):
+    def _get_state_handlers(self) -> dict[str, State]:
         return {
             "init": DefaultInitState(),
             "holding": HoldingState(),
@@ -59,10 +62,10 @@ class SimulatedCRYOSMS(StateMachineDevice):
             "ramping": RampingState(),
         }
 
-    def _get_initial_state(self):
+    def _get_initial_state(self) -> str:
         return "init"
 
-    def _get_transition_handlers(self):
+    def _get_transition_handlers(self) -> dict[tuple[str, str], Callable[[], bool]]:
         return OrderedDict(
             [
                 (("init", "ramping"), lambda: not self.at_target and not self.is_paused),
@@ -74,10 +77,10 @@ class SimulatedCRYOSMS(StateMachineDevice):
 
     # Utilities
 
-    def timestamp_str(self):
+    def timestamp_str(self) -> str:
         return datetime.now().strftime("%H:%M:%S")
 
-    def switch_mode(self, mode):
+    def switch_mode(self, mode: str) -> None:
         if mode == "TESLA" and not self.is_output_mode_tesla:
             # going from A to T
             self.output *= self.constant
@@ -93,19 +96,20 @@ class SimulatedCRYOSMS(StateMachineDevice):
             self.heater_value /= self.constant
             self.is_output_mode_tesla = False
 
-    def check_is_at_target(self):
+    def check_is_at_target(self) -> bool:
         self.at_target = self.output == self.ramp_target_value()
         return self.at_target
 
-    def ramp_target_value(self):
+    def ramp_target_value(self) -> float:
         if self.ramp_target.name == "MID":
             return self.mid_target
         elif self.ramp_target.name == "MAX":
             return self.max_target
         elif self.ramp_target.name == "ZERO":
             return self.zero_target
+        raise ValueError(f"Unknown ramp target {self.ramp_target.name}")
 
-    def switch_direction(self, dir):
+    def switch_direction(self, dir: int) -> None:
         """
         :param dir: output direction, can be -1, 0 or 1. If not one of these values, nothing happens
         :return:
