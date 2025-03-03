@@ -193,7 +193,7 @@ class CRYOSMSStreamInterface(StreamInterface):
 
     @if_connected
     def read_direction(self) -> str:
-        return "CURRENT DIRECTION: {}\r\n".format(self._device.direction.name)
+        return "........ CURRENT DIRECTION: {}\r\n\x13".format(self._device.direction.name)
 
     @if_connected
     def write_direction(self, direction: Literal["+"] | Literal["-"] | Literal["0"]) -> str:
@@ -203,7 +203,7 @@ class CRYOSMSStreamInterface(StreamInterface):
             self._device.direction = RampDirection.NEGATIVE
         if direction == "0":
             self._device.direction = RampDirection.ZERO
-        return "........ \r\n"
+        return "\x13"
 
     @if_connected
     def read_output_mode(self) -> str:
@@ -269,21 +269,17 @@ class CRYOSMSStreamInterface(StreamInterface):
         return self._out_message(status_message)
 
     @if_connected
-    def write_ramp_target(self, ramp_target_str: str) -> str:
+    def write_ramp_target(self, ramp_target_str: str) -> None:
         if ramp_target_str in ["0", "ZERO"]:
             ramp_target = RampTarget.ZERO
-            out = "ZERO"
         elif ramp_target_str in ["%", "MID"]:
             ramp_target = RampTarget.MID
-            out = "MID"
         elif ramp_target_str in ["!", "MAX"]:
             ramp_target = RampTarget.MAX
-            out = "MAX"
         else:
             raise ValueError("Invalid arguments sent")
         self._device.ramp_target = ramp_target
         self._device.is_paused = False
-        return self._out_message(f"RAMP TARGET: {out}")
 
     @if_connected
     def read_ramp_rate(self) -> str:
@@ -346,19 +342,19 @@ class CRYOSMSStreamInterface(StreamInterface):
         else:
             raise ValueError("Invalid arguments sent")
 
-        return self._out_message("PAUSE STATUS: {}".format(paused), terminator="\r\n")
+        return self._out_message("PAUSE STATUS: {}".format(paused))
 
     @if_connected
     def read_heater_value(self) -> str:
         return self._out_message(
-            "HEATER OUTPUT: {} VOLTS".format(self._device.heater_value), terminator="\x13"
+            "HEATER OUTPUT: {} VOLTS".format(self._device.heater_value)
         )
 
     @if_connected
     def write_heater_value(self, heater_value: float) -> str:
         self._device.heater_value = heater_value
         self._create_log_message("HEATER OUTPUT", heater_value, suffix=" VOLTS")
-        return f"{self._device.log_message}\x13"
+        return f"{self._device.log_message}\r\n\x13"
 
     @if_connected
     def read_max_target(self) -> str:
@@ -378,7 +374,7 @@ class CRYOSMSStreamInterface(StreamInterface):
     def read_mid_target(self) -> str:
         mode = self._get_output_mode_string()
         return self._out_message(
-            "MID SETTING: {:.4} {}".format(float(self._device.mid_target), mode), terminator="\r\n"
+            "MID SETTING: {:.4} {}".format(float(self._device.mid_target), mode), terminator="\r\n\x13"
         )
 
     @if_connected
