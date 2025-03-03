@@ -346,9 +346,7 @@ class CRYOSMSStreamInterface(StreamInterface):
 
     @if_connected
     def read_heater_value(self) -> str:
-        return self._out_message(
-            "HEATER OUTPUT: {} VOLTS".format(self._device.heater_value)
-        )
+        return self._out_message("HEATER OUTPUT: {} VOLTS".format(self._device.heater_value))
 
     @if_connected
     def write_heater_value(self, heater_value: float) -> str:
@@ -374,7 +372,8 @@ class CRYOSMSStreamInterface(StreamInterface):
     def read_mid_target(self) -> str:
         mode = self._get_output_mode_string()
         return self._out_message(
-            "MID SETTING: {:.4} {}".format(float(self._device.mid_target), mode), terminator="\r\n\x13"
+            "MID SETTING: {:.4} {}".format(float(self._device.mid_target), mode),
+            terminator="\r\n\x13",
         )
 
     @if_connected
