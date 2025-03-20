@@ -32,7 +32,9 @@ class DeviceUID:
     
 
 @has_log
-class IpsStreamInterface(StreamInterface):
+class IpsSCPIStreamInterface(StreamInterface):
+    protocol = "ips_scpi"
+
     # Commands that we expect via serial during normal operation
     commands = {
         CmdBuilder("get_version").escape("*IDN?").eos().build(),
@@ -56,6 +58,8 @@ class IpsStreamInterface(StreamInterface):
         CmdBuilder("get_pos_current_limit").escape(f"READ:DEV:{DeviceUID.magnet_supply}:PSU:CLIM").eos().build(),
         CmdBuilder("get_lead_resistance").escape(f"READ:DEV:{DeviceUID.magnet_temperature_sensor}:TEMP:SIG:RES").eos().build(),
         CmdBuilder("get_magnet_inductance").escape(f"READ:DEV:{DeviceUID.magnet_supply}:PSU:IND").eos().build(),
+        CmdBuilder("get_heater_status").escape(f"READ:DEV:{DeviceUID.magnet_supply}:PSU:SIG:SWHT").eos().build(),
+
 #        CmdBuilder("set_control_mode")
 #        .escape("C")
 #        .arg("0|1|2|3", argument_mapping=int)
@@ -208,6 +212,9 @@ class IpsStreamInterface(StreamInterface):
 
     def get_magnet_inductance(self):
         return "R{}".format(self.device.inductance)
+
+    def get_heater_status(self):
+        return f"STAT:DEV:GRPZ:PSU:SIG:SWHT:{'ON' if self.device.heater_on else 'OFF'}"
 
     def set_current(self, current):
         self.device.current_setpoint = float(current)
