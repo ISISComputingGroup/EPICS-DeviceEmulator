@@ -1,3 +1,4 @@
+from calendar import different_locale
 from collections import OrderedDict
 
 from lewis.core.logging import has_log
@@ -52,51 +53,51 @@ class SimulatedIps(StateMachineDevice):
         #
         # When the heater is OFF, the wire is superconducting, which means that the power supply can be ramped down and
         # the magnet will stay active (this is "persistent" mode)
-        self.heater_on = False
-        self.heater_current = 0
+        self.heater_on: bool = False
+        self.heater_current: float = 0.0
 
         # "Leads" are the non-superconducting wires between the superconducting magnet and the power supply.
         # Not sure what a realistic value is for these leads, so I've guessed.
-        self.lead_resistance = 50
+        self.lead_resistance: float = 50.0
 
         # Current = what the power supply is providing.
-        self.current = 0
-        self.current_setpoint = 0
+        self.current: float = 0.0
+        self.current_setpoint: float = 0.0
 
         # Current for the magnet. May be different from the power supply current if the magnet is in persistent mode.
-        self.magnet_current = 0
+        self.magnet_current: float = 0.0
 
         # Measured current may be different from what the PSU is attempting to provide
-        self.measured_current = 0
+        self.measured_current: float = 0.0
 
         # If the device trips, store the last current which caused a trip in here.
         # This could be used for diagnostics e.g. finding maximum field which magnet is capable of in a certain config.
-        self.trip_current = 0
+        self.trip_current: float = 0.0
 
         # Ramp rate == sweep rate
-        self.current_ramp_rate = 1 / LOAD_LINE_GRADIENT
+        self.current_ramp_rate: float = 1 / LOAD_LINE_GRADIENT
 
         # Set to true if the magnet is quenched - this will cause lewis to enter the quenched state
-        self.quenched = False
+        self.quenched: bool = False
 
         # Mode of the magnet e.g. HOLD, TO SET POINT, TO ZERO, CLAMP
-        self.activity = Activity.TO_SETPOINT
+        self.activity: Activity = Activity.TO_SETPOINT
 
         # No idea what a sensible value is. Hard-code this here for now - can't be changed on real device.
-        self.inductance = 0.005
+        self.inductance: float = 0.005
 
         # No idea what sensible values are here. Also not clear what the behaviour is of the controller when these
         # limits are hit.
         self.neg_current_limit, self.pos_current_limit = -(10**6), 10**6
 
         # Local and locked is the zeroth mode of the control command
-        self.control = Control.LOCAL_LOCKED
+        self.control: Control = Control.LOCAL_LOCKED
 
         # The only sweep mode we are interested in is tesla fast
-        self.sweep_mode = SweepMode.TESLA_FAST
+        self.sweep_mode: SweepMode = SweepMode.TESLA_FAST
 
         # Not sure what is the sensible value here
-        self.mode = Mode.SLOW
+        self.mode: Mode = Mode.SLOW
 
     def _get_state_handlers(self):
         return {
