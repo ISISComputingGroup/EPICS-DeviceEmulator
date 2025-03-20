@@ -23,6 +23,8 @@ CONTROL_MODE_MAPPING = {
 
 @has_log
 class IpsStreamInterface(StreamInterface):
+    protocol = "ips_legacy"
+
     # Commands that we expect via serial during normal operation
     commands = {
         CmdBuilder("get_version").escape("V").eos().build(),
