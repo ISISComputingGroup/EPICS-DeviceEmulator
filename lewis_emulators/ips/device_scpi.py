@@ -3,7 +3,7 @@ from collections import OrderedDict
 from lewis.core.logging import has_log
 from lewis.devices import StateMachineDevice
 
-from lewis_emulators.ips.modes import Activity, Control, Mode, SweepMode
+from lewis_emulators.ips.modes_scpi import Activity, Control, Mode, SweepMode, MagnetSupplyStatus
 
 from .states import HeaterOffState, HeaterOnState, MagnetQuenchedState
 
@@ -93,12 +93,17 @@ class SimulatedIps(StateMachineDevice):
         self.control: Control = Control.LOCAL_LOCKED
 
         # The only sweep mode we are interested in is tesla fast
+        # This appears to be unssupported by the SCPI protocol, so the
+        # corresponding EPICS records have been removed.
         self.sweep_mode: SweepMode = SweepMode.TESLA_FAST
 
         # Not sure what is the sensible value here
         self.mode: Mode = Mode.SLOW
 
         self.bipolar: bool = True
+
+        self.magnet_supply_status = MagnetSupplyStatus.OK
+
 
     def _get_state_handlers(self):
         return {
