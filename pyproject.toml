@@ -52,9 +52,9 @@ dev = [
 ]
 
 [project.urls]
-"Homepage" = "https://github.com/isiscomputinggroup/ibex_bluesky_core"
-"Bug Reports" = "https://github.com/isiscomputinggroup/ibex_bluesky_core/issues"
-"Source" = "https://github.com/isiscomputinggroup/ibex_bluesky_core"
+"Homepage" = "https://github.com/isiscomputinggroup/lewis-devices"
+"Bug Reports" = "https://github.com/isiscomputinggroup/lewis-devices/issues"
+"Source" = "https://github.com/isiscomputinggroup/lewis-devices"
 
 
 [tool.setuptools_scm]
