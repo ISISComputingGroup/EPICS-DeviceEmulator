@@ -4,7 +4,7 @@ jobs:
   call-linter-workflow:
     uses: ISISComputingGroup/reusable-workflows/.github/workflows/linters.yml@main
     with:
-      compare-branch: origin/main
+      compare-branch: origin/master
       python-ver: '3.13'
   tests:
     runs-on: ubuntu-latest
