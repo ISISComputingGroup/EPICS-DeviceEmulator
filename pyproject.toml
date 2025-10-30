@@ -18,9 +18,6 @@ maintainers = [
   {name = "ISIS Experiment Controls", email = "ISISExperimentControls@stfc.ac.uk" }
 ]
 
-# Classifiers help users find your project by categorizing it.
-#
-# For a list of valid classifiers, see https://pypi.org/classifiers/
 classifiers = [
   # How mature is this project? Common values are
   #   3 - Alpha
@@ -36,6 +33,7 @@ classifiers = [
   "Programming Language :: Python :: 3.11",
   "Programming Language :: Python :: 3.12",
   "Programming Language :: Python :: 3.13",
+  "Programming Language :: Python :: 3.14",
   "Programming Language :: Python :: 3 :: Only",
 ]
 

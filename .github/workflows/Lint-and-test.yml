@@ -1,0 +1,35 @@
+name: Lint-and-test
+on: [pull_request, workflow_call]
+jobs:
+  call-linter-workflow:
+    uses: ISISComputingGroup/reusable-workflows/.github/workflows/linters.yml@main
+    with:
+      compare-branch: origin/main
+      python-ver: '3.13'
+  tests:
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        version: ['3.11', '3.12', '3.13', '3.14']
+    steps:
+      - uses: actions/checkout@v4
+      - uses: astral-sh/setup-uv@v6
+        with:
+          python-version: ${{ matrix.version }}
+      - name: install requirements
+        run: uv sync --extra dev
+      - name: run unit tests
+        run: uv run pytest
+  results:
+    if: ${{ always() }}
+    runs-on: ubuntu-latest
+    name: Final Results
+    needs: [call-linter-workflow, tests]
+    steps:
+    - run: exit 1
+      # see https://stackoverflow.com/a/67532120/4907315
+      if: >-
+          ${{
+               contains(needs.*.result, 'failure')
+            || contains(needs.*.result, 'cancelled')
+          }}
