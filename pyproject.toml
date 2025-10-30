@@ -48,7 +48,6 @@ dev = [
   "ruff>=0.8",
   "pyright",
   "pytest",
-  "pytest-cov",
 ]
 
 [project.urls]
