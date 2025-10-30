@@ -97,3 +97,5 @@ ENV/
 #pycharm
 **/.idea/
 *.pyc
+
+src/lewis_devices/version.py
