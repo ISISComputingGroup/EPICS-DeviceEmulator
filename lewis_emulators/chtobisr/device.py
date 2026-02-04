@@ -1,12 +1,14 @@
 from collections import OrderedDict
+from dataclasses import dataclass, field
 
 from lewis.core.logging import has_log
+from lewis.core.statemachine import State
 from lewis.devices import StateMachineDevice
 
 from .states import DefaultState
 
 
-def build_code(codes_dict):
+def build_code(codes_dict: dict[str, tuple[bool, int]]) -> int:
     """Builds a code based on a codes dictionary
     :param codes_dict: A dictionary with the code and whether it's flagged or not.
     :return: The full code
@@ -20,20 +22,13 @@ def build_code(codes_dict):
     return code
 
 
-class SimulatedChtobisr(StateMachineDevice):
-    """Class to simulate Coherent OBIS Laser Remote
-    """
+@dataclass
+class ChtobisrLaser:
+    id = "Coherent OBIS Laser Remote - EMULATOR"
+    interlock = "OFF"
 
-    def _initialize_data(self):
-        """Initialize all of the device's attributes.
-        """
-        self.connected = True
-        self.id = "Coherent OBIS Laser Remote - EMULATOR"
-        self.interlock = "OFF"  # "OFF" -> OPEN, "ON" -> CLOSED
-
-        # Dictionary of form:
-        # {status_name: [whether_in_status, return_code]}
-        self.status = {
+    status: dict = field(
+        default_factory=lambda: {
             # Laser specific status bits
             "laser_fault": [False, 0x00000001],
             "laser_emission": [False, 0x00000002],
@@ -57,8 +52,10 @@ class SimulatedChtobisr(StateMachineDevice):
             "remote_active": [False, 0x40000000],
             "controller_indicator": [False, 0x80000000],
         }
+    )
 
-        self.faults = {
+    faults: dict = field(
+        default_factory=lambda: {
             # Laser specific fault bits
             "base_plate_temp_fault": [False, 0x00000001],
             "diode_temp_fault": [False, 0x00000002],
@@ -86,70 +83,87 @@ class SimulatedChtobisr(StateMachineDevice):
             "controller_checksum": [False, 0x40000000],
             "controller_status": [False, 0x80000000],
         }
+    )
+
+    source_on: bool = False
+    source_power: float = 0.0
+
+
+class SimulatedChtobisr(StateMachineDevice):
+    """Class to simulate Coherent OBIS Laser Remote"""
+
+    def _initialize_data(self) -> None:
+        """Initialize the device's attributes."""
+        self.connected = True
+
+        self.lasers = {
+            1: ChtobisrLaser(),
+            2: ChtobisrLaser(),
+            3: ChtobisrLaser(),
+        }
 
     @has_log
-    def backdoor_set_interlock(self, value):
-        """Sets interlock via backdoor
-        :param value: "ON" or "OFF"
-        :return: none
-        """
+    def backdoor_set_interlock(self, laser: int, value: str) -> None:
+        """Sets interlock via backdoor"""
         if value not in ["ON", "OFF"]:
             self.log.error("Interlock can only be set to ON or OFF")
         else:
-            self.interlock = value
+            self.lasers[laser].interlock = value
 
-    def reset(self):
-        """Resets all parameters by calling initialize function
-        """
+    def reset(self) -> None:
+        """Resets all parameters by calling initialize function"""
         self._initialize_data()
 
-    def build_status_code(self):
+    def build_status_code(self, laser: int) -> int:
         """ "
             Builds the device status code
 
         :return: status code
         """
-        return build_code(self.status)
+        return build_code(self.lasers[laser].status)
 
-    def build_fault_code(self):
+    def build_fault_code(self, laser: int) -> int:
         """ "
             Builds the device fault code
 
         :return: fault code
         """
-        return build_code(self.faults)
+        return build_code(self.lasers[laser].faults)
 
     @has_log
-    def backdoor_set_status(self, statusname, value):
+    def backdoor_set_status(self, laser: int, statusname: str, value: bool) -> None:
         """Sets status code via backdoor
         :param statusname: name of status attribute
         :param value: true or false
         :return: none
         """
         try:
-            self.status[statusname][0] = value
-        except KeyError:
-            self.log.error("An error occurred: " + KeyError.message)
+            self.lasers[laser].status[statusname][0] = value
+        except KeyError as e:
+            self.log.error(f"An error occurred: {e}")
 
     @has_log
-    def backdoor_set_fault(self, faultname, value):
+    def backdoor_set_fault(self, laser: int, faultname: str, value: bool) -> None:
         """Sets fault code via backdoor
         :param faultname: name of fault attribute
         :param value: true or false
         :return: none
         """
         try:
-            self.faults[faultname][0] = value
-        except KeyError:
-            self.log.error("An error occurred: " + KeyError.message)
+            self.lasers[laser].faults[faultname][0] = value
+        except KeyError as e:
+            self.log.error(f"An error occurred: {e}")
 
-    def _get_state_handlers(self):
+    def backdoor_set_id(self, laser: int, id: str) -> None:
+        self.lasers[laser].id = id
+
+    def _get_state_handlers(self) -> dict[str, State]:
         return {
             "default": DefaultState(),
         }
 
-    def _get_initial_state(self):
+    def _get_initial_state(self) -> str:
         return "default"
 
-    def _get_transition_handlers(self):
+    def _get_transition_handlers(self) -> OrderedDict:
         return OrderedDict([])
