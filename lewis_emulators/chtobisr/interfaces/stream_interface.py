@@ -5,6 +5,8 @@ from lewis.core.logging import has_log
 from lewis.utils.command_builder import CmdBuilder
 from lewis.utils.replies import conditional_reply
 
+from ..device import SimulatedChtobisr
+
 
 @has_log
 class ChtobisrStreamInterface(StreamInterface):
@@ -41,6 +43,8 @@ class ChtobisrStreamInterface(StreamInterface):
 
     in_terminator = "\r\n"
     out_terminator = "\r\n"
+
+    _device: SimulatedChtobisr
 
     def handle_error(self, request: str, error: Exception) -> None:
         """If command is not recognised, print and error
