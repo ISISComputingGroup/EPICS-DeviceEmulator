@@ -314,4 +314,4 @@ class EurothermModbusInterface(StreamInterface):
         return int(self.device.outdcomp(sensor))
 
     def get_snbrkpst(self) -> bool:
-        return int(self.device.snbrkpst(sensor))
+        return bool(self.device.snbrkpst(sensor))
