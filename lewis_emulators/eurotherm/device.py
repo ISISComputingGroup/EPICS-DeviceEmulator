@@ -957,11 +957,10 @@ class SimulatedEurotherm(StateMachineDevice):
             self.needlevalve_stop = 0
             self.automan = False
             self.lowrange = 0.0
-            self.hirange = 0.0 
-            self.workoutp = 0.0 
+            self.hirange = 0.0
+            self.workoutp = 0.0
             self.outlowlm = 0.0
-            self.outpcomp = 0.0  
+            self.outpcomp = 0.0
             self.outicomp = 0.0
             self.outdcomp = 0.0
             self.snbrkpst = False
-

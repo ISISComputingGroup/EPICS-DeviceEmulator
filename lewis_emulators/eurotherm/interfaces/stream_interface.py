@@ -84,7 +84,6 @@ class EurothermStreamInterface(StreamInterface):
         CmdBuilder("get_outicomp").eot().arg("[0-9]{4}").escape("xI").enq().build(),
         CmdBuilder("get_outdcomp").eot().arg("[0-9]{4}").escape("xD").enq().build(),
         CmdBuilder("get_snbrkpst").eot().arg("[0-9]{4}").escape("sb").enq().build(),
-        
     }
 
     # Add terminating characters manually for each command,

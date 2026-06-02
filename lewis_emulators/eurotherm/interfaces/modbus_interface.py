@@ -287,31 +287,31 @@ class EurothermModbusInterface(StreamInterface):
         return int(self.device.needlevalve_stop(sensor))
 
     def get_automan(self) -> bool:
-        return bool(self.device.output_rate(sensor))
+        return bool(self.device.automan(sensor))
 
     def set_automan(self, value: bool) -> None:
-        self.device.set_output_rate(sensor, value)
-        
+        self.device.set_automan(sensor, value)
+
     def get_lowrange(self) -> int:
-        return int(self.device.output_rate(sensor))
-    
+        return int(self.device.lowrange(sensor))
+
     def get_hirange(self) -> int:
-        return int(self.device.output_rate(sensor))
+        return int(self.device.hirange(sensor))
 
     def get_workoutp(self) -> int:
-        return int(self.device.output_rate(sensor))
+        return int(self.device.workoutp(sensor))
 
     def get_outlowlm(self) -> int:
-        return int(self.device.output_rate(sensor))
+        return int(self.device.outlowlm(sensor))
 
     def get_outpcomp(self) -> int:
-        return int(self.device.output_rate(sensor))
+        return int(self.device.outpcomp(sensor))
 
     def get_outicomp(self) -> int:
-        return int(self.device.output_rate(sensor))
+        return int(self.device.outicomp(sensor))
 
     def get_outdcomp(self) -> int:
-        return int(self.device.output_rate(sensor))
+        return int(self.device.outdcomp(sensor))
 
     def get_snbrkpst(self) -> bool:
-        return int(bool.device.output_rate(sensor))
+        return int(self.device.snbrkpst(sensor))
