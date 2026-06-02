@@ -75,6 +75,16 @@ class EurothermStreamInterface(StreamInterface):
         .etx()
         .any()
         .build(),
+        CmdBuilder("get_automan").eot().arg("[0-9]{4}").escape("mA").enq().build(),
+        CmdBuilder("get_lowrange").eot().arg("[0-9]{4}").escape("QC").enq().build(),
+        CmdBuilder("get_hirange").eot().arg("[0-9]{4}").escape("QB").enq().build(),
+        CmdBuilder("get_workoutp").eot().arg("[0-9]{4}").escape("WO").enq().build(),
+        CmdBuilder("get_outlowlm").eot().arg("[0-9]{4}").escape("LO").enq().build(),
+        CmdBuilder("get_outpcomp").eot().arg("[0-9]{4}").escape("Xp").enq().build(),
+        CmdBuilder("get_outicomp").eot().arg("[0-9]{4}").escape("xI").enq().build(),
+        CmdBuilder("get_outdcomp").eot().arg("[0-9]{4}").escape("xD").enq().build(),
+        CmdBuilder("get_snbrkpst").eot().arg("[0-9]{4}").escape("sb").enq().build(),
+        
     }
 
     # Add terminating characters manually for each command,
@@ -323,3 +333,111 @@ class EurothermStreamInterface(StreamInterface):
         """
         reply = "\x02EE>0x{}\x03".format(self.device.error(addr))
         return f"{reply}{self.make_checksum(reply[1:])}"
+
+    @if_connected
+    @translate_adddress
+    def get_automan(self, addr: str) -> str | None:
+        """Get the automan mode of the Eurotherm sensor.
+
+        Returns: the automan mode formatted like the Eurotherm protocol.
+        """
+        try:
+            return self.make_read_reply("mA", self.device.automan(addr))
+        except Exception:
+            return None
+
+    @if_connected
+    @translate_adddress
+    def get_lowrange(self, addr: str) -> str | None:
+        """Get the low range limit value of the Eurotherm sensor.
+
+        Returns: the low range limit formatted like the Eurotherm protocol.
+        """
+        try:
+            return self.make_read_reply("QC", self.device.max_output(addr))
+        except Exception:
+            return None
+
+    @if_connected
+    @translate_adddress
+    def get_hirange(self, addr: str) -> str | None:
+        """Get the high range limit value of the Eurotherm sensor.
+
+        Returns: the high range limit value formatted like the Eurotherm protocol.
+        """
+        try:
+            return self.make_read_reply("QB", self.device.max_output(addr))
+        except Exception:
+            return None
+
+    @if_connected
+    @translate_adddress
+    def get_workoutp(self, addr: str) -> str | None:
+        """Get the working output value of the Eurotherm sensor.
+
+        Returns: the working output value formatted like the Eurotherm protocol.
+        """
+        try:
+            return self.make_read_reply("WO", self.device.max_output(addr))
+        except Exception:
+            return None
+
+    @if_connected
+    @translate_adddress
+    def get_outlowlm(self, addr: str) -> str | None:
+        """Get the low power limit value of the Eurotherm sensor.
+
+        Returns: the low power limit value formatted like the Eurotherm protocol.
+        """
+        try:
+            return self.make_read_reply("LO", self.device.max_output(addr))
+        except Exception:
+            return None
+
+    @if_connected
+    @translate_adddress
+    def get_outpcomp(self, addr: str) -> str | None:
+        """Get the proportional component of output of the Eurotherm sensor.
+
+        Returns: the proportional component of output formatted like the Eurotherm protocol.
+        """
+        try:
+            return self.make_read_reply("Xp", self.device.max_output(addr))
+        except Exception:
+            return None
+
+    @if_connected
+    @translate_adddress
+    def get_outicomp(self, addr: str) -> str | None:
+        """Get the integral component of output of the Eurotherm sensor.
+
+        Returns: the integral component of output formatted like the Eurotherm protocol.
+        """
+        try:
+            return self.make_read_reply("xI", self.device.max_output(addr))
+        except Exception:
+            return None
+
+    @if_connected
+    @translate_adddress
+    def get_outdcomp(self, addr: str) -> str | None:
+        """Get the derivative component of output of the Eurotherm sensor.
+
+        Returns: the derivative component of output formatted like the Eurotherm protocol.
+        """
+        try:
+            return self.make_read_reply("xD", self.device.max_output(addr))
+        except Exception:
+            return None
+
+    @if_connected
+    @translate_adddress
+    def get_snbrkpst(self, addr: str) -> str | None:
+        """Get the sensor break status of the Eurotherm sensor.
+
+        Returns: the sensor break status formatted like the Eurotherm protocol.
+        """
+        try:
+            return self.make_read_reply("sb", self.device.max_output(addr))
+        except Exception:
+            return None

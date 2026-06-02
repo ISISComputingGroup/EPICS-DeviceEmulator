@@ -95,6 +95,15 @@ class EurothermModbusInterface(StreamInterface):
             4963: self.get_nv_min_auto_flow_bl_temp,
             4965: self.get_nv_auto_flow_scale,
             1292: self.get_nv_stop,
+            273: self.get_automan,
+            11: self.get_lowrange,
+            12: self.get_hirange,
+            4: self.get_workoutp,
+            31: self.get_outlowlm,
+            214: self.get_outpcomp,
+            55: self.get_outicomp,
+            116: self.get_outdcomp,
+            258: self.get_snbrkpst,
         }
 
         self.write_commands = {
@@ -112,6 +121,7 @@ class EurothermModbusInterface(StreamInterface):
             4963: self.set_nv_min_auto_flow_bl_temp,
             4965: self.set_nv_auto_flow_scale,
             1292: self.set_nv_stop,
+            273: self.set_automan,
         }
 
     in_terminator = ""
@@ -275,3 +285,33 @@ class EurothermModbusInterface(StreamInterface):
 
     def get_nv_stop(self) -> int:
         return int(self.device.needlevalve_stop(sensor))
+
+    def get_automan(self) -> bool:
+        return bool(self.device.output_rate(sensor))
+
+    def set_automan(self, value: bool) -> None:
+        self.device.set_output_rate(sensor, value)
+        
+    def get_lowrange(self) -> int:
+        return int(self.device.output_rate(sensor))
+    
+    def get_hirange(self) -> int:
+        return int(self.device.output_rate(sensor))
+
+    def get_workoutp(self) -> int:
+        return int(self.device.output_rate(sensor))
+
+    def get_outlowlm(self) -> int:
+        return int(self.device.output_rate(sensor))
+
+    def get_outpcomp(self) -> int:
+        return int(self.device.output_rate(sensor))
+
+    def get_outicomp(self) -> int:
+        return int(self.device.output_rate(sensor))
+
+    def get_outdcomp(self) -> int:
+        return int(self.device.output_rate(sensor))
+
+    def get_snbrkpst(self) -> bool:
+        return int(bool.device.output_rate(sensor))

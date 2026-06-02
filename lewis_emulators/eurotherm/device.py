@@ -793,6 +793,134 @@ class SimulatedEurotherm(StateMachineDevice):
             euro = self.sensors[addr]
             euro.connected = connected
 
+    def automan(self, addr: str) -> bool:
+        """
+        Gets the Auto/Manual status
+
+        Returns: current Automan mode (Auto/Manual)
+        """
+
+        euro = self.sensors[addr]
+        return euro.automan
+
+    def set_automan(self, addr: str, value: bool) -> None:
+        """
+        Sets Automan mode
+        """
+        self.log.info(f"Addr: {addr}, Automan: {value}")
+        self.log.info(f"{addr.__class__.__name__}")
+        automan = bool(value)
+        if addr is None:
+            for euro in self.sensors.values():
+                euro.automan = automan
+        else:
+            euro = self.sensors[addr]
+            euro.automan = automan
+
+    def lowrange(self, addr: str) -> float:
+        """
+        Get low range limit of the device.
+
+        Returns: the low range limit.
+        """
+        self._delay()
+
+        euro = self.sensors[addr]
+        if not euro.connected:
+            raise ValueError
+        return euro.lowrange
+
+    def hirange(self, addr: str) -> float:
+        """
+        Get high range limit of the device.
+
+        Returns: the high range limit.
+        """
+        self._delay()
+
+        euro = self.sensors[addr]
+        if not euro.connected:
+            raise ValueError
+        return euro.hirange
+
+    def workoutp(self, addr: str) -> float:
+        """
+        Get working output value of the device.
+
+        Returns: the working output value in K.
+        """
+        self._delay()
+
+        euro = self.sensors[addr]
+        if not euro.connected:
+            raise ValueError
+        return euro.workoutp
+
+    def outlowlm(self, addr: str) -> float:
+        """
+        Get low power limit value of the device.
+
+        Returns: the low power limit value.
+        """
+        self._delay()
+
+        euro = self.sensors[addr]
+        if not euro.connected:
+            raise ValueError
+        return euro.outlowlm
+
+    def outpcomp(self, addr: str) -> float:
+        """
+        Get proportional component of output of the device.
+
+        Returns: the proportional component of output.
+        """
+        self._delay()
+
+        euro = self.sensors[addr]
+        if not euro.connected:
+            raise ValueError
+        return euro.outpcomp
+
+    def outicomp(self, addr: str) -> float:
+        """
+        Get integral component of output of the device.
+
+        Returns: the Integral component of output.
+        """
+        self._delay()
+
+        euro = self.sensors[addr]
+        if not euro.connected:
+            raise ValueError
+        return euro.outicomp
+
+    def outdcomp(self, addr: str) -> float:
+        """
+        Get the derivative component of output of the device.
+
+        Returns: the derivative component of output.
+        """
+        self._delay()
+
+        euro = self.sensors[addr]
+        if not euro.connected:
+            raise ValueError
+        return euro.outdcomp
+
+    def snbrkpst(self, addr: str) -> bool:
+        """
+        Get the sensor break status of the device.
+
+        Returns: the sensor break status.
+        """
+        self._delay()
+
+        euro = self.sensors[addr]
+        if not euro.connected:
+            raise ValueError
+        return euro.snbrkpst
+
     class EurothermSensor:
         """
         Eurotherm temperature sensor method
@@ -827,3 +955,13 @@ class SimulatedEurotherm(StateMachineDevice):
             self.needlevalve_flow_sp_mode = 0
             self.needlevalve_direction = 0
             self.needlevalve_stop = 0
+            self.automan = False
+            self.lowrange = 0.0
+            self.hirange = 0.0 
+            self.workoutp = 0.0 
+            self.outlowlm = 0.0
+            self.outpcomp = 0.0  
+            self.outicomp = 0.0
+            self.outdcomp = 0.0
+            self.snbrkpst = False
+
