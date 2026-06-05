@@ -793,7 +793,7 @@ class SimulatedEurotherm(StateMachineDevice):
             euro = self.sensors[addr]
             euro.connected = connected
 
-    def automan(self, addr: str) -> bool:
+    def automan(self, addr: str) -> int:
         """
         Gets the Auto/Manual status
 
@@ -803,13 +803,13 @@ class SimulatedEurotherm(StateMachineDevice):
         euro = self.sensors[addr]
         return euro.automan
 
-    def set_automan(self, addr: str, value: bool) -> None:
+    def set_automan(self, addr: str, value: int) -> None:
         """
         Sets Automan mode
         """
         self.log.info(f"Addr: {addr}, Automan: {value}")
         self.log.info(f"{addr.__class__.__name__}")
-        automan = bool(value)
+        automan = int(value)
         if addr is None:
             for euro in self.sensors.values():
                 euro.automan = automan
@@ -955,7 +955,7 @@ class SimulatedEurotherm(StateMachineDevice):
             self.needlevalve_flow_sp_mode = 0
             self.needlevalve_direction = 0
             self.needlevalve_stop = 0
-            self.automan = False
+            self.automan = 0
             self.lowrange = 0.0
             self.hirange = 0.0
             self.workoutp = 0.0
@@ -963,4 +963,4 @@ class SimulatedEurotherm(StateMachineDevice):
             self.outpcomp = 0.0
             self.outicomp = 0.0
             self.outdcomp = 0.0
-            self.snbrkpst = False
+            self.snbrkpst = 0

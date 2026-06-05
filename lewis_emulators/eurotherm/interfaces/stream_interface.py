@@ -76,6 +76,7 @@ class EurothermStreamInterface(StreamInterface):
         .any()
         .build(),
         CmdBuilder("get_automan").eot().arg("[0-9]{4}").escape("mA").enq().build(),
+        CmdBuilder("set_automan").eot().arg("[0-9]{4}").stx().escape("mA").int().etx().any().build(),
         CmdBuilder("get_lowrange").eot().arg("[0-9]{4}").escape("QC").enq().build(),
         CmdBuilder("get_hirange").eot().arg("[0-9]{4}").escape("QB").enq().build(),
         CmdBuilder("get_workoutp").eot().arg("[0-9]{4}").escape("WO").enq().build(),
@@ -347,13 +348,30 @@ class EurothermStreamInterface(StreamInterface):
 
     @if_connected
     @translate_adddress
+    def set_automan(self, addr: str, automan: int, _: str) -> str | None:
+        """Set the automan flag.
+
+        Args:
+            automan: automan lfag to be set as int.
+            _: argument captured by the command.
+            addr: address of the Eurotherm sensor.
+
+        """
+        try:
+            self.device.set_automan(addr, automan)
+            return "\x06"
+        except Exception:
+            return None
+
+    @if_connected
+    @translate_adddress
     def get_lowrange(self, addr: str) -> str | None:
         """Get the low range limit value of the Eurotherm sensor.
 
         Returns: the low range limit formatted like the Eurotherm protocol.
         """
         try:
-            return self.make_read_reply("QC", self.device.max_output(addr))
+            return self.make_read_reply("QC", self.device.lowrange(addr))
         except Exception:
             return None
 
@@ -365,7 +383,7 @@ class EurothermStreamInterface(StreamInterface):
         Returns: the high range limit value formatted like the Eurotherm protocol.
         """
         try:
-            return self.make_read_reply("QB", self.device.max_output(addr))
+            return self.make_read_reply("QB", self.device.hirange(addr))
         except Exception:
             return None
 
@@ -377,7 +395,7 @@ class EurothermStreamInterface(StreamInterface):
         Returns: the working output value formatted like the Eurotherm protocol.
         """
         try:
-            return self.make_read_reply("WO", self.device.max_output(addr))
+            return self.make_read_reply("WO", self.device.workoutp(addr))
         except Exception:
             return None
 
@@ -389,7 +407,7 @@ class EurothermStreamInterface(StreamInterface):
         Returns: the low power limit value formatted like the Eurotherm protocol.
         """
         try:
-            return self.make_read_reply("LO", self.device.max_output(addr))
+            return self.make_read_reply("LO", self.device.outlowlm(addr))
         except Exception:
             return None
 
@@ -401,7 +419,7 @@ class EurothermStreamInterface(StreamInterface):
         Returns: the proportional component of output formatted like the Eurotherm protocol.
         """
         try:
-            return self.make_read_reply("Xp", self.device.max_output(addr))
+            return self.make_read_reply("Xp", self.device.outpcomp(addr))
         except Exception:
             return None
 
@@ -413,7 +431,7 @@ class EurothermStreamInterface(StreamInterface):
         Returns: the integral component of output formatted like the Eurotherm protocol.
         """
         try:
-            return self.make_read_reply("xI", self.device.max_output(addr))
+            return self.make_read_reply("xI", self.device.outicomp(addr))
         except Exception:
             return None
 
@@ -425,7 +443,7 @@ class EurothermStreamInterface(StreamInterface):
         Returns: the derivative component of output formatted like the Eurotherm protocol.
         """
         try:
-            return self.make_read_reply("xD", self.device.max_output(addr))
+            return self.make_read_reply("xD", self.device.outdcomp(addr))
         except Exception:
             return None
 
@@ -437,6 +455,6 @@ class EurothermStreamInterface(StreamInterface):
         Returns: the sensor break status formatted like the Eurotherm protocol.
         """
         try:
-            return self.make_read_reply("sb", self.device.max_output(addr))
+            return self.make_read_reply("sb", self.device.snbrkpst(addr))
         except Exception:
             return None
