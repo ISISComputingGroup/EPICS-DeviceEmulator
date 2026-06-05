@@ -908,7 +908,7 @@ class SimulatedEurotherm(StateMachineDevice):
             raise ValueError
         return euro.outdcomp
 
-    def snbrkpst(self, addr: str) -> bool:
+    def snbrkpst(self, addr: str) -> int:
         """
         Get the sensor break status of the device.
 
