@@ -76,7 +76,15 @@ class EurothermStreamInterface(StreamInterface):
         .any()
         .build(),
         CmdBuilder("get_automan").eot().arg("[0-9]{4}").escape("mA").enq().build(),
-        CmdBuilder("set_automan").eot().arg("[0-9]{4}").stx().escape("mA").int().etx().any().build(),
+        CmdBuilder("set_automan")
+        .eot()
+        .arg("[0-9]{4}")
+        .stx()
+        .escape("mA")
+        .int()
+        .etx()
+        .any()
+        .build(),
         CmdBuilder("get_lowrange").eot().arg("[0-9]{4}").escape("QC").enq().build(),
         CmdBuilder("get_hirange").eot().arg("[0-9]{4}").escape("QB").enq().build(),
         CmdBuilder("get_workoutp").eot().arg("[0-9]{4}").escape("WO").enq().build(),
