@@ -921,6 +921,20 @@ class SimulatedEurotherm(StateMachineDevice):
             raise ValueError
         return euro.snbrkpst
 
+    def set_snbrkpst(self, addr: str, value: int) -> None:
+        """
+        Sets snbrkpst status
+        """
+        self.log.info(f"Addr: {addr}, snbrkpst: {value}")
+        self.log.info(f"{addr.__class__.__name__}")
+        snbrkpst = int(value)
+        if addr is None:
+            for euro in self.sensors.values():
+                euro.snbrkpst = snbrkpst
+        else:
+            euro = self.sensors[addr]
+            euro.snbrkpst = snbrkpst
+
     class EurothermSensor:
         """
         Eurotherm temperature sensor method
